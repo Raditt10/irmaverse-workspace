@@ -161,9 +161,25 @@ const Sidebar = () => {
     { 
       icon: BookOpen, 
       label: (isInstruktur || isAdmin) ? "Kelola Kajian" : "Kajian Mingguanku", 
-      path: (isInstruktur || isAdmin) ? "/materials" : undefined,
+      path: (isInstruktur || isAdmin) ? undefined : undefined,
       id: "kajian",
-      submenu: (!isInstruktur && !isAdmin) ? [
+      submenu: (isInstruktur || isAdmin) ? [
+        {
+          icon: Calendar,
+          label: "Kelola Jadwal Kajian",
+          path: "/materials"
+        },
+        {
+          icon: BookMarked,
+          label: "Kelola Rekapan Materi",
+          path: "/materials/rekapan"
+        },
+        {
+          icon: HelpCircle,
+          label: "Kelola Kuis",
+          path: "/quiz"
+        }
+      ] : [
         {
           icon: Calendar,
           label: "Jadwal Kajian",
@@ -179,7 +195,7 @@ const Sidebar = () => {
           label: "Kuis",
           path: "/quiz"
         }
-      ] : undefined
+      ]
     },
   ];
 

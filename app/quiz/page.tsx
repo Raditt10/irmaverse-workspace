@@ -16,7 +16,10 @@ import {
   Sparkles, 
   Infinity,
   Medal,
-  Target
+  Target,
+  Plus,
+  Trash2,
+  XCircle
 } from "lucide-react";
 
 // --- MOCK DATA (Nanti diganti dengan fetch dari API) ---
@@ -68,12 +71,14 @@ const MOCK_QUIZZES: Quiz[] = [
 
 const QuizHome = () => {
   const router = useRouter();
-  const { status } = useSession({
+  const { data: session, status } = useSession({
     required: true,
     onUnauthenticated() {
       router.push("/auth");
     },
   });
+
+  const isInstructor = session?.user?.role === "instruktur" || session?.user?.role === "admin";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<"all" | "not_started" | "completed">("all");
@@ -113,30 +118,49 @@ const QuizHome = () => {
         <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
           
           {/* --- HERO BANNER ALA QUIZIZZ --- */}
-          <div className="bg-gradient-to-r from-teal-500 to-emerald-400 rounded-[2rem] lg:rounded-[3rem] p-6 lg:p-10 border-4 border-teal-700 shadow-[0_8px_0_0_#0f766e] text-white relative overflow-hidden mb-10 group">
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700" />
-            <div className="absolute bottom-0 left-20 w-32 h-32 bg-teal-300 opacity-20 rounded-full blur-2xl" />
-            
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-center md:text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-black uppercase tracking-wider mb-4">
-                  <Sparkles className="h-4 w-4 text-yellow-300" />
-                  Quiz Arena
-                </div>
-                <h1 className="text-3xl lg:text-5xl font-black tracking-tight mb-3 leading-tight">
-                  Uji Pemahamanmu!
-                </h1>
-                <p className="text-teal-50 font-medium text-sm lg:text-base max-w-xl">
-                  Kerjakan kuis dari kajian yang telah kamu selesaikan. <br className="hidden md:block"/>
-                  <span className="font-bold underline decoration-2 underline-offset-4 decoration-yellow-300">Tanpa batas waktu</span>, dapatkan skor terbaikmu!
-                </p>
-              </div>
+          {!isInstructor && (
+            <div className="bg-gradient-to-r from-teal-500 to-emerald-400 rounded-[2rem] lg:rounded-[3rem] p-6 lg:p-10 border-4 border-teal-700 shadow-[0_8px_0_0_#0f766e] text-white relative overflow-hidden mb-10 group">
+              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700" />
+              <div className="absolute bottom-0 left-20 w-32 h-32 bg-teal-300 opacity-20 rounded-full blur-2xl" />
               
-              <div className="hidden md:flex shrink-0 w-32 h-32 lg:w-40 lg:h-40 bg-white/10 rounded-full border-4 border-white/20 backdrop-blur-md items-center justify-center shadow-inner transform rotate-12 group-hover:rotate-0 transition-all duration-500">
-                <Trophy className="h-16 w-16 lg:h-20 lg:w-20 text-yellow-300 drop-shadow-md" />
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-center md:text-left">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-black uppercase tracking-wider mb-4">
+                    <Sparkles className="h-4 w-4 text-yellow-300" />
+                    Quiz Arena
+                  </div>
+                  <h1 className="text-3xl lg:text-5xl font-black tracking-tight mb-3 leading-tight">
+                    Uji Pemahamanmu!
+                  </h1>
+                  <p className="text-teal-50 font-medium text-sm lg:text-base max-w-xl">
+                    Kerjakan kuis dari kajian yang telah kamu selesaikan. <br className="hidden md:block"/>
+                    <span className="font-bold underline decoration-2 underline-offset-4 decoration-yellow-300">Tanpa batas waktu</span>, dapatkan skor terbaikmu!
+                  </p>
+                </div>
+                
+                <div className="hidden md:flex shrink-0 w-32 h-32 lg:w-40 lg:h-40 bg-white/10 rounded-full border-4 border-white/20 backdrop-blur-md items-center justify-center shadow-inner transform rotate-12 group-hover:rotate-0 transition-all duration-500">
+                  <Trophy className="h-16 w-16 lg:h-20 lg:w-20 text-yellow-300 drop-shadow-md" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {isInstructor && (
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
+                  Kelola Kuis Kajian
+                </h1>
+                <p className="text-slate-500 font-medium text-sm lg:text-lg">
+                  Atur dan kelola kuis untuk mengukur pemahaman santri pada materi kajian.
+                </p>
+              </div>
+              <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-teal-400 text-white font-bold border-2 border-teal-600 border-b-4 hover:bg-teal-500 hover:border-b-4 active:border-b-2 active:translate-y-0.5 transition-all w-full md:w-auto">
+                <Plus className="h-5 w-5" />
+                Tambah Kuis
+              </button>
+            </div>
+          )}
 
           {/* --- SEARCH & FILTERS --- */}
           <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
@@ -182,33 +206,35 @@ const QuizHome = () => {
           </div>
 
           {/* --- BANNER TOTAL POIN --- */}
-          <div className="mb-8 flex flex-col sm:flex-row items-center justify-between bg-white border-2 border-slate-200 rounded-[1.5rem] p-4 lg:p-5 shadow-[0_4px_0_0_#cbd5e1] hover:border-yellow-400 hover:shadow-[0_4px_0_0_#facc15] transition-all duration-300 group cursor-default">
-            
-            {/* Bagian Kiri: Ikon & Angka Poin */}
-            <div className="flex items-center gap-4 w-full sm:w-auto">
-              <div className="w-14 h-14 bg-yellow-50 rounded-full border-2 border-yellow-200 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300 shrink-0 shadow-sm">
-                <Trophy className="h-7 w-7 text-yellow-500 drop-shadow-sm" fill="currentColor" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total Poin Kuis-mu</span>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-2xl lg:text-3xl font-black text-slate-800 group-hover:text-yellow-500 transition-colors duration-300">
-                    {totalPoints}
-                  </span>
-                  <span className="text-sm font-bold text-yellow-500">XP</span>
+          {!isInstructor && (
+            <div className="mb-8 flex flex-col sm:flex-row items-center justify-between bg-white border-2 border-slate-200 rounded-[1.5rem] p-4 lg:p-5 shadow-[0_4px_0_0_#cbd5e1] hover:border-yellow-400 hover:shadow-[0_4px_0_0_#facc15] transition-all duration-300 group cursor-default">
+              
+              {/* Bagian Kiri: Ikon & Angka Poin */}
+              <div className="flex items-center gap-4 w-full sm:w-auto">
+                <div className="w-14 h-14 bg-yellow-50 rounded-full border-2 border-yellow-200 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300 shrink-0 shadow-sm">
+                  <Trophy className="h-7 w-7 text-yellow-500 drop-shadow-sm" fill="currentColor" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total Poin Kuis-mu</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl lg:text-3xl font-black text-slate-800 group-hover:text-yellow-500 transition-colors duration-300">
+                      {totalPoints}
+                    </span>
+                    <span className="text-sm font-bold text-yellow-500">XP</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Bagian Kanan: Motivasi (Responsif) */}
-            <div className="w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t-2 border-slate-100 sm:border-none flex items-center sm:justify-end">
-              <div className="px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 inline-flex items-center gap-2 w-full sm:w-auto justify-center group-hover:bg-teal-50 group-hover:text-teal-600 group-hover:border-teal-200 transition-colors duration-300">
-                <Sparkles className="h-4 w-4 text-teal-500" />
-                <span>Terus tingkatkan skormu! 🚀</span>
+              
+              {/* Bagian Kanan: Motivasi (Responsif) */}
+              <div className="w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t-2 border-slate-100 sm:border-none flex items-center sm:justify-end">
+                <div className="px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 inline-flex items-center gap-2 w-full sm:w-auto justify-center group-hover:bg-teal-50 group-hover:text-teal-600 group-hover:border-teal-200 transition-colors duration-300">
+                  <Sparkles className="h-4 w-4 text-teal-500" />
+                  <span>Terus tingkatkan skormu! 🚀</span>
+                </div>
               </div>
+              
             </div>
-            
-          </div>
+          )}
           {/* ------------------------------------------- */}
 
           {/* --- QUIZ GRID --- */}
@@ -285,14 +311,30 @@ const QuizHome = () => {
                       </div>
 
                       {/* Action Button */}
-                      <button className={`
-                        px-4 py-2 rounded-xl text-xs font-black transition-all border-b-4 active:border-b-0 active:translate-y-1
-                        ${quiz.status === "completed" 
-                          ? "bg-slate-100 text-slate-600 border-slate-300 group-hover:bg-slate-200" 
-                          : "bg-teal-400 text-white border-teal-600 group-hover:bg-teal-500 shadow-[0_2px_0_0_#0f766e] group-hover:shadow-none"}
-                      `}>
-                        {quiz.status === "completed" ? "Lihat Hasil" : quiz.status === "in_progress" ? "Lanjut" : "Mulai"}
-                      </button>
+                      {isInstructor ? (
+                        <div className="flex z-10 items-center justify-end w-full gap-2 mt-2">
+                           <button onClick={(e) => { e.stopPropagation(); }} className="px-3 py-2 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl border-2 border-slate-200 hover:bg-slate-200 transition-colors">
+                              Edit Kuis
+                           </button>
+                           {quiz.status !== "completed" && (
+                            <button onClick={(e) => { e.stopPropagation(); }} className="p-2 text-rose-500 bg-rose-50 border-2 border-rose-200 rounded-xl hover:bg-rose-100 transition-colors" title="Tutup Kuis">
+                                <XCircle className="h-4 w-4" />
+                            </button>
+                           )}
+                           <button onClick={(e) => { e.stopPropagation(); }} className="p-2 text-slate-400 bg-white border-2 border-slate-200 rounded-xl hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors" title="Hapus Kuis">
+                               <Trash2 className="h-4 w-4" />
+                           </button>
+                        </div>
+                      ) : (
+                        <button className={`
+                          px-4 py-2 rounded-xl text-xs font-black transition-all border-b-4 active:border-b-0 active:translate-y-1
+                          ${quiz.status === "completed" 
+                            ? "bg-slate-100 text-slate-600 border-slate-300 group-hover:bg-slate-200" 
+                            : "bg-teal-400 text-white border-teal-600 group-hover:bg-teal-500 shadow-[0_2px_0_0_#0f766e] group-hover:shadow-none"}
+                        `}>
+                          {quiz.status === "completed" ? "Lihat Hasil" : quiz.status === "in_progress" ? "Lanjut" : "Mulai"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
