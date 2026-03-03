@@ -14,17 +14,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (!session.user.email) {
+      console.error("[GET /api/materials] Session user has no email");
+      return NextResponse.json({ error: "Invalid session: email missing" }, { status: 400 });
+    }
+
     // Check if user exists (using email for higher reliability with session)
     const User = await prisma.user.findUnique({
-      where: { email: session.user.email as string },
+      where: { email: session.user.email },
     });
 
     if (!User) {
-      console.log(
-        "[GET /api/materials] User not found for email:",
-        session.user.email,
-      );
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      console.log("[GET /api/materials] User not found in database for email:", session.user.email);
+      return NextResponse.json({ error: "User profile not found" }, { status: 404 });
     }
 
     console.log("[GET /api/materials] User role:", User.role, "ID:", User.id);
@@ -62,9 +64,6 @@ export async function GET(req: NextRequest) {
     }
 
     console.log("[GET /api/materials] isPrivileged:", isPrivileged);
-
-    console.log("[GET /api/materials] Generated where clause:");
-    console.dir(where, { depth: null });
 
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
@@ -105,11 +104,6 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    console.log(
-      "[GET /api/materials] Found materials count:",
-      materials.length,
-    );
-
     // normalize ke format frontend
     const result = materials.map((m: any) => {
       const hasEnrollment = (m.courseenrollment || []).length > 0;
@@ -137,24 +131,21 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    console.log(
-      "[GET /api/materials] Returning mapped result count:",
-      result.length,
-    );
-
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching materials:", error);
-    // Enhanced error logging to provide more context
-    if (error instanceof Error) {
-      console.error("Error details:", error.message, error.stack);
-    } else {
-      console.error("Unknown error type:", error);
+    
+    // Check for database connection errors specifically
+    if (error?.message?.includes("Can't connect to MySQL server") || error?.code === 'P2002' || error?.code === 'P2021') {
+      return NextResponse.json(
+        { error: "Database connection failed. Please ensure Laragon/MySQL is running." },
+        { status: 503 }
+      );
     }
+
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Failed to fetch materials",
+        error: error instanceof Error ? error.message : "Failed to fetch materials",
       },
       { status: 500 },
     );

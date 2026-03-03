@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Comic_Neue } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import { SocketProvider } from "@/lib/socket";
 import { NotificationProvider } from "@/lib/notification-provider";
@@ -18,6 +18,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const comicNeue = Comic_Neue({
+  variable: "--font-comic-neue",
+  subsets: ["latin"],
+  weight: ["300", "400", "700"],
+});
+
 export const metadata: Metadata = {
   title: "IrmaVerse - SMKN 13 Bandung",
   description: "Platform pembelajaran Islam interaktif untuk generasi muda",
@@ -31,10 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{
-          fontFamily: "'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive",
-        }}
+        className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} antialiased`}
       >
         <SessionProvider>
           <SocketProvider>

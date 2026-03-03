@@ -357,82 +357,138 @@ const CreateProgram = () => {
               </div>
 
               {/* RIGHT COLUMN */}
-              <div className="lg:col-span-1 space-y-6">
-                <div className="sticky top-8 space-y-6">
-                  {/* Thumbnail */}
-                  <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] text-center">
-                    <label className="block text-sm font-bold text-slate-600 mb-4">
-                      Banner Kursus
-                    </label>
-                    <div className="relative group overflow-hidden rounded-3xl border-2 border-dashed border-slate-300 aspect-video flex flex-col items-center justify-center bg-slate-50 hover:bg-emerald-50 hover:border-emerald-400 transition-all cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                      />
-                      {formData.thumbnailUrl ? (
-                        <>
-                          <img
-                            src={formData.thumbnailUrl}
-                            alt="Banner Preview"
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Upload className="h-10 w-10 text-white" />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          {uploading ? (
-                            <Sparkles className="h-10 w-10 text-emerald-400 animate-spin" />
-                          ) : (
-                            <>
-                              <div className="p-4 bg-white rounded-2xl border-2 border-slate-100 mb-3 shadow-sm group-hover:scale-110 transition-transform">
-                                <Upload className="h-8 w-8 text-slate-400 group-hover:text-emerald-500" />
-                              </div>
-                              <span className="text-sm font-bold text-slate-400 group-hover:text-emerald-600">
-                                Pilih Gambar Banner
-                              </span>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </div>
+              <div className="lg:col-span-1 space-y-6 lg:space-y-8">
+                {/* Thumbnail Card */}
+                <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
+                  <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
+                    Banner Kursus
+                  </label>
+                  <div className="relative group cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="hidden"
+                      id="upload-comp"
+                      required={!formData.thumbnailUrl}
+                    />
+                    {formData.thumbnailUrl ? (
+                      <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-emerald-400 transition-all shadow-sm">
+                        <img
+                          src={formData.thumbnailUrl}
+                          alt="Banner Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setFormData((prev) => ({
+                              ...prev,
+                              thumbnailUrl: "",
+                            }));
+                          }}
+                          className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shadow-md"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="upload-comp"
+                        className={`flex flex-col items-center justify-center w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-400 transition-all cursor-pointer ${
+                          uploading ? "opacity-50 pointer-events-none" : ""
+                        }`}
+                      >
+                        {uploading ? (
+                          <svg
+                            className="animate-spin -ml-1 mr-3 h-6 w-6 lg:h-8 lg:w-8 text-emerald-500"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        ) : (
+                          <>
+                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-emerald-500 transition-colors" />
+                            <span className="text-xs lg:text-sm font-bold text-slate-400 group-hover:text-emerald-500 transition-colors">
+                              Klik untuk Upload Banner
+                            </span>
+                            <span className="text-[10px] sm:text-xs text-slate-400 font-medium mt-1">
+                              JPG, PNG, WebP (Max 5MB)
+                            </span>
+                          </>
+                        )}
+                      </label>
+                    )}
                   </div>
+                </div>
 
-                  {/* Info Card */}
-                  <div className="bg-blue-50 p-5 rounded-[2rem] border-2 border-blue-200 border-dashed">
-                    <p className="text-xs text-blue-700 font-bold leading-relaxed text-center">
-                      💡 Setelah kursus dibuat, Anda dapat menambahkan materi ke
-                      dalam kursus melalui halaman <strong>Buat Kajian</strong>.
-                    </p>
-                  </div>
+                {/* Info Card */}
+                <div className="bg-blue-50 p-5 rounded-[2rem] border-2 border-blue-200 border-dashed">
+                  <p className="text-xs text-blue-700 font-bold leading-relaxed text-center">
+                    💡 Setelah kursus dibuat, Anda dapat menambahkan materi ke
+                    dalam kursus melalui halaman <strong>Buat Kajian</strong>.
+                  </p>
+                </div>
 
-                  {/* Submit */}
-                  <div className="bg-emerald-500 p-6 rounded-[2.5rem] text-white border-2 border-emerald-600 shadow-[0_6px_0_0_#059669]">
-                    <div className="flex items-center gap-3 mb-4">
-                      <GraduationCap
-                        className="h-8 w-8 text-emerald-100"
-                        strokeWidth={2.5}
-                      />
-                      <h3 className="text-xl font-black">Siap Terbit?</h3>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full flex items-center justify-center gap-2 py-4 bg-white text-emerald-600 font-black text-lg rounded-2xl shadow-[0_4px_0_0_#d1fae5] border-2 border-emerald-100 hover:bg-emerald-50 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
-                    >
-                      {loading ? (
-                        <Sparkles className="h-6 w-6 animate-spin" />
-                      ) : (
-                        <>
-                          <Rocket className="h-6 w-6" />
-                          Terbitkan Kursus
-                        </>
-                      )}
-                    </button>
+                {/* Submit Card */}
+                <div className="bg-emerald-500 p-6 rounded-[2.5rem] text-white border-2 border-emerald-600 shadow-[0_6px_0_0_#059669] mb-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <GraduationCap
+                      className="h-8 w-8 text-emerald-100"
+                      strokeWidth={2.5}
+                    />
+                    <h3 className="text-xl font-black">Siap Terbit?</h3>
                   </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-white text-emerald-600 font-black text-lg rounded-2xl shadow-[0_4px_0_0_#d1fae5] border-2 border-emerald-100 hover:bg-emerald-50 active:translate-y-1 active:shadow-none transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <Sparkles className="h-6 w-6 animate-spin" />{" "}
+                        Menyimpan...
+                      </>
+                    ) : (
+                      <>
+                        <Rocket className="h-6 w-6" />
+                        Terbitkan Kursus
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-emerald-100 font-bold mt-4 text-center opacity-80">
+                    Pastikan semua kurikulum program sudah benar sebelum
+                    diterbitkan.
+                  </p>
                 </div>
               </div>
             </form>

@@ -30,6 +30,7 @@
   --ring: 160 75% 50%;
 
   --radius: 0.75rem;
+  --font-sans: var(--font-comic-neue), ui-sans-serif, system-ui, sans-serif, "Comic Sans MS", "Comic Neue", cursive;
 }
 
 :root {
@@ -87,7 +88,9 @@
   }
 
   html, body {
-    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive !important;
+    font-family: var(--font-comic-neue), 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive !important;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   body {

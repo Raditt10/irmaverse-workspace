@@ -276,100 +276,96 @@ const MaterialDetail = () => {
             </button>
 
             {/* --- HERO SECTION --- */}
-            <div className="relative bg-white rounded-4xl lg:rounded-5xl border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] overflow-hidden group">
-              <div className="relative h-64 md:h-80 lg:h-96 w-full overflow-hidden border-b-2 border-slate-200">
+            <div className="relative bg-[#334155] rounded-[40px] md:rounded-[60px] border-4 border-slate-200 shadow-[0_12px_0_0_#cbd5e1] overflow-hidden min-h-[300px] md:min-h-[400px] flex flex-col justify-end p-8 md:p-12 group">
+              {/* Image with Gradient Overlay */}
+              <div className="absolute inset-0">
                 <img
-                  src={
-                    material.thumbnailUrl || "https://picsum.photos/1200/600"
-                  }
+                  src={material.thumbnailUrl || "https://picsum.photos/1200/600"}
                   alt={material.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-40 brightness-50"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] via-[#334155]/60 to-transparent" />
+              </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-10">
-                  <div className="flex flex-wrap items-center gap-3 mb-3 lg:mb-4">
-                    {getCategoryBadge(material.category)}
-                    <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-white/90 text-slate-800 border-2 border-white uppercase tracking-wide backdrop-blur-sm">
-                      Kelas: {material.grade}
-                    </span>
-                  </div>
-                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-3 drop-shadow-md leading-tight">
-                    {material.title}
-                  </h1>
+              <div className="relative z-10 w-full">
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="px-5 py-2.5 rounded-full text-xs font-black bg-[#10b981] text-white border-2 border-[#059669] shadow-[0_4px_0_0_#065f46] uppercase tracking-wider animate-pulse">
+                    SEGERA HADIR
+                  </span>
                 </div>
+                
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 drop-shadow-xl leading-tight tracking-tight">
+                  {material.title}
+                </h1>
+                
+                <p className="text-slate-300 font-bold text-lg md:text-xl max-w-2xl leading-relaxed drop-shadow-md">
+                  {material.description ? material.description.split('\n')[0] : "Deskripsi materi tidak tersedia..."}
+                </p>
               </div>
             </div>
 
             {/* --- GRID LAYOUT --- */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* LEFT COLUMN (Details) */}
-              <div className="lg:col-span-2 space-y-6 lg:space-y-8">
+              <div className="lg:col-span-2 space-y-8">
                 {/* Quick Stats Tiles */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] flex flex-col items-center text-center hover:-translate-y-1 transition-transform">
-                    <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center mb-3 border-2 border-teal-100">
-                      <Calendar
-                        className="h-6 w-6 text-teal-500"
-                        strokeWidth={2.5}
-                      />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Tanggal */}
+                  <div className="bg-white p-7 rounded-[35px] border-4 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] flex flex-col items-center text-center hover:-translate-y-1 transition-all group">
+                    <div className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center mb-4 border-2 border-rose-100 group-hover:scale-110 transition-transform">
+                      <Calendar className="h-7 w-7 text-rose-400" strokeWidth={2.5} />
                     </div>
-                    <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
+                    <span className="text-[11px] text-rose-300 font-black uppercase tracking-[0.2em] mb-2">
                       Tanggal
                     </span>
-                    <span className="text-slate-800 font-black text-sm px-2 leading-tight">
+                    <span className="text-slate-700 font-black text-lg">
                       {new Date(material.date).toLocaleDateString("id-ID", {
                         day: "numeric",
-                        month: "long",
+                        month: "short",
                         year: "numeric",
                       })}
                     </span>
                   </div>
-                  <div className="bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] flex flex-col items-center text-center hover:-translate-y-1 transition-transform">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mb-3 border-2 border-indigo-100">
-                      <Clock
-                        className="h-6 w-6 text-indigo-500"
-                        strokeWidth={2.5}
-                      />
+
+                  {/* Waktu */}
+                  <div className="bg-white p-7 rounded-[35px] border-4 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] flex flex-col items-center text-center hover:-translate-y-1 transition-all group">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-4 border-2 border-amber-100 group-hover:scale-110 transition-transform">
+                      <Clock className="h-7 w-7 text-amber-400" strokeWidth={2.5} />
                     </div>
-                    <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
+                    <span className="text-[11px] text-amber-300 font-black uppercase tracking-[0.2em] mb-2">
                       Waktu
                     </span>
-                    <span className="text-slate-800 font-black text-sm px-2 leading-tight">
+                    <span className="text-slate-700 font-black text-lg">
                       {material.startedAt} WIB
                     </span>
                   </div>
-                  <div className="bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] flex flex-col items-center text-center hover:-translate-y-1 transition-transform">
-                    <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center mb-3 border-2 border-rose-100">
-                      <MapPin
-                        className="h-6 w-6 text-rose-500"
-                        strokeWidth={2.5}
-                      />
+
+                  {/* Lokasi */}
+                  <div className="bg-white p-7 rounded-[35px] border-4 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] flex flex-col items-center text-center hover:-translate-y-1 transition-all group">
+                    <div className="w-14 h-14 rounded-2xl bg-teal-50 flex items-center justify-center mb-4 border-2 border-teal-100 group-hover:scale-110 transition-transform">
+                      <MapPin className="h-7 w-7 text-teal-400" strokeWidth={2.5} />
                     </div>
-                    <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
+                    <span className="text-[11px] text-teal-300 font-black uppercase tracking-[0.2em] mb-2">
                       Lokasi
                     </span>
-                    <span className="text-slate-800 font-black text-sm px-2 leading-tight">
+                    <span className="text-slate-700 font-black text-lg">
                       {material.location}
                     </span>
                   </div>
                 </div>
 
-                {/* Deskripsi & Poin Pembahasan */}
-                <div className="bg-white p-6 lg:p-8 rounded-5xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1]">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="p-2.5 bg-blue-100 rounded-2xl border-2 border-blue-200">
-                      <BookOpen
-                        className="h-6 w-6 text-blue-600"
-                        strokeWidth={3}
-                      />
+                {/* Deskripsi Lengkap */}
+                <div className="bg-white p-8 md:p-10 rounded-[45px] border-4 border-slate-200 shadow-[0_10px_0_0_#cbd5e1]">
+                  <div className="flex items-center gap-5 mb-8">
+                    <div className="w-14 h-14 bg-indigo-100 rounded-2xl border-4 border-indigo-200 flex items-center justify-center">
+                      <Sparkles className="h-7 w-7 text-indigo-500" strokeWidth={3} />
                     </div>
-                    <h2 className="text-xl lg:text-2xl font-black text-slate-800">
-                      Detail Materi
+                    <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+                      Detail Lengkap
                     </h2>
                   </div>
 
-                  <p className="text-slate-600 font-medium leading-relaxed mb-6 whitespace-pre-line text-sm md:text-base">
+                  <p className="text-slate-600 font-bold leading-relaxed mb-8 whitespace-pre-line text-lg">
                     {material.description}
                   </p>
 
@@ -517,46 +513,47 @@ const MaterialDetail = () => {
               {/* RIGHT COLUMN (Instructor & CTA) */}
               <div className="space-y-6 lg:space-y-8">
                 {/* Instructor Card */}
-                <div className="bg-white rounded-5xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] overflow-hidden p-6 lg:p-8 text-center">
-                  <div className="w-28 h-28 mx-auto bg-slate-100 rounded-full mb-4 border-4 border-teal-100 overflow-hidden relative shadow-sm">
-                    {material.instructorAvatar ? (
-                      <img
-                        src={material.instructorAvatar}
-                        alt={material.instructor}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-teal-500 text-white">
-                        <User className="h-12 w-12" />
-                      </div>
-                    )}
+                <div className="bg-white rounded-[45px] border-4 border-slate-200 shadow-[0_10px_0_0_#cbd5e1] overflow-hidden p-8 flex flex-col items-center">
+                  <div className="relative mb-6">
+                    <div className="w-32 h-32 bg-teal-500 rounded-full border-4 border-white shadow-xl overflow-hidden">
+                      {material.instructorAvatar ? (
+                        <img
+                          src={material.instructorAvatar}
+                          alt={material.instructor}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white">
+                          <User className="h-16 w-16" strokeWidth={2.5} />
+                        </div>
+                      )}
+                    </div>
+                    {/* Status Online indicator or similar if needed */}
+                    <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-400 border-4 border-white rounded-full shadow-sm" />
                   </div>
-                  <h3 className="text-xl font-black text-slate-800 leading-tight mb-1">
+
+                  <h3 className="text-2xl font-black text-slate-800 leading-tight mb-2">
                     {material.instructor}
                   </h3>
-                  <p className="text-teal-600 text-xs font-bold uppercase tracking-wider mb-6 bg-teal-50 inline-block px-3 py-1 rounded-full border border-teal-100">
-                    Pemateri Kajian
-                  </p>
+                  
+                  <div className="px-4 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-black uppercase shadow-md mb-8 self-center border-2 border-emerald-600">
+                    {material.category.replace("Program ", "")}
+                  </div>
 
-                  <div className="space-y-3">
+                  <div className="w-full pt-6 border-t-2 border-slate-100">
+                    <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4 text-center">
+                      — HUBUNGI PEMATERI —
+                    </p>
                     <button
                       onClick={() =>
                         router.push(
                           `/instructors/chat?name=${encodeURIComponent(material.instructor)}`,
                         )
                       }
-                      className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-500 text-white shadow-[0_4px_0_0_#4338ca] hover:bg-indigo-600 hover:shadow-[0_4px_0_0_#3730a3] active:translate-y-0.5 active:shadow-none transition-all group"
+                      className="w-full p-4 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-2 hover:border-teal-400 hover:bg-teal-50 transition-all group"
                     >
-                      <MessageCircle
-                        className="w-5 h-5 group-hover:animate-bounce"
-                        strokeWidth={3}
-                      />
-                      <span className="font-black">Chat Pemateri</span>
-                    </button>
-
-                    <button className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl border-2 border-slate-200 text-slate-600 hover:border-teal-400 hover:text-teal-600 hover:bg-white hover:shadow-sm transition-all bg-white">
-                      <Share2 className="w-5 h-5" strokeWidth={2.5} />
-                      <span className="font-bold text-sm">Bagikan Kajian</span>
+                      <MessageCircle className="w-5 h-5 text-teal-500 group-hover:scale-110 transition-transform" strokeWidth={3} />
+                      <span className="font-bold text-slate-600">Kirim Pesan</span>
                     </button>
                   </div>
                 </div>

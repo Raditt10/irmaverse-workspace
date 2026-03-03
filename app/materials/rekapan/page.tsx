@@ -14,6 +14,10 @@ import {
   ArrowLeft,
   Eye,
   User,
+  Download,
+  CheckCircle2,
+  TrendingUp,
+  XCircle,
 } from "lucide-react";
 
 interface RekapanItem {
@@ -33,6 +37,7 @@ const RekapanListPage = () => {
   const [rekapanList, setRekapanList] = useState<RekapanItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [totalMaterials, setTotalMaterials] = useState(0);
 
   const { data: session, status } = useSession({
     required: true,
@@ -56,6 +61,7 @@ const RekapanListPage = () => {
       const matRes = await fetch("/api/materials");
       if (!matRes.ok) throw new Error("Gagal mengambil data");
       const materials = await matRes.json();
+      setTotalMaterials(materials.length);
 
       // For each material, try to fetch its rekapan
       const rekapanPromises = materials.map(async (mat: any) => {
@@ -102,6 +108,11 @@ const RekapanListPage = () => {
     "Program Susulan": "bg-slate-100 text-slate-700 border-slate-200",
   };
 
+  const totalHadir = rekapanList.length;
+  const totalKajian = totalMaterials || rekapanList.length;
+  const persentaseKehadiran =
+    totalKajian > 0 ? Math.round((totalHadir / totalKajian) * 100) : 0;
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-[#FDFBF7]">
@@ -123,23 +134,74 @@ const RekapanListPage = () => {
         <Sidebar />
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="mb-8 lg:mb-10">
-              <button
-                onClick={() => router.push("/materials")}
-                className="inline-flex items-center gap-2 text-slate-500 hover:text-teal-600 font-bold transition-all group px-4 py-2 rounded-xl border-2 border-transparent hover:border-slate-200 hover:bg-white hover:shadow-sm mb-4"
-              >
-                <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform stroke-3" />
-                Kembali
-              </button>
+            {/* --- HEADER SECTION --- */}
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
+                  Rekapan Kajian
+                </h1>
+                <p className="text-slate-500 font-medium text-sm lg:text-lg">
+                  Pantau riwayat kehadiran dan materi kajian yang telah kamu
+                  ikuti.
+                </p>
+              </div>
+              {session?.user?.role === "ADMIN" ||
+              session?.user?.role === "INSTRUCTOR" ? (
+                <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-teal-400 text-white font-bold border-2 border-teal-600 border-b-4 hover:bg-teal-500 hover:border-b-4 active:border-b-2 active:translate-y-0.5 transition-all">
+                  <Download className="h-5 w-5" />
+                  Cetak Laporan
+                </button>
+              ) : null}
+            </div>
+            {/* --- STATISTIK CARDS --- */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
+                <div className="p-4 bg-emerald-100 rounded-2xl border border-emerald-200">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">
+                    Total Hadir
+                  </p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {totalHadir}{" "}
+                    <span className="text-base text-slate-500 font-semibold">
+                      Kajian
+                    </span>
+                  </p>
+                </div>
+              </div>
 
-              <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
-                <BookOpen className="h-8 w-8 text-teal-500" />
-                Rekapan Kajian
-              </h1>
-              <p className="text-slate-500 font-medium text-sm lg:text-lg">
-                Baca ringkasan materi dari kajian yang telah berlangsung.
-              </p>
+              <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
+                <div className="p-4 bg-amber-100 rounded-2xl border border-amber-200">
+                  <TrendingUp className="h-8 w-8 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">
+                    Persentase
+                  </p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {persentaseKehadiran}%
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
+                <div className="p-4 bg-red-100 rounded-2xl border border-red-200">
+                  <XCircle className="h-8 w-8 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">
+                    Tidak Hadir
+                  </p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {totalKajian - totalHadir}{" "}
+                    <span className="text-base text-slate-500 font-semibold">
+                      Kajian
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Search */}

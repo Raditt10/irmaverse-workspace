@@ -6,7 +6,7 @@ const ChatbotButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 flex flex-col items-end gap-4" style={{ fontFamily: "'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive" }}>
+    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 flex flex-col items-end gap-4">
       
       {isOpen && (
         <div className="w-[calc(100vw-32px)] md:w-[420px] h-[70vh] md:h-[600px] bg-gradient-to-b from-emerald-50 to-white rounded-4xl shadow-[0_16px_0_0_rgba(0,0,0,0.2)] border-4 border-emerald-500 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 zoom-in-95 duration-300 origin-bottom-right relative">

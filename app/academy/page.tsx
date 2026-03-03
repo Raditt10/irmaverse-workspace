@@ -69,7 +69,7 @@ export default function InstructorAcademy() {
                 Pusat Instruktur
               </h1>
               <p className="text-slate-500 mt-1 font-bold text-base md:text-lg ml-1">
-                Kelola kajian dan bimbing siswa dengan penuh dedikasi ✨
+                Kelola kajian dan bimbing siswa dengan penuh dedikasi.
               </p>
             </div>
 
@@ -361,16 +361,16 @@ export default function InstructorAcademy() {
               </div>
 
               {/* Motivational Card */}
-              <div className="bg-slate-900 p-5 rounded-4xl text-white relative overflow-hidden group">
-                <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-emerald-500/20 rounded-full blur-xl group-hover:scale-125 transition-transform" />
+              <div className="bg-white p-5 rounded-4xl border-2 border-slate-100 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:scale-125 transition-transform" />
                 <div className="flex items-center gap-3 mb-3 relative z-10">
-                  <div className="p-2 bg-white/10 border border-white/20 rounded-xl">
-                    <Award className="w-5 h-5 text-amber-400" strokeWidth={2.5} />
+                  <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
+                    <Award className="w-5 h-5 text-amber-500" strokeWidth={2.5} />
                   </div>
-                  <h4 className="font-black text-base">Pencapaian Minggu Ini</h4>
+                  <h4 className="font-black text-base text-slate-800">Pencapaian Minggu Ini</h4>
                 </div>
-                <p className="text-sm text-slate-300 font-bold relative z-10 leading-relaxed mb-4">
-                  Kamu telah mengajar <span className="text-emerald-400">5 sesi</span> dan mendapatkan rating rata-rata <span className="text-amber-400">4.8 ⭐</span> minggu ini!
+                <p className="text-sm text-slate-500 font-bold relative z-10 leading-relaxed mb-4">
+                  Kamu telah mengajar <span className="text-emerald-600">5 sesi</span> dan mendapatkan rating rata-rata <span className="text-amber-500 font-black">4.8 ⭐</span> minggu ini!
                 </p>
                 <Link
                   href="/instructor-dashboard"

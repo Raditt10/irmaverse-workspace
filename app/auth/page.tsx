@@ -144,7 +144,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative flex flex-col justify-center items-center bg-[#FDFBF7] overflow-x-hidden" style={{ fontFamily: "'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive" }}>
+    <div className="min-h-screen w-full relative flex flex-col justify-center items-center bg-[#FDFBF7] overflow-x-hidden">
       
       {/* Background Decorations */}
       <div className="fixed inset-0 z-0 pointer-events-none">

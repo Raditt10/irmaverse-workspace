@@ -2,6 +2,8 @@ import {
   PrismaClient,
   material_grade,
   material_category,
+  NotificationType,
+  NotificationStatus,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -36,7 +38,7 @@ async function main() {
       email: "ustadz.ahmad@irma.com",
       name: "Ustadz Ahmad Zaki",
       password: hashedPassword,
-      role: "instruktur",
+      role: "user",
       notelp: "081234567890",
       address: "Jakarta, Indonesia",
       bio: "Pengajar bijak dengan 15 tahun pengalaman",
@@ -475,7 +477,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
 
-  // Create the MaterialInvite first
+  // Create the materialinvite first
   await prisma.materialinvite.create({
     data: {
       materialId: (await prisma.material.findFirst({

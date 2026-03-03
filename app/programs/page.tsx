@@ -12,6 +12,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import DetailButton from "@/components/ui/DetailButton";
 import CartoonConfirmDialog from "@/components/ui/ConfirmDialog";
 import Toast from "@/components/ui/Toast";
+import CategoryFilter from "@/components/ui/CategoryFilter";
 import AddButton from "@/components/ui/AddButton";
 import {
   BookOpen,
@@ -185,8 +186,8 @@ const OurPrograms = () => {
 
             {/* Filters */}
             {!loading && programs.length > 0 && (
-              <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
+              <div className="mb-8 flex flex-col gap-4">
+                <div className="w-full">
                   <SearchInput
                     placeholder="Cari kursus seru..."
                     value={searchTerm}

@@ -90,6 +90,9 @@ const Materials = () => {
   }, [materials, selectedProgram, selectedGrade, searchQuery, showJoinedOnly]);
 
   const filterMaterials = async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const filtered = materials.filter((material) => {
       const matchesProgram = selectedProgram === "Semua" || material.category === selectedProgram;
       const matchesGrade = selectedGrade === "Semua" || material.grade === selectedGrade;
@@ -97,10 +100,22 @@ const Materials = () => {
         material.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         material.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         material.instructor.toLowerCase().includes(searchQuery.toLowerCase());
-      // Logic: show only if isJoined (enrolled or accepted invite), hide if rejected/pending
-      const matchesJoined = !showJoinedOnly || (material.isJoined && !material.attendedAt);
+      
+      // Dynamic logic for second filter button
+      let matchesFilter = true;
+      if (showJoinedOnly) {
+        if (isPrivileged) {
+          // Instructors/Admins: filter by today's date
+          const materialDate = new Date(material.date);
+          materialDate.setHours(0, 0, 0, 0);
+          matchesFilter = materialDate.getTime() === today.getTime();
+        } else {
+          // Regular users: show enrolled/joined materials
+          matchesFilter = material.isJoined && !material.attendedAt;
+        }
+      }
 
-      return matchesProgram && matchesGrade && matchesSearch && matchesJoined;
+      return matchesProgram && matchesGrade && matchesSearch && matchesFilter;
     });
 
     setFilteredMaterials(filtered);
@@ -187,9 +202,9 @@ const Materials = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             
-            <div className="mb-6 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5">
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
                   {isPrivileged ? "Kelola Kajian" : "Jadwal Kajianku"}
                 </h1>
                 <p className="text-slate-500 font-medium text-xs lg:text-lg">
@@ -199,15 +214,17 @@ const Materials = () => {
                 </p>
               </div>
 
-              {isPrivileged && (
-                <AddButton
-                  label="Buat Kajian"
-                  onClick={() => router.push("/materials/create")}
-                  icon={<Plus className="h-5 w-5" />}
-                  color="emerald"
-                  hideIcon={false}
-                />
-              )}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                {isPrivileged && (
+                  <AddButton
+                    label="Buat Kajian"
+                    onClick={() => router.push("/materials/create")}
+                    icon={<Plus className="h-5 w-5" />}
+                    color="emerald"
+                    hideIcon={false}
+                  />
+                )}
+              </div>
             </div>
 
             {/* --- LATEST MATERIAL CARD --- */}
@@ -294,8 +311,8 @@ const Materials = () => {
                         : "text-slate-500 hover:text-slate-700"
                     }`}
                   >
-                    <CheckCheck className="h-4 w-4" />
-                    Kajian Diikuti
+                    {isPrivileged ? <Calendar className="h-4 w-4" /> : <CheckCheck className="h-4 w-4" />}
+                    {isPrivileged ? "Kajian Hari Ini" : "Kajian Diikuti"}
                   </button>
                 </div>
 
