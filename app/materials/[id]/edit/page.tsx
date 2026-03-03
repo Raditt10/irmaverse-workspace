@@ -166,9 +166,9 @@ const EditMaterial = () => {
             grade: material.grade || "Semua",
             thumbnailUrl: material.thumbnailUrl || "",
             programId: material.programId || material.parentId || "",
-            materialType: material.content?.type || "editor",
-            materialContent: material.content?.body || "",
-            materialLink: material.content?.link || "",
+            materialType: material.materialType || "editor",
+            materialContent: material.content || "",
+            materialLink: material.link || "",
           });
 
           // Load existing invite details with status

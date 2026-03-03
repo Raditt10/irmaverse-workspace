@@ -203,7 +203,7 @@ const RekapanDetailPage = () => {
                   {isPrivileged && (
                     <button
                       onClick={() =>
-                        router.push(`/materials/${materialId}/edit`)
+                        router.push(`/materials/${materialId}/rekapan/edit`)
                       }
                       className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 text-amber-600 font-bold border-2 border-amber-200 hover:bg-amber-100 transition-all text-sm"
                     >
