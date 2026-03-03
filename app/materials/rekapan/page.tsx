@@ -127,6 +127,28 @@ const RekapanListPage = () => {
     );
   }
 
+  // Instructor data mockup (akan diganti fetch ke API `/api/materials` untuk instruktur)
+  // Atau fetch rekapan list dari API `/api/materials` yang berisi content dan link
+  const [instructorMaterials, setInstructorMaterials] = useState<any[]>([
+    {
+      id: "m1",
+      title: "Kedudukan Akal dan Wahyu",
+      date: "2024-12-15",
+      content: "Isi PDF Rekapan...",
+      link: "https://drive.google.com/file/d/...",
+    },
+    {
+      id: "m2",
+      title: "Adab Menuntut Ilmu di Era Digital",
+      date: "2024-12-08",
+      content: "",
+      link: "",
+    }
+  ]);
+
+  if (status === "loading") return null;
+  const isInstructor = session?.user?.role === "instruktur" || session?.user?.role === "admin";
+
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
       <DashboardHeader />
@@ -134,11 +156,12 @@ const RekapanListPage = () => {
         <Sidebar />
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-6xl mx-auto">
+            
             {/* --- HEADER SECTION --- */}
             <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
-                  Rekapan Kajian
+                  {isInstructor ? "Kelola Rekapan Materi" : "Rekapan Kajian"}
                 </h1>
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Pantau riwayat kehadiran dan materi kajian yang telah kamu
@@ -151,8 +174,91 @@ const RekapanListPage = () => {
                   <Download className="h-5 w-5" />
                   Cetak Laporan
                 </button>
-              ) : null}
+              )}
             </div>
+
+            {isInstructor ? (
+              /* --- INSTRUCTOR VIEW --- */
+              <div className="space-y-6">
+                {/* --- FILTER & SEARCH BAR INSTRUKTUR --- */}
+                <div className="bg-white rounded-3xl border-2 border-slate-200 shadow-sm p-4 flex flex-col md:flex-row gap-4 justify-between items-center">
+                  <div className="w-full md:w-96">
+                    <SearchInput
+                      placeholder="Cari materi kajian..."
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      className="w-full border-2 border-emerald-400 focus-within:border-emerald-500 rounded-2xl shadow-none"
+                    />
+                  </div>
+                </div>
+
+                {/* --- LIST DATA REKAPAN INSTRUKTUR --- */}
+                <div className="space-y-4">
+                  {instructorMaterials.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+                    <div className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-[2.5rem] border-2 border-dashed border-slate-300">
+                      <FileText className="h-16 w-16 text-slate-300 mb-4" />
+                      <h3 className="text-xl font-black text-slate-800 mb-2">Belum ada kajian</h3>
+                      <p className="text-slate-500">Kajian yang kamu cari tidak ditemukan.</p>
+                    </div>
+                  ) : (
+                    instructorMaterials.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase())).map((material) => (
+                      <div 
+                        key={material.id}
+                        className="bg-white rounded-3xl border-2 border-slate-200 p-5 lg:p-6 hover:border-emerald-400 hover:shadow-[0_4px_0_0_#34d399] transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-5 group"
+                      >
+                        {/* Info Kiri */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            {material.content || material.link ? (
+                              <span className="px-3 py-1 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-wide border bg-emerald-50 text-emerald-600 border-emerald-200">
+                                Tersedia
+                              </span>
+                            ) : (
+                              <span className="px-3 py-1 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-wide border bg-red-50 text-red-600 border-red-200">
+                                Belum Ada
+                              </span>
+                            )}
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                              <Calendar className="h-4 w-4 text-slate-400" />
+                              {new Date(material.date).toLocaleDateString("id-ID", {
+                                day: "numeric", month: "long", year: "numeric"
+                              })}
+                            </div>
+                          </div>
+                          
+                          <h3 className="text-lg md:text-xl font-black text-slate-800 leading-tight group-hover:text-emerald-600 transition-colors">
+                            {material.title}
+                          </h3>
+                          
+                          <div className="flex flex-wrap items-center gap-4 text-sm font-semibold text-slate-500 mt-3">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 text-xs">
+                                👤
+                              </div>
+                              Anda (Instruktur)
+                            </div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></div>
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="h-4 w-4 text-slate-400" />
+                              -
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Tombol Kanan */}
+                        <div className="flex flex-col md:items-end justify-center shrink-0 border-t-2 border-dashed border-slate-200 md:border-none pt-4 md:pt-0 gap-3">
+                          <button className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-emerald-600 font-bold border-2 border-emerald-200 border-b-4 hover:bg-emerald-50 hover:border-emerald-400 hover:text-emerald-700 active:border-b-2 active:translate-y-0.5 transition-all text-sm w-full md:w-auto">
+                            {material.content || material.link ? "Edit Rekapan" : "Tambah Rekapan"}
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* --- USER VIEW (LAMA) --- */
+              <>
             {/* --- STATISTIK CARDS --- */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
@@ -303,8 +409,9 @@ const RekapanListPage = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
     </div>
+    <ChatbotButton />
+  </div>
   );
 };
 

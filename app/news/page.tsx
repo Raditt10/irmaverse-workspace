@@ -10,7 +10,7 @@ import { ArrowRight, Calendar, Eye, Share2, Bookmark, Filter, Plus, Pencil, Tras
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import CartoonNotification from "@/components/ui/Notification";
+import Toast from "@/components/ui/Toast";
 import EmptyState from "@/components/ui/EmptyState";
 import AddButton from "@/components/ui/AddButton";
 
@@ -91,6 +91,13 @@ const News = () => {
   useEffect(() => {
     filterNews();
   }, [selectedCategory, searchTerm, news]);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const fetchNews = async () => {
     try {
@@ -401,15 +408,12 @@ const News = () => {
       />
 
       {/* Notification */}
-      {notification && (
-        <CartoonNotification
-          type={notification.type}
-          title={notification.title}
-          message={notification.message}
-          duration={3000}
-          onClose={() => setNotification(null)}
-        />
-      )}
+      <Toast
+        show={!!notification}
+        type={notification?.type || "info"}
+        message={notification ? notification.message : ""}
+        onClose={() => setNotification(null)}
+      />
     </div>
   );
 };

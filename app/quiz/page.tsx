@@ -16,6 +16,8 @@ import {
   Plus,
   Zap,
   Settings,
+  Trash2,
+  XCircle
 } from "lucide-react";
 
 interface Quiz {
@@ -53,6 +55,8 @@ const QuizHome = () => {
 
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
+  const isInstructor = session?.user?.role === "instruktur" || session?.user?.role === "admin";
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
     "all" | "not_started" | "completed" | "standalone" | "material"
@@ -162,8 +166,15 @@ const QuizHome = () => {
                   <Sparkles className="h-4 w-4 text-yellow-300" />
                   Quiz Arena
                 </div>
-                <h1 className="text-3xl lg:text-5xl font-black tracking-tight mb-3 leading-tight">
-                  Uji Pemahamanmu!
+              </div>
+            </div>
+          )}
+
+          {isInstructor && (
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
+                  Kelola Kuis Kajian
                 </h1>
                 <p className="text-teal-50 font-medium text-sm lg:text-base max-w-xl">
                   Kerjakan kuis dari kajian atau quiz mandiri buatan instruktur.
@@ -196,7 +207,7 @@ const QuizHome = () => {
                 )}
               </div>
             </div>
-          </div>
+          )}
 
           {/* --- SEARCH & FILTERS --- */}
           <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
@@ -264,6 +275,7 @@ const QuizHome = () => {
                 <Sparkles className="h-4 w-4 text-teal-500" />
                 <span>Terus tingkatkan skormu! 🚀</span>
               </div>
+              
             </div>
           </div>
 
