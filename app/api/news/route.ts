@@ -125,14 +125,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user is admin
+    // Check if user is admin or instructor
     const user = await prisma.user.findUnique({
       where: { email: session.user.email! },
     });
 
-    if (!user || user.role !== "admin") {
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+
+    if (!user || !isPrivileged) {
       return NextResponse.json(
-        { error: "Only admins can create news" },
+        { error: "Only admins and instructors can create news" },
         { status: 403 }
       );
     }
@@ -209,9 +211,11 @@ export async function PUT(request: NextRequest) {
       where: { email: session.user.email! },
     });
 
-    if (!user || user.role !== "admin") {
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+
+    if (!user || !isPrivileged) {
       return NextResponse.json(
-        { error: "Only admins can update news" },
+        { error: "Only admins and instructors can update news" },
         { status: 403 }
       );
     }
@@ -298,9 +302,11 @@ export async function DELETE(request: NextRequest) {
       where: { email: session.user.email! },
     });
 
-    if (!user || user.role !== "admin") {
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+
+    if (!user || !isPrivileged) {
       return NextResponse.json(
-        { error: "Only admins can delete news" },
+        { error: "Only admins and instructors can delete news" },
         { status: 403 }
       );
     }

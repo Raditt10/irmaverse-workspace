@@ -149,14 +149,14 @@ export async function PATCH(req: NextRequest) {
         // Strategy: Try by token first, if fails, try by materialId + userId (fallback)
         let invite = null;
         if (inviteToken) {
-          invite = await prisma.materialinvite.findUnique({
+          invite = await prisma.materialInvite.findUnique({
             where: { token: inviteToken },
           });
         }
         
         if (!invite && materialId) {
           console.log("[PATCH /api/notifications] token failed, trying fallback by materialId:", materialId);
-          invite = await prisma.materialinvite.findFirst({
+          invite = await prisma.materialInvite.findFirst({
             where: { 
               materialId: materialId,
               userId: session.user.id
@@ -166,7 +166,7 @@ export async function PATCH(req: NextRequest) {
 
         if (invite) {
           console.log("[PATCH /api/notifications] Found invite, updating status to:", status);
-          await prisma.materialinvite.update({
+          await prisma.materialInvite.update({
             where: { id: invite.id },
             data: { 
               status, 
@@ -178,7 +178,7 @@ export async function PATCH(req: NextRequest) {
           // If accepted, create course enrollment
           if (status === "accepted") {
             console.log("[PATCH /api/notifications] Accepted! Creating enrollment for user:", session.user.id);
-            await prisma.courseenrollment.upsert({
+            await prisma.courseEnrollment.upsert({
               where: {
                 materialId_userId: {
                   materialId: invite.materialId,

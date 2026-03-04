@@ -7,23 +7,16 @@ export async function POST(req: NextRequest) {
     const session = await auth();
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { 
-      materialId, 
-      attendanceData,
-      surveyData 
-    } = body;
+    const { materialId, attendanceData, surveyData } = body;
 
     if (!materialId) {
       return NextResponse.json(
         { error: "Material ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -33,10 +26,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Check if user already attended
@@ -49,11 +39,11 @@ export async function POST(req: NextRequest) {
 
     if (existingAttendance) {
       return NextResponse.json(
-        { 
+        {
           message: "Already attended",
-          attendedAt: existingAttendance.createdAt
+          attendedAt: existingAttendance.createdAt,
         },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -106,13 +96,13 @@ export async function POST(req: NextRequest) {
         message: "Attendance recorded successfully",
         attendance,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Attendance error:", error);
     return NextResponse.json(
       { error: "Failed to record attendance" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -122,10 +112,7 @@ export async function GET(req: NextRequest) {
     const session = await auth();
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const materialId = req.nextUrl.searchParams.get("materialId");
@@ -134,10 +121,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     if (materialId) {
@@ -157,20 +141,25 @@ export async function GET(req: NextRequest) {
       // Return all attendance for user (for dashboard)
       const allAttendance = await prisma.attendance.findMany({
         where: { userId: user.id },
-        include: {
-          material: true, // This will only work if relation exists. Let's check relation.
-        } as any, // Cast to any because relation might be missing in some setups
         orderBy: { createdAt: "desc" },
       });
 
+      // Fetch related material titles separately (attendance has no Prisma relation to material)
+      const materialIds = [...new Set(allAttendance.map((a) => a.materialId))];
+      const materials = await prisma.material.findMany({
+        where: { id: { in: materialIds } },
+        select: { id: true, title: true },
+      });
+      const materialMap = new Map(materials.map((m) => [m.id, m]));
+
       // Map to expected dynamic format
-      const formatted = allAttendance.map((att: any) => ({
+      const formatted = allAttendance.map((att) => ({
         id: att.id,
         materialId: att.materialId,
-        materialTitle: att.material?.title || "Kajian",
-        instructorName: att.material?.instructor || "TBA",
+        materialTitle: materialMap.get(att.materialId)?.title || "Kajian",
+        instructorName: "TBA",
         attendedAt: att.createdAt,
-        status: att.status
+        status: att.status,
       }));
 
       return NextResponse.json(formatted);
@@ -179,7 +168,7 @@ export async function GET(req: NextRequest) {
     console.error("Get attendance error:", error);
     return NextResponse.json(
       { error: "Failed to fetch attendance" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

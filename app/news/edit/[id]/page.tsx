@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
@@ -17,11 +18,20 @@ export default function EditNewsPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const { data: session, status } = useSession();
   
   const [loading, setLoading] = useState(false);
   const [fetchingNews, setFetchingNews] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+
+  const role = session?.user?.role?.toLowerCase();
+  const isPrivileged = role === "admin" || role === "instruktur";
+
+  if (status === "authenticated" && !isPrivileged) {
+    router.push("/news");
+    return null;
+  }
 
   const [formData, setFormData] = useState({
     title: "",

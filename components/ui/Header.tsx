@@ -171,15 +171,12 @@ export default function DashboardHeader() {
   return (
     <div
       className="border-b-2 border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-40 font-sans"
-      style={{
-        fontFamily: "'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive",
-      }}
     >
-      <div className="flex items-center justify-between gap-4 h-20 px-4 lg:px-8">
+      <div className="flex items-center justify-between gap-2 sm:gap-4 h-20 px-3 sm:px-4 lg:px-8">
         {/* --- LEFT: LOGO --- */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink min-w-0">
           <button
-            className="lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 active:scale-95 transition-all"
+            className="lg:hidden inline-flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 active:scale-95 transition-all shrink-0"
             onClick={() =>
               window.dispatchEvent(new Event("open-mobile-sidebar"))
             }
@@ -191,15 +188,15 @@ export default function DashboardHeader() {
           <img
             src="/logo.webp"
             alt="IRMA Verse"
-            className="h-9 w-9 sm:h-10 sm:w-10 object-contain"
+            className="h-8 w-8 sm:h-10 sm:w-10 object-contain shrink-0"
           />
 
-          <div className="block">
-            <h2 className="text-sm sm:text-lg font-black text-emerald-600 leading-tight tracking-tight">
+          <div className="min-w-0">
+            <h2 className="text-xs sm:text-lg font-black text-emerald-600 leading-tight tracking-tight truncate">
               IRMA VERSE
             </h2>
-            <p className="text-[9px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5">
-              Irma 13 App
+            <p className="text-[8px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5 truncate">
+              Platform resmi Irma13
             </p>
           </div>
         </div>
@@ -236,10 +233,6 @@ export default function DashboardHeader() {
               <>
                 <div
                   className="fixed left-4 right-4 top-20 z-50 sm:absolute sm:right-0 sm:left-auto sm:top-full sm:mt-2 sm:w-105 sm:rounded-2xl flex flex-col bg-white rounded-2xl border-2 border-slate-200 shadow-[0_4px_20px_rgba(0,0,0,0.15)] max-h-[80vh] sm:max-h-150 overflow-hidden sm:shadow-xl animate-in fade-in-0 zoom-in-95 sm:fade-in-0 sm:zoom-in-100 duration-200"
-                  style={{
-                    fontFamily:
-                      "'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive",
-                  }}
                 >
                   {/* Header */}
                   <div className="bg-linear-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100 px-5 py-4 flex items-center justify-between shrink-0">
@@ -519,10 +512,6 @@ export default function DashboardHeader() {
             <DropdownMenuContent
               align="end"
               className="w-60 mt-2 p-2 rounded-2xl border-2 border-slate-200 shadow-[4px_4px_0_0_#cbd5e1] bg-white"
-              style={{
-                fontFamily:
-                  "'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive",
-              }}
             >
               <DropdownMenuLabel className="px-2 py-2 mb-2 bg-slate-50 rounded-xl border border-slate-100">
                 <div className="flex items-center gap-3">

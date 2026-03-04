@@ -6,16 +6,16 @@ import { auth } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const { materialId, userId, instructorId } = await req.json();
-    
+
     // For testing, allow manual instructorId specification
     let finalInstructorId = instructorId;
-    
+
     if (!finalInstructorId) {
       const session = await auth();
       if (!session?.user?.id) {
         return NextResponse.json(
           { error: "Unauthorized - provide instructorId or login" },
-          { status: 401 }
+          { status: 401 },
         );
       }
       finalInstructorId = session.user.id;
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (!material) {
       return NextResponse.json(
         { error: "Material tidak ditemukan" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     if (!targetUser) {
       return NextResponse.json(
         { error: "User tidak ditemukan" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
 
-    const invite = await prisma.materialInvite.create({
+    const invite = await prisma.materialinvite.create({
       data: {
         materialId,
         instructorId: finalInstructorId,
@@ -63,8 +63,8 @@ export async function POST(req: NextRequest) {
       },
       include: {
         material: true,
-        instructor: true,
-        user: true,
+        users_materialinvite_instructorIdTousers: true,
+        users_materialinvite_userIdTousers: true,
       },
     });
 
@@ -78,18 +78,19 @@ export async function POST(req: NextRequest) {
           id: invite.id,
           token: invite.token,
           material: invite.material.title,
-          instructor: invite.instructor.name,
-          user: invite.user.name,
+          instructor: (invite as any).users_materialinvite_instructorIdTousers
+            ?.name,
+          user: (invite as any).users_materialinvite_userIdTousers?.name,
           status: invite.status,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("[TEST-INVITE] Error:", error);
     return NextResponse.json(
       { error: "Failed to create test invitation", details: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -126,7 +127,7 @@ export async function GET() {
     console.error("[TEST-INVITE-GET] Error:", error);
     return NextResponse.json(
       { error: "Failed", details: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

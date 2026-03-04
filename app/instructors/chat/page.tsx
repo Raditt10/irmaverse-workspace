@@ -145,6 +145,7 @@ const ChatPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const searchParams = useSearchParams();
+  const autoInitRef = useRef<string | null>(null);
 
   // ... (Fungsi-fungsi fetch dan handler tetap sama) ...
   const fetchConversations = useCallback(async () => {
@@ -173,6 +174,27 @@ const ChatPage = () => {
     }
   }, []);
 
+  const startConversation = useCallback(async (instructorId: string) => {
+    try {
+      const res = await fetch("/api/chat/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instructorId }),
+      });
+      if (res.ok) {
+        const conv = await res.json();
+        await fetchConversations();
+        setSelectedConversationId(conv.id);
+        setShowNewChatModal(false);
+        if (window.innerWidth < 1024) {
+          setIsMobileViewingChat(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+    }
+  }, [fetchConversations]);
+
   const fetchMessages = useCallback(async (conversationId: string) => {
     setMessagesLoading(true);
     try {
@@ -194,19 +216,30 @@ const ChatPage = () => {
   }, [fetchConversations, fetchInstructors]);
 
   useEffect(() => {
+    if (loading) return; // tunggu sampai fetchConversations selesai
     const instructorId = searchParams.get("instructorId");
-    if (instructorId && conversations.length > 0) {
-      const existingConv = conversations.find(
-        (c) => c.participant.id === instructorId
-      );
-      if (existingConv) {
+    if (!instructorId) return;
+
+    // Supaya tidak terjadi looping create conversation
+    if (autoInitRef.current === instructorId) return;
+
+    const existingConv = conversations.find(
+      (c) => c.participant.id === instructorId
+    );
+
+    if (existingConv) {
+      if (selectedConversationId !== existingConv.id) {
         setSelectedConversationId(existingConv.id);
         if (window.innerWidth < 1024) {
           setIsMobileViewingChat(true);
         }
       }
+    } else {
+      // Tandai bahwa kita sedah mencoba untuk init percakapan ini secara otomatis
+      autoInitRef.current = instructorId;
+      startConversation(instructorId);
     }
-  }, [searchParams, conversations]);
+  }, [searchParams, conversations, loading, selectedConversationId, startConversation]);
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -578,26 +611,7 @@ const ChatPage = () => {
     }
   };
 
-  const startConversation = async (instructorId: string) => {
-    try {
-      const res = await fetch("/api/chat/conversations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ instructorId }),
-      });
-      if (res.ok) {
-        const conv = await res.json();
-        await fetchConversations();
-        setSelectedConversationId(conv.id);
-        setShowNewChatModal(false);
-        if (window.innerWidth < 1024) {
-          setIsMobileViewingChat(true);
-        }
-      }
-    } catch (error) {
-      console.error("Error starting conversation:", error);
-    }
-  };
+
 
   // --- RENDER ---
 
@@ -893,7 +907,7 @@ const ChatPage = () => {
                                   }
                                 `}>
                                   {editingMessageId === message.id ? (
-                                    <div className="min-w-[200px]">
+                                    <div className="min-w-50">
                                       <Textarea 
                                         value={editingContent} onChange={(e) => setEditingContent(e.target.value)} 
                                         className="text-sm bg-white/20 text-white border-white/30 focus:ring-0 mb-2"

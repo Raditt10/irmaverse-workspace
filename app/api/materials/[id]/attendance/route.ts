@@ -4,16 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth();
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: materialId } = await params;
@@ -21,7 +18,7 @@ export async function GET(
     if (!materialId) {
       return NextResponse.json(
         { error: "Material ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,7 +32,7 @@ export async function GET(
     if (!material) {
       return NextResponse.json(
         { error: "Material not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -44,19 +41,13 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (
-      material.instructorId !== user.id &&
-      user.role !== "admin"
-    ) {
+    if (user.role !== "instruktur" && user.role !== "admin") {
       return NextResponse.json(
-        { error: "Forbidden: Only instructor can view attendance" },
-        { status: 403 }
+        { error: "Forbidden: Only instructor or admin can view attendance" },
+        { status: 403 },
       );
     }
 
@@ -70,7 +61,7 @@ export async function GET(
     });
 
     const attendanceWithUsers = await Promise.all(
-      attendances.map(async (att) => {
+      attendances.map(async (att: any) => {
         const attendanceUser = await prisma.user.findUnique({
           where: { id: att.userId },
           select: {
@@ -84,7 +75,7 @@ export async function GET(
           ...att,
           user: attendanceUser,
         };
-      })
+      }),
     );
 
     return NextResponse.json({
@@ -101,7 +92,7 @@ export async function GET(
     console.error("Get attendance error:", error);
     return NextResponse.json(
       { error: "Failed to fetch attendance" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

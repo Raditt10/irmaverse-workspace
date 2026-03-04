@@ -11,11 +11,13 @@ import Loading from "@/components/ui/Loading";
 import DetailButton from "@/components/ui/DetailButton";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CartoonNotification from "@/components/ui/Notification";
+import CategoryFilter from "@/components/ui/CategoryFilter";
 import { 
   Calendar, 
   MapPin, 
   Clock, 
-  Users
+  Users,
+  Plus
 } from "lucide-react";
 import AddButton from "@/components/ui/AddButton";
 
@@ -162,44 +164,42 @@ const Schedule = () => {
         <div className="flex-1 px-6 lg:px-8 py-12 lg:ml-0">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
-                <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-2">
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
                   Event IRMA
                 </h1>
-                <p className="text-slate-500 text-lg font-medium">
+                <p className="text-slate-500 font-medium text-xs lg:text-lg">
                   Daftar event dan kegiatan rohani yang akan datang dan sedang berlangsung
                 </p>
               </div>
-              {session?.user?.role === "instruktur" && (
-                <AddButton
-                  label="Tambahkan Event"
-                  onClick={() => window.location.href = "/schedule/create"}
-                  color="teal"
-                />
-              )}
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                {session?.user?.role === "instruktur" && (
+                  <AddButton
+                    label="Buat Event"
+                    onClick={() => router.push("/schedule/create")}
+                    icon={<Plus className="h-5 w-5" />}
+                    color="emerald"
+                    hideIcon={false}
+                  />
+                )}
+              </div>
             </div>
 
             {/* Filter & Search Bar */}
             {!loading && schedules.length > 0 && (
               <div className="grid gap-6 mb-8 lg:grid-cols-[1fr_auto]">
-                <div className="space-y-4">
+                <div className="space-y-4 min-w-0 pr-1">
                   {/* Status Filter Buttons */}
-                  <div className="flex flex-wrap gap-2 lg:gap-3">
-                    {statusOptions.map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => setSelectedStatus(status)}
-                        className={`px-4 lg:px-6 py-2 lg:py-3 rounded-full font-bold transition-all border-2 ${
-                          selectedStatus === status
-                            ? "bg-teal-500 text-white border-teal-600 shadow-[0_4px_0_0_#0d9488]"
-                            : "bg-white text-slate-600 border-slate-200 hover:border-teal-300 shadow-sm hover:shadow-md"
-                        }`}
-                      >
-                        {status}
-                      </button>
-                    ))}
-                  </div>
+                  <CategoryFilter
+                    categories={statusOptions}
+                    subCategories={[]}
+                    selectedCategory={selectedStatus}
+                    selectedSubCategory=""
+                    onCategoryChange={setSelectedStatus}
+                    onSubCategoryChange={() => {}}
+                  />
                 </div>
 
                 <div className="relative w-full lg:w-80 self-start">

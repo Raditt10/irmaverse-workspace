@@ -1,0 +1,186 @@
+import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+
+// GET - get quiz detail (standalone or material-bound by quizId)
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> },
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { quizId } = await params;
+
+    const quiz = await prisma.materialQuiz.findUnique({
+      where: { id: quizId },
+      include: {
+        material: { select: { id: true, title: true, instructorId: true } },
+        creator: { select: { id: true, name: true, avatar: true } },
+        questions: {
+          include: { options: true },
+          orderBy: { order: "asc" },
+        },
+        attempts: {
+          where: { userId: session.user.id },
+          orderBy: { completedAt: "desc" },
+          select: {
+            id: true,
+            score: true,
+            totalScore: true,
+            completedAt: true,
+            answers: true,
+          },
+        },
+      },
+    });
+
+    if (!quiz) {
+      return NextResponse.json(
+        { error: "Quiz tidak ditemukan" },
+        { status: 404 },
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+    const isPrivileged = user?.role === "instruktur" || user?.role === "admin";
+
+    const questions = quiz.questions.map((q: any) => ({
+      id: q.id,
+      question: q.question,
+      order: q.order,
+      options: q.options.map((o: any) => ({
+        id: o.id,
+        text: o.text,
+        ...(isPrivileged || quiz.attempts.length > 0
+          ? { isCorrect: o.isCorrect }
+          : {}),
+      })),
+    }));
+
+    return NextResponse.json({
+      id: quiz.id,
+      materialId: quiz.materialId || null,
+      materialTitle: quiz.material?.title || null,
+      creatorName: quiz.creator?.name || null,
+      title: quiz.title,
+      description: quiz.description,
+      questionCount: quiz.questions.length,
+      questions,
+      attempts: quiz.attempts,
+      createdAt: quiz.createdAt,
+    });
+  } catch (error) {
+    console.error("Get quiz detail error:", error);
+    return NextResponse.json(
+      { error: "Gagal mengambil detail quiz" },
+      { status: 500 },
+    );
+  }
+}
+
+// PUT - update a quiz (title, description, questions, options)
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> },
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { quizId } = await params;
+    const body = await req.json();
+    const { title, description, questions } = body;
+
+    if (!title?.trim()) {
+      return NextResponse.json(
+        { error: "Judul quiz tidak boleh kosong" },
+        { status: 400 },
+      );
+    }
+
+    // Delete old questions (cascade deletes options)
+    await prisma.quizQuestion.deleteMany({ where: { quizId } });
+
+    // Update quiz and recreate questions
+    const quiz = await prisma.materialQuiz.update({
+      where: { id: quizId },
+      data: {
+        title: title.trim(),
+        description: description?.trim() || null,
+        questions: {
+          create: (questions || []).map((q: any, idx: number) => ({
+            question: q.question.trim(),
+            order: idx,
+            options: {
+              create: (q.options || []).map((o: any) => ({
+                text: o.text.trim(),
+                isCorrect: o.isCorrect === true,
+              })),
+            },
+          })),
+        },
+      },
+      include: {
+        questions: { include: { options: true }, orderBy: { order: "asc" } },
+      },
+    });
+
+    return NextResponse.json({ success: true, quiz });
+  } catch (error) {
+    console.error("Update quiz error:", error);
+    return NextResponse.json(
+      { error: "Gagal memperbarui quiz" },
+      { status: 500 },
+    );
+  }
+}
+
+// DELETE - delete a standalone quiz
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> },
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { quizId } = await params;
+
+    await prisma.materialQuiz.delete({ where: { id: quizId } });
+
+    return NextResponse.json({
+      success: true,
+      message: "Quiz berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Delete quiz error:", error);
+    return NextResponse.json(
+      { error: "Gagal menghapus quiz" },
+      { status: 500 },
+    );
+  }
+}

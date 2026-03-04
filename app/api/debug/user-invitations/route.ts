@@ -9,21 +9,21 @@ export async function GET(req: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: "userId query parameter required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.log("[DEBUG-USER-INVITATIONS] Fetching for user:", userId);
 
     // Get pending invitations for this user
-    const invitations = await prisma.materialInvite.findMany({
+    const invitations = await prisma.materialinvite.findMany({
       where: {
         userId,
         status: "pending",
       },
       include: {
         material: true,
-        instructor: {
+        users_materialinvite_instructorIdTousers: {
           select: {
             id: true,
             name: true,
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     console.log(
       "[DEBUG-USER-INVITATIONS] Found:",
       invitations.length,
-      "invitations"
+      "invitations",
     );
 
     return NextResponse.json({
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     console.error("[DEBUG-USER-INVITATIONS] Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch", details: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

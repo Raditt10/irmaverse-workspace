@@ -4,7 +4,8 @@ import { useParams } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
-import { ArrowLeft, Calendar, Eye, Share2, Bookmark } from "lucide-react";
+import BackButton from "@/components/ui/BackButton";
+import { Calendar, Eye, Share2, Bookmark } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 
@@ -95,13 +96,7 @@ export default function NewsDetailPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-500 mb-4">Berita tidak ditemukan</p>
-          <Link
-            href="/news"
-            className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali ke daftar berita
-          </Link>
+          <BackButton onClick={() => window.history.back()} />
         </div>
       </div>
     );
@@ -126,13 +121,9 @@ export default function NewsDetailPage() {
         <div className="flex-1 px-6 lg:px-8 py-12">
           <div className="max-w-4xl mx-auto">
             {/* Back Button */}
-            <Link
-              href="/news"
-              className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-semibold mb-8"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              Kembali ke daftar berita
-            </Link>
+            <div className="mb-8">
+              <BackButton onClick={() => window.history.back()} />
+            </div>
 
             {/* Article Container */}
             <article className="bg-white rounded-3xl shadow-lg overflow-hidden">
@@ -154,7 +145,7 @@ export default function NewsDetailPage() {
                   <span
                     className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
                       categoryStyles[news.category] ||
-                      "bg-slate-500 text-white"
+                      "bg-emerald-500 text-white"
                     }`}
                   >
                     {news.category}
@@ -179,7 +170,7 @@ export default function NewsDetailPage() {
                     </div>
                   )}
                   <div className="text-sm">
-                    Oleh: <span className="font-semibold">{news.author.name || news.author.email}</span>
+                    Diposting oleh: <span className="font-semibold">{news.author.name || news.author.email}</span>
                   </div>
                 </div>
 

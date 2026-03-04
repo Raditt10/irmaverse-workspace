@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
         notelp: true,
         createdAt: true,
         // Tambahkan field lain jika ada (class, points, status, dsb)
-      },
-    });
+        },
+      });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
     // Dummy/empty for stats, achievements, recentActivities (bisa diisi jika sudah ada di DB)
     return NextResponse.json({

@@ -53,9 +53,27 @@ model User {
   materialinvite_materialinvite_userIdTousers       MaterialInvite[]     @relation("materialinvite_userIdTousers")
   sentNotifications                                 Notification[]       @relation("senderNotifications")
   notifications                                     Notification[]       @relation("userNotifications")
-  quizEnrollments                                   QuizEnrollments[]
+  programs                                          Program[]            @relation("programInstructor")
+  programEnrollments                                ProgramEnrollment[]
+  quizAttempts                                      QuizAttempt[]
+  createdQuizzes                                    MaterialQuiz[]       @relation("createdQuizzes")
+  leaderboard                                       Leaderboard[]
 
   @@map("users")
+}
+
+model Leaderboard {
+  id        String   @id @default(cuid())
+  uid       String
+  score     Int      @default(0)
+  rank      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [uid], references: [id], onDelete: Cascade)
+
+  @@index([uid])
+  @@map("leaderboard")
 }
 
 model FavoriteInstructor {
@@ -210,8 +228,46 @@ model Notification {
   @@index([userId, status])
   @@index([userId, createdAt])
   @@index([inviteToken])
-  @@index([senderId], map: "notifications_senderId_fkey")
+  @@index([senderId], map: "Notification_senderId_fkey")
   @@map("notifications")
+}
+
+model Program {
+  id           String               @id @default(cuid())
+  title        String
+  description  String?              @db.Text
+  grade        MaterialGrade
+  category     MaterialCategory
+  thumbnailUrl String?
+  instructorId String
+  duration     String?
+  syllabus     Json?
+  requirements Json?
+  benefits     Json?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  instructor   User                 @relation("programInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  materials    Material[]           @relation("programMaterials")
+  enrollments  ProgramEnrollment[]
+
+  @@index([instructorId])
+  @@map("programs")
+}
+
+model ProgramEnrollment {
+  id         String   @id @default(cuid())
+  programId  String
+  userId     String
+  enrolledAt DateTime @default(now())
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([programId, userId])
+  @@index([programId])
+  @@index([userId])
+  @@map("program_enrollments")
 }
 
 model Attendance {
@@ -238,6 +294,7 @@ model Attendance {
   @@unique([userId, materialId], map: "Attendance_userId_materialId_key")
   @@index([materialId], map: "Attendance_materialId_idx")
   @@index([userId], map: "Attendance_userId_idx")
+  @@map("attendance")
 }
 
 model CourseEnrollment {
@@ -251,37 +308,44 @@ model CourseEnrollment {
 
   @@unique([materialId, userId], map: "CourseEnrollment_materialId_userId_key")
   @@index([userId], map: "CourseEnrollment_userId_idx")
+  @@map("course_enrollments")
 }
 
 model Material {
   id                                             String             @id @default(cuid())
   title                                          String
   description                                    String?
-  grade                                          Material_Grade
+  grade                                          MaterialGrade
   thumbnailUrl                                   String?
   instructorId                                   String
   nextCourseId                                   String?
   createdAt                                      DateTime           @default(now())
   updatedAt                                      DateTime           @updatedAt
   date                                           DateTime           @default(now())
-  category                                       Material_Category
+  category                                       MaterialCategory
   participants                                   String?
   startedAt                                      String?
   content                                        String?            @db.LongText
   link                                           String?
   materialType                                   String?
   parentId                                       String?
+  programId                                      String?
   courseenrollment                               CourseEnrollment[]
   users                                          User               @relation(fields: [instructorId], references: [id], map: "Material_instructorId_fkey")
   material_material_nextCourseIdTomaterial       Material?          @relation("material_nextCourseIdTomaterial", fields: [nextCourseId], references: [id], map: "Material_nextCourseId_fkey")
   other_material_material_nextCourseIdTomaterial Material[]         @relation("material_nextCourseIdTomaterial")
   material_material_parentIdTomaterial           Material?          @relation("material_parentIdTomaterial", fields: [parentId], references: [id], map: "Material_parentId_fkey")
   other_material_material_parentIdTomaterial     Material[]         @relation("material_parentIdTomaterial")
+  program                                        Program?           @relation("programMaterials", fields: [programId], references: [id], onDelete: SetNull, map: "Material_programId_fkey")
   materialinvite                                 MaterialInvite[]
+  rekapan                                        Rekapan?
+  quizzes                                        MaterialQuiz[]
 
   @@index([instructorId], map: "Material_instructorId_fkey")
   @@index([nextCourseId], map: "Material_nextCourseId_fkey")
   @@index([parentId], map: "Material_parentId_fkey")
+  @@index([programId], map: "Material_programId_fkey")
+  @@map("materials")
 }
 
 model MaterialInvite {
@@ -301,102 +365,110 @@ model MaterialInvite {
   @@index([instructorId], map: "MaterialInvite_instructorId_fkey")
   @@index([materialId], map: "MaterialInvite_materialId_idx")
   @@index([userId], map: "MaterialInvite_userId_idx")
+  @@map("material_invites")
 }
 
 model Friendship {
-  id          String           @id @default(cuid())
-  requesterId String
-  addresseeId String
-  status      FriendshipStatus
+  id             String        @id @default(cuid())
+  requesterId    String
+  addresseeId    String
+  status         FriendshipStatus
 
-  requester User @relation("Friends1", fields: [requesterId], references: [id], map: "fk_friendship_requester")
-  addressee User @relation("Friends2", fields: [addresseeId], references: [id], map: "fk_friendship_addressee")
+  requester      User @relation("Friends1", fields: [requesterId], references: [id], map: "fk_friendship_requester")
+  addressee      User @relation("Friends2", fields: [addresseeId], references: [id], map: "fk_friendship_addressee")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  
   @@index([requesterId])
   @@index([addresseeId])
   @@index([status])
+  @@map("friendships")
 }
 
-model Quiz {
-  id             String   @id @default(cuid())
-  title          String
-  description    String?
-  questionsCount Int?
-  thumbnailUrl   String?
-  coverColor     String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
 
-  enrollments QuizEnrollments[]
-  questions   QuizQuestion[]
+// ─── Rekapan (Ringkasan Materi) ───────────────────────────────────
+
+model Rekapan {
+  id         String   @id @default(cuid())
+  materialId String   @unique
+  content    String   @db.LongText
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@index([materialId])
+  @@map("rekapan")
 }
 
-model QuizQuestion {
+// ─── Material Quiz System ─────────────────────────────────────────
+
+model MaterialQuiz {
   id          String   @id @default(cuid())
-  quizId      String
-  question    String
-  isMultiple  Boolean?  @default(false)
+  materialId  String?
+  creatorId   String?
+  title       String
+  description String?  @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  options     QuizOption[]
-  userAnswers UserAnswer[]
-  @@unique([quizId, question])
+  material  Material?       @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  creator   User?           @relation("createdQuizzes", fields: [creatorId], references: [id], onDelete: SetNull)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@index([materialId])
+  @@index([creatorId])
+  @@map("material_quizzes")
+}
+
+model QuizQuestion {
+  id       String @id @default(cuid())
+  quizId   String
+  question String @db.Text
+  order    Int    @default(0)
+
+  quiz    MaterialQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options QuizOption[]
+
+  @@index([quizId])
+  @@map("quiz_questions")
 }
 
 model QuizOption {
-  id             String   @id @default(cuid())
-  order          Int
-  option         String
-  isCorrect      Boolean?  @default(false)
-  questionId     String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id         String  @id @default(cuid())
+  questionId String
+  text       String  @db.Text
+  isCorrect  Boolean @default(false)
 
-  quizQuestion QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userAnswers  UserAnswer[]
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@map("quiz_options")
 }
 
-model UserAnswer {
-  id           String   @id @default(cuid())
-  enrollmentId String
-  questionId   String
-  optionId     String?
-  createdAt    DateTime @default(now())
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  quizId      String
+  userId      String
+  score       Int
+  totalScore  Int
+  answers     Json
+  completedAt DateTime @default(now())
 
-  enrollment QuizEnrollments @relation(fields: [enrollmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  question   QuizQuestion    @relation(fields: [questionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  option     QuizOption?     @relation(fields: [optionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  quiz MaterialQuiz  @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([enrollmentId, questionId])
-}
-
-model QuizEnrollments {
-  id        String     @id @default(cuid())
-  quizId    String
-  userId    String
-  status    QuizStatus
-  score     Int?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userAnswers UserAnswer[]
-
-  @@unique([userId, quizId], name: "userId_quizId")
+  @@index([quizId])
+  @@index([userId])
+  @@map("quiz_attempts")
 }
 
 enum Grade {
   X
   XI
   XII
-  XIII
-  Alumni
 }
 
 enum Role {
@@ -444,11 +516,10 @@ enum FriendshipStatus {
   Blocked
 }
 
-enum Material_Grade {
+enum MaterialGrade {
   X
   XI
   XII
-  XIII
 }
 
 enum MaterialInvite_Status {
@@ -458,7 +529,7 @@ enum MaterialInvite_Status {
   expired
 }
 
-enum Material_Category {
+enum MaterialCategory {
   Wajib
   Extra
   NextLevel

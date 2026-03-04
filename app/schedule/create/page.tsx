@@ -261,7 +261,8 @@ const CreateSchedule = () => {
               </div>
 
               {/* --- KOLOM KANAN: MEDIA --- */}
-              <div className="space-y-6 lg:space-y-8">
+              <div className="lg:col-span-1 space-y-6 lg:space-y-8">
+                {/* Thumbnail Card */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
                     Thumbnail Event
@@ -271,11 +272,13 @@ const CreateSchedule = () => {
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
+                      disabled={uploading}
                       className="hidden"
                       id="upload-thumb"
+                      required={!formData.thumbnailUrl}
                     />
                     {formData.thumbnailUrl ? (
-                      <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-teal-400 transition-all">
+                      <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-teal-400 transition-all shadow-sm">
                         <img
                           src={formData.thumbnailUrl}
                           alt="Preview"
@@ -287,22 +290,32 @@ const CreateSchedule = () => {
                             e.preventDefault();
                             setFormData((prev) => ({ ...prev, thumbnailUrl: "" }));
                           }}
-                          className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shadow-sm"
+                          className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shadow-md"
                         >
-                          <X className="w-3 h-3 lg:w-4 lg:h-4" />
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                       </div>
                     ) : (
                       <label
                         htmlFor="upload-thumb"
-                        className="flex flex-col items-center justify-center w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 group-hover:border-teal-400 group-hover:bg-teal-50 transition-all cursor-pointer"
+                        className={`flex flex-col items-center justify-center w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 hover:border-teal-400 hover:bg-teal-50 transition-all cursor-pointer ${
+                          uploading ? "opacity-50 pointer-events-none" : ""
+                        }`}
                       >
                         {uploading ? (
-                          <Sparkles className="w-6 h-6 lg:w-8 lg:h-8 text-teal-400 animate-spin" />
+                          <svg className="animate-spin -ml-1 mr-3 h-6 w-6 lg:h-8 lg:w-8 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
                         ) : (
                           <>
-                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-teal-500" />
-                            <span className="text-xs lg:text-sm font-bold text-slate-400">Klik untuk Upload</span>
+                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-teal-500 transition-colors" />
+                            <span className="text-xs lg:text-sm font-bold text-slate-400 group-hover:text-teal-500 transition-colors">
+                              Klik untuk Upload Thumbnail
+                            </span>
+                            <span className="text-[10px] sm:text-xs text-slate-400 font-medium mt-1">
+                              JPG, PNG, WebP (Max 5MB)
+                            </span>
                           </>
                         )}
                       </label>
@@ -310,21 +323,33 @@ const CreateSchedule = () => {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 lg:py-4 rounded-2xl bg-teal-400 text-white font-black text-base lg:text-lg border-2 border-teal-600 border-b-4 lg:border-b-6 hover:bg-teal-500 active:border-b-2 active:translate-y-1 transition-all shadow-lg lg:shadow-xl hover:shadow-teal-200 flex items-center justify-center gap-2 lg:gap-3 disabled:opacity-70 disabled:cursor-not-allowed mb-8"
-                >
-                  {loading ? (
-                    <>
-                      <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 animate-spin" /> Menyimpan...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-5 h-5 lg:w-6 lg:h-6" /> Buat Jadwal
-                    </>
-                  )}
-                </button>
+                {/* Submit Card */}
+                <div className="bg-teal-500 p-6 rounded-[2.5rem] text-white border-2 border-teal-600 shadow-[0_6px_0_0_#0d9488] mb-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Sparkles className="h-8 w-8 text-teal-100" strokeWidth={2.5} />
+                    <h3 className="text-xl font-black">Siap Terbit?</h3>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-2 py-4 bg-white text-teal-600 font-black text-lg rounded-2xl shadow-[0_4px_0_0_#ccfbf1] border-2 border-teal-100 hover:bg-teal-50 active:translate-y-1 active:shadow-none transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <Sparkles className="h-6 w-6 animate-spin" />{" "}
+                        Menyimpan...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-6 w-6" />
+                        Buat Jadwal
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-teal-100 font-bold mt-4 text-center opacity-80">
+                    Pastikan semua informasi jadwal sudah benar sebelum diterbitkan.
+                  </p>
+                </div>
               </div>
             </form>
           </div>

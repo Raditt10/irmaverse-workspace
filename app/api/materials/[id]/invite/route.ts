@@ -48,7 +48,9 @@ export async function POST(
       select: { userId: true },
     });
 
-    const alreadyInvitedIds = existingInvites.map((invite) => invite.userId);
+    const alreadyInvitedIds = existingInvites.map(
+      (invite: any) => invite.userId,
+    );
     const newUserIds = userIds.filter(
       (id: string) => !alreadyInvitedIds.includes(id),
     );
@@ -81,7 +83,7 @@ export async function POST(
       });
 
       const notifications = await createBulkNotifications(
-        inviteData.map((inv) => ({
+        inviteData.map((inv: any) => ({
           userId: inv.userId,
           type: "invitation" as const,
           title: material?.title || "Undangan Kajian",

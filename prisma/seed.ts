@@ -1,7 +1,7 @@
 import {
   PrismaClient,
-  Material_Grade,
-  Material_Category,
+  MaterialGrade,
+  MaterialCategory,
   NotificationType,
   NotificationStatus,
 } from "@prisma/client";
@@ -18,15 +18,18 @@ async function main() {
 
   await prisma.notification.deleteMany();
   await prisma.materialInvite.deleteMany();
+  await prisma.courseEnrollment.deleteMany();
+  await prisma.programEnrollment.deleteMany();
 
   await prisma.material.deleteMany();
+  await prisma.program.deleteMany();
   await prisma.news.deleteMany();
   await prisma.schedule.deleteMany();
 
-  await prisma.quiz.deleteMany();
+  await prisma.materialQuiz.deleteMany();
   await prisma.quizQuestion.deleteMany();
   await prisma.quizOption.deleteMany();
-  await prisma.userAnswer.deleteMany();
+  await prisma.quizAttempt.deleteMany();
 
   await prisma.user.deleteMany();
 
@@ -40,7 +43,7 @@ async function main() {
       email: "ustadz.ahmad@irma.com",
       name: "Ustadz Ahmad Zaki",
       password: hashedPassword,
-      role: "instruktur",
+      role: "user",
       notelp: "081234567890",
       address: "Jakarta, Indonesia",
       bio: "Pengajar bijak dengan 15 tahun pengalaman",
@@ -272,6 +275,61 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
     });
   }
 
+  // ── PROGRAMS ──────────────────────────────────────────────────────────────────
+  const program1 = await prisma.program.create({
+    data: {
+      title: "Program Aqidah & Akhlak",
+      description:
+        "Program pembelajaran aqidah dan akhlak islami untuk santri, mencakup dasar-dasar keimanan dan pembentukan karakter Islami.",
+      grade: MaterialGrade.X,
+      category: MaterialCategory.Wajib,
+      instructorId: "101",
+      duration: "12 Sesi / 3 Bulan",
+      thumbnailUrl: "https://picsum.photos/seed/program1/400/300",
+      syllabus: [
+        "Pengenalan Aqidah Islam",
+        "Rukun Iman dan Penjelasannya",
+        "Akhlak Mulia dalam Kehidupan",
+        "Adab Sehari-hari",
+      ],
+      requirements: ["Bisa membaca Al-Quran", "Komitmen hadir tiap sesi"],
+      benefits: [
+        "Memahami dasar-dasar aqidah Islam",
+        "Meningkatkan kualitas akhlak",
+        "Mendapat sertifikat kelulusan",
+      ],
+    },
+  });
+
+  const program2 = await prisma.program.create({
+    data: {
+      title: "Program Tafsir Al-Quran",
+      description:
+        "Program mendalam tentang tafsir dan ilmu Al-Quran, dirancang untuk santri tingkat lanjut yang ingin memahami makna Al-Quran secara komprehensif.",
+      grade: MaterialGrade.XII,
+      category: MaterialCategory.NextLevel,
+      instructorId: "102",
+      duration: "16 Sesi / 4 Bulan",
+      thumbnailUrl: "https://picsum.photos/seed/program2/400/300",
+      syllabus: [
+        "Ilmu Tajwid Lanjutan",
+        "Tafsir Surat-surat Pendek",
+        "Tafsir Surat Al-Baqarah",
+        "Metode Penafsiran Al-Quran",
+      ],
+      requirements: [
+        "Hafal minimal Juz 30",
+        "Pengalaman mengaji minimal 2 tahun",
+      ],
+      benefits: [
+        "Mampu membaca Al-Quran dengan tartil",
+        "Memahami makna dan tafsir ayat",
+        "Meningkatkan kecintaan terhadap Al-Quran",
+      ],
+    },
+  });
+
+  // ── MATERIALS ─────────────────────────────────────────────────────────────────
   const materialsData = [
     {
       title: "Kedudukan Akal dan Wahyu",
@@ -283,6 +341,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       date: "2024-11-25",
       startedAt: "15:00 - 17:00",
       participants: 45,
+      programId: program1.id,
     },
     {
       title: "Fiqih Ibadah Sehari-hari",
@@ -294,6 +353,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       date: "2024-11-28",
       startedAt: "14:00 - 16:00",
       participants: 38,
+      programId: program2.id,
     },
     {
       title: "Tafsir Al-Quran: Surah Al-Baqarah",
@@ -305,6 +365,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       date: "2024-12-01",
       startedAt: "15:00 - 17:00",
       participants: 52,
+      programId: program2.id,
     },
     {
       title: "Sejarah Khulafaur Rasyidin",
@@ -316,6 +377,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       date: "2024-12-05",
       startedAt: "13:00 - 15:00",
       participants: 41,
+      programId: null,
     },
     {
       title: "Rukun Iman dan Implementasinya",
@@ -327,6 +389,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       date: "2024-12-08",
       startedAt: "14:00 - 16:00",
       participants: 47,
+      programId: program1.id,
     },
     {
       title: "Akhlak kepada Orang Tua",
@@ -338,6 +401,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       date: "2024-12-10",
       startedAt: "15:00 - 17:00",
       participants: 55,
+      programId: null,
     },
   ];
 
@@ -353,6 +417,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
         date: new Date(mt.date),
         startedAt: mt.startedAt,
         participants: mt.participants.toString(),
+        programId: mt.programId ?? null,
       },
     });
   };
@@ -363,30 +428,22 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
       id: "q1",
       title: "Pemahaman Dasar Fiqih",
       description: "Kajian Fiqih Bab Thaharah",
-      questionsCount: 15,
-      coverColor: "from-teal-400 to-emerald-400",
     },
     {
       id: "q2",
       title: "Kisah Nabi & Sahabat",
       description: "Sirah Nabawiyah: Perang Badar",
-      questionsCount: 20,
-      coverColor: "from-blue-400 to-indigo-400",
     },
     {
       id: "q3",
       title: "Adab Menuntut Ilmu",
       description: "Kajian Rutin: Kitab Ta'lim Muta'allim",
-      questionsCount: 10,
       score: 90,
-      coverColor: "from-purple-400 to-fuchsia-400",
     },
     {
       id: "q4",
       title: "Tajwid Dasar",
       description: "Tahsin Al-Quran Pertemuan 1",
-      questionsCount: 10,
-      coverColor: "from-orange-400 to-rose-400",
     }
   ];
 
@@ -455,13 +512,11 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
   ];
 
   for (const q of quizdata) {
-    await prisma.quiz.create({
+    await prisma.materialQuiz.create({
       data: {
         id: q.id,
         title: q.title,
         description: q.description,
-        questionsCount: q.questionsCount,
-        coverColor: q.coverColor,
       },
     });
   }
@@ -480,12 +535,17 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
     await prisma.quizOption.create({
       data: {
         questionId: o.questionId,
-        order: o.order,
-        option: o.option,
+        text: o.option,
         isCorrect: o.isCorrect,
       },
     });
   }
+
+  // ── PROGRAM ENROLLMENTS ───────────────────────────────────────────────────────
+  // Enroll user3 (Rafa) into program1
+  await prisma.programEnrollment.create({
+    data: { programId: program1.id, userId: user3.id },
+  });
 
   // Create sample notifications for user3 (Rafa)
   // 1. Basic notification
@@ -541,7 +601,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15);
 
-  // Create the MaterialInvite first
+  // Create the materialinvite first
   await prisma.materialInvite.create({
     data: {
       materialId: (await prisma.material.findFirst({
@@ -613,7 +673,11 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
   console.log(`   - Users: 3 + 6 instructors`);
   console.log(`   - News: 5`);
   console.log(`   - Schedules: 3`);
-  console.log(`   - Materials: 6`);
+  console.log(
+    `   - Programs: 2 (program1 dengan 3 materi, program2 dengan 2 materi)`,
+  );
+  console.log(`   - Materials: 6 (4 terhubung ke program, 2 mandiri)`);
+  console.log(`   - Program Enrollments: 1 (Rafa → Program Aqidah & Akhlak)`);
   console.log(`   - Notifications: 5 (3 basic + 2 invitations)`);
   console.log(`   - Material Invites: 2`);
   console.log(`   - Quizzes: 4`);
@@ -626,30 +690,28 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
   console.log('   - "rafa" (untuk mencari pengguna)');
 }
 
-function mapGrade(value: string): Material_Grade {
+function mapGrade(value: string): MaterialGrade {
   switch (value) {
     case "X":
-      return Material_Grade.X;
+      return MaterialGrade.X;
     case "XI":
-      return Material_Grade.XI;
+      return MaterialGrade.XI;
     case "XII":
-      return Material_Grade.XII;
-    case "XIII":
-      return Material_Grade.XIII;
+      return MaterialGrade.XII;
     default:
       throw new Error(`Invalid grade: ${value}`);
   }
 }
-function mapCourseCategory(value: string): Material_Category {
+function mapCourseCategory(value: string): MaterialCategory {
   switch (value) {
     case "Wajib":
-      return Material_Category.Wajib;
+      return MaterialCategory.Wajib;
     case "Ekstra":
-      return Material_Category.Extra;
+      return MaterialCategory.Extra;
     case "Next Level":
-      return Material_Category.NextLevel;
+      return MaterialCategory.NextLevel;
     case "Susulan":
-      return Material_Category.Susulan;
+      return MaterialCategory.Susulan;
     default:
       throw new Error(`Invalid course category: ${value}`);
   }

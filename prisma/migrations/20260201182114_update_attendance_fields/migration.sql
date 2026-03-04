@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `Attendance` ADD COLUMN `clarity` VARCHAR(191) NULL,
+ALTER TABLE `attendance` ADD COLUMN `clarity` VARCHAR(191) NULL,
     ADD COLUMN `date` VARCHAR(191) NULL,
     ADD COLUMN `endTime` VARCHAR(191) NULL,
     ADD COLUMN `feedback` TEXT NULL,

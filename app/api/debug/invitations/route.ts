@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     // Get ALL invitations (untuk debugging)
-    const allInvitations = await prisma.materialInvite.findMany({
+    const allInvitations = await prisma.materialinvite.findMany({
       include: {
         material: {
           select: {
@@ -12,14 +12,14 @@ export async function GET() {
             title: true,
           },
         },
-        user: {
+        users_materialinvite_userIdTousers: {
           select: {
             id: true,
             email: true,
             name: true,
           },
         },
-        instructor: {
+        users_materialinvite_instructorIdTousers: {
           select: {
             id: true,
             email: true,
@@ -29,7 +29,10 @@ export async function GET() {
       },
     });
 
-    console.log("All invitations in database:", JSON.stringify(allInvitations, null, 2));
+    console.log(
+      "All invitations in database:",
+      JSON.stringify(allInvitations, null, 2),
+    );
 
     return NextResponse.json({
       success: true,
@@ -40,7 +43,7 @@ export async function GET() {
     console.error("Debug invitations error:", error);
     return NextResponse.json(
       { error: "Failed to fetch invitations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -86,6 +86,8 @@ const Dashboard = () => {
   const [loadingInstructors, setLoadingInstructors] = useState(true);
   const [finishedMaterials, setFinishedMaterials] = useState<any[]>([]);
   const [loadingFinished, setLoadingFinished] = useState(true);
+  const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [loadingNews, setLoadingNews] = useState(true);
 
   // Redirect non-user roles away from overview
   React.useEffect(() => {
@@ -103,11 +105,12 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         // Load instructors, favorites, materials, and attendance
-        const [instructorsRes, favoritesRes, materialsRes, attendanceRes] = await Promise.all([
+        const [instructorsRes, favoritesRes, materialsRes, attendanceRes, newsRes] = await Promise.all([
           fetch("/api/instructors"),
           fetch("/api/instructors/favorites"),
           fetch("/api/materials"),
           fetch("/api/materials/attendance"),
+          fetch("/api/news"),
         ]);
 
         if (instructorsRes.ok) {
@@ -144,12 +147,21 @@ const Dashboard = () => {
           setFinishedMaterials(finished.slice(0, 5));
         }
 
+        if (newsRes.ok) {
+          const nData = await newsRes.json();
+          const sortedNews = Array.isArray(nData) 
+            ? nData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            : [];
+          setLatestNews(sortedNews.slice(0, 2));
+        }
+
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
         setLoadingInstructors(false);
         setLoadingMaterials(false);
         setLoadingFinished(false);
+        setLoadingNews(false);
       }
     };
 
@@ -190,23 +202,6 @@ const Dashboard = () => {
     { title: "Kuis", icon: Trophy, link: "/quiz" },
     { title: "Diskusi", icon: MessageCircle, link: "/chat-rooms" },
     { title: "Peringkat", icon: TrendingUp, link: "/leaderboard" },
-  ];
-
-  const newsItems = [
-    {
-      id: 1,
-      title: "Kegiatan Ramadhan 1446H Dimulai!",
-      category: "Event",
-      date: "12 Maret 2025",
-      imageId: "10"
-    },
-    {
-      id: 2,
-      title: "Selamat Kepada Juara Lomba Adzan",
-      category: "Prestasi",
-      date: "10 Maret 2025",
-      imageId: "15"
-    }
   ];
 
   const [materials, setMaterials] = useState<any[]>([]);
@@ -320,24 +315,30 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {newsItems.map((news) => (
-                    <div key={news.id} className="flex gap-4 p-4 bg-white rounded-4xl border-2 border-slate-100 hover:border-emerald-400 hover:shadow-[0_6px_0_0_#10b981] hover:-translate-y-1 transition-all cursor-pointer group">
-                      <div className="w-24 h-24 rounded-2xl bg-slate-200 overflow-hidden shrink-0 border-2 border-slate-100 group-hover:border-emerald-200">
-                        <img src={`https://picsum.photos/200/200?random=${news.imageId}`} alt={news.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                      </div>
-                      <div className="flex flex-col justify-center">
-                        <span className="inline-block w-fit px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-black border border-emerald-100 mb-2 uppercase tracking-wide">
-                          {news.category}
-                        </span>
-                        <h3 className="font-bold text-slate-800 leading-snug mb-2 text-base group-hover:text-emerald-600 transition-colors line-clamp-2">
-                          {news.title}
-                        </h3>
-                        <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" /> {news.date}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                  {loadingNews ? (
+                    <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2">Memuat kabar IRMA...</p>
+                  ) : latestNews.length === 0 ? (
+                    <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2">Belum ada kabar terbaru</p>
+                  ) : (
+                    latestNews.map((news) => (
+                      <Link href={`/news/${news.slug}`} key={news.id} className="flex gap-4 p-4 bg-white rounded-4xl border-2 border-slate-100 hover:border-emerald-400 hover:shadow-[0_6px_0_0_#10b981] hover:-translate-y-1 transition-all cursor-pointer group">
+                        <div className="w-24 h-24 rounded-2xl bg-slate-200 overflow-hidden shrink-0 border-2 border-slate-100 group-hover:border-emerald-200">
+                          <img src={news.image || `https://images.unsplash.com/photo-1633613286991-611bcfb63dba?auto=format&fit=crop&w=800&q=80`} alt={news.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        </div>
+                        <div className="flex flex-col justify-center">
+                          <span className="inline-block w-fit px-2 py-0.5 rounded-md bg-emerald-500 text-white text-[10px] font-black border border-emerald-600 shadow-sm mb-2 uppercase tracking-wide">
+                            {news.category}
+                          </span>
+                          <h3 className="font-bold text-slate-800 leading-snug mb-2 text-base group-hover:text-emerald-600 transition-colors line-clamp-2">
+                            {news.title}
+                          </h3>
+                          <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" /> {new Date(news.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          </span>
+                        </div>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </section>
 

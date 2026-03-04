@@ -8,10 +8,11 @@ import Loading from "@/components/ui/Loading";
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import SearchInput from "@/components/ui/SearchInput";
 import EmptyState from "@/components/ui/EmptyState";
-import { Trophy, Calendar, Target } from "lucide-react";
+import { Trophy, Calendar, Target, Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import DetailButton from "@/components/ui/DetailButton";
 import Toast from "@/components/ui/Toast";
+import AddButton from "@/components/ui/AddButton";
 
 interface CompetitionItem {
   id: string;
@@ -115,8 +116,8 @@ const Competitions = () => {
           <div className="max-w-7xl mx-auto">
             
             {/* Header */}
-            <div className="mb-6 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
                   Info Perlombaan
                 </h1>
@@ -124,14 +125,18 @@ const Competitions = () => {
                   Tunjukkan bakatmu di ajang bergengsi ini!
                 </p>
               </div>
-              {session?.user?.role === "instruktur" && (
-                <button
-                  onClick={() => router.push("/competitions/create")}
-                  className="px-6 py-3 rounded-2xl bg-emerald-400 text-white font-black border-2 border-emerald-600 border-b-4 hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5 transition-all shadow-lg hover:shadow-emerald-200"
-                >
-                  + Tambah Lomba
-                </button>
-              )}
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                {session?.user?.role === "instruktur" && (
+                  <AddButton
+                    label="Tambah Lomba"
+                    onClick={() => router.push("/competitions/create")}
+                    icon={<Plus className="h-5 w-5" />}
+                    color="emerald"
+                    hideIcon={false}
+                  />
+                )}
+              </div>
             </div>
 
             {/* Search Bar */}

@@ -4,11 +4,11 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     // Get ALL invitations with all details
-    const invitations = await prisma.materialInvite.findMany({
+    const invitations = await prisma.materialinvite.findMany({
       include: {
         material: true,
-        instructor: true,
-        user: true,
+        users_materialinvite_instructorIdTousers: true,
+        users_materialinvite_userIdTousers: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -28,15 +28,15 @@ export async function GET() {
         },
         instructorId: inv.instructorId,
         instructor: {
-          id: inv.instructor?.id,
-          name: inv.instructor?.name,
-          email: inv.instructor?.email,
+          id: inv.users_materialinvite_instructorIdTousers?.id,
+          name: inv.users_materialinvite_instructorIdTousers?.name,
+          email: inv.users_materialinvite_instructorIdTousers?.email,
         },
         userId: inv.userId,
         user: {
-          id: inv.user?.id,
-          name: inv.user?.name,
-          email: inv.user?.email,
+          id: inv.users_materialinvite_userIdTousers?.id,
+          name: inv.users_materialinvite_userIdTousers?.name,
+          email: inv.users_materialinvite_userIdTousers?.email,
         },
         createdAt: inv.createdAt,
       })),
@@ -45,7 +45,7 @@ export async function GET() {
     console.error("Debug invitations error:", error);
     return NextResponse.json(
       { error: "Failed to fetch invitations", details: String(error) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

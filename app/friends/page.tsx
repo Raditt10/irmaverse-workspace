@@ -208,7 +208,7 @@ export default function FriendsPage() {
   : friends;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex flex-col font-sans" style={{ fontFamily: "'Inter', 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif" }}>
+    <div className="min-h-screen bg-[#FDFBF7] flex flex-col font-sans">
       <DashboardHeader />
       
       <div className="flex flex-1">

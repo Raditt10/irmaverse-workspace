@@ -202,9 +202,9 @@ const Materials = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             
-            <div className="mb-6 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5">
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
                   {isPrivileged ? "Kelola Kajian" : "Jadwal Kajianku"}
                 </h1>
                 <p className="text-slate-500 font-medium text-xs lg:text-lg">
@@ -214,15 +214,17 @@ const Materials = () => {
                 </p>
               </div>
 
-              {isPrivileged && (
-                <AddButton
-                  label="Buat Kajian"
-                  onClick={() => router.push("/materials/create")}
-                  icon={<Plus className="h-5 w-5" />}
-                  color="emerald"
-                  hideIcon={false}
-                />
-              )}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                {isPrivileged && (
+                  <AddButton
+                    label="Buat Kajian"
+                    onClick={() => router.push("/materials/create")}
+                    icon={<Plus className="h-5 w-5" />}
+                    color="emerald"
+                    hideIcon={false}
+                  />
+                )}
+              </div>
             </div>
 
             {/* --- LATEST MATERIAL CARD --- */}

@@ -29,7 +29,6 @@ export async function GET(req: NextRequest) {
         name: true,
         role: true,
         avatar: true,
-        visibility: true,
         lastSeen: true,
         points: true,
         class: true,

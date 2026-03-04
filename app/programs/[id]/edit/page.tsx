@@ -4,13 +4,10 @@ import { useRouter, useParams } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
-import Toast from "@/components/ui/Toast"; // Import Toast
+import Toast from "@/components/ui/Toast";
 import {
   Type,
-  Calendar,
-  Save,
   ArrowLeft,
-  BookOpen,
   Sparkles,
   Plus,
   Trash2,
@@ -19,23 +16,9 @@ import {
   GraduationCap,
   Target,
   Clock,
-  ListChecks,
-  RotateCcw,
 } from "lucide-react";
 import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
-
-interface Program {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  level: string; // From API
-  image?: string;
-  syllabus?: string[];
-  requirements?: string[];
-  benefits?: string[];
-}
 
 const EditProgram = () => {
   const router = useRouter();
@@ -46,7 +29,6 @@ const EditProgram = () => {
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Ganti Notification dengan Toast State
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -63,68 +45,54 @@ const EditProgram = () => {
     syllabus: [] as string[],
     requirements: [] as string[],
     benefits: [] as string[],
-    sessions: [] as { id?: string; title: string; description: string }[],
   });
 
-  // Helper Toast
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
 
-  // Fetch program data
   useEffect(() => {
-    if (programId) {
-      fetchProgramData();
-    }
+    if (programId) fetchProgramData();
   }, [programId]);
 
   const fetchProgramData = async () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/programs/${programId}`);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Gagal mengambil data program");
-      }
-      
+      if (!res.ok) throw new Error("Gagal mengambil data kursus");
       const program = await res.json();
 
       setFormData({
         title: program.title || "",
         description: program.description || "",
         duration: program.duration || "",
-        grade: program.level || "Semua", // Align level to grade
-        category: "Program Wajib",
+        grade: program.level || "Semua",
+        category: program.category || "Program Wajib",
         thumbnailUrl: program.image || "",
         syllabus: program.syllabus || [],
         requirements: program.requirements || [],
         benefits: program.benefits || [],
-        sessions: (program.sessions || []).map((s: any) => ({
-          ...s,
-          title: s.title || "",
-          description: s.description || "",
-        })),
       });
     } catch (err: any) {
-      console.error(err);
-      showToast(err.message || "Tidak bisa memuat data program", "error");
+      showToast(err.message || "Tidak bisa memuat data kursus", "error");
     } finally {
       setLoading(false);
     }
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleArrayChange = (name: "syllabus" | "requirements" | "benefits", index: number, value: string) => {
+  const handleArrayChange = (
+    name: "syllabus" | "requirements" | "benefits",
+    index: number,
+    value: string,
+  ) => {
     const newArray = [...formData[name]];
     newArray[index] = value;
     setFormData((prev) => ({ ...prev, [name]: newArray }));
@@ -134,36 +102,12 @@ const EditProgram = () => {
     setFormData((prev) => ({ ...prev, [name]: [...prev[name], ""] }));
   };
 
-  const removeArrayItem = (name: "syllabus" | "requirements" | "benefits", index: number) => {
+  const removeArrayItem = (
+    name: "syllabus" | "requirements" | "benefits",
+    index: number,
+  ) => {
     const newArray = formData[name].filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, [name]: newArray }));
-  };
-
-  const handleSessionChange = (index: number, field: "title" | "description", value: string) => {
-    const newSessions = [...formData.sessions];
-    newSessions[index] = { ...newSessions[index], [field]: value };
-    setFormData((prev) => ({ ...prev, sessions: newSessions }));
-  };
-
-  const addSession = () => {
-    setFormData((prev) => ({ 
-      ...prev, 
-      sessions: [...prev.sessions, { title: `Kajian ${prev.sessions.length + 1}`, description: "" }] 
-    }));
-  };
-
-  const removeSession = (index: number) => {
-    const newSessions = formData.sessions.filter((_, i) => i !== index);
-    setFormData((prev) => ({ ...prev, sessions: newSessions }));
-  };
-
-  const generateSessionsTemplate = (count: number) => {
-    const newSessions = Array.from({ length: count }, (_, i) => ({
-      title: `Kajian ${i + 1}`,
-      description: "",
-    }));
-    setFormData((prev) => ({ ...prev, sessions: newSessions }));
-    showToast(`${count} Template Kajian berhasil dibuat`, "success");
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,24 +115,18 @@ const EditProgram = () => {
     if (file) {
       setUploading(true);
       try {
-        const data = new FormData();
-        data.append("file", file);
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: data,
-        });
-
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
         if (!res.ok) {
           const error = await res.json();
           showToast(error.error || "Gagal mengunggah gambar", "error");
           return;
         }
-
-        const resData = await res.json();
-        setFormData((prev) => ({ ...prev, thumbnailUrl: resData.url }));
-        showToast("Banner program berhasil diunggah", "success");
-      } catch (error: any) {
+        const data = await res.json();
+        setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
+        showToast("Banner berhasil diunggah", "success");
+      } catch {
         showToast("Terjadi kesalahan saat mengunggah gambar", "error");
       } finally {
         setUploading(false);
@@ -198,7 +136,6 @@ const EditProgram = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!formData.title || !formData.description) {
       showToast("Harap isi semua field yang diperlukan", "error");
       return;
@@ -208,9 +145,7 @@ const EditProgram = () => {
     try {
       const res = await fetch(`/api/programs/${programId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: formData.title,
           description: formData.description,
@@ -221,19 +156,16 @@ const EditProgram = () => {
           requirements: formData.requirements,
           benefits: formData.benefits,
           thumbnailUrl: formData.thumbnailUrl,
-          sessions: formData.sessions,
         }),
       });
-
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Gagal memperbarui program");
+        throw new Error(errorData.error || "Gagal memperbarui kursus");
       }
-      
-      showToast("Program berhasil diperbarui! ✨", "success");
+      showToast("Kursus berhasil diperbarui! ✨", "success");
       setTimeout(() => router.push(`/programs/${programId}`), 2000);
     } catch (error: any) {
-      showToast(error.message || "Terjadi kesalahan saat memperbarui program", "error");
+      showToast(error.message || "Terjadi kesalahan", "error");
     } finally {
       setSubmitting(false);
     }
@@ -243,8 +175,10 @@ const EditProgram = () => {
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-            <Sparkles className="h-10 w-10 text-emerald-400 animate-spin" />
-            <p className="text-slate-500 font-bold animate-pulse">Memuat data program...</p>
+          <Sparkles className="h-10 w-10 text-emerald-400 animate-spin" />
+          <p className="text-slate-500 font-bold animate-pulse">
+            Memuat data kursus...
+          </p>
         </div>
       </div>
     );
@@ -257,8 +191,7 @@ const EditProgram = () => {
         <Sidebar />
         <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-12 w-full max-w-[100vw] overflow-hidden">
           <div className="max-w-5xl mx-auto">
-            
-            {/* Header & Back Button */}
+            {/* Header */}
             <div className="flex flex-col gap-4 mb-8">
               <button
                 onClick={() => router.back()}
@@ -268,30 +201,30 @@ const EditProgram = () => {
                 Kembali
               </button>
               <div>
-                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
-                  Edit Program
+                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2">
+                  Edit Kursus
                 </h1>
                 <p className="text-slate-500 font-medium text-lg">
-                  Perbarui informasi dan detail program kurikulum.
+                  Perbarui informasi dan detail kursus.
                 </p>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
-              {/* --- LEFT COLUMN: CONTENT --- */}
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+            >
+              {/* LEFT COLUMN */}
               <div className="lg:col-span-2 space-y-8">
-                
-                {/* 1. Detail Program */}
+                {/* Detail */}
                 <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-xl font-black text-slate-700 mb-6 flex items-center gap-2">
-                    <Type className="h-6 w-6 text-emerald-500" /> Detail Program
+                    <Type className="h-6 w-6 text-emerald-500" /> Detail Kursus
                   </h2>
-
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-bold text-slate-600 ml-1">
-                        Nama Program Kurikulum
+                        Nama Kursus
                       </label>
                       <Input
                         type="text"
@@ -299,45 +232,41 @@ const EditProgram = () => {
                         required
                         value={formData.title}
                         onChange={handleInputChange}
-                        placeholder="Contoh: Tahfizh Akhir Pekan (Juz 30)"
+                        placeholder="Nama kursus..."
                       />
                     </div>
-
                     <div className="space-y-2">
                       <label className="block text-sm font-bold text-slate-600 ml-1">
-                        Deskripsi Program
+                        Deskripsi Kursus
                       </label>
                       <Textarea
                         name="description"
                         rows={6}
                         value={formData.description}
                         onChange={handleInputChange}
-                        placeholder="Jelaskan visi dan materi yang akan dipelajari dalam program ini..."
+                        placeholder="Deskripsi kursus..."
                       />
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-6 pt-4 border-t-2 border-slate-50">
-                      <div className="space-y-2">
-                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-emerald-500" /> Durasi
-                        </label>
-                        <Input
-                          type="text"
-                          name="duration"
-                          value={formData.duration}
-                          onChange={handleInputChange}
-                          placeholder="e.g. 12 Sesi / 3 Bulan"
-                        />
-                      </div>
+                    <div className="space-y-2 pt-4 border-t-2 border-slate-50">
+                      <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-emerald-500" /> Durasi
+                      </label>
+                      <Input
+                        type="text"
+                        name="duration"
+                        value={formData.duration}
+                        onChange={handleInputChange}
+                        placeholder="e.g. 12 Sesi / 3 Bulan"
+                      />
                     </div>
                   </div>
                 </div>
 
-                {/* 2. Silabus & Materi */}
+                {/* Silabus */}
                 <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
-                    <div className="w-1.5 h-8 bg-purple-500 rounded-full"></div>
-                    Silabus & Materi
+                    <div className="w-1.5 h-8 bg-purple-500 rounded-full" />
+                    Silabus
                   </h2>
                   <div className="space-y-4">
                     {formData.syllabus.map((item, idx) => (
@@ -348,8 +277,10 @@ const EditProgram = () => {
                         <input
                           type="text"
                           value={item}
-                          onChange={(e) => handleArrayChange("syllabus", idx, e.target.value)}
-                          placeholder="e.g. Pengenalan Tajwid Dasar"
+                          onChange={(e) =>
+                            handleArrayChange("syllabus", idx, e.target.value)
+                          }
+                          placeholder="Item silabus..."
                           className="flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 font-bold text-slate-700 focus:outline-none focus:border-emerald-400 focus:bg-white transition-all text-sm"
                         />
                         <button
@@ -371,12 +302,11 @@ const EditProgram = () => {
                   </div>
                 </div>
 
-                {/* 3. Persyaratan & Manfaat */}
+                {/* Persyaratan & Manfaat */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Persyaratan */}
                   <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]">
                     <h2 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
-                      <div className="w-1.5 h-8 bg-amber-400 rounded-full"></div>
+                      <div className="w-1.5 h-8 bg-amber-400 rounded-full" />
                       Persyaratan
                     </h2>
                     <div className="space-y-3">
@@ -385,8 +315,14 @@ const EditProgram = () => {
                           <input
                             type="text"
                             value={item}
-                            onChange={(e) => handleArrayChange("requirements", idx, e.target.value)}
-                            placeholder="e.g. Lancar membaca Quran"
+                            onChange={(e) =>
+                              handleArrayChange(
+                                "requirements",
+                                idx,
+                                e.target.value,
+                              )
+                            }
+                            placeholder="Persyaratan..."
                             className="flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:border-emerald-400 focus:bg-white transition-all"
                           />
                           <button
@@ -408,10 +344,9 @@ const EditProgram = () => {
                     </div>
                   </div>
 
-                  {/* Manfaat */}
                   <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]">
                     <h2 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-3">
-                      <div className="w-1.5 h-8 bg-emerald-400 rounded-full"></div>
+                      <div className="w-1.5 h-8 bg-emerald-400 rounded-full" />
                       Manfaat
                     </h2>
                     <div className="space-y-3">
@@ -420,8 +355,10 @@ const EditProgram = () => {
                           <input
                             type="text"
                             value={item}
-                            onChange={(e) => handleArrayChange("benefits", idx, e.target.value)}
-                            placeholder="e.g. Sertifikat resmi"
+                            onChange={(e) =>
+                              handleArrayChange("benefits", idx, e.target.value)
+                            }
+                            placeholder="Manfaat..."
                             className="flex-1 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:border-emerald-400 focus:bg-white transition-all"
                           />
                           <button
@@ -444,149 +381,39 @@ const EditProgram = () => {
                   </div>
                 </div>
 
-                {/* --- DAFTAR KAJIAN (SESSIONS) --- */}
+                {/* Target Kelas */}
                 <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <div>
-                      <h2 className="text-xl font-black text-slate-800 flex items-center gap-3 mb-1">
-                        <div className="w-1.5 h-8 bg-teal-500 rounded-full"></div>
-                        Bagian Kajian Program
-                      </h2>
-                      <p className="text-sm text-slate-500 font-bold ml-4">Kelola sesi atau tahapan dalam program ini.</p>
-                    </div>
-                    
-                    {/* Template Controls */}
-                    <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-2xl border-2 border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2">Template:</span>
-                      {[4, 8, 12].map(num => (
+                  <h3 className="text-sm font-bold text-slate-700 mb-4 ml-1 flex items-center gap-2">
+                    <Target className="h-4 w-4 text-emerald-500" /> Target Kelas
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {["Semua", "Kelas 10", "Kelas 11", "Kelas 12"].map(
+                      (grade) => (
                         <button
-                          key={num}
+                          key={grade}
                           type="button"
-                          onClick={() => generateSessionsTemplate(num)}
-                          className="px-3 py-1.5 rounded-xl bg-white border-2 border-slate-200 text-slate-600 font-black text-xs hover:border-teal-400 hover:text-teal-600 transition-all shadow-sm active:translate-y-0.5 active:shadow-none"
+                          onClick={() => setFormData({ ...formData, grade })}
+                          className={`px-6 py-2.5 rounded-full font-black text-sm transition-all border-2 ${
+                            formData.grade === grade
+                              ? "bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_0_#059669]"
+                              : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300"
+                          }`}
                         >
-                          {num} Sesi
+                          {grade}
                         </button>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, sessions: [] })}
-                        className="p-1.5 rounded-xl bg-red-50 text-red-400 hover:bg-red-100 transition-colors"
-                        title="Reset Semua"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {formData.sessions.length === 0 ? (
-                      <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-[2rem] bg-slate-50/30">
-                        <div className="w-16 h-16 bg-white rounded-3xl border-2 border-slate-100 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                          <ListChecks className="w-8 h-8 text-slate-300" />
-                        </div>
-                        <h4 className="text-slate-500 font-black mb-1">Belum ada bagian kajian</h4>
-                        <p className="text-slate-400 text-sm font-bold mb-6">Mulai dengan menambah sesi atau gunakan template di atas.</p>
-                        <button
-                          type="button"
-                          onClick={addSession}
-                          className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 text-white font-black rounded-2xl shadow-[0_4px_0_0_#0f766e] border-2 border-teal-400 hover:bg-teal-600 active:translate-y-1 active:shadow-none transition-all"
-                        >
-                          <Plus className="w-5 h-5" /> Tambah Kajian Pertama
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="grid grid-cols-1 gap-4">
-                          {formData.sessions.map((session, idx) => (
-                            <div key={idx} className="group relative bg-slate-50 p-5 rounded-[2rem] border-2 border-slate-100 hover:border-teal-400 hover:bg-white transition-all">
-                              <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex items-center justify-between sm:justify-start gap-4">
-                                  <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-teal-500 text-white font-black text-sm shadow-[0_3px_0_0_#0f766e]">
-                                    {idx + 1}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeSession(idx)}
-                                    className="sm:hidden p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100"
-                                  >
-                                    <Trash2 className="w-5 h-5" />
-                                  </button>
-                                </div>
-                                <div className="flex-1 space-y-3">
-                                  <input
-                                    type="text"
-                                    value={session.title || ""}
-                                    onChange={(e) => handleSessionChange(idx, "title", e.target.value)}
-                                    placeholder="Judul Kajian / Sesi"
-                                    className="w-full bg-transparent border-b-2 border-slate-200 focus:border-teal-400 outline-none py-1 font-black text-slate-800 placeholder:text-slate-300 transition-colors"
-                                  />
-                                  <textarea
-                                    value={session.description || ""}
-                                    onChange={(e) => handleSessionChange(idx, "description", e.target.value)}
-                                    placeholder="Apa yang akan dibahas di sesi ini? (Opsional)"
-                                    rows={1}
-                                    className="w-full bg-transparent border-none outline-none resize-none text-sm font-bold text-slate-500 placeholder:text-slate-300"
-                                  />
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => removeSession(idx)}
-                                  className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-red-50 text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 transition-all shrink-0"
-                                >
-                                  <Trash2 className="w-5 h-5" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={addSession}
-                          className="w-full py-4 rounded-[2rem] border-2 border-dashed border-teal-200 bg-teal-50/30 text-teal-600 font-black text-sm hover:bg-teal-50 transition-all flex items-center justify-center gap-2"
-                        >
-                          <Plus className="w-5 h-5" /> Tambah Bagian Kajian Lain
-                        </button>
-                      </>
+                      ),
                     )}
-                  </div>
-                </div>
-
-                {/* 4. Tingkat Kelas */}
-                <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]">
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-8 text-center sm:text-left">
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-700 mb-4 ml-1 flex items-center justify-center sm:justify-start gap-2">
-                        <Target className="h-4 w-4 text-emerald-500" /> Target Kelas
-                      </h3>
-                      <div className="flex flex-wrap justify-center sm:justify-start gap-3">
-                        {["Semua", "Kelas 10", "Kelas 11", "Kelas 12"].map((grade) => (
-                          <button
-                            key={grade}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, grade })}
-                            className={`px-6 py-2.5 rounded-full font-black text-sm transition-all border-2 ${
-                              formData.grade === grade
-                                ? "bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_0_#059669]"
-                                : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300"
-                            }`}
-                          >
-                            {grade}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* --- RIGHT COLUMN: MEDIA & SUBMIT --- */}
+              {/* RIGHT COLUMN */}
               <div className="lg:col-span-1 space-y-6">
                 <div className="sticky top-8 space-y-6">
-                  {/* Thumbnail Card */}
+                  {/* Thumbnail */}
                   <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] text-center">
                     <label className="block text-sm font-bold text-slate-600 mb-4">
-                      Banner Program
+                      Banner Kursus
                     </label>
                     <div className="relative group overflow-hidden rounded-3xl border-2 border-dashed border-slate-300 aspect-video flex flex-col items-center justify-center bg-slate-50 hover:bg-emerald-50 hover:border-emerald-400 transition-all cursor-pointer">
                       <input
@@ -625,11 +452,14 @@ const EditProgram = () => {
                     </div>
                   </div>
 
-                  {/* Submit Card */}
+                  {/* Submit */}
                   <div className="bg-emerald-500 p-6 rounded-[2.5rem] text-white border-2 border-emerald-600 shadow-[0_6px_0_0_#059669]">
                     <div className="flex items-center gap-3 mb-4">
-                      <GraduationCap className="h-8 w-8 text-emerald-100" strokeWidth={2.5} />
-                      <h3 className="text-xl font-black">Simpan Perubahan?</h3>
+                      <GraduationCap
+                        className="h-8 w-8 text-emerald-100"
+                        strokeWidth={2.5}
+                      />
+                      <h3 className="text-xl font-black">Simpan Perubahan</h3>
                     </div>
                     <button
                       type="submit"
@@ -640,14 +470,11 @@ const EditProgram = () => {
                         <Sparkles className="h-6 w-6 animate-spin" />
                       ) : (
                         <>
-                          <Save className="h-6 w-6" />
-                          Simpan
+                          <Rocket className="h-6 w-6" />
+                          Perbarui Kursus
                         </>
                       )}
                     </button>
-                    <p className="text-xs text-emerald-100 font-bold mt-4 text-center opacity-80">
-                      Pastikan semua data sudah benar sebelum menyimpan.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -656,8 +483,6 @@ const EditProgram = () => {
         </div>
       </div>
       <ChatbotButton />
-
-      {/* Toast Notification */}
       <Toast
         show={toast.show}
         message={toast.message}

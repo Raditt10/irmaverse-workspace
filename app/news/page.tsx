@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
@@ -9,8 +10,9 @@ import { ArrowRight, Calendar, Eye, Share2, Bookmark, Filter, Plus, Pencil, Tras
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import CartoonNotification from "@/components/ui/Notification";
+import Toast from "@/components/ui/Toast";
 import EmptyState from "@/components/ui/EmptyState";
+import AddButton from "@/components/ui/AddButton";
 
 interface NewsItem {
   id: string;
@@ -61,7 +63,10 @@ const getLevenshteinDistance = (a: string, b: string) => {
 };
 
 const News = () => {
+  const router = useRouter();
   const { data: session } = useSession();
+  const role = session?.user?.role?.toLowerCase();
+  const isPrivileged = role === "admin" || role === "instruktur";
   const [news, setNews] = useState<NewsItem[]>([]);
   const [filteredNews, setFilteredNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,6 +91,13 @@ const News = () => {
   useEffect(() => {
     filterNews();
   }, [selectedCategory, searchTerm, news]);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const fetchNews = async () => {
     try {
@@ -213,45 +225,42 @@ const News = () => {
       <DashboardHeader/>
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 px-6 lg:px-8 py-12">
+        <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-4xl font-black text-slate-800 mb-2">
-                    Berita IRMA
-                  </h1>
-                  <p className="text-slate-600 text-lg">
-                    Berita terkini seputar kegiatan dan perkembangan IRMA Verse
-                  </p>
-                </div>
-                
-                {session?.user?.role === "admin" && (
-                  <Link
-                    href="/news/create"
-                    className="flex items-center gap-2 px-6 py-3 rounded-lg bg-linear-to-r from-teal-500 to-cyan-500 text-white font-semibold hover:from-teal-600 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    <Plus className="h-5 w-5" />
-                    Buat Berita
-                  </Link>
+            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex-1">
+                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
+                  Berita IRMA
+                </h1>
+                <p className="text-slate-500 font-medium text-xs lg:text-lg">
+                  Berita terkini seputar kegiatan dan perkembangan IRMA Verse
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                {isPrivileged && (
+                  <AddButton
+                    label="Buat Berita"
+                    onClick={() => router.push("/news/create")}
+                    icon={<Plus className="h-5 w-5" />}
+                    color="emerald"
+                    hideIcon={false}
+                  />
                 )}
               </div>
             </div>
 
             {/* Search & Filter */}
-            <div className="mb-8 space-y-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col sm:flex-row gap-4 relative">
-                  <div className="flex-1">
-                     <SearchInput
-                        placeholder="Cari judul berita..."
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                        className="w-full"
-                      />
-                  </div>
-                </div>
+            <div className="mb-6 lg:mb-8 flex flex-col gap-4">
+              <div className="w-full">
+                <SearchInput
+                  placeholder="Cari judul berita..."
+                  value={searchTerm}
+                  onChange={setSearchTerm}
+                  className="w-full transition-shadow duration-300"
+                />
+              </div>
 
                 {/* --- PROFESSIONAL "DID YOU MEAN" SUGGESTION UI --- */}
                 {suggestion && filteredNews.length === 0 && (
@@ -263,23 +272,22 @@ const News = () => {
                           onClick={handleSuggestionClick}
                           className="font-bold text-teal-600 hover:text-teal-700 hover:underline italic transition-colors"
                         >
-                          "{suggestion}"
+                        &quot;{suggestion}&quot;
                         </button>
                         ?
                       </p>
                    </div>
                 )}
+              <div className="relative min-w-0 pr-1 overflow-hidden">
+                <CategoryFilter
+                  categories={categories}
+                  subCategories={[]}
+                  selectedCategory={selectedCategory}
+                  selectedSubCategory=""
+                  onCategoryChange={setSelectedCategory}
+                  onSubCategoryChange={() => {}}
+                />
               </div>
-              
-              {/* Category Pills */}
-              <CategoryFilter
-                categories={categories}
-                subCategories={[]}
-                selectedCategory={selectedCategory}
-                selectedSubCategory=""
-                onCategoryChange={setSelectedCategory}
-                onSubCategoryChange={() => {}}
-              />
             </div>
 
             {loading ? (
@@ -292,7 +300,7 @@ const News = () => {
                   icon="search"
                   title="Tidak ada berita ditemukan"
                   description="Coba kata kunci lain atau ubah filter kategori."
-                  actionLabel={suggestion ? `Cari "${suggestion}" saja` : undefined}
+                  actionLabel={suggestion ? `Cari &quot;${suggestion}&quot; saja` : undefined}
                   onAction={suggestion ? handleSuggestionClick : undefined}
                 />
               </div>
@@ -301,79 +309,78 @@ const News = () => {
                 {filteredNews.map((item) => (
                   <div
                     key={item.id}
-                    className={`bg-white rounded-3xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-slate-100/50`}
+                    className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_8px_0_0_#34d399] transition-all duration-300 overflow-hidden group"
                   >
-                    <div className="flex flex-col sm:flex-row">
-                      {/* Image */}
-                      <div className="sm:w-72 h-56 sm:h-auto shrink-0 relative overflow-hidden">
+                    <div className="flex flex-col sm:flex-row relative">
+                      {/* Image Area */}
+                      <div className="w-full sm:w-72 h-48 sm:h-auto shrink-0 relative overflow-hidden bg-slate-100">
                         <img
                           src={item.image || "https://images.unsplash.com/photo-1633613286991-611bcfb63dba?auto=format&fit=crop&w=800&q=80"}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent sm:hidden" />
+                        <div className="absolute inset-0 bg-linear-to-t from-slate-900/60 via-transparent to-transparent sm:hidden" />
                         <span
-                          className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-lg tracking-wide ${categoryStyles[item.category]}`}
+                          className={`absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] uppercase font-black shadow-lg tracking-wider border-2 border-white/20 backdrop-blur-sm ${categoryStyles[item.category] || "bg-emerald-500 text-white"}`}
                         >
                           {item.category}
                         </span>
                       </div>
 
-                      {/* Content */}
-                      <div className="flex-1 p-6 sm:p-8 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center gap-4 text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="h-3.5 w-3.5" />
-                              <span>{new Date(item.createdAt).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })}</span>
-                            </div>
+                      {/* Content Area */}
+                      <div className="flex-1 p-5 sm:p-6 lg:p-8 flex flex-col justify-between overflow-hidden">
+                        <div className="mb-4">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span>{new Date(item.createdAt).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })}</span>
                           </div>
 
-                          <h2 className="text-2xl font-bold text-slate-800 mb-3 group-hover:text-teal-600 transition-colors line-clamp-2 leading-tight">
+                          <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-2 group-hover:text-teal-600 transition-colors line-clamp-2 leading-tight">
                             {item.title}
                           </h2>
 
-                          <p className="text-slate-600 mb-4 line-clamp-2 leading-relaxed">
+                          <p className="text-slate-500 font-medium text-sm line-clamp-2 md:line-clamp-3 leading-relaxed pr-2">
                             {item.deskripsi}
                           </p>
                         </div>
 
-                        <div className="flex items-center justify-between pt-5 border-t border-slate-100">
-                          <div className="flex items-center gap-2">
-                             <div className="w-6 h-6 rounded-full bg-linear-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-[10px] text-white font-bold">
-                                {(item.author.name || "A").charAt(0)}
+                        {/* Footer Info */}
+                        <div className="flex items-center justify-between pt-4 mt-auto border-t-2 border-slate-100">
+                          <div className="flex items-center gap-2 min-w-0 mr-4">
+                             <div className="w-8 h-8 rounded-full bg-teal-400 border-2 border-teal-500 flex shrink-0 items-center justify-center text-xs text-white font-black shadow-sm">
+                                {(item.author.name || "A").charAt(0).toUpperCase()}
                              </div>
-                             <span className="text-sm font-medium text-slate-500 truncate max-w-[100px] sm:max-w-none">
-                                {item.author.name || "Admin"}
+                             <span className="text-sm font-bold text-slate-600 truncate">
+                                {item.author.name || "Admin IRMA"}
                              </span>
                           </div>
 
-                          <div className="flex gap-2">
-                            {session?.user?.role === "admin" && (
+                          <div className="flex shrink-0 gap-2 items-center">
+                            {isPrivileged && (
                               <>
                                 <Link
                                   href={`/news/edit/${item.id}`}
-                                  className="p-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors text-slate-400"
+                                  className="p-2 sm:p-2.5 rounded-xl border-2 border-slate-200 bg-white hover:bg-teal-50 hover:text-teal-600 hover:border-teal-300 transition-all text-slate-400 shadow-sm hover:shadow active:-translate-y-0.5"
                                   title="Edit berita"
                                 >
-                                  <Pencil className="h-4 w-4" />
+                                  <Pencil className="h-4 w-4" strokeWidth={2.5}/>
                                 </Link>
                                 <button
                                   onClick={() => handleDelete(item.id)}
-                                  className="p-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors text-slate-400"
+                                  className="p-2 sm:p-2.5 rounded-xl border-2 border-slate-200 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 transition-all text-slate-400 shadow-sm hover:shadow active:-translate-y-0.5"
                                   title="Hapus berita"
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-4 w-4" strokeWidth={2.5}/>
                                 </button>
                               </>
                             )}
                             
                             <Link
                               href={`/news/${item.slug}`}
-                              className="pl-4 pr-2 py-2 rounded-lg bg-slate-50 text-slate-600 font-semibold hover:bg-teal-50 hover:text-teal-600 transition-all duration-300 flex items-center gap-2 text-sm group/btn"
+                              className="px-4 py-2 sm:py-2.5 rounded-xl bg-teal-50 text-teal-600 font-black border-2 border-teal-200 hover:bg-teal-400 hover:text-white hover:border-teal-500 hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm group/btn active:translate-y-0.5"
                             >
-                              <span>Baca</span>
-                              <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                              <span className="hidden sm:inline">Baca</span>
+                              <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform" strokeWidth={3}/>
                             </Link>
                           </div>
                         </div>
@@ -401,15 +408,12 @@ const News = () => {
       />
 
       {/* Notification */}
-      {notification && (
-        <CartoonNotification
-          type={notification.type}
-          title={notification.title}
-          message={notification.message}
-          duration={3000}
-          onClose={() => setNotification(null)}
-        />
-      )}
+      <Toast
+        show={!!notification}
+        type={notification?.type || "info"}
+        message={notification ? notification.message : ""}
+        onClose={() => setNotification(null)}
+      />
     </div>
   );
 };

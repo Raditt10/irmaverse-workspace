@@ -69,7 +69,7 @@ export default function InstructorAcademy() {
                 Pusat Instruktur
               </h1>
               <p className="text-slate-500 mt-1 font-bold text-base md:text-lg ml-1">
-                Kelola kajian dan bimbing siswa dengan penuh dedikasi ✨
+                Kelola kajian dan bimbing siswa dengan penuh dedikasi.
               </p>
             </div>
 

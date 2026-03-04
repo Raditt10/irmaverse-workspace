@@ -61,56 +61,56 @@ const LeaderboardPage = async () => {
           </div>
 
           {/* --- TOP 3 PODIUM (MOBILE OPTIMIZED) --- */}
-          <div className="flex justify-center items-end gap-2 md:gap-10 mb-12 px-2 md:px-4 pt-10 scale-[0.9] md:scale-100 origin-bottom">
+          <div className="flex justify-center items-end gap-1 sm:gap-2 md:gap-10 mb-12 px-1 sm:px-2 md:px-4 pt-10 origin-bottom">
             
             {/* JUARA 2 */}
-            <div className="flex flex-col items-center group order-1">
+            <div className="flex flex-col items-center group order-1 shrink-0 w-[28%] sm:w-24 md:w-36">
                <div className="relative mb-[-15px] z-20 transition-transform group-hover:-translate-y-2">
-                  <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-[3px] border-slate-400 bg-slate-200 overflow-hidden shadow-md">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 rounded-full border-[3px] border-slate-400 bg-slate-200 overflow-hidden shadow-md mx-auto">
                      <img src={`https://picsum.photos/200/200?random=${topThree[1].avatarId}`} className="w-full h-full object-cover" />
                   </div>
-                  <div className="absolute -bottom-1 -right-1 bg-slate-500 text-white w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-xs md:text-base">2</div>
+                  <div className="absolute -bottom-1 -right-1 bg-slate-500 text-white w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-[10px] sm:text-xs md:text-base">2</div>
                </div>
-               <div className="w-24 md:w-36 h-28 md:h-40 bg-slate-100 rounded-t-3xl border-[3px] border-slate-300 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10">
-                  <p className="font-black text-slate-700 text-[10px] md:text-sm px-1 text-center line-clamp-1">{topThree[1].name}</p>
-                  <div className="mt-1 md:mt-2 bg-white px-2 py-0.5 rounded-full border border-slate-200">
-                    <p className="text-[9px] md:text-xs font-black text-slate-500">{topThree[1].points} XP</p>
+               <div className="w-full h-24 sm:h-28 md:h-40 bg-slate-100 rounded-t-3xl border-[3px] border-slate-300 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10 transition-all">
+                  <p className="font-black text-slate-700 text-[9px] sm:text-[10px] md:text-sm px-1 text-center line-clamp-1 w-full">{topThree[1].name}</p>
+                  <div className="mt-1 md:mt-2 bg-white px-1 sm:px-2 py-0.5 rounded-full border border-slate-200 w-[90%] sm:w-fit flex justify-center">
+                    <p className="text-[8px] sm:text-[9px] md:text-xs font-black text-slate-500 truncate">{topThree[1].points} XP</p>
                   </div>
                </div>
             </div>
 
             {/* JUARA 1 */}
-            <div className="flex flex-col items-center group order-2 -mt-10 z-20">
-               <div className="relative mb-5 z-20 transition-transform group-hover:-translate-y-3">
+            <div className="flex flex-col items-center group order-2 -mt-6 sm:-mt-10 z-30 shrink-0 w-[36%] sm:w-32 md:w-44">
+               <div className="relative mb-3 sm:mb-5 z-20 transition-transform group-hover:-translate-y-3">
                   {/* Animasi 'animate-bounce' telah dihapus di baris bawah ini */}
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                    <Crown className="w-8 h-8 md:w-12 md:h-12 text-amber-400 fill-amber-400" />
+                  <div className="absolute -top-6 sm:-top-8 left-1/2 -translate-x-1/2">
+                    <Crown className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-amber-400 fill-amber-400" />
                   </div>
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-amber-400 bg-amber-100 overflow-hidden shadow-lg">
+                  <div className="w-18 h-18 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full border-4 border-amber-400 bg-amber-100 overflow-hidden shadow-lg mx-auto">
                      <img src={`https://picsum.photos/200/200?random=${topThree[0].avatarId}`} className="w-full h-full object-cover" />
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-black border-[3px] border-white shadow-md text-sm md:text-lg">1</div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-white w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-black border-[3px] border-white shadow-md text-xs sm:text-sm md:text-lg">1</div>
                </div>
-               <div className="w-32 md:w-44 h-40 md:h-56 bg-amber-50 rounded-t-[2.5rem] border-[3px] border-amber-300 border-b-0 flex flex-col items-center pt-10 md:pt-12 shadow-inner relative z-10">
-                  <p className="font-black text-amber-900 text-xs md:text-lg px-2 text-center line-clamp-1">{topThree[0].name}</p>
-                  <div className="mt-2 bg-amber-400 px-3 py-1 rounded-full border-2 border-amber-500 shadow-sm">
-                    <p className="text-[10px] md:text-sm font-black text-white">{topThree[0].points} XP</p>
+               <div className="w-full h-32 sm:h-40 md:h-56 bg-amber-50 rounded-t-[2.5rem] border-[3px] border-amber-300 border-b-0 flex flex-col items-center pt-8 sm:pt-10 md:pt-12 shadow-inner relative z-10 transition-all">
+                  <p className="font-black text-amber-900 text-[10px] sm:text-xs md:text-lg px-1 sm:px-2 text-center line-clamp-1 w-full">{topThree[0].name}</p>
+                  <div className="mt-1 sm:mt-2 bg-amber-400 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-2 border-amber-500 shadow-sm w-[90%] sm:w-fit flex justify-center">
+                    <p className="text-[8px] sm:text-[10px] md:text-sm font-black text-white truncate">{topThree[0].points} XP</p>
                   </div>
                </div>
             </div>
 
             {/* JUARA 3 */}
-            <div className="flex flex-col items-center group order-3">
+            <div className="flex flex-col items-center group order-3 shrink-0 w-[28%] sm:w-24 md:w-36">
                <div className="relative mb-[-15px] z-20 transition-transform group-hover:-translate-y-2">
-                  <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-[3px] border-orange-300 bg-orange-100 overflow-hidden shadow-md">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 rounded-full border-[3px] border-orange-300 bg-orange-100 overflow-hidden shadow-md mx-auto">
                      <img src={`https://picsum.photos/200/200?random=${topThree[2].avatarId}`} className="w-full h-full object-cover" />
                   </div>
-                  <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-xs md:text-base">3</div>
+                  <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-[10px] sm:text-xs md:text-base">3</div>
                </div>
-               <div className="w-24 md:w-36 h-24 md:h-32 bg-orange-50 rounded-t-3xl border-[3px] border-orange-200 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10">
-                  <p className="font-black text-orange-900 text-[10px] md:text-sm px-1 text-center line-clamp-1">{topThree[2].name}</p>
-                  <div className="mt-1 md:mt-2 bg-white px-2 py-0.5 rounded-full border border-orange-100">
-                    <p className="text-[9px] md:text-xs font-black text-orange-500">{topThree[2].points} XP</p>
+               <div className="w-full h-20 sm:h-24 md:h-32 bg-orange-50 rounded-t-3xl border-[3px] border-orange-200 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10 transition-all">
+                  <p className="font-black text-orange-900 text-[9px] sm:text-[10px] md:text-sm px-1 text-center line-clamp-1 w-full">{topThree[2].name}</p>
+                  <div className="mt-1 md:mt-2 bg-white px-1 sm:px-2 py-0.5 rounded-full border border-orange-100 w-[90%] sm:w-fit flex justify-center">
+                    <p className="text-[8px] sm:text-[9px] md:text-xs font-black text-orange-500 truncate">{topThree[2].points} XP</p>
                   </div>
                </div>
             </div>
@@ -195,21 +195,21 @@ const LeaderboardPage = async () => {
           </div>
 
           {/* --- STICKY USER RANK (MOBILE) --- */}
-          <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+          <div className="md:hidden fixed bottom-4 left-4 right-20 z-40">
              <div className="bg-slate-900 text-white rounded-4xl p-1 shadow-xl border border-slate-700 overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-3 bg-slate-800 rounded-[1.8rem]">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-teal-500 flex items-center justify-center font-black text-base shadow-lg">
+                <div className="flex items-center justify-between px-3 py-2 sm:px-5 sm:py-3 bg-slate-800 rounded-[1.8rem]">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-teal-500 flex items-center justify-center font-black text-sm sm:text-base shadow-lg cursor-default">
                             7
                         </div>
-                        <div className="flex flex-col">
-                            <span className="font-bold text-sm leading-tight">Rafaditya S.</span>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Peringkat Anda</span>
+                        <div className="flex flex-col min-w-0">
+                            <span className="font-bold text-xs sm:text-sm leading-tight truncate">Rafaditya S.</span>
+                            <span className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-wider truncate">Peringkat Anda</span>
                         </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                        <span className="font-black text-base text-teal-400 leading-none">2,450</span>
-                        <span className="text-[8px] font-bold text-slate-500 uppercase">EXP Points</span>
+                    <div className="flex flex-col items-end shrink-0 pl-2 border-l border-slate-700">
+                        <span className="font-black text-sm sm:text-base text-teal-400 leading-none">2,450</span>
+                        <span className="text-[7px] sm:text-[8px] font-bold text-slate-500 uppercase">EXP</span>
                     </div>
                 </div>
              </div>

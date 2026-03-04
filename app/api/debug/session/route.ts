@@ -5,14 +5,17 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const session = await auth();
-    
+
     console.log("[DEBUG-SESSION] Session:", session);
-    
+
     if (!session?.user?.email) {
-      return NextResponse.json({
-        error: "No session or email",
-        session: session
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          error: "No session or email",
+          session: session,
+        },
+        { status: 401 },
+      );
     }
 
     // Find user by email
@@ -20,26 +23,32 @@ export async function GET() {
       where: { email: session.user.email },
     });
 
-    console.log("[DEBUG-SESSION] Looking for user with email:", session.user.email);
+    console.log(
+      "[DEBUG-SESSION] Looking for user with email:",
+      session.user.email,
+    );
     console.log("[DEBUG-SESSION] Found user:", user?.id, user?.email);
 
     if (!user) {
-      return NextResponse.json({
-        error: "User not found in database",
-        lookingFor: session.user.email,
-        sessionData: session.user
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: "User not found in database",
+          lookingFor: session.user.email,
+          sessionData: session.user,
+        },
+        { status: 404 },
+      );
     }
 
     // Get invitations for this user
-    const invitations = await prisma.materialInvite.findMany({
+    const invitations = await prisma.materialinvite.findMany({
       where: {
         userId: user.id,
         status: "pending",
       },
       include: {
         material: true,
-        instructor: true,
+        users_materialinvite_instructorIdTousers: true,
       },
     });
 
@@ -50,21 +59,18 @@ export async function GET() {
       session: {
         email: session.user.email,
         id: session.user.id,
-        name: session.user.name
+        name: session.user.name,
       },
       user: {
         id: user.id,
         email: user.email,
-        name: user.name
+        name: user.name,
       },
       invitationCount: invitations.length,
-      invitations: invitations
+      invitations: invitations,
     });
   } catch (error) {
     console.error("[DEBUG-SESSION] Error:", error);
-    return NextResponse.json(
-      { error: String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

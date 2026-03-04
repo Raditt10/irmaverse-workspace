@@ -48,6 +48,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             title: true,
           },
         },
+        program: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
         materialinvite: {
           include: {
             users_materialinvite_userIdTousers: {
@@ -63,7 +69,24 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     });
 
     if (!material) {
-      return NextResponse.json({ error: "Materi tidak ditemukan" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Materi tidak ditemukan" },
+        { status: 404 },
+      );
+    }
+
+    const isPrivileged = User.role === "instruktur" || User.role === "admin";
+
+    // Access control: non-privileged users must be enrolled (courseenrollment)
+    // OR have an accepted invitation to view this material
+    if (!isPrivileged) {
+      const hasEnrollment = (material as any).courseenrollment?.length > 0;
+      const hasAcceptedInvite = ((material as any).materialinvite || []).some(
+        (inv: any) => inv.status === "accepted",
+      );
+      if (!hasEnrollment && !hasAcceptedInvite) {
+        return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
+      }
     }
 
     const CATEGORY_LABEL = {
@@ -82,8 +105,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       xii: "Kelas 12",
     };
 
-    const isPrivileged = User.role === "instruktur" || User.role === "admin";
-
     const m = material as any; // Cast to any to bypass stale linting issues
     const result = {
       id: m.id,
@@ -92,23 +113,34 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       date: m.date,
       instructor: m.users?.name || null,
       instructorEmail: m.users?.email || null,
-      category: CATEGORY_LABEL[m.category as keyof typeof CATEGORY_LABEL] || m.category,
+      category:
+        CATEGORY_LABEL[m.category as keyof typeof CATEGORY_LABEL] || m.category,
       grade: GRADE_LABEL[m.grade as keyof typeof GRADE_LABEL] || m.grade,
       startedAt: m.startedAt,
       thumbnailUrl: m.thumbnailUrl,
       content: m.content,
       link: m.link,
       materialType: m.materialType,
-      isJoined: m.courseenrollment?.length > 0,
+      isJoined:
+        m.courseenrollment?.length > 0 ||
+        (m.materialinvite || []).some((inv: any) => inv.status === "accepted"),
       parent: m.material_material_parentIdTomaterial
         ? {
             id: m.material_material_parentIdTomaterial.id,
             title: m.material_material_parentIdTomaterial.title,
           }
         : null,
+      program: m.program
+        ? {
+            id: m.program.id,
+            title: m.program.title,
+          }
+        : null,
       // For editing: flat email list of all invited users
       invites: (m.materialinvite || [])
-        .map((inv: any) => inv.users_materialinvite_userIdTousers?.email || null)
+        .map(
+          (inv: any) => inv.users_materialinvite_userIdTousers?.email || null,
+        )
         .filter(Boolean),
       // For instructor view: rich invite status data
       inviteDetails: isPrivileged
@@ -269,7 +301,7 @@ export async function PUT(
         startedAt: time || null,
         grade: mappedGrade as any,
         thumbnailUrl: thumbnailUrl || null,
-        parentId: programId || null,
+        programId: programId || null,
         materialType: materialType || null,
         content: materialContent || null,
         link: materialLink || null,

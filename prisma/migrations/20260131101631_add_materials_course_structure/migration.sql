@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Material` (
+CREATE TABLE `materials` (
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
     `description` VARCHAR(191) NULL,
@@ -15,7 +15,7 @@ CREATE TABLE `Material` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `MaterialInvite` (
+CREATE TABLE `material_invites` (
     `id` VARCHAR(191) NOT NULL,
     `materialId` VARCHAR(191) NOT NULL,
     `instructorId` VARCHAR(191) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `MaterialInvite` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `CourseEnrollment` (
+CREATE TABLE `course_enrollments` (
     `id` VARCHAR(191) NOT NULL,
     `materialId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -43,19 +43,19 @@ CREATE TABLE `CourseEnrollment` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Material` ADD CONSTRAINT `Material_instructorId_fkey` FOREIGN KEY (`instructorId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `materials` ADD CONSTRAINT `Material_instructorId_fkey` FOREIGN KEY (`instructorId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Material` ADD CONSTRAINT `Material_nextCourseId_fkey` FOREIGN KEY (`nextCourseId`) REFERENCES `Material`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `materials` ADD CONSTRAINT `Material_nextCourseId_fkey` FOREIGN KEY (`nextCourseId`) REFERENCES `materials`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `MaterialInvite` ADD CONSTRAINT `MaterialInvite_materialId_fkey` FOREIGN KEY (`materialId`) REFERENCES `Material`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `material_invites` ADD CONSTRAINT `MaterialInvite_materialId_fkey` FOREIGN KEY (`materialId`) REFERENCES `materials`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `MaterialInvite` ADD CONSTRAINT `MaterialInvite_instructorId_fkey` FOREIGN KEY (`instructorId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `material_invites` ADD CONSTRAINT `MaterialInvite_instructorId_fkey` FOREIGN KEY (`instructorId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CourseEnrollment` ADD CONSTRAINT `CourseEnrollment_materialId_fkey` FOREIGN KEY (`materialId`) REFERENCES `Material`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `course_enrollments` ADD CONSTRAINT `CourseEnrollment_materialId_fkey` FOREIGN KEY (`materialId`) REFERENCES `materials`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CourseEnrollment` ADD CONSTRAINT `CourseEnrollment_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `course_enrollments` ADD CONSTRAINT `CourseEnrollment_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
