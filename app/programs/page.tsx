@@ -38,14 +38,15 @@ interface Program {
   materialCount: number;
   enrollmentCount: number;
   isEnrolled: boolean;
+  isCompleted: boolean;
 }
 
 const OurPrograms = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("Semua Kategori");
+  const [selectedStatus, setSelectedStatus] = useState("Semua Status");
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [programToDelete, setProgramToDelete] = useState<string | null>(null);
 
@@ -55,37 +56,16 @@ const OurPrograms = () => {
     type: "success" | "error";
   }>({ show: false, message: "", type: "success" });
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { data: session } = useSession({ required: false });
 
   const isPrivileged =
     session?.user?.role === "instruktur" || session?.user?.role === "admin";
 
-  const categoryOptions = [
-    { value: "all", label: "Semua Kategori" },
-    { value: "Program Wajib", label: "Program Wajib" },
-    { value: "Program Ekstra", label: "Program Ekstra" },
-    { value: "Program Next Level", label: "Next Level" },
-  ];
-
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   useEffect(() => {
     fetchPrograms();
@@ -135,13 +115,38 @@ const OurPrograms = () => {
     }
   };
 
-  const filteredPrograms = programs.filter(
-    (program) =>
-      (program?.title?.toLowerCase() ?? "").includes(
-        searchTerm.toLowerCase(),
-      ) &&
-      (categoryFilter === "all" || program.category === categoryFilter),
-  );
+  const filteredPrograms = programs.filter((program) => {
+    const matchSearch = (program?.title?.toLowerCase() ?? "").includes(
+      searchTerm.toLowerCase(),
+    );
+
+    let matchCategory = true;
+    if (selectedCategory !== "Semua Kategori") {
+      if (selectedCategory === "Next Level") {
+        matchCategory = program.category === "Program Next Level";
+      } else {
+        matchCategory = program.category === selectedCategory;
+      }
+    }
+
+    let matchStatus = true;
+    if (selectedStatus === "Selesai") {
+      matchStatus = program.isCompleted === true;
+    } else if (selectedStatus === "Belum Selesai") {
+      matchStatus = program.isCompleted === false;
+    }
+
+    return matchSearch && matchCategory && matchStatus;
+  });
+
+  const categories = [
+    "Semua Kategori",
+    "Program Wajib",
+    "Program Ekstra",
+    "Next Level",
+  ];
+  
+  const subCategories = isPrivileged ? [] : ["Semua Status", "Belum Selesai", "Selesai"];
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
@@ -184,7 +189,6 @@ const OurPrograms = () => {
               </div>
             </div>
 
-            {/* Filters */}
             {!loading && programs.length > 0 && (
               <div className="mb-8 flex flex-col gap-4">
                 <div className="w-full">
@@ -196,50 +200,14 @@ const OurPrograms = () => {
                   />
                 </div>
 
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className={`w-full flex items-center justify-between rounded-2xl border-2 bg-white px-5 py-3.5 lg:py-4 font-bold text-slate-700 transition-all cursor-pointer ${
-                      isDropdownOpen
-                        ? "border-teal-400 shadow-[0_4px_0_0_#34d399] -translate-y-0.5"
-                        : "border-slate-200 shadow-[0_4px_0_0_#e2e8f0] hover:border-teal-300"
-                    }`}
-                  >
-                    <span className="truncate mr-2">
-                      {categoryOptions.find((o) => o.value === categoryFilter)
-                        ?.label || "Semua Kategori"}
-                    </span>
-                    <ChevronDown
-                      className={`h-5 w-5 text-slate-400 shrink-0 transition-transform duration-300 ${
-                        isDropdownOpen ? "rotate-180 text-teal-500" : ""
-                      }`}
-                      strokeWidth={3}
-                    />
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-2 z-20 bg-white border-2 border-slate-200 rounded-2xl shadow-[0_8px_0_0_#cbd5e1] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                      <div className="p-1.5 space-y-1">
-                        {categoryOptions.map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => {
-                              setCategoryFilter(option.value);
-                              setIsDropdownOpen(false);
-                            }}
-                            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                              categoryFilter === option.value
-                                ? "bg-teal-50 text-teal-600"
-                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                            }`}
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <CategoryFilter
+                  categories={categories}
+                  subCategories={subCategories}
+                  selectedCategory={selectedCategory}
+                  selectedSubCategory={selectedStatus}
+                  onCategoryChange={setSelectedCategory}
+                  onSubCategoryChange={setSelectedStatus}
+                />
               </div>
             )}
 
@@ -261,7 +229,8 @@ const OurPrograms = () => {
                 actionLabel="Reset Pencarian"
                 onAction={() => {
                   setSearchTerm("");
-                  setCategoryFilter("all");
+                  setSelectedCategory("Semua Kategori");
+                  setSelectedStatus("Semua Status");
                 }}
               />
             ) : (
@@ -347,14 +316,26 @@ const OurPrograms = () => {
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                   Progress
                                 </span>
-                                <span className="text-[10px] font-black text-emerald-600">
-                                  Terdaftar ✓
-                                </span>
+                                {program.isCompleted ? (
+                                  <span className="text-[10px] font-black text-amber-600">
+                                    Selesai 🏆
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-black text-emerald-600">
+                                    Terdaftar ✓
+                                  </span>
+                                )}
                               </div>
                               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <div
-                                  className="h-full bg-emerald-400 rounded-full transition-all duration-500"
-                                  style={{ width: "0%" }}
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    program.isCompleted
+                                      ? "bg-amber-400"
+                                      : "bg-emerald-400"
+                                  }`}
+                                  style={{
+                                    width: program.isCompleted ? "100%" : "30%",
+                                  }}
                                 />
                               </div>
                             </div>

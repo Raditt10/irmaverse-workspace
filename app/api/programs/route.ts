@@ -35,6 +35,14 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
+    const userAttendances = await prisma.attendance.findMany({
+      where: { userId: user.id },
+      select: { materialId: true },
+    });
+    const attendedMaterialIds = new Set(
+      userAttendances.map((a) => a.materialId),
+    );
+
     const GRADE_LABEL: Record<string, string> = {
       X: "Kelas 10",
       XI: "Kelas 11",
@@ -48,9 +56,12 @@ export async function GET(req: NextRequest) {
       Susulan: "Program Susulan",
     };
 
-    // Semua user (privileged & non-privileged) bisa melihat semua program kurikulum
+    // Semua user bisa melihat semua program kurikulum
     const result = programs.map((p) => {
       const isEnrolled = p.enrollments.some((e) => e.userId === user.id);
+      const isCompleted =
+        p.materials.length > 0 &&
+        p.materials.every((m) => attendedMaterialIds.has(m.id));
 
       return {
         id: p.id,
@@ -65,6 +76,7 @@ export async function GET(req: NextRequest) {
         materialCount: p.materials.length,
         enrollmentCount: p.enrollments.length,
         isEnrolled,
+        isCompleted,
         createdAt: p.createdAt,
       };
     });

@@ -304,7 +304,6 @@ model material {
   materialType                                   String?
   parentId                                       String?
   programId                                      String?
-  location                                       String?
   courseenrollment                               courseenrollment[]
   users                                          User               @relation(fields: [instructorId], references: [id], map: "Material_instructorId_fkey")
   material_material_nextCourseIdTomaterial       material?          @relation("material_nextCourseIdTomaterial", fields: [nextCourseId], references: [id], map: "Material_nextCourseId_fkey")

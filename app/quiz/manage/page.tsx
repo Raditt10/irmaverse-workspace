@@ -8,7 +8,6 @@ import Sidebar from "@/components/ui/Sidebar";
 import Toast from "@/components/ui/Toast";
 import CartoonConfirmDialog from "@/components/ui/ConfirmDialog";
 import Loading from "@/components/ui/Loading";
-import CategoryFilter from "@/components/ui/CategoryFilter";
 import {
   Settings,
   Plus,
@@ -160,32 +159,19 @@ export default function QuizManagePage() {
     );
   }
 
-  const categories = ["Semua", "Mandiri", "Materi"];
-  const getCategoryLabel = (f: FilterType) => {
-    switch (f) {
-      case "standalone":
-        return "Mandiri";
-      case "material":
-        return "Materi";
-      case "all":
-      default:
-        return "Semua";
-    }
-  };
-
-  const setCategoryFromLabel = (label: string) => {
-    switch (label) {
-      case "Mandiri":
-        setFilter("standalone");
-        break;
-      case "Materi":
-        setFilter("material");
-        break;
-      case "Semua":
-      default:
-        setFilter("all");
-    }
-  };
+  const tabs: { key: FilterType; label: string; count: number }[] = [
+    { key: "all", label: "Semua", count: quizzes.length },
+    {
+      key: "standalone",
+      label: "Mandiri",
+      count: quizzes.filter((q) => q.isStandalone).length,
+    },
+    {
+      key: "material",
+      label: "Materi",
+      count: quizzes.filter((q) => !q.isStandalone).length,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
@@ -263,32 +249,29 @@ export default function QuizManagePage() {
                   className="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 bg-white text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
                 />
               </div>
-              <div className="w-full sm:w-auto">
-                <CategoryFilter
-                  categories={categories.map((cat) => {
-                    const count =
-                      cat === "Semua"
-                        ? quizzes.length
-                        : cat === "Mandiri"
-                          ? quizzes.filter((q) => q.isStandalone).length
-                          : quizzes.filter((q) => !q.isStandalone).length;
-                    return `${cat} (${count})`;
-                  })}
-                  subCategories={[]}
-                  selectedCategory={`${getCategoryLabel(filter)} (${
-                    filter === "all"
-                      ? quizzes.length
-                      : filter === "standalone"
-                        ? quizzes.filter((q) => q.isStandalone).length
-                        : quizzes.filter((q) => !q.isStandalone).length
-                  })`}
-                  selectedSubCategory=""
-                  onCategoryChange={(labelWithCount) => {
-                    const label = labelWithCount.split(" (")[0];
-                    setCategoryFromLabel(label);
-                  }}
-                  onSubCategoryChange={() => {}}
-                />
+              <div className="flex gap-2">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setFilter(tab.key)}
+                    className={`px-4 py-2.5 rounded-2xl text-sm font-black border-2 transition-all ${
+                      filter === tab.key
+                        ? "bg-teal-500 text-white border-teal-700 border-b-4 active:border-b-2 active:translate-y-0.5"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-teal-300 hover:text-teal-600"
+                    }`}
+                  >
+                    {tab.label}
+                    <span
+                      className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                        filter === tab.key
+                          ? "bg-white/20 text-white"
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
 

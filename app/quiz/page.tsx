@@ -6,7 +6,6 @@ import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import Loading from "@/components/ui/Loading";
 import EmptyState from "@/components/ui/EmptyState";
-import CategoryFilter from "@/components/ui/CategoryFilter";
 import {
   Trophy,
   Play,
@@ -171,7 +170,7 @@ const QuizHome = () => {
                 </div>
                 {/* Moved specific quiz header into Hero Banner for better alignment and display */}
                 <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-2 flex items-center gap-3 justify-center md:justify-start">
-                  {isInstructor && isPrivileged ? "Kelola Kuis Kajian" : "Kuis Kajian"}
+                  Kelola Kuis Kajian
                 </h1>
                 <p className="text-teal-50 font-medium text-sm lg:text-base max-w-xl mx-auto md:mx-0">
                   Kerjakan kuis dari kajian atau quiz mandiri buatan instruktur.
@@ -218,31 +217,28 @@ const QuizHome = () => {
               </div>
             </div>
 
-            <div className="w-full md:w-auto">
-              <CategoryFilter
-                categories={["Semua", "Belum", "Selesai", "Mandiri", "Materi"]}
-                subCategories={[]}
-                selectedCategory={
-                  activeFilter === "all"
-                    ? "Semua"
-                    : activeFilter === "not_started"
-                    ? "Belum"
-                    : activeFilter === "completed"
-                    ? "Selesai"
-                    : activeFilter === "standalone"
-                    ? "Mandiri"
-                    : "Materi"
-                }
-                selectedSubCategory=""
-                onCategoryChange={(label) => {
-                  if (label === "Semua") setActiveFilter("all");
-                  if (label === "Belum") setActiveFilter("not_started");
-                  if (label === "Selesai") setActiveFilter("completed");
-                  if (label === "Mandiri") setActiveFilter("standalone");
-                  if (label === "Materi") setActiveFilter("material");
-                }}
-                onSubCategoryChange={() => {}}
-              />
+            <div className="flex bg-slate-200/60 p-1.5 rounded-2xl w-full md:w-auto overflow-x-auto">
+              {(
+                [
+                  { key: "all", label: "Semua" },
+                  { key: "not_started", label: "Belum" },
+                  { key: "completed", label: "Selesai" },
+                  { key: "standalone", label: "Mandiri" },
+                  { key: "material", label: "Materi" },
+                ] as const
+              ).map((f) => (
+                <button
+                  key={f.key}
+                  onClick={() => setActiveFilter(f.key)}
+                  className={`flex-shrink-0 px-4 lg:px-6 py-2.5 rounded-xl text-xs font-black transition-all ${
+                    activeFilter === f.key
+                      ? "bg-white text-teal-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -284,6 +280,7 @@ const QuizHome = () => {
                 icon="search"
                 title="Tidak Ada Kuis Ditemukan"
                 description="Coba gunakan kata kunci lain atau selesaikan kajian baru."
+                customIcon={<Target className="h-10 w-10 text-slate-400" />}
               />
             </div>
           ) : (
