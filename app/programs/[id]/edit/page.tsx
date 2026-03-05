@@ -207,6 +207,9 @@ const EditProgram = () => {
                 <p className="text-slate-500 font-medium text-lg">
                   Perbarui informasi dan detail kursus.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                  <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+                </div>
               </div>
             </div>
 
@@ -224,7 +227,7 @@ const EditProgram = () => {
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-bold text-slate-600 ml-1">
-                        Nama Kursus
+                        Nama Kursus <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -237,7 +240,7 @@ const EditProgram = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="block text-sm font-bold text-slate-600 ml-1">
-                        Deskripsi Kursus
+                        Deskripsi Kursus <span className="text-red-500">*</span>
                       </label>
                       <Textarea
                         name="description"

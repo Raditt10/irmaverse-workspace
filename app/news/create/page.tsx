@@ -157,6 +157,9 @@ export default function CreateNewsPage() {
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Buat berita terbaru menggunakan format Markdown.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                  <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+                </div>
               </div>
             </div>
 
@@ -173,7 +176,7 @@ export default function CreateNewsPage() {
                     {/* Title */}
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
-                        Judul Berita *
+                        Judul Berita <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -198,7 +201,7 @@ export default function CreateNewsPage() {
                     <div className="pt-6 border-t-2 border-slate-100">
                       <div className="flex flex-row items-center justify-between mb-4">
                         <h3 className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
-                          <Edit3 className="h-4 w-4 text-emerald-500" /> Konten (Markdown) *
+                          <Edit3 className="h-4 w-4 text-emerald-500" /> Konten (Markdown) <span className="text-red-500">*</span>
                         </h3>
                         <button
                           type="button"
@@ -256,7 +259,7 @@ export default function CreateNewsPage() {
                 {/* Upload Image */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Gambar Berita *
+                    Gambar Berita <span className="text-red-500">*</span>
                   </label>
                   <div className="relative group cursor-pointer">
                     <input

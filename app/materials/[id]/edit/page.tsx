@@ -375,6 +375,9 @@ const EditMaterial = () => {
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Update detail kajian yang sudah dibuat.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                  <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+                </div>
               </div>
             </div>
 
@@ -394,7 +397,7 @@ const EditMaterial = () => {
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
-                        Judul Kajian
+                        Judul Kajian <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -408,7 +411,7 @@ const EditMaterial = () => {
 
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
-                        Deskripsi Singkat
+                        Deskripsi Singkat <span className="text-red-500">*</span>
                       </label>
                       <Textarea
                         name="description"
@@ -763,20 +766,20 @@ const EditMaterial = () => {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mb-4 lg:mb-6">
                     <DatePicker
-                      label="Tanggal Pelaksanaan"
+                      label="Tanggal Pelaksanaan *"
                       value={formData.date}
                       onChange={(date) => setFormData({ ...formData, date })}
                       placeholder="Pilih tanggal"
                     />
                     <TimePicker
-                      label="Jam Mulai"
+                      label="Jam Mulai *"
                       value={formData.time}
                       onChange={(time) => setFormData({ ...formData, time })}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
-                      Lokasi / Platform
+                      Lokasi / Platform <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type="text"

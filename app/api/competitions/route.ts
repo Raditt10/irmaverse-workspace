@@ -24,11 +24,13 @@ export async function GET() {
         return {
           id: comp.id,
           title: comp.title || "Untitled",
-          date: new Date(comp.date).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }),
+          date: Array.isArray(comp.schedules) && comp.schedules.length > 0
+            ? (comp.schedules as any[])[0]?.date || "TBA"
+            : new Date(comp.date).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }),
           prize: comp.prize || "TBA",
           category: comp.category,
           image: comp.thumbnailUrl || "https://images.unsplash.com/photo-1526080652727-5b77f74df6c5?auto=format&fit=crop&w=1000&q=80",
@@ -74,7 +76,8 @@ export async function POST(request: NextRequest) {
     
     const { 
       title, description, date, location, prize, category, thumbnailUrl,
-      contactPerson, contactNumber, contactEmail, maxParticipants, prizes
+      contactPerson, contactNumber, contactEmail, maxParticipants, prizes, schedules,
+      requirements, judgingCriteria
     } = body;
 
     if (!title || !date || !prize || !category) {
@@ -111,6 +114,9 @@ export async function POST(request: NextRequest) {
         contactEmail: contactEmail || null,
         maxParticipants: maxParticipants || null,
         prizes: prizes || null,
+        schedules: schedules || null,
+        requirements: requirements || null,
+        judgingCriteria: judgingCriteria || null,
         instructorId,
       },
       include: {

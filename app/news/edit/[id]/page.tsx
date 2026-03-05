@@ -184,12 +184,15 @@ export default function EditNewsPage() {
               <p className="text-slate-600 text-lg mb-8">
                 Edit berita menggunakan Markdown format
               </p>
+              <div className="mb-6 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Title */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Judul Berita *
+                    Judul Berita <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -205,7 +208,7 @@ export default function EditNewsPage() {
                 {/* Category */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Kategori *
+                    Kategori <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="category"
@@ -225,7 +228,7 @@ export default function EditNewsPage() {
                 {/* Image Upload */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Gambar Berita *
+                    Gambar Berita <span className="text-red-500">*</span>
                   </label>
 
                   <div className="space-y-4">
@@ -277,7 +280,7 @@ export default function EditNewsPage() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-semibold text-slate-700">
-                      Konten (Markdown) *
+                      Konten (Markdown) <span className="text-red-500">*</span>
                     </label>
                     <button
                       type="button"

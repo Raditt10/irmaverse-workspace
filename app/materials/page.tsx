@@ -458,29 +458,34 @@ const Materials = () => {
                         </div>
 
                         {/* --- BUTTON ACTION DINAMIS (LAYOUT BARU) --- */}
-                        <div className="mt-auto flex gap-3 items-end">
-                          {/* Tombol Absensi / Manage di Kiri (Lebar) */}
-                          <div className="flex-1">
+                        <div className="mt-auto flex w-full">
                             {isPrivileged ? (
                               <MaterialInstructorActions
                                 materialId={material.id}
                                 onDelete={handleDeleteMaterial}
+                                detailButton={
+                                  <DetailButton
+                                    onClick={() => router.push(`/materials/${material.id}`)}
+                                    iconOnly
+                                  />
+                                }
                               />
                             ) : (
-                              <MaterialUserActions
-                                materialId={material.id}
-                                isJoined={material.isJoined}
-                                attendedAt={material.attendedAt}
-                                materialDate={material.date}
-                              />
+                              <div className="flex gap-3 w-full items-center">
+                                <div className="flex-1">
+                                  <MaterialUserActions
+                                    materialId={material.id}
+                                    isJoined={material.isJoined}
+                                    attendedAt={material.attendedAt}
+                                    materialDate={material.date}
+                                  />
+                                </div>
+                                <DetailButton
+                                  onClick={() => router.push(`/materials/${material.id}`)}
+                                  iconOnly
+                                />
+                              </div>
                             )}
-                          </div>
-
-                          {/* Tombol Detail (Icon Only) di Kanan */}
-                          <DetailButton
-                            onClick={() => router.push(`/materials/${material.id}`)}
-                            iconOnly
-                          />
                         </div>
 
                       </div>

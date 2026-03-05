@@ -62,7 +62,7 @@ const Schedule = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Semua");
 
-  const statusOptions = ["Semua", "Segera hadir", "Sedang berlangsung", "Acara telah dilaksanakan"];
+  const statusOptions = ["Semua", "Segera hadir", "Sedang berlangsung", "Kegiatan telah selesai "];
 
   useEffect(() => {
     fetchSchedules();
@@ -170,17 +170,17 @@ const Schedule = () => {
             <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex-1">
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  Event IRMA
+                  Kegiatan IRMA
                 </h1>
                 <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  Daftar event dan kegiatan rohani yang akan datang dan sedang berlangsung
+                  Daftar kegiatan IRMA yang akan datang dan sedang berlangsung
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                 {session?.user?.role === "instruktur" && (
                   <AddButton
-                    label="Buat Event"
+                    label="Buat Kegiatan"
                     onClick={() => router.push("/schedule/create")}
                     icon={<Plus className="h-5 w-5" />}
                     color="emerald"
@@ -207,7 +207,7 @@ const Schedule = () => {
 
                 <div className="relative w-full lg:w-80 self-start">
                   <SearchInput
-                    placeholder="Cari event seru atau topik..."
+                    placeholder="Cari Kegiatan seru atau topik..."
                     value={searchQuery}
                     onChange={setSearchQuery}
                   />
@@ -222,13 +222,13 @@ const Schedule = () => {
             ) : schedules.length === 0 ? (
                <EmptyState
                  icon="calendar"
-                 title="Yah, tidak ada event tersedia sekarang"
+                 title="Yah, tidak ada Kegiatan IRMA tersedia sekarang"
                  description="Belum ada kegiatan yang dijadwalkan. Cek lagi nanti ya!"
                />
             ) : filteredSchedules.length === 0 ? (
               <EmptyState
                 icon="search"
-                title="Yah, event tidak ditemukan..."
+                title="Yah, Kegiatan tidak ditemukan..."
                 description="Coba cari dengan kata kunci lain atau ubah filternya ya!"
                 actionLabel="Reset Filter"
                 onAction={() => {
@@ -241,7 +241,7 @@ const Schedule = () => {
                 {searchQuery && (
                   <div className="mb-8">
                     <SuccessDataFound
-                      message={`Ditemukan ${filteredSchedules.length} event sesuai pencarian`}
+                      message={`Ditemukan ${filteredSchedules.length} Kegiatan sesuai pencarian`}
                       icon="sparkles"
                     />
                   </div>

@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       date,
       time,
       location,
-      penanggungjawab,
+      pemateri,
       thumbnailUrl,
     } = body;
 
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    if (!penanggungjawab || !penanggungjawab.toString().trim()) {
+    if (!pemateri || !pemateri.toString().trim()) {
       return NextResponse.json(
         { error: "Penanggung jawab harus diisi" },
         { status: 400 }
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
         date: new Date(date),
         time,
         location,
-        pemateri: penanggungjawab,
+        pemateri,
         thumbnailUrl,
         instructorId: session.user.id,
         status: "segera_hadir",

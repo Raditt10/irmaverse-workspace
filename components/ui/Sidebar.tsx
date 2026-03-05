@@ -215,7 +215,7 @@ const Sidebar = () => {
     },
     { 
       icon: Calendar, 
-      label: "Event", 
+      label: "Kegiatan", 
       path: "/schedule" 
     },
     { 

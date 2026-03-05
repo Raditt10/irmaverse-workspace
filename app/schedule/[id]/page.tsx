@@ -252,39 +252,39 @@ const ScheduleDetail = () => {
               <div className="lg:col-span-2 space-y-6 md:space-y-8">
                 
                 {/* Info Cards Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-                    <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-rose-100 rounded-full flex items-center justify-center border-2 border-rose-200 shrink-0">
-                            <Calendar className="h-5 w-5 md:h-6 md:w-6 text-rose-500" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                        <div className="w-12 h-12 shrink-0 rounded-full bg-rose-50 flex items-center justify-center border-2 border-rose-100">
+                            <Calendar className="h-6 w-6 text-rose-500" strokeWidth={2.5} />
                         </div>
-                        <div>
-                           <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Tanggal</span>
-                           <span className="text-sm md:text-sm font-black text-slate-700">
+                        <div className="flex flex-col flex-1 overflow-hidden">
+                           <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Tanggal</span>
+                           <span className="text-slate-800 font-black text-sm md:text-base truncate">
                                {new Date(schedule.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                            </span>
                         </div>
                     </div>
 
                     {schedule.time && (
-                        <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-full flex items-center justify-center border-2 border-amber-200 shrink-0">
-                                <Clock className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
+                        <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                            <div className="w-12 h-12 shrink-0 rounded-full bg-amber-50 flex items-center justify-center border-2 border-amber-100">
+                                <Clock className="h-6 w-6 text-amber-500" strokeWidth={2.5} />
                             </div>
-                            <div>
-                                <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Waktu</span>
-                                <span className="text-sm md:text-sm font-black text-slate-700">{schedule.time}</span>
+                            <div className="flex flex-col flex-1 overflow-hidden">
+                                <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Waktu</span>
+                                <span className="text-slate-800 font-black text-sm md:text-base truncate">{schedule.time} WIB</span>
                             </div>
                         </div>
                     )}
 
                     {schedule.location && (
-                        <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-100 rounded-full flex items-center justify-center border-2 border-teal-200 shrink-0">
-                                <MapPin className="h-5 w-5 md:h-6 md:w-6 text-teal-500" />
+                        <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
+                            <div className="w-12 h-12 shrink-0 rounded-full bg-teal-50 flex items-center justify-center border-2 border-teal-100">
+                                <MapPin className="h-6 w-6 text-teal-500" strokeWidth={2.5} />
                             </div>
-                            <div className="min-w-0">
-                                <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Lokasi</span>
-                                <span className="block text-sm md:text-sm font-black text-slate-700 line-clamp-1 sm:line-clamp-2">{schedule.location}</span>
+                            <div className="flex flex-col flex-1 overflow-hidden">
+                                <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Lokasi</span>
+                                <span className="text-slate-800 font-black text-sm md:text-base truncate">{schedule.location}</span>
                             </div>
                         </div>
                     )}

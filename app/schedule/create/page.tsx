@@ -10,7 +10,7 @@ import DatePicker from "@/components/ui/DatePicker";
 import TimePicker from "@/components/ui/TimePicker";
 import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, MapPin, Clock, ArrowLeft, Upload, X, Save, Sparkles, Type, Users, Mic } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowLeft, Upload, X, Save, Sparkles, Type, Users, Headset } from "lucide-react";
 import Toast from "@/components/ui/Toast";
 
 const CreateSchedule = () => {
@@ -98,12 +98,12 @@ const CreateSchedule = () => {
     e.preventDefault();
     
     // --- VALIDASI KUAT ---
-    if (!formData.title.trim()) { showToast("Judul event tidak boleh kosong", "error"); return; }
-    if (formData.title.length < 5) { showToast("Judul event minimal 5 karakter", "error"); return; }
+    if (!formData.title.trim()) { showToast("Judul Kegiatan tidak boleh kosong", "error"); return; }
+    if (formData.title.length < 5) { showToast("Judul Kegiatan minimal 5 karakter", "error"); return; }
     if (!formData.description.trim()) { showToast("Deskripsi singkat tidak boleh kosong", "error"); return; }
-    if (!formData.date) { showToast("Tanggal event harus dipilih", "error"); return; }
-    if (!formData.time) { showToast("Jam event harus dipilih", "error"); return; }
-    if (!formData.location.trim()) { showToast("Lokasi event tidak boleh kosong", "error"); return; }
+    if (!formData.date) { showToast("Tanggal Kegiatan harus dipilih", "error"); return; }
+    if (!formData.time) { showToast("Jam Kegiatan harus dipilih", "error"); return; }
+    if (!formData.location.trim()) { showToast("Lokasi Kegiatan tidak boleh kosong", "error"); return; }
     if (!formData.pemateri.trim()) { showToast("Nama pemateri/penanggung jawab tidak boleh kosong", "error"); return; }
 
     setLoading(true);
@@ -119,7 +119,7 @@ const CreateSchedule = () => {
         throw new Error(error.error || "Gagal membuat jadwal");
       }
 
-      showToast("Event berhasil dibuat. Mengalihkan...", "success");
+      showToast("Kegiatan berhasil dibuat. Mengalihkan...", "success");
       // REDIRECT KE HALAMAN UTAMA SCHEDULE
       setTimeout(() => router.push("/schedule"), 1500);
     } catch (error: any) {
@@ -148,11 +148,14 @@ const CreateSchedule = () => {
               </button>
               <div>
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-2 lg:gap-3">
-                  Buat Jadwal Event
+                  Buat Jadwal Kegiatan
                 </h1>
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
-                  Isi detail event dan upload gambar thumbnail.
+                  Isi detail Kegiatan dan upload gambar thumbnail.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                  <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+                </div>
               </div>
             </div>
 
@@ -167,7 +170,9 @@ const CreateSchedule = () => {
 
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Judul Event</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Judul Kegiatan <span className="text-red-500">*</span>
+                      </label>
                       <Input
                         type="text"
                         name="title"
@@ -179,14 +184,16 @@ const CreateSchedule = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Deskripsi Singkat</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Deskripsi Singkat <span className="text-red-500">*</span>
+                      </label>
                       <Textarea
                         name="description"
                         required
                         rows={3}
                         value={formData.description}
                         onChange={handleChange}
-                        placeholder="Jelaskan tentang event ini..."
+                        placeholder="Jelaskan tentang Jelaskan ini..."
                         maxLength={200}
                       />
                       <p className="text-xs text-slate-500 ml-1">{formData.description.length}/200 karakter</p>
@@ -199,7 +206,7 @@ const CreateSchedule = () => {
                         rows={5}
                         value={formData.fullDescription}
                         onChange={handleChange}
-                        placeholder="Deskripsi lengkap tentang event, materi yang akan dibahas, dll."
+                        placeholder="Deskripsi lengkap tentang Kegiatan, materi yang akan dibahas, dll."
                       />
                     </div>
                   </div>
@@ -213,7 +220,7 @@ const CreateSchedule = () => {
                   <div className="space-y-4 lg:space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <DatePicker
-                        label="Tanggal Event"
+                        label="Tanggal Kegiatan *"
                         value={formData.date}
                         onChange={(date) =>
                           setFormData({ ...formData, date })
@@ -221,7 +228,7 @@ const CreateSchedule = () => {
                         placeholder="Pilih tanggal"
                       />
                       <TimePicker
-                        label="Jam Mulai"
+                        label="Jam Mulai *"
                         value={formData.time}
                         onChange={(time) =>
                           setFormData({ ...formData, time })
@@ -231,7 +238,7 @@ const CreateSchedule = () => {
 
                     <div className="space-y-2">
                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                        <MapPin className="h-4 w-4" /> Lokasi
+                        <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -245,7 +252,7 @@ const CreateSchedule = () => {
 
                     <div className="space-y-2">
                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                         <Mic className="h-4 w-4" /> Pemateri / Penanggung Jawab
+                         <Headset className="h-4 w-4" /> Narahubung <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -265,7 +272,7 @@ const CreateSchedule = () => {
                 {/* Thumbnail Card */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Thumbnail Event
+                    Thumbnail Kegiatan
                   </label>
                   <div className="relative group cursor-pointer">
                     <input

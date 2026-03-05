@@ -7,11 +7,13 @@ import MaterialEditButton from "./ButtonEdit";
 interface MaterialInstructorActionsProps {
   materialId: string;
   onDelete: (materialId: string) => void;
+  detailButton?: React.ReactNode;
 }
 
 export default function MaterialInstructorActions({
   materialId,
   onDelete,
+  detailButton,
 }: MaterialInstructorActionsProps) {
   const router = useRouter();
 
@@ -23,6 +25,7 @@ export default function MaterialInstructorActions({
       >
         <Book className="w-4 h-4" /> Absensi
       </button>
+      {detailButton}
       <MaterialEditButton id={materialId} />
       <DeleteButton
         onClick={() => onDelete(materialId)}

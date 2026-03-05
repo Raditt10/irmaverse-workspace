@@ -270,44 +270,33 @@ const CompetitionDetail = () => {
               <div className="lg:col-span-2 space-y-8">
                 
                 {/* Quick Stats Tiles */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-4 md:p-5 rounded-3xl md:rounded-4xl border-2 border-slate-200 shadow-sm md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-rose-50 flex items-center justify-center border-2 border-rose-100">
-                            <Calendar className="h-5 w-5 md:h-6 md:w-6 text-rose-500" strokeWidth={2.5} />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-full flex items-center justify-center border-2 border-indigo-200 shrink-0">
+                            <Trophy className="h-5 w-5 md:h-6 md:w-6 text-indigo-500" />
                         </div>
-                        <div className="flex flex-col flex-1 overflow-hidden sm:items-center">
-                            <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Tanggal</span>
-                            <span className="text-sm md:text-sm font-black text-slate-700 truncate">
-                              {new Date(competition.date).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </span>
+                        <div className="min-w-0">
+                            <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Hadiah Utama</span>
+                            <span className="block text-sm md:text-sm font-black text-slate-700 line-clamp-1 sm:line-clamp-2">{competition.prize}</span>
                         </div>
                     </div>
-                    <div className="bg-white p-4 md:p-5 rounded-3xl md:rounded-4xl border-2 border-slate-200 shadow-sm md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-indigo-50 flex items-center justify-center border-2 border-indigo-100">
-                            <Trophy className="h-5 w-5 md:h-6 md:w-6 text-indigo-500" strokeWidth={2.5} />
+                    <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-100 rounded-full flex items-center justify-center border-2 border-teal-200 shrink-0">
+                            <MapPin className="h-5 w-5 md:h-6 md:w-6 text-teal-500" />
                         </div>
-                        <div className="flex flex-col flex-1 overflow-hidden sm:items-center">
-                            <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Hadiah 1</span>
-                            <span className="text-sm md:text-sm font-black text-slate-700 truncate">{competition.prize}</span>
-                        </div>
-                    </div>
-                    <div className="bg-white p-4 md:p-5 rounded-3xl md:rounded-4xl border-2 border-slate-200 shadow-sm md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-teal-50 flex items-center justify-center border-2 border-teal-100">
-                            <MapPin className="h-5 w-5 md:h-6 md:w-6 text-teal-500" strokeWidth={2.5} />
-                        </div>
-                        <div className="flex flex-col flex-1 overflow-hidden sm:items-center">
+                        <div className="min-w-0">
                             <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Lokasi</span>
-                            <span className="text-sm md:text-sm font-black text-slate-700 truncate">{competition.location}</span>
+                            <span className="block text-sm md:text-sm font-black text-slate-700 line-clamp-1 sm:line-clamp-2">{competition.location}</span>
                         </div>
                     </div>
                     {competition.maxParticipants && (
-                    <div className="bg-white p-4 md:p-5 rounded-3xl md:rounded-4xl border-2 border-slate-200 shadow-sm md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full bg-amber-50 flex items-center justify-center border-2 border-amber-100">
-                            <Users className="h-5 w-5 md:h-6 md:w-6 text-amber-500" strokeWidth={2.5} />
+                    <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-full flex items-center justify-center border-2 border-amber-200 shrink-0">
+                            <Users className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
                         </div>
-                        <div className="flex flex-col flex-1 overflow-hidden sm:items-center">
+                        <div className="min-w-0">
                             <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Kuota</span>
-                            <span className="text-sm md:text-sm font-black text-slate-700 truncate">{competition.maxParticipants} Peserta</span>
+                            <span className="block text-sm md:text-sm font-black text-slate-700 line-clamp-1 sm:line-clamp-2">{competition.maxParticipants} Peserta</span>
                         </div>
                     </div>
                     )}
@@ -364,14 +353,26 @@ const CompetitionDetail = () => {
                         <div className="p-2 bg-purple-100 rounded-xl border-2 border-purple-200">
                             <Clock className="h-6 w-6 text-purple-600" strokeWidth={2.5} />
                         </div>
-                        <h2 className="text-xl font-black text-slate-800">Jadwal Pelaksanaan</h2>
+                        <h2 className="text-xl font-black text-slate-800">Timeline Perlombaan</h2>
                     </div>
                     <ul className="space-y-3">
                       {competition.schedules.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-purple-200 hover:bg-purple-50 transition-colors">
-                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white border-2 border-slate-200 text-slate-600 font-black text-sm shrink-0 mt-0.5">
-                            ✓
-                          </span>
+                          {(() => {
+                            const parsedDate = new Date(item.date);
+                            const isPassed = !isNaN(parsedDate.getTime()) && new Date() > parsedDate;
+                            return (
+                              <span
+                                className={`flex items-center justify-center w-8 h-8 rounded-full bg-white border-2 font-black text-sm shrink-0 mt-0.5 ${
+                                  isPassed
+                                    ? "border-emerald-200 text-emerald-600"
+                                    : "border-slate-200 text-slate-600"
+                                }`}
+                              >
+                                {isPassed ? "✓" : idx + 1}
+                              </span>
+                            );
+                          })()}
                           <div className="flex-1">
                             <p className="text-slate-700 font-bold text-sm md:text-base">{item.phase}</p>
                             <p className="text-slate-500 text-xs mt-1">{item.date}</p>
@@ -430,15 +431,20 @@ const CompetitionDetail = () => {
                       — HUBUNGI NARAHUBUNG —
                     </p>
                     
-                    <a
-                      href={`https://wa.me/${(competition.contactNumber || "").replace(/[^0-9]/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => {
+                        const phone = (competition.contactNumber || "").replace(/[^0-9]/g, "");
+                        if (!phone) {
+                          setToast({ show: true, message: "Maaf, nomor telepon ini tidak valid", type: "error" });
+                          return;
+                        }
+                        window.open(`https://wa.me/${phone}`, "_blank", "noopener,noreferrer");
+                      }}
                       className="w-full p-4 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-2 hover:border-teal-400 hover:bg-teal-50 transition-all group mt-2"
                     >
                       <MessageCircle className="w-5 h-5 text-teal-500 group-hover:scale-110 transition-transform" strokeWidth={3} />
                       <span className="font-bold text-slate-600">Kirim Pesan</span>
-                    </a>
+                    </button>
                   </div>
                 </div>
 
@@ -459,7 +465,7 @@ const CompetitionDetail = () => {
                 {/* Disclaimer */}
                 <div className="bg-amber-50/80 border-[3px] border-amber-300 border-dashed rounded-[45px] p-6 lg:p-8">
                     <p className="text-sm text-amber-800 font-semibold leading-relaxed text-center w-full mx-auto max-w-[85%]">
-                        💡 Hubungi panitia untuk detail materi dan persiapan sebelum kompetisi dimulai.
+                        💡 Hubungi panitia untuk detail yang dibutuhkan dan persiapan sebelum kompetisi dimulai.
                     </p>
                 </div>
 

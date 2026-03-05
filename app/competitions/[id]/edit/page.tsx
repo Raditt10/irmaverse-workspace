@@ -250,6 +250,9 @@ const EditCompetition = () => {
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Sesuaikan detail kompetisi dan perbarui gambar thumbnail.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                  <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+                </div>
               </div>
             </div>
 
@@ -264,7 +267,9 @@ const EditCompetition = () => {
 
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Judul Kompetisi</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Judul Kompetisi <span className="text-red-500">*</span>
+                      </label>
                       <Input
                         type="text"
                         name="title"
@@ -276,7 +281,9 @@ const EditCompetition = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Kategori</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Kategori <span className="text-red-500">*</span>
+                      </label>
                       <CustomDropdown
                         options={[
                           { value: "Tahfidz", label: "Tahfidz" },
@@ -291,7 +298,9 @@ const EditCompetition = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Deskripsi Singkat</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Deskripsi Singkat <span className="text-red-500">*</span>
+                      </label>
                       <Textarea
                         name="description"
                         required
@@ -314,7 +323,9 @@ const EditCompetition = () => {
                   <div className="space-y-4 lg:space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Tanggal Kompetisi</label>
+                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Tanggal Kompetisi <span className="text-red-500">*</span>
+                        </label>
                         <DatePicker
                           value={formData.date}
                           onChange={(date) => setFormData({ ...formData, date })}
@@ -334,7 +345,7 @@ const EditCompetition = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                        <MapPin className="h-4 w-4" /> Lokasi
+                        <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -468,7 +479,9 @@ const EditCompetition = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Hadiah</label>
+                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                              Hadiah {index === 0 && <span className="text-red-500">*</span>}
+                            </label>
                             <Input
                               type="text"
                               value={prize.amount}
@@ -527,7 +540,9 @@ const EditCompetition = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Fase / Tahapan</label>
+                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                              Fase / Tahapan <span className="text-red-500">*</span>
+                            </label>
                             <Input
                               value={schedule.phase}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -539,7 +554,9 @@ const EditCompetition = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Waktu</label>
+                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                              Waktu <span className="text-red-500">*</span>
+                            </label>
                             <Input
                               value={schedule.date}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -581,7 +598,7 @@ const EditCompetition = () => {
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Nama Yang Bisa Dihubungi</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Narahubung</label>
                       <Input
                         type="text"
                         name="contactPerson"

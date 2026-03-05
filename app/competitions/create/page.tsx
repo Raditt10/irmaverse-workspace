@@ -6,12 +6,10 @@ import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
 import CustomDropdown from "@/components/ui/CustomDropdown";
-import DatePicker from "@/components/ui/DatePicker";
-import TimePicker from "@/components/ui/TimePicker";
 import DashedAddButton from "@/components/ui/DashedAddButton";
 import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, MapPin, ArrowLeft, Upload, X, Save, Sparkles, Trophy, Tag, Users, Plus } from "lucide-react";
+import { Calendar, MapPin, ArrowLeft, Upload, X, Save, Sparkles, Trophy, Tag, Users, Plus, ShieldCheck, ListChecks } from "lucide-react";
 import Toast from "@/components/ui/Toast";
 
 const CreateCompetition = () => {
@@ -30,7 +28,6 @@ const CreateCompetition = () => {
     title: "",
     description: "",
     date: "",
-    time: "",
     location: "",
     prize: "", // Hadiah Utama (Opsional jika Juara 1 diisi)
     category: "Tahfidz" as "Tahfidz" | "Seni" | "Bahasa" | "Lainnya",
@@ -41,9 +38,14 @@ const CreateCompetition = () => {
     maxParticipants: "",
   });
 
-  const [winners, setWinners] = useState<{ rank: number; prize: string; benefits: string }[]>([
-    { rank: 1, prize: "", benefits: "" } // Default ada Juara 1
+  const [schedules, setSchedules] = useState([{ phase: "", date: "", description: "" }]);
+  const [winners, setWinners] = useState([
+    { rank: 1, prize: "", benefits: "" },
+    { rank: 2, prize: "", benefits: "" },
+    { rank: 3, prize: "", benefits: "" },
   ]);
+  const [requirements, setRequirements] = useState<string[]>([""]);
+  const [judgingCriteria, setJudgingCriteria] = useState<string[]>([""]);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
@@ -77,7 +79,23 @@ const CreateCompetition = () => {
   };
 
   const handleDeleteWinner = (index: number) => {
-    setWinners(winners.filter((_, i) => i !== index));
+    if (winners.length > 1) {
+      setWinners(winners.filter((_, i) => i !== index));
+    } else {
+      showToast("Minimal harus ada 1 juara", "error");
+    }
+  };
+
+  const handleAddSchedule = () => {
+    setSchedules([...schedules, { phase: "", date: "", description: "" }]);
+  };
+
+  const handleDeleteSchedule = (index: number) => {
+    if (schedules.length > 1) {
+      setSchedules(schedules.filter((_, i) => i !== index));
+    } else {
+      showToast("Minimal harus ada 1 jadwal pelaksanaan", "error");
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,11 +149,11 @@ const CreateCompetition = () => {
       showToast("Deskripsi kompetisi belum diisi!", "error");
       return;
     }
-    if (!formData.date) {
-      showToast("Tanggal kompetisi belum dipilih!", "error");
+    if (schedules.length === 0 || !schedules[0].date) {
+      showToast("Jadwal pelaksanaan minimal 1 harus diisi!", "error");
       return;
     }
-    if (!formData.location.trim()) {
+    if (!formData.location?.trim()) {
       showToast("Lokasi kompetisi belum diisi!", "error");
       return;
     }
@@ -149,30 +167,32 @@ const CreateCompetition = () => {
 
     setLoading(true);
     try {
-      // Create a combined date object from date and time
-      let finalDate = formData.date;
-      if (formData.time) {
-        finalDate = `${formData.date}T${formData.time}:00`;
-      }
-
       const payload = {
         title: formData.title,
         description: formData.description,
-        date: finalDate,
+        date: new Date().toISOString(), // dummy date to satisfy schema if needed
         location: formData.location,
         prize: finalPrize, // Gunakan hadiah yang sudah divalidasi
         category: formData.category,
         thumbnailUrl: formData.thumbnailUrl || null,
         contactPerson: formData.contactPerson,
         contactNumber: formData.contactNumber,
-        contactEmail: formData.contactEmail,
         maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
+        requirements: requirements.filter((r) => r.trim() !== ""),
+        judgingCriteria: judgingCriteria.filter((j) => j.trim() !== ""),
         prizes: winners
           .filter(w => w.prize || w.benefits)
           .map(w => ({
             rank: `Juara ${w.rank}`,
             amount: w.prize,
             benefits: w.benefits
+          })),
+        schedules: schedules
+          .filter(s => s.phase && s.date)
+          .map(s => ({
+            phase: s.phase,
+            date: s.date,
+            description: s.description || undefined
           })),
       };
 
@@ -230,6 +250,9 @@ const CreateCompetition = () => {
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Isi detail kompetisi dan upload gambar thumbnail.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold bg-rose-50 text-rose-600 px-3 py-2 rounded-xl border-2 border-rose-100">
+                  <span className="text-rose-500 font-black text-lg leading-none mt-1">*</span> Wajib diisi
+                </div>
               </div>
             </div>
 
@@ -244,7 +267,9 @@ const CreateCompetition = () => {
 
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Judul Kompetisi</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Judul Kompetisi <span className="text-red-500">*</span>
+                      </label>
                       <Input
                         type="text"
                         name="title"
@@ -256,7 +281,9 @@ const CreateCompetition = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Kategori</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Kategori <span className="text-red-500">*</span>
+                      </label>
                       <CustomDropdown
                         options={[
                           { value: "Tahfidz", label: "Tahfidz" },
@@ -271,7 +298,9 @@ const CreateCompetition = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Deskripsi Singkat</label>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Deskripsi Singkat <span className="text-red-500">*</span>
+                      </label>
                       <Textarea
                         name="description"
                         required
@@ -284,6 +313,20 @@ const CreateCompetition = () => {
                       <p className="text-xs text-slate-500 ml-1">{formData.description.length}/200 karakter</p>
                     </div>
 
+                    <div className="space-y-2">
+                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
+                         <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
+                       </label>
+                       <Input
+                         type="text"
+                         name="location"
+                         required
+                         value={formData.location}
+                         onChange={handleChange}
+                         placeholder="Contoh: Aula Utama IRMA / Online"
+                       />
+                    </div>
+
                     {/* HAPUS INPUT HADIAH DISINI AGAR TIDAK BINGUNG */}
                     {/* <div className="space-y-2">
                          <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Hadiah Utama</label>
@@ -293,85 +336,168 @@ const CreateCompetition = () => {
                   </div>
                 </div>
 
-                {/* Card Waktu & Tempat */}
+                {/* Timeline / Jadwal Pelaksanaan */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-500" /> Waktu & Lokasi
+                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-500" /> Jadwal Pelaksanaan
                   </h2>
-                  <div className="space-y-4 lg:space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-                      <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Tanggal Kompetisi</label>
-                        <DatePicker
-                          value={formData.date}
-                          onChange={(date) => setFormData({ ...formData, date })}
-                          label=""
-                          placeholder="Pilih tanggal"
-                        />
+                  <p className="text-xs lg:text-sm text-slate-500 mb-4 lg:mb-6">Tambahkan linimasa perlombaan seperti masa pendaftaran, penjurian, dll.</p>
+                  
+                  <div className="space-y-4">
+                    {schedules.map((schedule, index) => (
+                      <div key={index} className="bg-slate-50 p-4 lg:p-6 rounded-2xl border-2 border-slate-100 relative">
+                        <div className="flex items-center justify-between mb-4">
+                           <h3 className="font-bold text-slate-700 text-sm flex items-center gap-2">
+                               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs">{index + 1}</span>
+                               Tahap {index + 1}
+                           </h3>
+                           <button
+                             type="button"
+                             onClick={() => handleDeleteSchedule(index)}
+                             className="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1 transition-colors"
+                           >
+                             <X className="h-4 w-4" /> Hapus
+                           </button>
+                        </div>
+                        
+                        <div className="space-y-4 lg:space-y-6">
+                           <div className="space-y-2">
+                             <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                               Fase / Kegiatan <span className="text-red-500">*</span>
+                             </label>
+                             <Input
+                               type="text"
+                               value={schedule.phase}
+                               onChange={(e) => {
+                                 const newSchedules = [...schedules];
+                                 newSchedules[index].phase = e.target.value;
+                                 setSchedules(newSchedules);
+                               }}
+                               placeholder="Contoh: Pendaftaran / Babak Penyisihan"
+                             />
+                           </div>
+                           
+                           <div className="space-y-2">
+                             <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                               Waktu Pelaksanaan <span className="text-red-500">*</span>
+                             </label>
+                             <Input
+                               type="text"
+                               value={schedule.date}
+                               onChange={(e) => {
+                                 const newSchedules = [...schedules];
+                                 newSchedules[index].date = e.target.value;
+                                 setSchedules(newSchedules);
+                               }}
+                               placeholder="Contoh: 10 - 20 Agustus 2024"
+                             />
+                           </div>
+                           
+                           <div className="space-y-2">
+                             <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Keterangan Tambahan (Opsional)</label>
+                             <Textarea
+                               value={schedule.description}
+                               onChange={(e) => {
+                                 const newSchedules = [...schedules];
+                                 newSchedules[index].description = e.target.value;
+                                 setSchedules(newSchedules);
+                               }}
+                               rows={2}
+                               placeholder="Keterangan singkat..."
+                             />
+                           </div>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Jam Mulai</label>
-                        <TimePicker
-                          value={formData.time}
-                          onChange={(time) => setFormData({ ...formData, time })}
-                          label=""
-                          placeholder="HH:MM"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                        <MapPin className="h-4 w-4" /> Lokasi
-                      </label>
-                      <Input
-                        type="text"
-                        name="location"
-                        required
-                        value={formData.location}
-                        onChange={handleChange}
-                        placeholder="Contoh: Aula Utama IRMA"
-                      />
-                    </div>
+                    ))}
+                    
+                    <DashedAddButton
+                      label="Tambah Jadwal"
+                      onClick={handleAddSchedule}
+                      count={schedules.length}
+                      emptyLabel="Mulai Tambah Jadwal Pertama"
+                    />
                   </div>
                 </div>
 
-                {/* Card Kontak */}
-                <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
-                  <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Users className="h-5 w-5 lg:h-6 lg:w-6 text-blue-500" /> Kontak Person
-                  </h2>
-                  <div className="space-y-4 lg:space-y-6">
-                    <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Nama Yang Bisa Dihubungi</label>
-                      <Input
-                        type="text"
-                        name="contactPerson"
-                        value={formData.contactPerson}
-                        onChange={handleChange}
-                        placeholder="Contoh: Ahmad Fauzi"
-                      />
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-                      <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Nomor Telepon</label>
-                        <Input
-                          type="tel"
-                          name="contactNumber"
-                          value={formData.contactNumber}
-                          onChange={handleChange}
-                          placeholder="Contoh: 08123456789"
+
+                {/* Card Persyaratan & Kriteria */}
+                <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                    {/* Requirements Column */}
+                    <div className="space-y-4 lg:space-y-6">
+                      <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-6 lg:mb-8 flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
+                          <ShieldCheck className="h-5 w-5 lg:h-6 lg:w-6" />
+                        </div>
+                        Persyaratan
+                      </h2>
+                      <div className="space-y-4">
+                        {requirements.map((req, index) => (
+                          <div key={index} className="flex gap-2">
+                            <Input
+                              value={req}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const newReqs = [...requirements];
+                                newReqs[index] = e.target.value;
+                                setRequirements(newReqs);
+                              }}
+                              placeholder={`Persyaratan ${index + 1}`}
+                            />
+                            {requirements.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => setRequirements(requirements.filter((_, i) => i !== index))}
+                                className="px-3 py-2 bg-red-100 text-red-600 rounded-xl border-2 border-red-200 hover:bg-red-200 transition-all active:translate-y-0.5"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        <DashedAddButton
+                          label="Tambah Persyaratan"
+                          onClick={() => setRequirements([...requirements, ""])}
+                          count={requirements.length}
                         />
                       </div>
+                    </div>
 
-                      <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Email</label>
-                        <Input
-                          type="email"
-                          name="contactEmail"
-                          value={formData.contactEmail}
-                          onChange={handleChange}
-                          placeholder="email@example.com"
+                    {/* Criteria Column */}
+                    <div className="space-y-4 lg:space-y-6">
+                      <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-6 lg:mb-8 flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-rose-100 text-rose-600">
+                          <ListChecks className="h-5 w-5 lg:h-6 lg:w-6" />
+                        </div>
+                        Kriteria Penilaian
+                      </h2>
+                      <div className="space-y-4">
+                        {judgingCriteria.map((criteria, index) => (
+                          <div key={index} className="flex gap-2">
+                            <Input
+                              value={criteria}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const newCriteria = [...judgingCriteria];
+                                newCriteria[index] = e.target.value;
+                                setJudgingCriteria(newCriteria);
+                              }}
+                              placeholder={`Kriteria ${index + 1}`}
+                            />
+                            {judgingCriteria.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => setJudgingCriteria(judgingCriteria.filter((_, i) => i !== index))}
+                                className="px-3 py-2 bg-red-100 text-red-600 rounded-xl border-2 border-red-200 hover:bg-red-200 transition-all active:translate-y-0.5"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        <DashedAddButton
+                          label="Tambah Kriteria"
+                          onClick={() => setJudgingCriteria([...judgingCriteria, ""])}
+                          count={judgingCriteria.length}
                         />
                       </div>
                     </div>
@@ -404,7 +530,9 @@ const CreateCompetition = () => {
 
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Hadiah</label>
+                            <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                              Hadiah {index === 0 && <span className="text-red-500">*</span>}
+                            </label>
                             <Input
                               type="text"
                               value={winner.prize}
@@ -442,6 +570,49 @@ const CreateCompetition = () => {
                       count={winners.length}
                       emptyLabel="Tambah Juara Pertama"
                     />
+                  </div>
+                </div>
+
+                {/* Card Kontak */}
+                <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
+                  <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
+                    <Users className="h-5 w-5 lg:h-6 lg:w-6 text-blue-500" /> Kontak Person
+                  </h2>
+                  <div className="space-y-4 lg:space-y-6">
+                    <div className="space-y-2">
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Narahubung</label>
+                      <Input
+                        type="text"
+                        name="contactPerson"
+                        value={formData.contactPerson}
+                        onChange={handleChange}
+                        placeholder="Contoh: Ahmad Fauzi"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+                      <div className="space-y-2">
+                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Nomor Telepon</label>
+                        <Input
+                          type="tel"
+                          name="contactNumber"
+                          value={formData.contactNumber}
+                          onChange={handleChange}
+                          placeholder="Contoh: 08123456789"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Email</label>
+                        <Input
+                          type="email"
+                          name="contactEmail"
+                          value={formData.contactEmail}
+                          onChange={handleChange}
+                          placeholder="email@example.com"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -489,6 +660,17 @@ const CreateCompetition = () => {
                       </label>
                     )}
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Max Peserta</label>
+                  <Input
+                    type="number"
+                    name="maxParticipants"
+                    value={formData.maxParticipants}
+                    onChange={handleChange}
+                    placeholder="Misal: 100"
+                  />
                 </div>
 
                 {/* Submit Card */}
