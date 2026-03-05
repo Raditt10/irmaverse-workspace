@@ -9,7 +9,7 @@ import CustomDropdown from "@/components/ui/CustomDropdown";
 import DashedAddButton from "@/components/ui/DashedAddButton";
 import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, MapPin, ArrowLeft, Upload, X, Save, Sparkles, Trophy, Tag, Users, Plus, ShieldCheck, ListChecks } from "lucide-react";
+import { Calendar, MapPin, ArrowLeft, Upload, X, Save, Sparkles, Trophy, Tag, Users, Plus, ShieldCheck, ListChecks, Headset, Phone, Mail } from "lucide-react";
 import Toast from "@/components/ui/Toast";
 
 const CreateCompetition = () => {
@@ -580,7 +580,9 @@ const CreateCompetition = () => {
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Narahubung</label>
+                      <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
+                        <Headset className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Narahubung
+                      </label>
                       <Input
                         type="text"
                         name="contactPerson"
@@ -592,7 +594,9 @@ const CreateCompetition = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Nomor Telepon</label>
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
+                          <Phone className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Nomor Telepon
+                        </label>
                         <Input
                           type="tel"
                           name="contactNumber"
@@ -603,7 +607,9 @@ const CreateCompetition = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Email</label>
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
+                          <Mail className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Email
+                        </label>
                         <Input
                           type="email"
                           name="contactEmail"

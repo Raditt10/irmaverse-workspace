@@ -13,7 +13,7 @@ import TimePicker from "@/components/ui/TimePicker";
 import DashedAddButton from "@/components/ui/DashedAddButton";
 import { 
   ArrowLeft, Upload, X, Plus, Trophy, Sparkles, Save, 
-  Calendar, MapPin, Tag, Users, ShieldCheck, ListChecks, Award
+  Calendar, MapPin, Tag, Users, ShieldCheck, ListChecks, Award, Headset, Phone, Mail
 } from "lucide-react";
 import Toast from "@/components/ui/Toast"; // Import Toast
 
@@ -598,7 +598,9 @@ const EditCompetition = () => {
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Narahubung</label>
+                      <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
+                        <Headset className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Narahubung
+                      </label>
                       <Input
                         type="text"
                         name="contactPerson"
@@ -610,7 +612,9 @@ const EditCompetition = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Nomor Telepon</label>
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
+                          <Phone className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Nomor Telepon
+                        </label>
                         <Input
                           type="tel"
                           name="contactNumber"
@@ -621,7 +625,9 @@ const EditCompetition = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Email</label>
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
+                          <Mail className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Email
+                        </label>
                         <Input
                           type="email"
                           name="contactEmail"
