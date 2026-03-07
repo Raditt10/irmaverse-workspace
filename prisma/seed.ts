@@ -4,6 +4,7 @@ import {
   material_category,
   NotificationType,
   NotificationStatus,
+  FriendshipStatus,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -16,6 +17,7 @@ async function main() {
   await prisma.chatMessage.deleteMany();
   await prisma.chatConversation.deleteMany();
 
+  await prisma.friendship.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.materialinvite.deleteMany();
   await prisma.courseenrollment.deleteMany();
@@ -423,6 +425,63 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
     data: { programId: program1.id, userId: user3.id },
   });
 
+  // ── FRIENDSHIPS ────────────────────────────────────────────────────────────────
+  // Create sample friendships for testing
+  // user1 follow user2 (pending - one direction)
+  await prisma.friendship.create({
+    data: {
+      followerId: user1.id,
+      followingId: user2.id,
+      status: "pending",
+    },
+  });
+
+  // user2 follow user1 (creates mutual/accepted)
+  await prisma.friendship.create({
+    data: {
+      followerId: user2.id,
+      followingId: user1.id,
+      status: "accepted", // Will be set to accepted since user1 already follows user2
+    },
+  });
+
+  // user1 follow user3 (accepted - mutual)
+  await prisma.friendship.create({
+    data: {
+      followerId: user1.id,
+      followingId: user3.id,
+      status: "accepted",
+    },
+  });
+
+  // user3 follow user1 (also accepted - mutual)
+  await prisma.friendship.create({
+    data: {
+      followerId: user3.id,
+      followingId: user1.id,
+      status: "accepted",
+    },
+  });
+
+  // user2 follow user3 (pending)
+  await prisma.friendship.create({
+    data: {
+      followerId: user2.id,
+      followingId: user3.id,
+      status: "pending",
+    },
+  });
+
+  // Several instructors create sample friendships
+  // user1 follow instructor user2
+  await prisma.friendship.create({
+    data: {
+      followerId: user1.id,
+      followingId: "102",
+      status: "accepted",
+    },
+  });
+
   // Create sample notifications for user3 (Rafa)
   // 1. Basic notification
   await prisma.notification.create({
@@ -554,6 +613,7 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
   );
   console.log(`   - Materials: 6 (4 terhubung ke program, 2 mandiri)`);
   console.log(`   - Program Enrollments: 1 (Rafa → Program Aqidah & Akhlak)`);
+  console.log(`   - Friendships: 6 (mix of pending dan accepted)`);
   console.log(`   - Notifications: 5 (3 basic + 2 invitations)`);
   console.log(`   - Material Invites: 2`);
   console.log("\n💡 Test the search with these keywords:");
@@ -561,6 +621,10 @@ Hadis dibagi menjadi beberapa tingkatan berdasarkan kualitasnya...`,
   console.log('   - "ahmad" (untuk mencari instruktur)');
   console.log('   - "tafsir" (untuk mencari artikel tafsir)');
   console.log('   - "rafa" (untuk mencari pengguna)');
+  console.log("\n👥 Friendship test data:");
+  console.log(`   - user1 ↔ user2: mutual (accepted)`);
+  console.log(`   - user1 ↔ user3: mutual (accepted)`);
+  console.log(`   - user2 → user3: one-way (pending)`);
 }
 
 function mapGrade(value: string): material_grade {
