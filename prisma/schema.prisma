@@ -48,8 +48,28 @@ model User {
   quizAttempts                                      quiz_attempt[]
   createdQuizzes                                    material_quiz[]      @relation("createdQuizzes")
   schedules                                         Schedule[]           @relation("instructorSchedules")
+  followers                                          Friendship[]         @relation("followers")
+  following                                          Friendship[]         @relation("following")
 
   @@map("users")
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  followerId  String
+  followingId String
+  status      FriendshipStatus @default(pending)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  follower  User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@index([status])
+  @@map("friendships")
 }
 
 model FavoriteInstructor {
@@ -478,4 +498,9 @@ enum material_category {
   Extra
   NextLevel
   Susulan
+}
+
+enum FriendshipStatus {
+  pending
+  accepted
 }
