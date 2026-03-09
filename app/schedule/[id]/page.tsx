@@ -90,7 +90,7 @@ const ScheduleDetail = () => {
           ? "Segera hadir" 
           : data.status === "ongoing" 
           ? "Sedang berlangsung" 
-          : "Acara telah dilaksanakan",
+          : "Kegiatan telah selesai",
         pemateriAvatar: data.instructor?.name 
           ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.instructor.name}`
           : null,
@@ -128,8 +128,8 @@ const ScheduleDetail = () => {
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, string> = {
       "Segera hadir": "bg-emerald-400 text-white border-emerald-600 shadow-[2px_2px_0_0_#065f46] md:shadow-[4px_4px_0_0_#065f46]",
-      "Sedang berlangsung": "bg-blue-400 text-white border-blue-600 shadow-[2px_2px_0_0_#1e40af] md:shadow-[4px_4px_0_0_#1e40af]",
-      "Acara telah dilaksanakan": "bg-slate-400 text-white border-slate-600 shadow-[2px_2px_0_0_#475569] md:shadow-[4px_4px_0_0_#475569]"
+      "Sedang berlangsung": "bg-emerald-500 text-white border-emerald-700 shadow-[2px_2px_0_0_#064e3b] md:shadow-[4px_4px_0_0_#064e3b]",
+      "Kegiatan telah selesai": "bg-emerald-300 text-emerald-900 border-emerald-500 shadow-[2px_2px_0_0_#065f46] md:shadow-[4px_4px_0_0_#065f46]"
     };
 
     const style = statusConfig[status] || statusConfig["Segera hadir"];
@@ -378,21 +378,6 @@ const ScheduleDetail = () => {
                         <span className="font-bold text-slate-600">Kirim Pesan</span>
                       </button>
                     )}
-                  </div>
-                </div>
-
-                {/* Important Note */}
-                <div className="p-4 md:p-5 bg-amber-50 border-2 border-amber-200 rounded-2xl md:rounded-4xl shadow-sm">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1">
-                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-amber-500 rounded-full animate-ping"></div>
-                    </div>
-                    <div>
-                        <p className="text-xs md:text-sm font-black text-amber-800 mb-1">Penting!</p>
-                        <p className="text-[10px] md:text-xs font-bold text-amber-700/80 leading-relaxed">
-                            Pastikan Anda hadir 15 menit sebelum acara dimulai untuk registrasi ulang.
-                        </p>
-                    </div>
                   </div>
                 </div>
 

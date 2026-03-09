@@ -130,7 +130,7 @@ export default function InstructorAcademy() {
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats ? stats.completedSessions : "0"}</div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Sesi Selesai</div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Kajian Selesai</div>
               </div>
             </div>
 

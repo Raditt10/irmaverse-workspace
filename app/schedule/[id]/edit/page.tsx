@@ -15,15 +15,15 @@ import Toast from "@/components/ui/Toast";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 
 const statusMapping = {
-  "Segera Hadir": "segera_hadir",
-  "Sedang Berlangsung": "ongoing",
-  "Kegiatan Selesai": "completed",
+  "Segera hadir": "segera_hadir",
+  "Sedang berlangsung": "ongoing",
+  "Kegiatan telah selesai": "completed",
 };
 
 const reverseStatusMapping = {
-  segera_hadir: "Segera Hadir",
-  ongoing: "Sedang Berlangsung",
-  completed: "Kegiatan Selesai",
+  segera_hadir: "Segera hadir",
+  ongoing: "Sedang berlangsung",
+  completed: "Kegiatan telah selesai",
 };
 
 const EditSchedule = () => {
@@ -297,9 +297,9 @@ const EditSchedule = () => {
                     <div className="space-y-2">
                        <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">Status Kegiatan</label>
                        <CategoryFilter
-                         categories={["Segera Hadir", "Sedang Berlangsung", "Kegiatan Selesai"]}
+                         categories={["Segera hadir", "Sedang berlangsung", "Kegiatan telah selesai"]}
                          subCategories={[]}
-                         selectedCategory={reverseStatusMapping[formData.status as keyof typeof reverseStatusMapping] || "Segera Hadir"}
+                         selectedCategory={reverseStatusMapping[formData.status as keyof typeof reverseStatusMapping] || "Segera hadir"}
                          selectedSubCategory=""
                          onCategoryChange={(cat) => setFormData(prev => ({ ...prev, status: statusMapping[cat as keyof typeof statusMapping] }))}
                          onSubCategoryChange={() => {}}

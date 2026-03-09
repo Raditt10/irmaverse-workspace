@@ -62,7 +62,7 @@ const Schedule = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Semua");
 
-  const statusOptions = ["Semua", "Segera hadir", "Sedang berlangsung", "Kegiatan telah selesai "];
+  const statusOptions = ["Semua", "Segera hadir", "Sedang berlangsung", "Kegiatan telah selesai"];
 
   useEffect(() => {
     fetchSchedules();
@@ -86,7 +86,7 @@ const Schedule = () => {
           ? "Segera hadir" 
           : schedule.status === "ongoing" 
           ? "Sedang berlangsung" 
-          : "Acara telah dilaksanakan",
+          : "Kegiatan telah selesai",
         thumbnail: schedule.thumbnailUrl || `https://picsum.photos/seed/event${schedule.id}/200/200`,
       }));
       

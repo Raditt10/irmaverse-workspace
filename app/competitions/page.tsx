@@ -223,7 +223,7 @@ const Competitions = () => {
 
                             <div className="flex items-center justify-between text-[11px] sm:text-sm">
                               <div className="flex items-center gap-2 text-slate-500 font-bold">
-                                <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                                <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
                                 <span>Hadiah</span>
                               </div>
                               <span className="text-emerald-600 font-black bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">

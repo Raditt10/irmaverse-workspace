@@ -13,7 +13,7 @@ import TimePicker from "@/components/ui/TimePicker";
 import DashedAddButton from "@/components/ui/DashedAddButton";
 import { 
   ArrowLeft, Upload, X, Plus, Trophy, Sparkles, Save, 
-  Calendar, MapPin, Tag, Users, ShieldCheck, ListChecks, Award, Headset, Phone, Mail
+  Calendar, CalendarClock, MapPin, Tag, Users, ShieldCheck, ListChecks, Headset, Phone, Mail
 } from "lucide-react";
 import Toast from "@/components/ui/Toast"; // Import Toast
 import Loading from "@/components/ui/Loading";
@@ -318,7 +318,7 @@ const EditCompetition = () => {
                 {/* Card Waktu & Tempat */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-500" /> Waktu & Lokasi
+                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Waktu & Lokasi
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
@@ -445,7 +445,7 @@ const EditCompetition = () => {
                 {/* Card Info Juara */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Trophy className="h-5 w-5 lg:h-6 lg:w-6 text-amber-500" /> Info Juara
+                    <Trophy className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Info Juara
                   </h2>
                   <div className="space-y-6">
                     {prizes.map((prize, index) => (
@@ -521,13 +521,13 @@ const EditCompetition = () => {
                 {/* Card Jadwal Kompetisi */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Award className="h-5 w-5 lg:h-6 lg:w-6 text-purple-500" /> Jadwal Kompetisi
+                    <CalendarClock className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Jadwal Kompetisi
                   </h2>
                   <div className="space-y-6">
                     {schedules.map((schedule, index) => (
                       <div key={index} className="bg-slate-50 p-4 lg:p-6 rounded-2xl border-2 border-slate-100 relative space-y-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-black text-xs">
+                          <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-xs">
                             {index + 1}
                           </div>
                           <button

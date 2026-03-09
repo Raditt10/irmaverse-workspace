@@ -308,9 +308,12 @@ const Dashboard = () => {
   if (status === "loading") return null;
   if (session?.user?.role !== "user") return null;
 
+  const isLoading = loadingInstructors || loadingFinished || loadingNews || loadingToday || loadingQuizzes || loadingMaterials;
+
   return (
     // Background hangat (Warm White)
     <div className="min-h-screen bg-[#FDFBF7]">
+      {isLoading && <Loading fullScreen text="Memuat halaman..." size="lg" />}
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
@@ -461,9 +464,7 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {loadingNews ? (
-                    <Loading text="Memuat kabar IRMA..." />
-                  ) : latestNews.length === 0 ? (
+                  {latestNews.length === 0 ? (
                     <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2">Belum ada kabar terbaru</p>
                   ) : (
                     latestNews.map((news) => (
@@ -503,9 +504,7 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  {loadingFinished ? (
-                    <Loading text="Memuat kajian..." />
-                  ) : finishedMaterials.length === 0 ? (
+                  {finishedMaterials.length === 0 ? (
                     <p className="text-center text-xs text-slate-400 font-bold py-10">Belum ada kajian yang diselesaikan</p>
                   ) : (
                     finishedMaterials.map((material) => (
@@ -581,9 +580,7 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {loadingQuizzes ? (
-                     <Loading text="Memuat kuis..." />
-                  ) : upcomingQuizzes.length === 0 ? (
+                  {upcomingQuizzes.length === 0 ? (
                      <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2 lg:col-span-3">Yey! Tidak ada kuis kajian yang tertunda.</p>
                   ) : (
                     upcomingQuizzes.map((quiz, index) => {
@@ -683,11 +680,7 @@ const Dashboard = () => {
                     <h4 className="font-black text-slate-800 text-lg">Instruktur Favorit</h4>
                   </div>
                   
-                  {loadingInstructors ? (
-                    <div className="text-center py-6">
-                      <Loading text="Memuat..." />
-                    </div>
-                  ) : favoriteInstructors.length === 0 ? (
+                  {favoriteInstructors.length === 0 ? (
                     <div className="text-center py-8 bg-emerald-50/50 rounded-3xl border-2 border-dashed border-emerald-200">
                       <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-emerald-100 shadow-sm">
                         <Heart className="w-6 h-6 text-emerald-300" />
@@ -736,9 +729,7 @@ const Dashboard = () => {
                   </h4>
                   
                   <div className="space-y-4">
-                    {loadingFinished ? (
-                      <Loading text="Memuat data..." />
-                    ) : finishedMaterials.length === 0 ? (
+                    {finishedMaterials.length === 0 ? (
                       <div className="text-center py-8">
                         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3 border-2 border-slate-100">
                           <BookOpen className="w-6 h-6 text-slate-200" />
