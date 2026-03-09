@@ -107,12 +107,12 @@ export default function InstructorAcademy() {
             </div>
 
             {/* Stat 2 - Kajian Aktif (Blue) */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-blue-100 shadow-[0_8px_0_0_#dbeafe] hover:shadow-[0_4px_0_0_#dbeafe] hover:translate-y-1 hover:border-blue-200 transition-all duration-300 group relative max-md:aspect-square flex flex-col justify-between">
+            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group relative max-md:aspect-square flex flex-col justify-between">
               <div className="flex justify-between items-start md:mb-5">
-                <div className="p-2.5 md:p-3 bg-blue-50 border-2 border-blue-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-6 h-6 md:w-8 md:h-8 text-blue-500" strokeWidth={2.5} />
+                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-blue-100 text-blue-600 rounded-full border-2 border-blue-200">Aktif</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Aktif</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats ? stats.activeCourses : "0"}</div>
@@ -121,12 +121,12 @@ export default function InstructorAcademy() {
             </div>
 
             {/* Stat 3 - Sesi Selesai (Purple) */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-purple-100 shadow-[0_8px_0_0_#f3e8ff] hover:shadow-[0_4px_0_0_#f3e8ff] hover:translate-y-1 hover:border-purple-200 transition-all duration-300 group relative max-md:aspect-square flex flex-col justify-between">
+            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group relative max-md:aspect-square flex flex-col justify-between">
               <div className="flex justify-between items-start md:mb-5">
-                <div className="p-2.5 md:p-3 bg-purple-50 border-2 border-purple-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-purple-500" strokeWidth={2.5} />
+                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
+                  <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-purple-100 text-purple-600 rounded-full border-2 border-purple-200">Selesai</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Selesai</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats ? stats.completedSessions : "0"}</div>
@@ -135,12 +135,12 @@ export default function InstructorAcademy() {
             </div>
 
             {/* Stat 4 - Rating (Amber) */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-amber-100 shadow-[0_8px_0_0_#fef3c7] hover:shadow-[0_4px_0_0_#fef3c7] hover:translate-y-1 hover:border-amber-200 transition-all duration-300 group relative max-md:aspect-square flex flex-col justify-between">
+            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group relative max-md:aspect-square flex flex-col justify-between">
               <div className="flex justify-between items-start md:mb-5">
-                <div className="p-2.5 md:p-3 bg-amber-50 border-2 border-amber-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <Star className="w-6 h-6 md:w-8 md:h-8 text-amber-500 fill-amber-400" strokeWidth={2.5} />
+                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
+                  <Star className="w-6 h-6 md:w-8 md:h-8 text-emerald-500 fill-emerald-400" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-amber-100 text-amber-600 rounded-full border-2 border-amber-200">Bagus!</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Bagus!</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats ? stats.averageRating : "0"}</div>
@@ -190,7 +190,7 @@ export default function InstructorAcademy() {
                           <div className={`px-3 py-1 rounded-full text-xs font-black border ${
                             kls.status === "upcoming"
                               ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                              : "bg-amber-100 text-amber-700 border-amber-200"
+                              : "bg-emerald-50 text-emerald-600 border-emerald-200"
                           }`}>
                             {kls.status === "upcoming" ? "Segera" : "Pending"}
                           </div>
@@ -248,7 +248,7 @@ export default function InstructorAcademy() {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-slate-500 font-bold flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> Rating</span>
-                            <span className="font-black text-amber-500">⭐ {course.rating}</span>
+                            <span className="font-black text-emerald-500">⭐ {course.rating}</span>
                           </div>
                         </div>
 
@@ -317,9 +317,9 @@ export default function InstructorAcademy() {
                     {recentActivities.map((activity) => {
                       // Activity Type mapping
                       const config: Record<string, { icon: any, bgColor: string, iconColor: string, borderColor: string }> = {
-                        material: { icon: BookOpen, bgColor: 'bg-blue-50', iconColor: 'text-blue-600', borderColor: 'border-blue-100' },
-                        schedule: { icon: Calendar, bgColor: 'bg-amber-50', iconColor: 'text-amber-600', borderColor: 'border-amber-100' },
-                        competition: { icon: Award, bgColor: 'bg-purple-50', iconColor: 'text-purple-600', borderColor: 'border-purple-100' },
+                        material: { icon: BookOpen, bgColor: 'bg-emerald-50', iconColor: 'text-emerald-600', borderColor: 'border-emerald-100' },
+                        schedule: { icon: Calendar, bgColor: 'bg-emerald-50', iconColor: 'text-emerald-600', borderColor: 'border-emerald-100' },
+                        competition: { icon: Award, bgColor: 'bg-emerald-50', iconColor: 'text-emerald-600', borderColor: 'border-emerald-100' },
                         news: { icon: Newspaper, bgColor: 'bg-emerald-50', iconColor: 'text-emerald-600', borderColor: 'border-emerald-100' },
                       };
                       const { icon: ActivityIcon, bgColor, iconColor, borderColor } = config[activity.type] || config.material;
@@ -352,12 +352,12 @@ export default function InstructorAcademy() {
                 <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:scale-125 transition-transform" />
                 <div className="flex items-center gap-3 mb-3 relative z-10">
                   <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
-                    <Award className="w-5 h-5 text-amber-500" strokeWidth={2.5} />
+                    <Award className="w-5 h-5 text-emerald-500" strokeWidth={2.5} />
                   </div>
                   <h4 className="font-black text-base text-slate-800">Pencapaian Minggu Ini</h4>
                 </div>
                 <p className="text-sm text-slate-500 font-bold relative z-10 leading-relaxed mb-4">
-                  Kamu telah mengajar <span className="text-emerald-600">{achievement?.weeklySessions || 0} sesi</span> dan mendapatkan rating rata-rata <span className="text-amber-500 font-black">{achievement?.weeklyRating || 0} ⭐</span> minggu ini!
+                  Kamu telah mengajar <span className="text-emerald-600">{achievement?.weeklySessions || 0} sesi</span> dan mendapatkan rating rata-rata <span className="text-emerald-500 font-black">{achievement?.weeklyRating || 0} ⭐</span> minggu ini!
                 </p>
                 <Link
                   href="/instructor-dashboard"

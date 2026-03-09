@@ -159,13 +159,13 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Stat 2 - Total Instructors (Blue) */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-blue-100 shadow-[0_8px_0_0_#dbeafe] hover:shadow-[0_4px_0_0_#dbeafe] hover:translate-y-1 hover:border-blue-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
+            {/* Stat 2 - Total Instructors */}
+            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
               <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-blue-50 border-2 border-blue-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <UserCheck className="w-6 h-6 md:w-8 md:h-8 text-blue-500" strokeWidth={2.5} />
+                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
+                  <UserCheck className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-blue-100 text-blue-600 rounded-full border-2 border-blue-200">Instruktur</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Instruktur</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats.totalInstructors}</div>
@@ -173,13 +173,13 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Stat 3 - Active Materials (Purple) */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-purple-100 shadow-[0_8px_0_0_#f3e8ff] hover:shadow-[0_4px_0_0_#f3e8ff] hover:translate-y-1 hover:border-purple-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
+            {/* Stat 3 - Active Materials */}
+            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
               <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-purple-50 border-2 border-purple-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-6 h-6 md:w-8 md:h-8 text-purple-500" strokeWidth={2.5} />
+                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-purple-100 text-purple-600 rounded-full border-2 border-purple-200">Aktif</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Aktif</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats.totalActiveMaterials}</div>
@@ -187,13 +187,13 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Stat 4 - System Status (Amber) */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-amber-100 shadow-[0_8px_0_0_#fef3c7] hover:shadow-[0_4px_0_0_#fef3c7] hover:translate-y-1 hover:border-amber-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
+            {/* Stat 4 - System Status */}
+            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
               <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-amber-50 border-2 border-amber-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <Activity className="w-6 h-6 md:w-8 md:h-8 text-amber-500" strokeWidth={2.5} />
+                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
+                  <Activity className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-amber-100 text-amber-600 rounded-full border-2 border-amber-200">Bagus</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Bagus</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">Healthy</div>
@@ -220,11 +220,11 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[
                     { icon: Users, label: "Mengelola User", desc: "Manajemen akun anggota", color: "emerald", path: "/admin/users" },
-                    { icon: UserPlus, label: "Mengelola Instruktur", desc: "Kelola akun instruktur", color: "blue", path: "/admin/instructors" },
-                    { icon: BookMarked, label: "Rekapan Kajian", desc: "Arsip & ringkasan materi", color: "purple", path: "/materials/rekapan" },
-                    { icon: HelpCircle, label: "Kuis Akademia", desc: "Kelola bank soal & nilai", color: "amber", path: "/quiz" },
-                    { icon: Bell, label: "Broadcast Pesan", desc: "Kirim pengumuman massal", color: "rose", path: "/admin/broadcast" },
-                    { icon: Settings, label: "Konfigurasi IRMA", desc: "Pengaturan inti platform", color: "slate", path: "/admin/settings" },
+                    { icon: UserPlus, label: "Mengelola Instruktur", desc: "Kelola akun instruktur", color: "emerald", path: "/admin/instructors" },
+                    { icon: BookMarked, label: "Rekapan Kajian", desc: "Arsip & ringkasan materi", color: "emerald", path: "/materials/rekapan" },
+                    { icon: HelpCircle, label: "Kuis Akademia", desc: "Kelola bank soal & nilai", color: "emerald", path: "/quiz" },
+                    { icon: Bell, label: "Broadcast Pesan", desc: "Kirim pengumuman massal", color: "emerald", path: "/admin/broadcast" },
+                    { icon: Settings, label: "Konfigurasi IRMA", desc: "Pengaturan inti platform", color: "emerald", path: "/admin/settings" },
                   ].map((item, idx) => (
                     <Link
                       key={idx}
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
                     </div>
                     <h2 className="text-xl font-black text-slate-800">Pendaftaran Terbaru</h2>
                   </div>
-                  <Link href="/admin/users" className="text-sm font-black text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                  <Link href="/admin/users" className="text-sm font-black text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
                     Lihat List <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -261,16 +261,16 @@ export default function AdminDashboard() {
                   {recentUsers.map((user) => (
                     <div key={user.id} className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white transition-all group">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-black text-xl">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 font-black text-xl">
                                 {user.name.charAt(0)}
                             </div>
                             <div>
-                                <h3 className="font-black text-slate-700 group-hover:text-indigo-600 transition-colors">{user.name}</h3>
+                                <h3 className="font-black text-slate-700 group-hover:text-emerald-600 transition-colors">{user.name}</h3>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
                             </div>
                         </div>
                         <div className="text-right">
-                            <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase border border-indigo-100">
+                            <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase border border-emerald-100">
                                 {user.role}
                             </span>
                             <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{user.joinedAt}</p>
@@ -318,16 +318,16 @@ export default function AdminDashboard() {
 
                 <div className="space-y-4">
                   {systemAlerts.map((alert) => (
-                    <div key={alert.id} className="flex gap-4 p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white hover:border-indigo-100 transition-all group">
+                    <div key={alert.id} className="flex gap-4 p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white hover:border-emerald-100 transition-all group">
                         <div className={`mt-1 p-2 rounded-xl h-fit border-2 ${
-                          alert.type === 'warning' ? 'bg-amber-50 border-amber-100 text-amber-500' : 
-                          alert.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-500' : 'bg-blue-50 border-blue-100 text-blue-500'
+                          alert.type === 'warning' ? 'bg-emerald-50 border-emerald-100 text-emerald-500' : 
+                          alert.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-500' : 'bg-emerald-50 border-emerald-100 text-emerald-500'
                         }`}>
                           {alert.type === 'warning' ? <AlertCircle className="h-5 w-5" /> : 
                            alert.type === 'success' ? <CheckCircle2 className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-slate-700 leading-tight mb-1 text-sm group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{alert.message}</p>
+                          <p className="font-black text-slate-700 leading-tight mb-1 text-sm group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{alert.message}</p>
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{alert.time}</p>
                         </div>
                     </div>
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
                       <button className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-700 hover:border-teal-400 hover:text-teal-600 transition-all shadow-sm">
                           Backup Database
                       </button>
-                      <button className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-700 hover:border-indigo-400 hover:text-indigo-600 transition-all shadow-sm">
+                      <button className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-700 hover:border-emerald-400 hover:text-emerald-600 transition-all shadow-sm">
                           System Update
                       </button>
                   </div>

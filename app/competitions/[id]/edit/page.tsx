@@ -262,7 +262,7 @@ const EditCompetition = () => {
                 {/* Card Informasi Dasar */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Tag className="h-5 w-5 lg:h-6 lg:w-6 text-teal-500" /> Informasi Dasar
+                    <Tag className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Informasi Dasar
                   </h2>
 
                   <div className="space-y-4 lg:space-y-6">
@@ -594,7 +594,7 @@ const EditCompetition = () => {
                 {/* Card Kontak */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Users className="h-5 w-5 lg:h-6 lg:w-6 text-blue-500" /> Kontak Person
+                    <Users className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Kontak Person
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">

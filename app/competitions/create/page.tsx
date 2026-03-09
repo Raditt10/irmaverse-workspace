@@ -262,7 +262,7 @@ const CreateCompetition = () => {
                 {/* Card Informasi Dasar */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Tag className="h-5 w-5 lg:h-6 lg:w-6 text-teal-500" /> Informasi Dasar
+                    <Tag className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Informasi Dasar
                   </h2>
 
                   <div className="space-y-4 lg:space-y-6">
@@ -339,7 +339,7 @@ const CreateCompetition = () => {
                 {/* Timeline / Jadwal Pelaksanaan */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-500" /> Jadwal Pelaksanaan
+                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Jadwal Pelaksanaan
                   </h2>
                   <p className="text-xs lg:text-sm text-slate-500 mb-4 lg:mb-6">Tambahkan linimasa perlombaan seperti masa pendaftaran, penjurian, dll.</p>
                   
@@ -348,7 +348,7 @@ const CreateCompetition = () => {
                       <div key={index} className="bg-slate-50 p-4 lg:p-6 rounded-2xl border-2 border-slate-100 relative">
                         <div className="flex items-center justify-between mb-4">
                            <h3 className="font-bold text-slate-700 text-sm flex items-center gap-2">
-                               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs">{index + 1}</span>
+                               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 text-xs">{index + 1}</span>
                                Tahap {index + 1}
                            </h3>
                            <button
@@ -466,7 +466,7 @@ const CreateCompetition = () => {
                     {/* Criteria Column */}
                     <div className="space-y-4 lg:space-y-6">
                       <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-6 lg:mb-8 flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-rose-100 text-rose-600">
+                        <div className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
                           <ListChecks className="h-5 w-5 lg:h-6 lg:w-6" />
                         </div>
                         Kriteria Penilaian
@@ -507,7 +507,7 @@ const CreateCompetition = () => {
                 {/* Card Info Juara */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Trophy className="h-5 w-5 lg:h-6 lg:w-6 text-amber-500" /> Info Juara
+                    <Trophy className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Info Juara
                   </h2>
                   <p className="text-xs lg:text-sm text-slate-500 mb-4 lg:mb-6">Isi detail hadiah dan benefit untuk setiap juara.</p>
 
@@ -576,7 +576,7 @@ const CreateCompetition = () => {
                 {/* Card Kontak */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Users className="h-5 w-5 lg:h-6 lg:w-6 text-blue-500" /> Kontak Person
+                    <Users className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" /> Kontak Person
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">

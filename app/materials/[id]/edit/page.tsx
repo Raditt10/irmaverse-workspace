@@ -390,7 +390,7 @@ const EditMaterial = () => {
                 {/* Card 1: Informasi Dasar */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Type className="h-5 w-5 lg:h-6 lg:w-6 text-teal-500" />{" "}
+                    <Type className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" />{" "}
                     Informasi Dasar
                   </h2>
 
@@ -622,7 +622,7 @@ const EditMaterial = () => {
                       <div className="pt-6 border-t-2 border-slate-100 mt-6">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-amber-500" />{" "}
+                            <FileText className="h-4 w-4 text-emerald-500" />{" "}
                             Rekapan Materi
                             <span className="text-[10px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-black border border-amber-200">
                               Disarankan
@@ -692,7 +692,7 @@ const EditMaterial = () => {
                           <div className="animate-in fade-in slide-in-from-top-1 duration-200 space-y-3">
                             <div className="relative group">
                               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <Globe className="h-5 w-5 text-teal-500" />
+                                <Globe className="h-5 w-5 text-emerald-500" />
                               </div>
                               <Input
                                 type="url"
@@ -711,7 +711,7 @@ const EditMaterial = () => {
                             </div>
                             <div className="p-4 rounded-2xl bg-teal-50 border border-teal-100 flex gap-3">
                               <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shrink-0 border border-teal-200">
-                                <Link className="h-5 w-5 text-teal-500" />
+                                <Link className="h-5 w-5 text-emerald-500" />
                               </div>
                               <div>
                                 <p className="text-xs font-black text-teal-900 mb-0.5">
@@ -761,7 +761,7 @@ const EditMaterial = () => {
                 {/* Card Waktu & Tempat */}
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-indigo-500" />{" "}
+                    <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" />{" "}
                     Teknis Pelaksanaan
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mb-4 lg:mb-6">

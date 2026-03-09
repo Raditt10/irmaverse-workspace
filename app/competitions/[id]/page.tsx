@@ -274,8 +274,8 @@ const CompetitionDetail = () => {
                 {/* Quick Stats Tiles */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
                     <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-full flex items-center justify-center border-2 border-indigo-200 shrink-0">
-                            <Trophy className="h-5 w-5 md:h-6 md:w-6 text-indigo-500" />
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 rounded-full flex items-center justify-center border-2 border-emerald-200 shrink-0">
+                            <Trophy className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" />
                         </div>
                         <div className="min-w-0">
                             <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Hadiah Utama</span>
@@ -283,8 +283,8 @@ const CompetitionDetail = () => {
                         </div>
                     </div>
                     <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-100 rounded-full flex items-center justify-center border-2 border-teal-200 shrink-0">
-                            <MapPin className="h-5 w-5 md:h-6 md:w-6 text-teal-500" />
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 rounded-full flex items-center justify-center border-2 border-emerald-200 shrink-0">
+                            <MapPin className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" />
                         </div>
                         <div className="min-w-0">
                             <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Lokasi</span>
@@ -293,8 +293,8 @@ const CompetitionDetail = () => {
                     </div>
                     {competition.maxParticipants && (
                     <div className="bg-white p-4 md:p-5 rounded-2xl md:rounded-4xl border-2 border-slate-200 shadow-[2px_2px_0_0_#cbd5e1] md:shadow-[4px_4px_0_0_#cbd5e1] flex flex-row sm:flex-col items-center gap-4 sm:gap-2 text-left sm:text-center hover:-translate-y-1 transition-transform">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-full flex items-center justify-center border-2 border-amber-200 shrink-0">
-                            <Users className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 rounded-full flex items-center justify-center border-2 border-emerald-200 shrink-0">
+                            <Users className="h-5 w-5 md:h-6 md:w-6 text-emerald-500" />
                         </div>
                         <div className="min-w-0">
                             <span className="block text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">Kuota</span>
@@ -308,14 +308,14 @@ const CompetitionDetail = () => {
                 {competition.requirements && competition.requirements.length > 0 && (
                   <div className="bg-white p-6 rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#e2e8f0]">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-amber-100 rounded-xl border-2 border-amber-200">
-                            <Clock className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
+                        <div className="p-2 bg-emerald-100 rounded-xl border-2 border-emerald-200">
+                            <Clock className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />
                         </div>
                         <h2 className="text-xl font-black text-slate-800">Persyaratan Peserta</h2>
                     </div>
                     <ul className="space-y-3">
                       {competition.requirements.map((item, idx) => (
-                        <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-amber-200 hover:bg-amber-50 transition-colors">
+                        <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors">
                           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white border-2 border-slate-200 text-slate-600 font-black text-sm shrink-0">
                             {idx + 1}
                           </span>
@@ -330,14 +330,14 @@ const CompetitionDetail = () => {
                 {competition.judgingCriteria && competition.judgingCriteria.length > 0 && (
                   <div className="bg-white p-6 rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#e2e8f0]">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-rose-100 rounded-xl border-2 border-rose-200">
-                            <CheckCircle2 className="h-6 w-6 text-rose-600" strokeWidth={2.5} />
+                        <div className="p-2 bg-emerald-100 rounded-xl border-2 border-emerald-200">
+                            <CheckCircle2 className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />
                         </div>
                         <h2 className="text-xl font-black text-slate-800">Kriteria Penilaian</h2>
                     </div>
                     <ul className="space-y-3">
                       {competition.judgingCriteria.map((item, idx) => (
-                        <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-rose-200 hover:bg-rose-50 transition-colors">
+                        <li key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors">
                           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white border-2 border-slate-200 text-slate-600 font-black text-sm shrink-0">
                             {idx + 1}
                           </span>
@@ -352,14 +352,14 @@ const CompetitionDetail = () => {
                 {competition.schedules && competition.schedules.length > 0 && (
                   <div className="bg-white p-6 rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#e2e8f0]">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-purple-100 rounded-xl border-2 border-purple-200">
-                            <Clock className="h-6 w-6 text-purple-600" strokeWidth={2.5} />
+                        <div className="p-2 bg-emerald-100 rounded-xl border-2 border-emerald-200">
+                            <Clock className="h-6 w-6 text-emerald-600" strokeWidth={2.5} />
                         </div>
                         <h2 className="text-xl font-black text-slate-800">Timeline Perlombaan</h2>
                     </div>
                     <ul className="space-y-3">
                       {competition.schedules.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-purple-200 hover:bg-purple-50 transition-colors">
+                        <li key={idx} className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors">
                           {(() => {
                             const parsedDate = new Date(item.date);
                             const isPassed = !isNaN(parsedDate.getTime()) && new Date() > parsedDate;

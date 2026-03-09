@@ -303,9 +303,9 @@ const ProgramDetail = () => {
             {program.isEnrolled && (
               <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1]">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="p-2.5 bg-indigo-100 rounded-2xl border-2 border-indigo-200">
+                  <div className="p-2.5 bg-emerald-100 rounded-2xl border-2 border-emerald-200">
                     <BarChart3
-                      className="h-6 w-6 text-indigo-600"
+                      className="h-6 w-6 text-emerald-600"
                       strokeWidth={3}
                     />
                   </div>
@@ -347,9 +347,9 @@ const ProgramDetail = () => {
                 <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-teal-100 rounded-2xl border-2 border-teal-200">
+                      <div className="p-2.5 bg-emerald-100 rounded-2xl border-2 border-emerald-200">
                         <BookOpen
-                          className="h-6 w-6 text-teal-600"
+                          className="h-6 w-6 text-emerald-600"
                           strokeWidth={3}
                         />
                       </div>
@@ -467,7 +467,7 @@ const ProgramDetail = () => {
                               </div>
                               {material.startedAt && (
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="h-3.5 w-3.5 text-indigo-400" />
+                                  <Clock className="h-3.5 w-3.5 text-emerald-400" />
                                   <span>{material.startedAt} WIB</span>
                                 </div>
                               )}
@@ -488,9 +488,9 @@ const ProgramDetail = () => {
                 {program.syllabus.length > 0 && (
                   <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1]">
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="p-2.5 bg-purple-100 rounded-2xl border-2 border-purple-200">
+                      <div className="p-2.5 bg-emerald-100 rounded-2xl border-2 border-emerald-200">
                         <ListChecks
-                          className="h-6 w-6 text-purple-600"
+                          className="h-6 w-6 text-emerald-600"
                           strokeWidth={3}
                         />
                       </div>
@@ -502,9 +502,9 @@ const ProgramDetail = () => {
                       {program.syllabus.map((item, idx) => (
                         <li
                           key={idx}
-                          className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-purple-200 hover:bg-purple-50 transition-colors group"
+                          className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50 transition-colors group"
                         >
-                          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-black text-sm shrink-0 group-hover:border-purple-300 group-hover:text-purple-600 transition-colors">
+                          <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-black text-sm shrink-0 group-hover:border-emerald-300 group-hover:text-emerald-600 transition-colors">
                             {idx + 1}
                           </span>
                           <span className="text-slate-700 font-bold text-sm md:text-base leading-snug">
@@ -568,8 +568,8 @@ const ProgramDetail = () => {
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-teal-50 rounded-xl border border-teal-100">
-                        <BookOpen className="h-5 w-5 text-teal-600" />
+                      <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <BookOpen className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div>
                         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -581,8 +581,8 @@ const ProgramDetail = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
-                        <Clock className="h-5 w-5 text-amber-600" />
+                      <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <Clock className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div>
                         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">

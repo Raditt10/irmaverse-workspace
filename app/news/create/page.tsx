@@ -168,7 +168,7 @@ export default function CreateNewsPage() {
               <div className="lg:col-span-2 space-y-6 lg:space-y-8">
                 <div className="bg-white p-5 lg:p-8 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-4 lg:mb-6 flex items-center gap-2">
-                    <Edit3 className="h-5 w-5 lg:h-6 lg:w-6 text-teal-500" />{" "}
+                    <Edit3 className="h-5 w-5 lg:h-6 lg:w-6 text-emerald-500" />{" "}
                     Informasi Berita
                   </h2>
 

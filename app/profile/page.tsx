@@ -224,9 +224,9 @@ const Profile = () => {
   const getInstrukturActivityIcon = (type: string) => {
     switch (type) {
       case "kajian": return <BookOpen className="h-5 w-5 text-emerald-600" />;
-      case "sesi": return <GraduationCap className="h-5 w-5 text-blue-600" />;
-      case "materi": return <FileText className="h-5 w-5 text-purple-600" />;
-      case "siswa": return <Users className="h-5 w-5 text-rose-600" />;
+      case "sesi": return <GraduationCap className="h-5 w-5 text-emerald-600" />;
+      case "materi": return <FileText className="h-5 w-5 text-emerald-600" />;
+      case "siswa": return <Users className="h-5 w-5 text-emerald-600" />;
       case "jadwal": return <Calendar className="h-5 w-5 text-teal-600" />;
       default: return <Zap className="h-5 w-5 text-slate-600" />;
     }
@@ -235,9 +235,9 @@ const Profile = () => {
   const getInstrukturActivityBg = (type: string) => {
     switch (type) {
       case "kajian": return "bg-emerald-100 border-emerald-200";
-      case "sesi": return "bg-blue-100 border-blue-200";
-      case "materi": return "bg-purple-100 border-purple-200";
-      case "siswa": return "bg-rose-100 border-rose-200";
+      case "sesi": return "bg-emerald-100 border-emerald-200";
+      case "materi": return "bg-emerald-50 border-emerald-200";
+      case "siswa": return "bg-emerald-100 border-emerald-200";
       case "jadwal": return "bg-teal-100 border-teal-200";
       default: return "bg-slate-100 border-slate-200";
     }
@@ -352,8 +352,8 @@ const Profile = () => {
                 {/* Stats Card */}
                 <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[4px_4px_0_0_#cbd5e1] p-6 lg:p-8">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-amber-50 rounded-xl border border-amber-100">
-                      <BarChart3 className="h-6 w-6 text-amber-500" />
+                    <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-100">
+                      <BarChart3 className="h-6 w-6 text-emerald-500" />
                     </div>
                     <h2 className="text-xl lg:text-2xl font-black text-slate-800">Statistik</h2>
                   </div>
@@ -362,14 +362,14 @@ const Profile = () => {
                     /* ===== INSTRUKTUR STATS ===== */
                     <div className="grid grid-cols-1 gap-4">
                       {/* Rating */}
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-amber-100 bg-linear-to-r from-amber-50 to-orange-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-amber-200 shadow-xs">
-                            <Star className="h-5 w-5 text-amber-500 fill-amber-400" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <Star className="h-5 w-5 text-emerald-500 fill-emerald-400" />
                           </div>
-                          <span className="text-sm font-bold text-amber-800">Rating</span>
+                          <span className="text-sm font-bold text-emerald-800">Rating</span>
                         </div>
-                        <span className="text-xl font-black text-amber-600">⭐ {instrukturStats.rating}</span>
+                        <span className="text-xl font-black text-emerald-600">⭐ {instrukturStats.rating}</span>
                       </div>
 
                       {/* Total Kajian */}
@@ -384,36 +384,36 @@ const Profile = () => {
                       </div>
 
                       {/* Total Siswa */}
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-blue-100 bg-linear-to-r from-blue-50 to-sky-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-blue-200 shadow-xs">
-                            <Users className="h-5 w-5 text-blue-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <Users className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-blue-800">Total Siswa</span>
+                          <span className="text-sm font-bold text-emerald-800">Total Siswa</span>
                         </div>
-                        <span className="text-xl font-black text-blue-600">{instrukturStats.totalSiswa}</span>
+                        <span className="text-xl font-black text-emerald-600">{instrukturStats.totalSiswa}</span>
                       </div>
 
                       {/* Total Sesi */}
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-purple-100 bg-linear-to-r from-purple-50 to-fuchsia-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-purple-200 shadow-xs">
-                            <GraduationCap className="h-5 w-5 text-purple-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <GraduationCap className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-purple-800">Total Sesi</span>
+                          <span className="text-sm font-bold text-emerald-800">Total Sesi</span>
                         </div>
-                        <span className="text-xl font-black text-purple-600">{instrukturStats.totalSesi}</span>
+                        <span className="text-xl font-black text-emerald-600">{instrukturStats.totalSesi}</span>
                       </div>
 
                       {/* Kepuasan Siswa */}
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-rose-100 bg-linear-to-r from-rose-50 to-red-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-rose-200 shadow-xs">
-                            <TrendingUp className="h-5 w-5 text-rose-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <TrendingUp className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-rose-800">Kepuasan</span>
+                          <span className="text-sm font-bold text-emerald-800">Kepuasan</span>
                         </div>
-                        <span className="text-xl font-black text-rose-600">{instrukturStats.kepuasan}%</span>
+                        <span className="text-xl font-black text-emerald-600">{instrukturStats.kepuasan}%</span>
                       </div>
                     </div>
                   ) : (
@@ -432,44 +432,44 @@ const Profile = () => {
                         <span className="text-xl font-black text-emerald-600">{userStats.totalAttended}</span>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-sky-100 bg-linear-to-r from-sky-50 to-blue-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-sky-200 shadow-xs">
-                            <Award className="h-5 w-5 text-sky-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <Award className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-sky-800">Badge</span>
+                          <span className="text-sm font-bold text-emerald-800">Badge</span>
                         </div>
-                        <span className="text-xl font-black text-sky-600">{userStats.badges}</span>
+                        <span className="text-xl font-black text-emerald-600">{userStats.badges}</span>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-purple-100 bg-linear-to-r from-purple-50 to-fuchsia-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-purple-200 shadow-xs">
-                            <BookOpen className="h-5 w-5 text-purple-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <BookOpen className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-purple-800">Kuis Selesai</span>
+                          <span className="text-sm font-bold text-emerald-800">Kuis Selesai</span>
                         </div>
-                        <span className="text-xl font-black text-purple-600">{userStats.quizCompleted}</span>
+                        <span className="text-xl font-black text-emerald-600">{userStats.quizCompleted}</span>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-rose-100 bg-linear-to-r from-rose-50 to-red-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-rose-200 shadow-xs">
-                            <AlertCircle className="h-5 w-5 text-rose-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <AlertCircle className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-rose-800">Kuis Tertunda</span>
+                          <span className="text-sm font-bold text-emerald-800">Kuis Tertunda</span>
                         </div>
-                        <span className="text-xl font-black text-rose-600">{userStats.quizPending}</span>
+                        <span className="text-xl font-black text-emerald-600">{userStats.quizPending}</span>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-amber-100 bg-linear-to-r from-amber-50 to-orange-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-amber-200 shadow-xs">
-                            <Target className="h-5 w-5 text-amber-500" />
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <Target className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-amber-800">Rata-rata Skor</span>
+                          <span className="text-sm font-bold text-emerald-800">Rata-rata Skor</span>
                         </div>
-                        <span className="text-xl font-black text-amber-600">{userStats.avgScore}%</span>
+                        <span className="text-xl font-black text-emerald-600">{userStats.avgScore}%</span>
                       </div>
                     </div>
                     )

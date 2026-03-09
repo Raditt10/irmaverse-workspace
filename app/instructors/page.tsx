@@ -178,12 +178,12 @@ const Instructors = () => {
                 onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                 className={`hidden md:flex px-4 lg:px-6 py-3 rounded-2xl border-2 border-b-4 font-bold items-center gap-2 transition-all ${
                   showFavoritesOnly
-                    ? 'bg-rose-400 border-rose-500 text-white shadow-lg hover:bg-rose-500 active:border-b-2 active:translate-y-0.5'
-                    : 'bg-white border-slate-200 text-slate-600 shadow-[0_4px_0_0_#e2e8f0] hover:border-rose-300 hover:text-rose-500 active:border-b-2 active:translate-y-0.5'
+                    ? 'bg-emerald-400 border-emerald-500 text-white shadow-lg hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5'
+                    : 'bg-white border-slate-200 text-slate-600 shadow-[0_4px_0_0_#e2e8f0] hover:border-emerald-300 hover:text-emerald-500 active:border-b-2 active:translate-y-0.5'
                 }`}
               >
                 <Heart className={`h-5 w-5 ${
-                  showFavoritesOnly ? 'fill-white' : 'group-hover:fill-rose-500'
+                  showFavoritesOnly ? 'fill-white' : 'group-hover:fill-emerald-500'
                 }`} strokeWidth={2.5} />
                 <span className="hidden sm:inline text-sm lg:text-base">
                   {showFavoritesOnly ? "Semua Instruktur" : "Favorit"}
@@ -224,12 +224,12 @@ const Instructors = () => {
                     onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                     className={`group p-3.5 rounded-2xl border-2 border-b-4 flex items-center justify-center transition-all ${
                       showFavoritesOnly
-                        ? 'bg-rose-400 border-rose-500 shadow-lg hover:bg-rose-500 active:border-b-2 active:translate-y-0.5'
-                        : 'bg-white border-slate-200 shadow-[0_4px_0_0_#e2e8f0] hover:border-rose-300 active:border-b-2 active:translate-y-0.5'
+                        ? 'bg-emerald-400 border-emerald-500 shadow-lg hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5'
+                        : 'bg-white border-slate-200 shadow-[0_4px_0_0_#e2e8f0] hover:border-emerald-300 active:border-b-2 active:translate-y-0.5'
                     }`}
                   >
                     <Heart className={`h-6 w-6 transition-colors ${
-                      showFavoritesOnly ? 'fill-white text-white' : 'text-slate-400 group-hover:fill-rose-500 group-hover:text-rose-500'
+                      showFavoritesOnly ? 'fill-white text-white' : 'text-slate-400 group-hover:fill-emerald-500 group-hover:text-emerald-500'
                     }`} strokeWidth={2.5} />
                   </button>
                 </div>
@@ -269,27 +269,27 @@ const Instructors = () => {
                           key={instructor.id}
                           className={`bg-white rounded-3xl md:rounded-[2.5rem] border-2 transition-all duration-300 overflow-hidden group hover:-translate-y-2 flex flex-col relative ${
                             instructor.featured 
-                            ? 'border-amber-400 shadow-[0_4px_0_0_#fbbf24] md:shadow-[0_8px_0_0_#fbbf24]' 
+                            ? 'border-emerald-400 shadow-[0_4px_0_0_#34d399] md:shadow-[0_8px_0_0_#34d399]' 
                             : 'border-slate-200 shadow-[0_4px_0_0_#cbd5e1] md:shadow-[0_8px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_4px_0_0_#34d399] md:hover:shadow-[0_8px_0_0_#34d399]'
                           }`}
                         >
                           {/* Featured Badge & Favorite Button */}
                           <div className="absolute top-5 right-5 z-10 flex gap-2 items-center">
                             {instructor.featured && (
-                              <div className="bg-amber-400 text-white text-[10px] font-black px-3 py-1 rounded-full border-2 border-amber-500 shadow-sm flex items-center gap-1 animate-pulse">
+                              <div className="bg-emerald-400 text-white text-[10px] font-black px-3 py-1 rounded-full border-2 border-emerald-500 shadow-sm flex items-center gap-1 animate-pulse">
                                 <Star className="w-3 h-3 fill-white" strokeWidth={3} />
                                 <span>POPULER</span>
                               </div>
                             )}
                             <button
                               onClick={() => toggleFavorite(instructor.id)}
-                              className="bg-white border-2 border-slate-200 rounded-full p-1.5 md:p-2.5 shadow-sm md:shadow-md hover:bg-rose-50 hover:border-rose-300 transition-all hover:-translate-y-1"
+                              className="bg-white border-2 border-slate-200 rounded-full p-1.5 md:p-2.5 shadow-sm md:shadow-md hover:bg-emerald-50 hover:border-emerald-300 transition-all hover:-translate-y-1"
                             >
                                 <Heart 
                                   className={`h-5 w-5 transition-colors ${
                                     favoriteInstructorIds.has(String(instructor.id))
-                                      ? 'fill-rose-500 text-rose-500'
-                                      : 'text-slate-400 hover:text-rose-400'
+                                      ? 'fill-emerald-500 text-emerald-500'
+                                      : 'text-slate-400 hover:text-emerald-400'
                                   }`} 
                                   strokeWidth={2.5} 
                                 />
@@ -301,7 +301,7 @@ const Instructors = () => {
                             <div className="flex justify-center mb-4 mt-2">
                               <div className="relative group-hover:scale-105 transition-transform duration-500">
                                 <div className={`w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full overflow-hidden border-[3px] md:border-4 shadow-lg mx-auto ${
-                                   instructor.featured ? 'border-amber-200' : 'border-teal-100'
+                                   instructor.featured ? 'border-emerald-200' : 'border-teal-100'
                                 }`}>
                                   <img
                                     src={instructor.avatar}
@@ -330,7 +330,7 @@ const Instructors = () => {
                             {/* Stats Widget */}
                             <div className="grid grid-cols-2 gap-0 mb-4 md:mb-6 bg-slate-50 rounded-xl md:rounded-2xl border-2 border-slate-100 overflow-hidden">
                               <div className="py-2 md:py-3 text-center border-r-2 border-slate-200 hover:bg-slate-100 transition-colors">
-                                <div className="flex items-center justify-center gap-1 text-amber-500 mb-0.5">
+                                <div className="flex items-center justify-center gap-1 text-emerald-500 mb-0.5">
                                   <Star className="h-3 w-3 md:h-4 md:w-4 fill-current" />
                                   <span className="font-black text-xs md:text-lg text-slate-700">{instructor.rating}</span>
                                 </div>
