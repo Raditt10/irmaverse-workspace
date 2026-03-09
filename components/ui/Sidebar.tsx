@@ -22,6 +22,7 @@ import {
   Contact,
   Shield,
   Heart,
+  Zap,
 } from "lucide-react";
 
 // Custom scrollbar styles - Cartoon Style
@@ -232,6 +233,11 @@ const Sidebar = () => {
       icon: Award,
       label: "Peringkat",
       path: "/leaderboard",
+    },
+    {
+      icon: Zap,
+      label: "Level & XP",
+      path: "/level",
     },
     {
       icon: Calendar,

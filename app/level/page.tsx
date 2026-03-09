@@ -21,6 +21,8 @@ import {
   GraduationCap,
   MessageCircle,
   Star,
+  Target,
+  TrendingUp,
   Trophy,
   Users,
   Zap,
@@ -162,6 +164,21 @@ function formatRelativeTime(date: Date): string {
   });
 }
 
+function formatDateLabel(date: Date): string {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const d = new Date(date);
+  if (d.toDateString() === today.toDateString()) return "Hari Ini";
+  if (d.toDateString() === yesterday.toDateString()) return "Kemarin";
+  return d.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
 export default async function LevelPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth");
@@ -192,18 +209,66 @@ export default async function LevelPage() {
   const xp = getXpProgress(user.points);
   const levelTitle = getLevelTitle(user.level);
 
-  const [activities, earnedBadges] = await Promise.all([
+  const [activities, earnedBadges, allBadges, rank] = await Promise.all([
     prisma.activityLog.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
-      take: 30,
+      take: 50,
     }),
     prisma.userBadge.findMany({
       where: { userId: session.user.id },
       include: { badge: true },
       orderBy: { earnedAt: "desc" },
     }),
+    prisma.badge.findMany(),
+    prisma.user.count({
+      where: { points: { gt: user.points } },
+    }),
   ]);
+
+  const myRank = rank + 1;
+
+  // ── Daily XP Summary ──────────────────────────────────────────────────
+  const dailyXpMap = new Map<string, number>();
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    dailyXpMap.set(d.toDateString(), 0);
+  }
+  for (const a of activities) {
+    const key = a.createdAt.toDateString();
+    if (dailyXpMap.has(key)) {
+      dailyXpMap.set(key, (dailyXpMap.get(key) ?? 0) + a.xpEarned);
+    }
+  }
+  const dailyXp = Array.from(dailyXpMap.entries()).map(([dateStr, xpTotal]) => {
+    const d = new Date(dateStr);
+    return {
+      label:
+        d.toDateString() === today.toDateString()
+          ? "Hari Ini"
+          : d.toLocaleDateString("id-ID", { weekday: "short" }),
+      xp: xpTotal,
+    };
+  });
+  const maxDailyXp = Math.max(...dailyXp.map((d) => d.xp), 1);
+
+  // ── Group activities by day ───────────────────────────────────────────
+  const grouped: { label: string; items: typeof activities }[] = [];
+  let currentLabel = "";
+  for (const a of activities) {
+    const label = formatDateLabel(a.createdAt);
+    if (label !== currentLabel) {
+      grouped.push({ label, items: [] });
+      currentLabel = label;
+    }
+    grouped[grouped.length - 1].items.push(a);
+  }
+
+  // ── Next badge to earn ────────────────────────────────────────────────
+  const earnedCodes = new Set(earnedBadges.map((ub) => ub.badge.code));
+  const unearnedBadges = allBadges.filter((b) => !earnedCodes.has(b.code));
 
   const currentMilestone =
     [...LEVEL_MILESTONES].reverse().find((m) => m.level <= user.level) ??
@@ -245,7 +310,7 @@ export default async function LevelPage() {
                   {levelTitle}
                 </h1>
                 <p className="text-white/70 font-bold text-sm mb-5">
-                  {user.name}
+                  {user.name} • Peringkat #{myRank}
                 </p>
 
                 {/* XP Bar */}
@@ -262,7 +327,7 @@ export default async function LevelPage() {
                   </div>
                   <div className="w-full h-4 bg-white/20 rounded-full border border-white/30 overflow-hidden">
                     <div
-                      className="h-4 bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 rounded-full"
+                      className="h-4 bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 rounded-full transition-all duration-700"
                       style={{ width: `${xp.progressPercent}%` }}
                     />
                   </div>
@@ -333,11 +398,64 @@ export default async function LevelPage() {
             ))}
           </div>
 
+          {/* ── DAILY XP CHART ────────────────────────────────────────────── */}
+          <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-800">
+                  XP 7 Hari Terakhir
+                </h2>
+                <p className="text-xs text-slate-500 font-medium">
+                  Total:{" "}
+                  {dailyXp.reduce((s, d) => s + d.xp, 0).toLocaleString()} XP
+                  minggu ini
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-end gap-2 h-32">
+              {dailyXp.map((d, i) => (
+                <div
+                  key={i}
+                  className="flex-1 flex flex-col items-center gap-1"
+                >
+                  {d.xp > 0 && (
+                    <span className="text-[10px] font-black text-emerald-600">
+                      +{d.xp}
+                    </span>
+                  )}
+                  <div className="w-full flex justify-center">
+                    <div
+                      className={`w-full max-w-10 rounded-t-xl transition-all ${
+                        i === 0
+                          ? "bg-gradient-to-t from-emerald-500 to-emerald-400"
+                          : "bg-gradient-to-t from-slate-200 to-slate-100"
+                      }`}
+                      style={{
+                        height: `${Math.max(8, (d.xp / maxDailyXp) * 90)}px`,
+                      }}
+                    />
+                  </div>
+                  <span
+                    className={`text-[10px] font-bold ${
+                      i === 0 ? "text-emerald-600" : "text-slate-400"
+                    }`}
+                  >
+                    {d.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* ── MAIN GRID ─────────────────────────────────────────────────── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* LEFT col */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Activity Log */}
+              {/* Activity Log — grouped by day */}
               <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
@@ -364,38 +482,51 @@ export default async function LevelPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-1">
-                    {activities.map((a) => {
-                      const cfg = getActivityConfig(a.type);
-                      return (
-                        <div
-                          key={a.id}
-                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
-                        >
-                          <div
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}
-                          >
-                            {cfg.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-bold text-slate-700 text-sm truncate">
-                              {a.title}
-                            </p>
-                            <p className="text-[11px] text-slate-400 font-medium">
-                              {formatRelativeTime(a.createdAt)}
-                            </p>
-                          </div>
-                          {a.xpEarned > 0 && (
-                            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0">
-                              <Zap className="h-3 w-3 text-emerald-500" />
-                              <span className="text-xs font-black text-emerald-600">
-                                +{a.xpEarned}
-                              </span>
-                            </div>
-                          )}
+                  <div className="space-y-4">
+                    {grouped.map((group) => (
+                      <div key={group.label}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="h-px flex-1 bg-slate-100" />
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2">
+                            {group.label}
+                          </span>
+                          <div className="h-px flex-1 bg-slate-100" />
                         </div>
-                      );
-                    })}
+                        <div className="space-y-1">
+                          {group.items.map((a) => {
+                            const cfg = getActivityConfig(a.type);
+                            return (
+                              <div
+                                key={a.id}
+                                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                              >
+                                <div
+                                  className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}
+                                >
+                                  {cfg.icon}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-slate-700 text-sm truncate">
+                                    {a.title}
+                                  </p>
+                                  <p className="text-[11px] text-slate-400 font-medium">
+                                    {formatRelativeTime(a.createdAt)}
+                                  </p>
+                                </div>
+                                {a.xpEarned > 0 && (
+                                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0">
+                                    <Zap className="h-3 w-3 text-emerald-500" />
+                                    <span className="text-xs font-black text-emerald-600">
+                                      +{a.xpEarned}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -473,6 +604,51 @@ export default async function LevelPage() {
 
             {/* RIGHT col */}
             <div className="space-y-6">
+              {/* Next Badge Preview */}
+              {unearnedBadges.length > 0 && (
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-[2rem] p-5 shadow-[0_6px_0_0_#c7d2fe]">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-indigo-100">
+                      <Target className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-black text-slate-800">
+                        Badge Selanjutnya
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        {unearnedBadges.length} badge belum didapat
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {unearnedBadges.slice(0, 4).map((b) => (
+                      <div
+                        key={b.id}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/70 border border-indigo-100"
+                      >
+                        <span className="text-2xl flex-shrink-0 opacity-40 grayscale">
+                          {b.icon}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-slate-700 text-sm">
+                            {b.name}
+                          </p>
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            {b.requirement}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 flex-shrink-0">
+                          <Zap className="h-2.5 w-2.5 text-indigo-500" />
+                          <span className="text-[10px] font-black text-indigo-600">
+                            +{b.xpReward}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Earned Badges */}
               <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-5 shadow-[0_6px_0_0_#cbd5e1]">
                 <div className="flex items-center gap-3 mb-4">
@@ -484,7 +660,7 @@ export default async function LevelPage() {
                       Badge Kamu
                     </h2>
                     <p className="text-xs text-slate-500">
-                      {earnedBadges.length} diperoleh
+                      {earnedBadges.length} / {allBadges.length} diperoleh
                     </p>
                   </div>
                 </div>

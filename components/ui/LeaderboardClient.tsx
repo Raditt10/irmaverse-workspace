@@ -4,13 +4,13 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Trophy,
-  Medal,
   Crown,
   Search,
-  ArrowUp,
-  Minus,
-  ArrowDown,
   Zap,
+  Flame,
+  Users,
+  Award,
+  Filter,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -23,7 +23,7 @@ export interface LeaderboardUser {
   badges: number;
   level: number;
   streak: number;
-  globalRank: number; // pre-computed rank from server
+  globalRank: number;
 }
 
 interface Props {
@@ -41,24 +41,107 @@ const avatarSrc = (u: LeaderboardUser) =>
   u.avatar ||
   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name ?? "user")}`;
 
+type RoleFilter = "all" | "user" | "instruktur";
+
+const ROLE_FILTERS: { key: RoleFilter; label: string; emoji: string }[] = [
+  { key: "all", label: "Semua", emoji: "👥" },
+  { key: "user", label: "Anggota", emoji: "🧑‍🎓" },
+  { key: "instruktur", label: "Instruktur", emoji: "👨‍🏫" },
+];
+
 export default function LeaderboardClient({ users, currentUserId }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return users;
-    const q = search.toLowerCase();
-    return users.filter((u) => u.name?.toLowerCase().includes(q));
-  }, [users, search]);
+    let result = users;
+
+    // Role filter
+    if (roleFilter !== "all") {
+      result = result.filter((u) => u.role === roleFilter);
+    }
+
+    // Search filter
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((u) => u.name?.toLowerCase().includes(q));
+    }
+
+    // Re-rank after filtering
+    return result.map((u, i) => ({ ...u, globalRank: i + 1 }));
+  }, [users, search, roleFilter]);
 
   const topThree = filtered.slice(0, 3);
   const rest = filtered.slice(3);
 
   const currentUser = users.find((u) => u.id === currentUserId);
-  const currentUserRank = currentUser?.globalRank ?? null;
+  const currentUserRank = useMemo(() => {
+    const idx = filtered.findIndex((u) => u.id === currentUserId);
+    return idx >= 0 ? idx + 1 : null;
+  }, [filtered, currentUserId]);
+
+  // Stats
+  const stats = useMemo(() => {
+    const totalXp = users.reduce((sum, u) => sum + u.points, 0);
+    const highestStreak = Math.max(...users.map((u) => u.streak), 0);
+    const totalBadges = users.reduce((sum, u) => sum + u.badges, 0);
+    return { totalXp, highestStreak, totalBadges };
+  }, [users]);
 
   return (
     <>
+      {/* ── STATS STRIP ──────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {[
+          {
+            icon: <Users className="h-4 w-4 text-emerald-500" />,
+            label: "Peserta",
+            value: users.length,
+            bg: "bg-emerald-50",
+            border: "border-emerald-200",
+          },
+          {
+            icon: <Trophy className="h-4 w-4 text-amber-500" />,
+            label: "Peringkatmu",
+            value: currentUserRank ? `#${currentUserRank}` : "—",
+            bg: "bg-amber-50",
+            border: "border-amber-200",
+          },
+          {
+            icon: <Flame className="h-4 w-4 text-orange-500" />,
+            label: "Streak Tertinggi",
+            value: `${stats.highestStreak} hari`,
+            bg: "bg-orange-50",
+            border: "border-orange-200",
+          },
+          {
+            icon: <Award className="h-4 w-4 text-purple-500" />,
+            label: "Total Badge",
+            value: stats.totalBadges,
+            bg: "bg-purple-50",
+            border: "border-purple-200",
+          },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className={`${s.bg} border-2 ${s.border} rounded-2xl p-3 flex items-center gap-3`}
+          >
+            <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-slate-100 flex-shrink-0">
+              {s.icon}
+            </div>
+            <div className="min-w-0">
+              <div className="text-lg font-black text-slate-800 leading-none">
+                {s.value}
+              </div>
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                {s.label}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* ── PODIUM ───────────────────────────────────────────────────────── */}
       {topThree.length >= 1 && (
         <div className="flex justify-center items-end gap-1 sm:gap-3 md:gap-10 mb-12 px-1 sm:px-2 pt-10">
@@ -89,6 +172,9 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
                     {topThree[1].points.toLocaleString()} XP
                   </p>
                 </div>
+                <span className="mt-1 text-[8px] font-bold text-slate-400 uppercase">
+                  Lv.{topThree[1].level} • {getRoleLabel(topThree[1].role)}
+                </span>
               </div>
             </div>
           )}
@@ -123,6 +209,9 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
                     {topThree[0].points.toLocaleString()} XP
                   </p>
                 </div>
+                <span className="mt-1 text-[8px] sm:text-[9px] font-bold text-amber-600 uppercase">
+                  Lv.{topThree[0].level} • {getRoleLabel(topThree[0].role)}
+                </span>
               </div>
             </div>
           )}
@@ -154,16 +243,37 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
                     {topThree[2].points.toLocaleString()} XP
                   </p>
                 </div>
+                <span className="mt-1 text-[8px] font-bold text-orange-400 uppercase">
+                  Lv.{topThree[2].level} • {getRoleLabel(topThree[2].role)}
+                </span>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* ── LIST ──────────────────────────────────────────────────────────── */}
+      {/* ── FILTERS & SEARCH ─────────────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-2">
-        {/* Search */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          {/* Role Filter */}
+          <div className="flex gap-1.5 bg-white border-2 border-slate-200 rounded-2xl p-1.5 flex-shrink-0">
+            {ROLE_FILTERS.map((rf) => (
+              <button
+                key={rf.key}
+                onClick={() => setRoleFilter(rf.key)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all ${
+                  roleFilter === rf.key
+                    ? "bg-emerald-500 text-white shadow-[0_3px_0_0_#059669]"
+                    : "text-slate-500 hover:bg-slate-50"
+                }`}
+              >
+                <span className="text-sm">{rf.emoji}</span>
+                <span className="hidden sm:inline">{rf.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Search */}
           <div className="relative flex-1 bg-white border-2 border-slate-200 rounded-2xl flex items-center px-4 py-2.5 transition-all focus-within:border-emerald-400 focus-within:shadow-[0_0_0_3px_#d1fae5]">
             <Search className="w-4 h-4 md:w-5 md:h-5 text-slate-400 mr-2 flex-shrink-0" />
             <input
@@ -176,10 +286,32 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
           </div>
         </div>
 
+        {/* Filter active indicator */}
+        {(roleFilter !== "all" || search.trim()) && (
+          <div className="flex items-center gap-2 mb-4 px-1">
+            <Filter className="h-3.5 w-3.5 text-slate-400" />
+            <span className="text-xs font-bold text-slate-400">
+              Menampilkan {filtered.length} dari {users.length} peserta
+            </span>
+            <button
+              onClick={() => {
+                setRoleFilter("all");
+                setSearch("");
+              }}
+              className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200"
+            >
+              Reset
+            </button>
+          </div>
+        )}
+
         {filtered.length === 0 && (
           <div className="text-center py-16">
             <p className="text-4xl mb-3">🔍</p>
             <p className="font-bold text-slate-500">Tidak ditemukan</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Coba ubah filter atau kata kunci pencarian
+            </p>
           </div>
         )}
 
@@ -240,9 +372,17 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-tight">
-                      {getRoleLabel(u.role)} • Lv.{u.level}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-tight">
+                        {getRoleLabel(u.role)} • Lv.{u.level}
+                      </p>
+                      {u.streak >= 3 && (
+                        <span className="flex items-center gap-0.5 text-[9px] font-black text-orange-500">
+                          <Flame className="h-2.5 w-2.5" />
+                          {u.streak}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -275,7 +415,7 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
             <div className="flex items-center justify-between px-3 py-2 sm:px-5 sm:py-3 bg-slate-800 rounded-[1.8rem]">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-teal-500 flex items-center justify-center font-black text-sm sm:text-base shadow-lg">
-                  {currentUserRank}
+                  {currentUserRank ?? "—"}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="font-bold text-xs sm:text-sm leading-tight truncate">

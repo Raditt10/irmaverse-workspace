@@ -168,6 +168,13 @@ const MaterialDetail = () => {
       };
 
       setMaterial(mapped);
+
+      // Track material read for XP (fire-and-forget, non-blocking)
+      if (!isPrivileged) {
+        fetch(`/api/materials/${materialId}/read`, { method: "POST" }).catch(
+          () => {},
+        );
+      }
     } catch (error: any) {
       console.error("Error loading material:", error);
       showToast(error.message || "Gagal memuat detail kajian", "error");
@@ -251,7 +258,7 @@ const MaterialDetail = () => {
             <button
               onClick={() => router.push("/materials")}
               className="mt-4 px-6 py-3 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all"
-            > 
+            >
               Kembali
             </button>
           </div>
@@ -283,7 +290,9 @@ const MaterialDetail = () => {
               {/* Image with Gradient Overlay */}
               <div className="absolute inset-0">
                 <img
-                  src={material.thumbnailUrl || "https://picsum.photos/1200/600"}
+                  src={
+                    material.thumbnailUrl || "https://picsum.photos/1200/600"
+                  }
                   alt={material.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-40 brightness-50"
                 />
@@ -296,13 +305,15 @@ const MaterialDetail = () => {
                     {material.category}
                   </span>
                 </div>
-                
+
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 drop-shadow-xl leading-tight tracking-tight">
                   {material.title}
-                </h1>     
-                
+                </h1>
+
                 <p className="text-slate-300 font-bold text-lg md:text-xl max-w-2xl leading-relaxed drop-shadow-md">
-                  {material.description ? material.description.split('\n')[0] : "Deskripsi materi tidak tersedia..."}
+                  {material.description
+                    ? material.description.split("\n")[0]
+                    : "Deskripsi materi tidak tersedia..."}
                 </p>
               </div>
             </div>
@@ -316,7 +327,10 @@ const MaterialDetail = () => {
                   {/* Tanggal */}
                   <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
                     <div className="w-12 h-12 shrink-0 rounded-full bg-rose-50 flex items-center justify-center border-2 border-rose-100">
-                      <Calendar className="h-6 w-6 text-rose-500" strokeWidth={2.5} />
+                      <Calendar
+                        className="h-6 w-6 text-rose-500"
+                        strokeWidth={2.5}
+                      />
                     </div>
                     <div className="flex flex-col flex-1 overflow-hidden">
                       <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">
@@ -335,7 +349,10 @@ const MaterialDetail = () => {
                   {/* Waktu */}
                   <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
                     <div className="w-12 h-12 shrink-0 rounded-full bg-amber-50 flex items-center justify-center border-2 border-amber-100">
-                      <Clock className="h-6 w-6 text-amber-500" strokeWidth={2.5} />
+                      <Clock
+                        className="h-6 w-6 text-amber-500"
+                        strokeWidth={2.5}
+                      />
                     </div>
                     <div className="flex flex-col flex-1 overflow-hidden">
                       <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">
@@ -350,7 +367,10 @@ const MaterialDetail = () => {
                   {/* Lokasi */}
                   <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
                     <div className="w-12 h-12 shrink-0 rounded-full bg-teal-50 flex items-center justify-center border-2 border-teal-100">
-                      <MapPin className="h-6 w-6 text-teal-500" strokeWidth={2.5} />
+                      <MapPin
+                        className="h-6 w-6 text-teal-500"
+                        strokeWidth={2.5}
+                      />
                     </div>
                     <div className="flex flex-col flex-1 overflow-hidden">
                       <span className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider mb-0.5">
@@ -367,10 +387,13 @@ const MaterialDetail = () => {
                 <div className="bg-white p-8 md:p-10 rounded-[45px] border-4 border-slate-200 shadow-[0_10px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-5 mb-8">
                     <div className="w-14 h-14 bg-indigo-100 rounded-2xl border-4 border-indigo-200 flex items-center justify-center">
-                      <Sparkles className="h-7 w-7 text-indigo-500" strokeWidth={3} />
+                      <Sparkles
+                        className="h-7 w-7 text-indigo-500"
+                        strokeWidth={3}
+                      />
                     </div>
                     <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-                      Deskripsi Kajian  
+                      Deskripsi Kajian
                     </h2>
                   </div>
 
@@ -420,7 +443,10 @@ const MaterialDetail = () => {
                         if (material.hasRekapan) {
                           router.push(`/materials/${material.id}/rekapan`);
                         } else {
-                          showToast("Maaf, Kajian ini belum memuat rekapan materi", "warning" as any);
+                          showToast(
+                            "Maaf, Kajian ini belum memuat rekapan materi",
+                            "warning" as any,
+                          );
                         }
                       }}
                       className="flex items-center gap-4 p-5 rounded-2xl border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 transition-all text-left group shadow-[0_3px_0_0_#fcd34d] hover:shadow-[0_3px_0_0_#f59e0b] active:translate-y-0.5 active:shadow-none"
@@ -559,8 +585,13 @@ const MaterialDetail = () => {
                       }
                       className="w-full p-4 rounded-2xl bg-white border-2 border-slate-200 flex items-center justify-center gap-2 hover:border-teal-400 hover:bg-teal-50 transition-all group"
                     >
-                      <MessageCircle className="w-5 h-5 text-teal-500 group-hover:scale-110 transition-transform" strokeWidth={3} />
-                      <span className="font-bold text-slate-600">Kirim Pesan</span>
+                      <MessageCircle
+                        className="w-5 h-5 text-teal-500 group-hover:scale-110 transition-transform"
+                        strokeWidth={3}
+                      />
+                      <span className="font-bold text-slate-600">
+                        Kirim Pesan
+                      </span>
                     </button>
                   </div>
                 </div>
