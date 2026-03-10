@@ -32,6 +32,7 @@ import {
   Plus,
   AlertCircle,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 
 interface InviteDetail {
