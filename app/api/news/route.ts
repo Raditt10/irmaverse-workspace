@@ -37,6 +37,26 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get("id");
     const category = searchParams.get("category");
 
+    const session = await auth();
+    let userId: string | null = null;
+    let savedNewsIds: Set<string> = new Set();
+    
+    if (session?.user?.email) {
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true }
+      });
+      if (user) {
+        userId = user.id;
+        // Fetch saved news separately to avoid Prisma inclusion error if client is out of sync
+        const saved = await (prisma as any).savedNews.findMany({
+          where: { userId: user.id },
+          select: { newsId: true }
+        });
+        savedNewsIds = new Set(saved.map((s: any) => s.newsId));
+      }
+    }
+
     if (slug) {
       // Get specific news by slug
       const news = await prisma.news.findUnique({
@@ -57,7 +77,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
-      return NextResponse.json(news);
+      const result = {
+        ...news,
+        isSaved: savedNewsIds.has(news.id),
+      };
+
+      return NextResponse.json(result);
     }
 
     if (id) {
@@ -80,7 +105,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
-      return NextResponse.json(news);
+      const result = {
+        ...news,
+        isSaved: savedNewsIds.has(news.id),
+      };
+
+      return NextResponse.json(result);
     }
 
     // Get all news with optional category filter
@@ -106,11 +136,26 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(allNews);
+    // Map to include isSaved and sort
+    const mappedNews = allNews.map((n: any) => ({
+      ...n,
+      isSaved: savedNewsIds.has(n.id),
+    }));
+
+    if (userId) {
+      // Sort: saved first, then by createdAt desc
+      mappedNews.sort((a: any, b: any) => {
+        if (a.isSaved && !b.isSaved) return -1;
+        if (!a.isSaved && b.isSaved) return 1;
+        return 0; // maintain createdAt desc from database
+      });
+    }
+
+    return NextResponse.json(mappedNews);
   } catch (error: any) {
-    console.error("Error fetching news:", error);
+    console.error("DEBUG: Error fetching news:", error);
     return NextResponse.json(
-      { error: "Failed to fetch news" },
+      { error: error?.message || "Failed to fetch news" },
       { status: 500 }
     );
   }

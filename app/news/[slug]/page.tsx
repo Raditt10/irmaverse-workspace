@@ -9,6 +9,8 @@ import { Calendar, Eye, Share2, Bookmark } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import Loading from "@/components/ui/Loading";
+import Toast from "@/components/ui/Toast";
+import { Newspaper } from "lucide-react";
 
 interface NewsDetail {
   id: string;
@@ -26,6 +28,7 @@ interface NewsDetail {
     email: string;
   };
   views?: number;
+  isSaved?: boolean;
 }
 
 const categoryStyles: Record<string, string> = {
@@ -41,6 +44,20 @@ export default function NewsDetailPage() {
   const slug = params.slug as string;
   const [news, setNews] = useState<NewsDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "info" | "warning";
+  }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showToast = (message: string, type: "success" | "error" | "info" | "warning" = "success") => {
+    setToast({ show: true, message, type });
+  };
 
   useEffect(() => {
     fetchNewsDetail();
@@ -71,16 +88,39 @@ export default function NewsDetailPage() {
     try {
       if (navigator.share) {
         await navigator.share(shareData);
+        showToast("Berhasil dibagikan!", "success");
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        alert("Link berita berhasil disalin ke clipboard!");
+        showToast("Link berita berhasil disalin ke clipboard!", "success");
       }
     } catch (error) {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-      } catch (clipboardError) {
-        console.error("Clipboard error:", clipboardError);
-      }
+       if ((error as Error).name !== 'AbortError') {
+         showToast("Gagal membagikan", "error");
+       }
+    }
+  };
+
+  const handleSave = async () => {
+    if (!news || isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/news/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newsId: news.id }),
+      });
+
+      if (!response.ok) throw new Error("Gagal menyimpan berita");
+      
+      const data = await response.json();
+      setNews(prev => prev ? { ...prev, isSaved: data.isSaved } : null);
+      showToast(data.message, data.isSaved ? "success" : "info");
+    } catch (error) {
+      console.error("Error saving news:", error);
+      showToast("Gagal menyimpan berita", "error");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -235,23 +275,55 @@ export default function NewsDetailPage() {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3 pt-8 border-t border-slate-200">
-                  <button className="p-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-600">
-                    <Bookmark className="h-5 w-5" />
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className={`p-3 rounded-xl border-2 border-b-4 transition-all ${
+                      news.isSaved
+                        ? "bg-amber-400 border-amber-600 text-white shadow-inner active:border-b-2 translate-y-0.5"
+                        : "bg-white border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-400 active:border-b-2 active:translate-y-0.5 shadow-md"
+                    }`}
+                    title={news.isSaved ? "Hapus dari simpanan" : "Simpan berita"}
+                  >
+                    <Bookmark className={`h-5 w-5 ${news.isSaved ? "fill-current" : ""}`} />
                   </button>
                   <button
                     onClick={handleShare}
-                    className="p-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-600"
+                    className="p-3 rounded-xl border-2 border-slate-200 border-b-4 bg-white text-slate-400 hover:text-teal-500 hover:border-teal-400 active:border-b-2 active:translate-y-0.5 transition-all shadow-md group"
                     title="Bagikan berita"
                   >
-                    <Share2 className="h-5 w-5" />
+                    <Share2 className="h-5 w-5 group-hover:scale-110 transition-transform" />
                   </button>
                 </div>
+
+                {/* Save Prompt */}
+                {!news.isSaved && (
+                  <div className="mt-8 bg-amber-50 rounded-4xl p-6 border-2 border-amber-200 border-dashed flex flex-col items-center text-center">
+                    <Newspaper className="h-8 w-8 text-amber-500 mb-3" />
+                    <h3 className="text-lg font-black text-amber-900 mb-1">Berita ini menarik?</h3>
+                    <p className="text-sm text-amber-700 font-bold mb-4">Simpan agar berita ini selalu muncul di paling atas daftar berita Anda!</p>
+                    <button 
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="px-6 py-3 rounded-2xl bg-amber-400 text-white font-black border-2 border-amber-600 border-b-4 hover:bg-amber-500 active:border-b-2 active:translate-y-0.5 transition-all flex items-center gap-2 shadow-lg"
+                    >
+                      <Bookmark className="h-5 w-5" />
+                      Sematkan Berita
+                    </button>
+                  </div>
+                )}
               </div>
             </article>
           </div>
         </div>
       </div>
       <ChatbotButton />
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(prev => ({ ...prev, show: false }))}
+      />
     </div>
   );
 }

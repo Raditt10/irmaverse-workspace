@@ -52,6 +52,7 @@ model User {
   following                                          Friendship[]         @relation("following")
   activities                                         ActivityLog[]
   earnedBadges                                       UserBadge[]
+  savedNews                                          SavedNews[]
 
   @@map("users")
 }
@@ -148,7 +149,8 @@ model News {
   authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  author    User     @relation("authorNews", fields: [authorId], references: [id], onDelete: Cascade)
+  author    User        @relation("authorNews", fields: [authorId], references: [id], onDelete: Cascade)
+  savedByUsers SavedNews[]
 
   @@index([slug])
   @@index([authorId])
@@ -576,4 +578,19 @@ enum BadgeCategory {
   achievement
   streak
   special
+}
+
+model SavedNews {
+  id        String   @id @default(cuid())
+  userId    String
+  newsId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsId])
+  @@index([userId])
+  @@index([newsId])
+  @@map("saved_news")
 }

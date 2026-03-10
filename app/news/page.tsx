@@ -31,6 +31,7 @@ interface NewsItem {
     email: string;
     avatar?: string | null;
   };
+  isSaved?: boolean;
 }
 
 const categoryStyles: Record<NewsItem["category"], string> = {
@@ -182,6 +183,48 @@ const News = () => {
   const handleDelete = (id: string) => {
     setSelectedNewsId(id);
     setDeleteDialogOpen(true);
+  };
+
+  const handleToggleSave = async (e: React.MouseEvent, newsId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      const response = await fetch("/api/news/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newsId }),
+      });
+
+      if (!response.ok) throw new Error("Gagal menyimpan berita");
+      
+      const data = await response.json();
+      
+      // Update local state and re-sort
+      setNews(prev => {
+        const updated = prev.map(item => 
+          item.id === newsId ? { ...item, isSaved: data.isSaved } : item
+        );
+        return [...updated].sort((a, b) => {
+          if (a.isSaved && !b.isSaved) return -1;
+          if (!a.isSaved && b.isSaved) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+      });
+      
+      setNotification({
+        type: data.isSaved ? "success" : "info",
+        title: data.isSaved ? "Tersimpan" : "Dihapus",
+        message: data.message,
+      });
+    } catch (error) {
+      console.error("Error toggling save:", error);
+      setNotification({
+        type: "error",
+        title: "Gagal",
+        message: "Gagal menyimpan berita",
+      });
+    }
   };
 
   const confirmDelete = async () => {
@@ -337,6 +380,11 @@ const News = () => {
                         >
                           {item.category}
                         </span>
+                        {item.isSaved && (
+                          <div className="absolute top-4 right-4 bg-amber-400 text-white p-2 rounded-full shadow-lg border-2 border-amber-600 animate-bounce-subtle">
+                            <Bookmark className="h-4 w-4 fill-current" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Content Area */}
@@ -394,6 +442,18 @@ const News = () => {
                                 </button>
                               </>
                             )}
+                            
+                            <button
+                              onClick={(e) => handleToggleSave(e, item.id)}
+                              className={`p-2 sm:p-2.5 rounded-xl border-2 border-b-4 transition-all ${
+                                item.isSaved
+                                  ? "bg-amber-400 border-amber-600 text-white shadow-inner active:border-b-2 translate-y-0.5"
+                                  : "bg-white border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-400 active:border-b-2 active:translate-y-0.5 shadow-sm"
+                              }`}
+                              title={item.isSaved ? "Hapus dari simpanan" : "Simpan berita"}
+                            >
+                              <Bookmark className={`h-4 w-4 ${item.isSaved ? "fill-current" : ""}`} strokeWidth={2.5}/>
+                            </button>
                             
                             <Link
                               href={`/news/${item.slug}`}
