@@ -48,79 +48,9 @@ model User {
   quizAttempts                                      quiz_attempt[]
   createdQuizzes                                    material_quiz[]      @relation("createdQuizzes")
   schedules                                         Schedule[]           @relation("instructorSchedules")
-  followers                                          Friendship[]         @relation("followers")
-  following                                          Friendship[]         @relation("following")
-  activities                                         ActivityLog[]
-  earnedBadges                                       UserBadge[]
+  savedNews                                         SavedNews[]          @relation("userSavedNews")
 
   @@map("users")
-}
-
-model ActivityLog {
-  id          String       @id @default(cuid())
-  userId      String
-  type        ActivityType
-  title       String
-  description String?      @db.Text
-  xpEarned    Int          @default(0)
-  metadata    Json?
-  createdAt   DateTime     @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([userId, createdAt])
-  @@index([type])
-  @@map("activity_logs")
-}
-
-model Badge {
-  id          String      @id @default(cuid())
-  code        String      @unique
-  name        String
-  description String      @db.Text
-  icon        String
-  category    BadgeCategory
-  requirement String      @db.Text
-  xpReward    Int         @default(0)
-  createdAt   DateTime    @default(now())
-
-  earnedBy UserBadge[]
-
-  @@map("badges")
-}
-
-model UserBadge {
-  id        String   @id @default(cuid())
-  userId    String
-  badgeId   String
-  earnedAt  DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, badgeId])
-  @@index([userId])
-  @@index([badgeId])
-  @@map("user_badges")
-}
-
-model Friendship {
-  id          String           @id @default(cuid())
-  followerId  String
-  followingId String
-  status      FriendshipStatus @default(pending)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  follower  User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
-  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@unique([followerId, followingId])
-  @@index([followerId])
-  @@index([followingId])
-  @@index([status])
-  @@map("friendships")
 }
 
 model FavoriteInstructor {
@@ -149,10 +79,26 @@ model News {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User     @relation("authorNews", fields: [authorId], references: [id], onDelete: Cascade)
+  savedBy                                           SavedNews[]          @relation("newsSavedByUsers")
 
   @@index([slug])
   @@index([authorId])
   @@map("news")
+}
+
+model SavedNews {
+  id        String   @id @default(cuid())
+  userId    String
+  newsId    String
+  createdAt DateTime @default(now())
+
+  user User @relation("userSavedNews", fields: [userId], references: [id], onDelete: Cascade)
+  news News @relation("newsSavedByUsers", fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsId])
+  @@index([userId])
+  @@index([newsId])
+  @@map("saved_news")
 }
 
 model ForumMessage {
@@ -549,31 +495,4 @@ enum material_category {
   Extra
   NextLevel
   Susulan
-}
-
-enum FriendshipStatus {
-  pending
-  accepted
-}
-
-enum ActivityType {
-  quiz_completed
-  material_read
-  course_enrolled
-  program_enrolled
-  attendance_marked
-  badge_earned
-  level_up
-  friend_added
-  forum_post
-  streak_maintained
-  profile_completed
-}
-
-enum BadgeCategory {
-  learning
-  social
-  achievement
-  streak
-  special
 }

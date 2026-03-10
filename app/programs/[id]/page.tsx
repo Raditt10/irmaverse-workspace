@@ -27,7 +27,6 @@ import {
   GraduationCap,
   Edit,
   Trash2,
-  Share2,
 } from "lucide-react";
 
 interface MaterialItem {
@@ -151,20 +150,6 @@ const ProgramDetail = () => {
     }
   };
 
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: program?.title || "Program Kursus IRMA",
-        text: `Ikuti program kursus "${program?.title}" di IRMA!`,
-        url: window.location.href,
-      });
-    } catch (err) {
-      console.log("Error sharing:", err);
-      // Fallback copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      showToast("Tautan disalin ke clipboard!", "success");
-    }
-  };
 
   if (loading) {
     return (
@@ -253,13 +238,6 @@ const ProgramDetail = () => {
                     </button>
                   </>
                 )}
-                <button
-                  onClick={handleShare}
-                  className="w-[46px] h-[46px] rounded-[14px] bg-white text-slate-500 border-2 border-slate-200 border-b-4 hover:text-teal-500 hover:border-teal-300 hover:bg-teal-50 hover:border-b-2 hover:translate-y-0.5 active:translate-y-1 active:border-b-0 transition-all flex items-center justify-center p-0"
-                  title="Bagikan"
-                >
-                  <Share2 className="w-5 h-5" strokeWidth={2.5} />
-                </button>
               </div>
             </div>
 

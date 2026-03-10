@@ -57,7 +57,22 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
-      return NextResponse.json(news);
+      // Check if saved by current user
+      const session = await auth();
+      let isSaved = false;
+      if (session?.user?.id) {
+        const saved = await prisma.savedNews.findUnique({
+          where: {
+            userId_newsId: {
+              userId: session.user.id,
+              newsId: news.id,
+            },
+          },
+        });
+        isSaved = !!saved;
+      }
+
+      return NextResponse.json({ ...news, isSaved });
     }
 
     if (id) {
@@ -80,7 +95,22 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
-      return NextResponse.json(news);
+      // Check if saved by current user
+      const session = await auth();
+      let isSaved = false;
+      if (session?.user?.id) {
+        const saved = await prisma.savedNews.findUnique({
+          where: {
+            userId_newsId: {
+              userId: session.user.id,
+              newsId: news.id,
+            },
+          },
+        });
+        isSaved = !!saved;
+      }
+
+      return NextResponse.json({ ...news, isSaved });
     }
 
     // Get all news with optional category filter
@@ -106,11 +136,32 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(allNews);
+    // Check saved status for each news if user is logged in
+    const session = await auth();
+    if (session?.user?.id && (prisma as any).savedNews) {
+      try {
+        // @ts-ignore
+        const savedNewsIds = await prisma.savedNews.findMany({
+          where: { userId: session.user.id },
+          select: { newsId: true },
+        }).then((saves: any[]) => saves.map((s: any) => s.newsId));
+
+        const newsWithSavedStatus = allNews.map(item => ({
+          ...item,
+          isSaved: savedNewsIds.includes(item.id),
+        }));
+
+        return NextResponse.json(newsWithSavedStatus);
+      } catch (e) {
+        console.error("Error checking savedNews (list):", e);
+      }
+    }
+
+    return NextResponse.json(allNews.map(item => ({ ...item, isSaved: false })));
   } catch (error: any) {
     console.error("Error fetching news:", error);
     return NextResponse.json(
-      { error: "Failed to fetch news" },
+      { error: error.message || "Failed to fetch news" },
       { status: 500 }
     );
   }

@@ -126,7 +126,7 @@ const News = () => {
   };
 
   const filterNews = () => {
-    let filtered = news;
+    let filtered = [...news]; // Create shallow copy for sorting
     setSuggestion(null); // Reset suggestion awal
     
     // Filter by Category
@@ -169,6 +169,15 @@ const News = () => {
         }
       }
     }
+
+    // Sort: Priority to isSaved news, then chronological
+    filtered.sort((a, b) => {
+      // @ts-ignore - added isSaved property in API
+      if (a.isSaved && !b.isSaved) return -1;
+      // @ts-ignore
+      if (!a.isSaved && b.isSaved) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
     
     setFilteredNews(filtered);
   };
@@ -347,8 +356,16 @@ const News = () => {
                             <span>{new Date(item.createdAt).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })}</span>
                           </div>
 
-                          <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-2 group-hover:text-teal-600 transition-colors line-clamp-2 leading-tight">
+                          <h2 className="text-xl sm:text-2xl font-black text-slate-800 mb-2 group-hover:text-teal-600 transition-colors line-clamp-2 leading-tight flex items-center gap-2">
+                            {/* @ts-ignore */}
+                            {item.isSaved && (
+                              <Bookmark className="h-5 w-5 text-amber-500 fill-current shrink-0" />
+                            )}
                             {item.title}
+                            {/* @ts-ignore */}
+                            {item.isSaved && (
+                              <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-lg border border-amber-200 ml-1">Disematkan</span>
+                            )}
                           </h2>
 
                           <p className="text-slate-500 font-medium text-sm line-clamp-2 md:line-clamp-3 leading-relaxed pr-2">
