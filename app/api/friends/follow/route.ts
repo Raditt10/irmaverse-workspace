@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { grantXp } from "@/lib/gamification";
 
 // POST /api/friends/follow - Follow seorang user
+// Hanya role "user" yang boleh follow
 export async function POST(req: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Guard: Hanya role "user"
+    if ((session.user as any).role !== "user") {
+      return NextResponse.json(
+        { error: "Hanya pengguna biasa yang dapat follow" },
+        { status: 403 },
+      );
     }
 
     const { targetUserId } = await req.json();
@@ -102,19 +110,6 @@ export async function POST(req: Request) {
     } catch (e) {
       // Notifikasi gagal tidak boleh block follow action
       console.error("Gagal kirim notifikasi:", e);
-    }
-
-    // Grant XP for following someone
-    try {
-      await grantXp({
-        userId: userId,
-        type: "friend_added",
-        title: `Mengikuti pengguna baru`,
-        description: `Mulai mengikuti seorang pengguna`,
-        metadata: { targetUserId, isMutual: status === "accepted" },
-      });
-    } catch (e) {
-      console.error("Gagal grant XP follow:", e);
     }
 
     return NextResponse.json({

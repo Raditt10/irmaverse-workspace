@@ -2,20 +2,30 @@ import prisma from "@/lib/prisma";
 import { ActivityType } from "@prisma/client";
 
 // ─── XP CONFIG ──────────────────────────────────────────────────────────────────
-// Setiap aksi memberikan jumlah XP tertentu
+// Hanya 4 sumber XP yang aktif:
+//   quiz_completed, program_enrolled, attendance_marked, badge_earned
+// Sumber lain dinonaktifkan (0 XP).
 export const XP_REWARDS: Record<ActivityType, number> = {
   quiz_completed: 50,
-  material_read: 20,
-  course_enrolled: 30,
+  material_read: 0, // dinonaktifkan
+  course_enrolled: 0, // dinonaktifkan
   program_enrolled: 40,
   attendance_marked: 25,
   badge_earned: 100,
   level_up: 0, // Level up sendiri tidak memberikan XP tambahan
-  friend_added: 15,
-  forum_post: 10,
-  streak_maintained: 35,
-  profile_completed: 50,
+  friend_added: 0, // dinonaktifkan
+  forum_post: 0, // dinonaktifkan
+  streak_maintained: 0, // dinonaktifkan
+  profile_completed: 0, // dinonaktifkan
 };
+
+// Tipe aktivitas yang diizinkan mendapatkan XP
+const ALLOWED_XP_TYPES: Set<ActivityType> = new Set([
+  "quiz_completed",
+  "program_enrolled",
+  "attendance_marked",
+  "badge_earned",
+]);
 
 // ─── LEVEL THRESHOLDS ───────────────────────────────────────────────────────────
 // XP yang dibutuhkan untuk setiap level (kumulatif)
@@ -74,6 +84,8 @@ export function getLevelTitle(level: number): string {
 
 // ─── GRANT XP ───────────────────────────────────────────────────────────────────
 // Fungsi utama untuk memberikan XP kepada user + log aktivitas + cek level up + badge
+// PENTING: Hanya role "user" yang bisa mendapatkan XP.
+// Hanya tipe aktivitas yang ada di ALLOWED_XP_TYPES yang memberikan XP.
 export async function grantXp(params: {
   userId: string;
   type: ActivityType;
@@ -89,7 +101,27 @@ export async function grantXp(params: {
   badgesEarned: string[];
 }> {
   const { userId, type, title, description, xpOverride, metadata } = params;
+
+  const EMPTY_RESULT = {
+    xpEarned: 0,
+    newTotal: 0,
+    leveledUp: false,
+    newLevel: 0,
+    badgesEarned: [],
+  };
+
+  // ── Guard: Hanya role "user" yang boleh mendapat XP ──
+  const currentUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true, points: true, level: true },
+  });
+  if (!currentUser || currentUser.role !== "user") return EMPTY_RESULT;
+
+  // ── Guard: Hanya tipe aktivitas yang diizinkan ──
+  if (!ALLOWED_XP_TYPES.has(type)) return EMPTY_RESULT;
+
   const xpEarned = xpOverride ?? XP_REWARDS[type] ?? 0;
+  if (xpEarned <= 0) return EMPTY_RESULT;
 
   // 1. Update user points
   const user = await prisma.user.update({
@@ -150,11 +182,13 @@ export async function grantXp(params: {
 
 // ─── BADGE CHECKER ──────────────────────────────────────────────────────────────
 // Cek semua badge dan berikan yang belum dimiliki jika syarat terpenuhi
+// PENTING: Hanya role "user" yang bisa mendapatkan badge.
 export async function checkAndAwardBadges(userId: string): Promise<string[]> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       id: true,
+      role: true,
       points: true,
       level: true,
       streak: true,
@@ -164,6 +198,9 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
   });
 
   if (!user) return [];
+
+  // ── Guard: Hanya role "user" ──
+  if (user.role !== "user") return [];
 
   const ownedCodes = new Set(user.earnedBadges.map((ub) => ub.badge.code));
   const allBadges = await prisma.badge.findMany();

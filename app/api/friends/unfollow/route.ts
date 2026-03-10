@@ -3,11 +3,20 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
 // POST /api/friends/unfollow - Unfollow seorang user
+// Hanya role "user" yang boleh unfollow
 export async function POST(req: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Guard: Hanya role "user"
+    if ((session.user as any).role !== "user") {
+      return NextResponse.json(
+        { error: "Hanya pengguna biasa yang dapat unfollow" },
+        { status: 403 },
+      );
     }
 
     const { targetUserId } = await req.json();

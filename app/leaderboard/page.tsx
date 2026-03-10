@@ -13,6 +13,7 @@ const LeaderboardPage = async () => {
   if (!session?.user) redirect("/auth");
 
   const rawUsers = await prisma.user.findMany({
+    where: { role: "user" },
     orderBy: { points: "desc" },
     select: {
       id: true,

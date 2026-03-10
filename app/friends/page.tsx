@@ -46,7 +46,7 @@ interface FriendCounts {
 
 export default function FriendsPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>("friends");
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState<FriendUser[]>([]);
@@ -56,6 +56,18 @@ export default function FriendsPage() {
     friends: 0,
   });
   const [loading, setLoading] = useState(true);
+
+  // Hanya role "user" yang bisa mengakses halaman Teman Belajar
+  useEffect(() => {
+    if (sessionStatus === "loading") return;
+    if (!session?.user) {
+      router.replace("/auth");
+      return;
+    }
+    if ((session.user as any).role !== "user") {
+      router.replace("/overview");
+    }
+  }, [session, sessionStatus, router]);
 
   const fetchCounts = useCallback(async () => {
     try {

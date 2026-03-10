@@ -82,11 +82,7 @@ const LEVEL_MILESTONES = [
 const XP_GUIDE = [
   { icon: "🧠", label: "Selesaikan Quiz", xp: 50, bonus: "+25 jika skor ≥80%" },
   { icon: "📚", label: "Ikut Program", xp: 40 },
-  { icon: "🔥", label: "Streak Harian", xp: 35 },
   { icon: "✅", label: "Absensi", xp: 25 },
-  { icon: "📖", label: "Baca Materi", xp: 20 },
-  { icon: "🤝", label: "Tambah Teman", xp: 15 },
-  { icon: "💬", label: "Forum Post", xp: 10 },
   { icon: "🏅", label: "Dapat Badge", xp: 100 },
 ];
 
@@ -183,6 +179,9 @@ export default async function LevelPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth");
 
+  // Hanya role "user" yang bisa mengakses halaman Level & XP
+  if ((session.user as any).role !== "user") redirect("/overview");
+
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -242,16 +241,19 @@ export default async function LevelPage() {
       dailyXpMap.set(key, (dailyXpMap.get(key) ?? 0) + a.xpEarned);
     }
   }
-  const dailyXp = Array.from(dailyXpMap.entries()).map(([dateStr, xpTotal]) => {
-    const d = new Date(dateStr);
-    return {
-      label:
-        d.toDateString() === today.toDateString()
-          ? "Hari Ini"
-          : d.toLocaleDateString("id-ID", { weekday: "short" }),
-      xp: xpTotal,
-    };
-  });
+  const dailyXp = Array.from(dailyXpMap.entries())
+    .map(([dateStr, xpTotal]) => {
+      const d = new Date(dateStr);
+      return {
+        label:
+          d.toDateString() === today.toDateString()
+            ? "Hari Ini"
+            : d.toLocaleDateString("id-ID", { weekday: "short" }),
+        xp: xpTotal,
+        isToday: d.toDateString() === today.toDateString(),
+      };
+    })
+    .reverse(); // oldest on left, today on right
   const maxDailyXp = Math.max(...dailyXp.map((d) => d.xp), 1);
 
   // ── Group activities by day ───────────────────────────────────────────
@@ -430,7 +432,7 @@ export default async function LevelPage() {
                   <div className="w-full flex justify-center">
                     <div
                       className={`w-full max-w-10 rounded-t-xl transition-all ${
-                        i === 0
+                        d.isToday
                           ? "bg-gradient-to-t from-emerald-500 to-emerald-400"
                           : "bg-gradient-to-t from-slate-200 to-slate-100"
                       }`}
@@ -441,7 +443,7 @@ export default async function LevelPage() {
                   </div>
                   <span
                     className={`text-[10px] font-bold ${
-                      i === 0 ? "text-emerald-600" : "text-slate-400"
+                      d.isToday ? "text-emerald-600" : "text-slate-400"
                     }`}
                   >
                     {d.label}

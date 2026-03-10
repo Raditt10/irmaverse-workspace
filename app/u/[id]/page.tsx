@@ -29,6 +29,7 @@ import {
   CheckCircle2,
   BarChart3,
   FileText,
+  Lock,
 } from "lucide-react";
 
 interface UserProfile {
@@ -234,6 +235,11 @@ export default function UserPublicProfile() {
     );
 
   const online = isOnline(profile.lastSeen);
+
+  // Konten privat hanya terlihat jika pertemanan mutual (saling mengikuti) atau profil sendiri
+  const canViewPrivate =
+    friendshipStatus?.isOwnProfile === true ||
+    friendshipStatus?.isMutual === true;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col font-sans">
@@ -452,8 +458,8 @@ export default function UserPublicProfile() {
                 ))}
               </div>
 
-              {/* XP Progress */}
-              {xpProgress && (
+              {/* XP Progress — hanya untuk pertemanan mutual atau profil sendiri */}
+              {canViewPrivate && xpProgress && (
                 <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -533,8 +539,8 @@ export default function UserPublicProfile() {
                 </div>
               )}
 
-              {/* Learning Stats */}
-              {stats && (
+              {/* Learning Stats — hanya untuk pertemanan mutual atau profil sendiri */}
+              {canViewPrivate && stats && (
                 <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
@@ -596,71 +602,129 @@ export default function UserPublicProfile() {
                 </div>
               )}
 
-              {/* Recent Activity */}
-              <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center border border-green-100">
-                    <Activity className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-black text-slate-800">
-                      Aktivitas Terkini
-                    </h2>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Kegiatan terbaru pengguna ini
-                    </p>
-                  </div>
-                </div>
-                {activities.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Activity className="h-8 w-8 text-slate-300" />
+              {/* Recent Activity — hanya untuk pertemanan mutual atau profil sendiri */}
+              {canViewPrivate && (
+                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center border border-green-100">
+                      <Activity className="h-6 w-6 text-green-600" />
                     </div>
-                    <p className="text-slate-400 font-bold text-sm">
-                      Belum ada aktivitas terbaru
-                    </p>
+                    <div>
+                      <h2 className="text-xl font-black text-slate-800">
+                        Aktivitas Terkini
+                      </h2>
+                      <p className="text-xs text-slate-500 font-medium">
+                        Kegiatan terbaru pengguna ini
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {activities.map((a) => (
-                      <div
-                        key={a.id}
-                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group"
-                      >
-                        <div
-                          className={`w-10 h-10 ${getBg(a.type)} rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform`}
-                        >
-                          {getIcon(a.type)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-slate-700 text-sm truncate">
-                            {a.title}
-                          </h4>
-                          <p className="text-[11px] text-slate-400 font-medium">
-                            {formatDate(a.date)}
-                          </p>
-                        </div>
-                        {a.xpEarned !== undefined && a.xpEarned > 0 && (
-                          <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100">
-                            <Zap className="h-3.5 w-3.5 text-emerald-500" />
-                            <span className="text-xs font-black text-emerald-600">
-                              +{a.xpEarned}
-                            </span>
-                          </div>
-                        )}
-                        {a.score !== undefined && (
-                          <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 border border-amber-100">
-                            <Star className="h-3.5 w-3.5 text-amber-500" />
-                            <span className="text-xs font-black text-amber-600">
-                              {a.score}/{a.totalScore}
-                            </span>
-                          </div>
-                        )}
+                  {activities.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Activity className="h-8 w-8 text-slate-300" />
                       </div>
-                    ))}
+                      <p className="text-slate-400 font-bold text-sm">
+                        Belum ada aktivitas terbaru
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {activities.map((a) => (
+                        <div
+                          key={a.id}
+                          className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group"
+                        >
+                          <div
+                            className={`w-10 h-10 ${getBg(a.type)} rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform`}
+                          >
+                            {getIcon(a.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-slate-700 text-sm truncate">
+                              {a.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 font-medium">
+                              {formatDate(a.date)}
+                            </p>
+                          </div>
+                          {a.xpEarned !== undefined && a.xpEarned > 0 && (
+                            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100">
+                              <Zap className="h-3.5 w-3.5 text-emerald-500" />
+                              <span className="text-xs font-black text-emerald-600">
+                                +{a.xpEarned}
+                              </span>
+                            </div>
+                          )}
+                          {a.score !== undefined && (
+                            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 border border-amber-100">
+                              <Star className="h-3.5 w-3.5 text-amber-500" />
+                              <span className="text-xs font-black text-amber-600">
+                                {a.score}/{a.totalScore}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Locked Card — tampil saat belum berteman */}
+              {!canViewPrivate && (
+                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-10 shadow-[0_6px_0_0_#cbd5e1] text-center">
+                  <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-5 border-2 border-slate-200">
+                    <Lock className="h-10 w-10 text-slate-400" />
                   </div>
-                )}
-              </div>
+                  <h3 className="text-xl font-black text-slate-700 mb-3">
+                    Konten Pribadi
+                  </h3>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6 max-w-xs mx-auto">
+                    Berteman dengan{" "}
+                    <span className="font-black text-slate-700">
+                      {profile.name?.split(" ")[0]}
+                    </span>{" "}
+                    untuk melihat XP, statistik pembelajaran, dan aktivitas
+                    belajar mereka
+                  </p>
+                  {!session?.user ? (
+                    <button
+                      onClick={() => router.push("/auth")}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 border-b-4 border-emerald-700 hover:border-b-2 transition-all text-sm"
+                    >
+                      <Users className="h-4 w-4" />
+                      Login untuk Berteman
+                    </button>
+                  ) : friendshipStatus?.isFollowing &&
+                    !friendshipStatus?.isMutual ? (
+                    <div className="inline-flex items-center gap-2 px-5 py-3 bg-amber-50 border-2 border-amber-200 rounded-2xl text-amber-700 font-bold text-sm">
+                      <Star className="h-4 w-4" />
+                      Menunggu {profile.name?.split(" ")[0]} mengikutimu kembali
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      {friendshipStatus?.isFollowedBy && (
+                        <p className="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+                          ✨ {profile.name?.split(" ")[0]} sudah mengikutimu!
+                        </p>
+                      )}
+                      <FollowButton
+                        targetUserId={profile.id}
+                        initialIsFollowing={
+                          friendshipStatus?.isFollowing || false
+                        }
+                        initialIsMutual={false}
+                        size="md"
+                      />
+                      {!friendshipStatus?.isFollowing && (
+                        <p className="text-xs text-slate-400 font-medium mt-1">
+                          Ikuti dan tunggu mereka membalas untuk berteman
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </main>

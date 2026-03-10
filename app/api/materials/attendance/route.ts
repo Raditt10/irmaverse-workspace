@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { grantXp } from "@/lib/gamification";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -30,13 +31,21 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if attendance is open for this material using raw query since Prisma client generation was blocked
-    const materialData = await prisma.$queryRaw<any[]>`SELECT isAttendanceOpen FROM material WHERE id = ${materialId}`;
-    const isAttendanceOpen = materialData.length > 0 ? (materialData[0].isAttendanceOpen !== 0 && materialData[0].isAttendanceOpen !== false) : true;
+    const materialData = await prisma.$queryRaw<
+      any[]
+    >`SELECT isAttendanceOpen FROM material WHERE id = ${materialId}`;
+    const isAttendanceOpen =
+      materialData.length > 0
+        ? materialData[0].isAttendanceOpen !== 0 &&
+          materialData[0].isAttendanceOpen !== false
+        : true;
 
     if (!isAttendanceOpen) {
       return NextResponse.json(
-        { error: "Maaf, Absensi pada kajian ini telah ditutup oleh instruktur" },
-        { status: 403 }
+        {
+          error: "Maaf, Absensi pada kajian ini telah ditutup oleh instruktur",
+        },
+        { status: 403 },
       );
     }
 
@@ -60,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     // Create new attendance record with form data using raw query
     const attendanceId = `att-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
-    
+
     // Default values mapping to prevent undefined issues in SQL
     const status = attendanceData?.status || "hadir";
     const sessionName = attendanceData?.session || null;
@@ -72,7 +81,7 @@ export async function POST(req: NextRequest) {
     const instructorArrival = attendanceData?.instructorArrival || null;
     const startTime = attendanceData?.startTime || null;
     const endTime = attendanceData?.endTime || null;
-    
+
     // Survey mapping
     const rating = surveyData?.rating || null;
     const clarity = surveyData?.clarity || null;
@@ -119,6 +128,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Grant XP for attendance (hanya role "user", ditangani oleh grantXp)
+    try {
+      const materialInfo = await prisma.material.findUnique({
+        where: { id: materialId },
+        select: { title: true },
+      });
+      await grantXp({
+        userId: user.id,
+        type: "attendance_marked",
+        title: `Absensi: ${materialInfo?.title || "Kajian"}`,
+        description: `Mengirimkan absensi untuk kajian "${materialInfo?.title || materialId}"`,
+        metadata: { materialId, attendanceId: attendanceId },
+      });
+    } catch (e) {
+      console.error("Gagal grant XP attendance:", e);
+    }
+
     return NextResponse.json(
       {
         success: true,
@@ -130,11 +156,14 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Attendance error DETAILS:", error);
     if (error instanceof Error) {
-        console.error("Attendance error MESSAGE:", error.message);
-        console.error("Attendance error STACK:", error.stack);
+      console.error("Attendance error MESSAGE:", error.message);
+      console.error("Attendance error STACK:", error.stack);
     }
     return NextResponse.json(
-      { error: "Failed to record attendance", details: error instanceof Error ? error.message : String(error) },
+      {
+        error: "Failed to record attendance",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

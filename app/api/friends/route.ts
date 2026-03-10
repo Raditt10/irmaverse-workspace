@@ -3,11 +3,20 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
 // GET /api/friends - Ambil daftar teman (mutual follows = accepted)
+// Hanya role "user" yang boleh mengakses fitur pertemanan
 export async function GET(req: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Guard: Hanya role "user"
+    if ((session.user as any).role !== "user") {
+      return NextResponse.json(
+        { error: "Fitur pertemanan hanya untuk pengguna biasa" },
+        { status: 403 },
+      );
     }
 
     const userId = session.user.id;
@@ -107,6 +116,7 @@ export async function GET(req: Request) {
       const suggestions = await prisma.user.findMany({
         where: {
           id: { notIn: excludeIds },
+          role: "user", // Hanya tampilkan user biasa sebagai saran
           ...(search ? { name: { contains: search } } : {}),
         },
         select: {

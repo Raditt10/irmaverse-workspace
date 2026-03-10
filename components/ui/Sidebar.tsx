@@ -21,8 +21,6 @@ import {
   ChevronDown,
   Contact,
   Shield,
-  Heart,
-  Zap,
 } from "lucide-react";
 
 // Custom scrollbar styles - Cartoon Style
@@ -235,11 +233,6 @@ const Sidebar = () => {
       path: "/leaderboard",
     },
     {
-      icon: Zap,
-      label: "Level & XP",
-      path: "/level",
-    },
-    {
       icon: Calendar,
       label: "Kegiatan",
       path: "/schedule",
@@ -279,11 +272,6 @@ const Sidebar = () => {
               },
             ],
           },
-          {
-            icon: Heart,
-            label: "Teman Belajar",
-            path: "/friends",
-          },
         ]
       : [
           {
@@ -307,11 +295,6 @@ const Sidebar = () => {
             icon: Users,
             label: "Daftar Anggota",
             path: "/members",
-          },
-          {
-            icon: Heart,
-            label: "Teman Belajar",
-            path: "/friends",
           },
         ]),
     // ----------------------------------------------------

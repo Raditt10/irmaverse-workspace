@@ -50,8 +50,8 @@ async function main() {
       bidangKeahlian: "Akidah dan Aqidah",
       pengalaman:
         "Mengajar sejak tahun 2010 di berbagai pesantren dan institusi pendidikan",
-      points: 1250,
-      level: 7,
+      points: 1355,
+      level: 8,
       streak: 14,
       badges: 6,
       quizzes: 12,
@@ -70,10 +70,10 @@ async function main() {
       bio: "Spesialis dalam mengajar Al-Quran dan Tafsir",
       bidangKeahlian: "Al-Quran dan Tafsir",
       pengalaman: "Pengalaman 10 tahun mengajar dan membimbing santri",
-      points: 2100,
-      level: 10,
-      streak: 21,
-      badges: 8,
+      points: 0,
+      level: 1,
+      streak: 0,
+      badges: 0,
       quizzes: 18,
       averageScore: 92,
     },
@@ -88,8 +88,8 @@ async function main() {
       notelp: "083456789012",
       address: "Surabaya, Indonesia",
       bio: "Santri yang antusias belajar",
-      points: 480,
-      level: 4,
+      points: 640,
+      level: 5,
       streak: 7,
       badges: 3,
       quizzes: 5,
@@ -107,10 +107,10 @@ async function main() {
       notelp: "084567890123",
       address: "Yogyakarta, Indonesia",
       bio: "Pecinta ilmu dan penghapal Al-Quran",
-      points: 3500,
-      level: 14,
+      points: 2495,
+      level: 12,
       streak: 30,
-      badges: 10,
+      badges: 9,
       quizzes: 25,
       averageScore: 95,
     },
@@ -127,10 +127,10 @@ async function main() {
       bio: "Instruktur Fiqih Wanita berpengalaman",
       bidangKeahlian: "Fiqih Wanita",
       pengalaman: "8 tahun mengajar di ma'had",
-      points: 1800,
-      level: 9,
-      streak: 10,
-      badges: 7,
+      points: 0,
+      level: 1,
+      streak: 0,
+      badges: 0,
       quizzes: 14,
       averageScore: 89,
     },
@@ -145,8 +145,8 @@ async function main() {
       notelp: "086789012345",
       address: "Malang, Indonesia",
       bio: "Mahasiswa ilmu syariah",
-      points: 750,
-      level: 5,
+      points: 890,
+      level: 6,
       streak: 5,
       badges: 4,
       quizzes: 8,
@@ -163,8 +163,8 @@ async function main() {
       notelp: "087890123456",
       address: "Depok, Indonesia",
       bio: "Senang belajar hadits dan tafsir",
-      points: 320,
-      level: 3,
+      points: 465,
+      level: 4,
       streak: 3,
       badges: 2,
       quizzes: 4,
@@ -181,7 +181,7 @@ async function main() {
       notelp: "088901234567",
       address: "Medan, Indonesia",
       bio: "Santri baru yang bersemangat",
-      points: 90,
+      points: 50,
       level: 1,
       streak: 1,
       badges: 0,
@@ -191,6 +191,25 @@ async function main() {
   });
 
   const allMainUsers = [user1, user2, user3, user4, user5, user6, user7, user8];
+
+  // ── ADMIN ACCOUNT ─────────────────────────────────────────────────────────
+  const adminUser = await prisma.user.create({
+    data: {
+      email: "admin@irma.com",
+      name: "Admin IRMA",
+      password: hashedPassword,
+      role: "admin",
+      notelp: "080000000000",
+      address: "Jakarta, Indonesia",
+      bio: "Administrator sistem IRMA-Verse",
+      points: 0,
+      level: 1,
+      streak: 0,
+      badges: 0,
+      quizzes: 0,
+      averageScore: 0,
+    },
+  });
 
   // ── INSTRUCTOR ACCOUNTS ───────────────────────────────────────────────────
   const instructors = [
@@ -202,9 +221,7 @@ async function main() {
     { id: "106", conID: "inst-khadijah", name: "Ustadzah Khadijah" },
   ];
 
-  const instructorXp = [400, 600, 350, 280, 500, 450];
-  for (let i = 0; i < instructors.length; i++) {
-    const inst = instructors[i];
+  for (const inst of instructors) {
     await prisma.user.create({
       data: {
         id: inst.id,
@@ -212,12 +229,12 @@ async function main() {
         email: `${inst.conID}@irma.com`,
         password: hashedPassword,
         role: "instruktur",
-        points: instructorXp[i],
-        level: Math.max(1, Math.floor(instructorXp[i] / 100)),
-        streak: Math.floor(Math.random() * 10) + 1,
-        badges: Math.floor(Math.random() * 3),
-        quizzes: Math.floor(Math.random() * 5),
-        averageScore: Math.floor(Math.random() * 20) + 75,
+        points: 0,
+        level: 1,
+        streak: 0,
+        badges: 0,
+        quizzes: 0,
+        averageScore: 0,
       },
     });
   }
@@ -843,7 +860,8 @@ async function main() {
     });
   }
 
-  // ── user1 (1250 XP, Lv7, 14 streak) ──────────────────────────────────
+  // ── user1 (1355 XP, Lv8, 14 streak) ──────────────────────────────────
+  // XP sources: quiz_completed(50), program_enrolled(40), attendance_marked(25), badge_earned(100)
   const user1Activities: ActivitySeed[] = [
     {
       type: "quiz_completed",
@@ -851,21 +869,6 @@ async function main() {
       description: "Skor 85/100",
       xpEarned: 75,
       daysAgo: 0,
-    },
-    {
-      type: "streak_maintained",
-      title: "Streak 14 Hari!",
-      description: "Login 14 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 0,
-    },
-    {
-      type: "material_read",
-      title: "Membaca Materi: Fiqih Shalat",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 0,
-      hoursOffset: 3,
     },
     {
       type: "quiz_completed",
@@ -883,13 +886,6 @@ async function main() {
       hoursOffset: 5,
     },
     {
-      type: "friend_added",
-      title: "Berteman dengan Ali Hakim",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 2,
-    },
-    {
       type: "badge_earned",
       title: "Badge: Seribu Poin",
       description: "Mengumpulkan 1000 XP!",
@@ -905,15 +901,8 @@ async function main() {
       daysAgo: 3,
     },
     {
-      type: "material_read",
-      title: "Membaca Materi: Kedudukan Akal dan Wahyu",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 3,
-    },
-    {
       type: "level_up",
-      title: "Naik ke Level 7!",
+      title: "Naik ke Level 8!",
       description: "Selamat! Kamu sekarang Pencari Ilmu",
       xpEarned: 0,
       daysAgo: 3,
@@ -934,19 +923,26 @@ async function main() {
       daysAgo: 5,
     },
     {
-      type: "friend_added",
-      title: "Berteman dengan Ustadzah Fatimah",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 5,
-      hoursOffset: 4,
+      type: "attendance_marked",
+      title: "Hadir: Halaqah Tahsin",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 6,
     },
     {
-      type: "material_read",
-      title: "Membaca Materi: Sejarah Khulafaur",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 6,
+      type: "attendance_marked",
+      title: "Hadir: Kajian Fiqih",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 7,
+    },
+    {
+      type: "program_enrolled",
+      title: "Mendaftar Program Fiqih Dasar",
+      description: "Bergabung di program fiqih",
+      xpEarned: 40,
+      daysAgo: 7,
+      hoursOffset: 3,
     },
     {
       type: "badge_earned",
@@ -954,13 +950,6 @@ async function main() {
       description: "Mendapatkan badge Quiz Pertama!",
       xpEarned: 50,
       daysAgo: 8,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Teman Pertama",
-      description: "Mendapatkan badge Teman Pertama!",
-      xpEarned: 30,
-      daysAgo: 9,
     },
     {
       type: "badge_earned",
@@ -984,143 +973,20 @@ async function main() {
       daysAgo: 6,
       hoursOffset: 2,
     },
-  ];
-
-  // ── user2 (2100 XP, Lv10, 21 streak, instruktur) ─────────────────────
-  const user2Activities: ActivitySeed[] = [
-    {
-      type: "quiz_completed",
-      title: "Menyelesaikan Quiz: Tajwid Lanjutan",
-      description: "Skor 95/100",
-      xpEarned: 75,
-      daysAgo: 0,
-    },
-    {
-      type: "streak_maintained",
-      title: "Streak 21 Hari!",
-      description: "Login 21 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 0,
-      hoursOffset: 2,
-    },
-    {
-      type: "quiz_completed",
-      title: "Menyelesaikan Quiz: Tafsir Al-Baqarah",
-      description: "Skor 92/100",
-      xpEarned: 75,
-      daysAgo: 1,
-    },
-    {
-      type: "material_read",
-      title: "Membaca Materi: Hukum Tajwid",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 1,
-      hoursOffset: 4,
-    },
-    {
-      type: "quiz_completed",
-      title: "Menyelesaikan Quiz: Fiqih Muamalah",
-      description: "Skor 88/100",
-      xpEarned: 75,
-      daysAgo: 2,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Master Quiz",
-      description: "Menyelesaikan 10 quiz!",
-      xpEarned: 200,
-      daysAgo: 2,
-      hoursOffset: 1,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Pelajar Handal",
-      description: "Mencapai Level 10!",
-      xpEarned: 250,
-      daysAgo: 2,
-      hoursOffset: 0,
-    },
-    {
-      type: "level_up",
-      title: "Naik ke Level 10!",
-      description: "Selamat! Kamu sekarang Pencari Ilmu",
-      xpEarned: 0,
-      daysAgo: 2,
-    },
-    {
-      type: "friend_added",
-      title: "Berteman dengan Rafa Ardanza",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 3,
-    },
-    {
-      type: "quiz_completed",
-      title: "Menyelesaikan Quiz: Ushul Fiqih",
-      description: "Skor 91/100",
-      xpEarned: 75,
-      daysAgo: 4,
-    },
-    {
-      type: "attendance_marked",
-      title: "Hadir: Halaqah Tahsin",
-      description: "Absensi kehadiran",
-      xpEarned: 25,
-      daysAgo: 5,
-    },
-    {
-      type: "program_enrolled",
-      title: "Mendaftar Program Tafsir Al-Quran",
-      description: "Bergabung di program tafsir",
-      xpEarned: 40,
-      daysAgo: 6,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Streak 7 Hari",
-      description: "Semangat mingguan!",
-      xpEarned: 150,
-      daysAgo: 8,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Streak 3 Hari",
-      description: "Konsisten 3 hari!",
-      xpEarned: 75,
-      daysAgo: 12,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Quiz Pertama",
-      description: "Mendapatkan badge Quiz Pertama!",
-      xpEarned: 50,
-      daysAgo: 15,
-    },
     {
       type: "badge_earned",
       title: "Badge: Teman Pertama",
       description: "Mendapatkan badge Teman Pertama!",
       xpEarned: 30,
-      daysAgo: 14,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Naik Kelas",
-      description: "Mencapai Level 5!",
-      xpEarned: 100,
-      daysAgo: 10,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Seribu Poin",
-      description: "Mengumpulkan 1000 XP!",
-      xpEarned: 100,
-      daysAgo: 5,
+      daysAgo: 9,
     },
   ];
 
-  // ── user3 (480 XP, Lv4, 7 streak) ────────────────────────────────────
+  // ── user2 (instruktur — 0 XP, tidak mendapat XP) ──────────────────────
+  const user2Activities: ActivitySeed[] = [];
+
+  // ── user3 (640 XP, Lv5, 7 streak) ────────────────────────────────────
+  // XP sources: quiz_completed(50), program_enrolled(40), attendance_marked(25), badge_earned(100)
   const user3Activities: ActivitySeed[] = [
     {
       type: "program_enrolled",
@@ -1130,27 +996,11 @@ async function main() {
       daysAgo: 0,
     },
     {
-      type: "streak_maintained",
-      title: "Streak 7 Hari!",
-      description: "Login 7 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 0,
-      hoursOffset: 3,
-    },
-    {
       type: "quiz_completed",
       title: "Menyelesaikan Quiz: Adab Belajar",
       description: "Skor 78/100",
       xpEarned: 50,
       daysAgo: 1,
-    },
-    {
-      type: "material_read",
-      title: "Membaca Materi: Fiqih Ibadah",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 1,
-      hoursOffset: 5,
     },
     {
       type: "quiz_completed",
@@ -1160,27 +1010,26 @@ async function main() {
       daysAgo: 2,
     },
     {
-      type: "friend_added",
-      title: "Berteman dengan Ustadz Ahmad Zaki",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 2,
-      hoursOffset: 6,
-    },
-    {
       type: "level_up",
-      title: "Naik ke Level 4!",
+      title: "Naik ke Level 5!",
       description: "Selamat! Kamu sekarang Pelajar",
       xpEarned: 0,
       daysAgo: 2,
       hoursOffset: 0,
     },
     {
-      type: "material_read",
-      title: "Membaca Materi: Rukun Iman",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
+      type: "attendance_marked",
+      title: "Hadir: Kajian Mingguan",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
       daysAgo: 3,
+    },
+    {
+      type: "attendance_marked",
+      title: "Hadir: Halaqah Tahfidz",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 6,
     },
     {
       type: "badge_earned",
@@ -1204,22 +1053,32 @@ async function main() {
       daysAgo: 4,
     },
     {
-      type: "attendance_marked",
-      title: "Hadir: Kajian Mingguan",
-      description: "Absensi kehadiran",
-      xpEarned: 25,
-      daysAgo: 6,
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Fiqih Ibadah",
+      description: "Skor 76/100",
+      xpEarned: 50,
+      daysAgo: 4,
+      hoursOffset: 3,
     },
     {
-      type: "friend_added",
-      title: "Berteman dengan Zahra Putri",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 7,
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Rukun Iman",
+      description: "Skor 82/100",
+      xpEarned: 75,
+      daysAgo: 5,
+    },
+    {
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Taharah Dasar",
+      description: "Skor 74/100",
+      xpEarned: 50,
+      daysAgo: 6,
+      hoursOffset: 4,
     },
   ];
 
-  // ── user4 (3500 XP, Lv14, 30 streak — top user) ──────────────────────
+  // ── user4 (2495 XP, Lv12, 30 streak — top user) ──────────────────────
+  // XP sources: quiz_completed(50), program_enrolled(40), attendance_marked(25), badge_earned(100)
   const user4Activities: ActivitySeed[] = [
     {
       type: "quiz_completed",
@@ -1227,21 +1086,6 @@ async function main() {
       description: "Skor 98/100",
       xpEarned: 75,
       daysAgo: 0,
-    },
-    {
-      type: "streak_maintained",
-      title: "Streak 30 Hari!",
-      description: "Login 30 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 0,
-    },
-    {
-      type: "material_read",
-      title: "Membaca Materi: Mustalah Hadits",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 0,
-      hoursOffset: 4,
     },
     {
       type: "quiz_completed",
@@ -1267,17 +1111,10 @@ async function main() {
     },
     {
       type: "level_up",
-      title: "Naik ke Level 14!",
+      title: "Naik ke Level 12!",
       description: "Selamat! Kamu sekarang Penuntut Ilmu",
       xpEarned: 0,
       daysAgo: 1,
-    },
-    {
-      type: "friend_added",
-      title: "Berteman dengan Siti Aisyah",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 3,
     },
     {
       type: "program_enrolled",
@@ -1287,6 +1124,20 @@ async function main() {
       daysAgo: 5,
     },
     {
+      type: "program_enrolled",
+      title: "Mendaftar Program Fiqih Kontemporer",
+      description: "Bergabung di program fiqih",
+      xpEarned: 40,
+      daysAgo: 8,
+    },
+    {
+      type: "program_enrolled",
+      title: "Mendaftar Program Aqidah & Akhlak",
+      description: "Bergabung di program",
+      xpEarned: 40,
+      daysAgo: 15,
+    },
+    {
       type: "attendance_marked",
       title: "Hadir: Halaqah Tahfidz",
       description: "Absensi kehadiran",
@@ -1294,77 +1145,40 @@ async function main() {
       daysAgo: 4,
     },
     {
-      type: "material_read",
-      title: "Membaca Materi: Qawaid Fiqhiyyah",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 3,
-      hoursOffset: 5,
-    },
-  ];
-
-  // ── user5 (1800 XP, Lv9) ─────────────────────────────────────────────
-  const user5Activities: ActivitySeed[] = [
-    {
-      type: "quiz_completed",
-      title: "Menyelesaikan Quiz: Fiqih Wanita",
-      description: "Skor 90/100",
-      xpEarned: 75,
-      daysAgo: 0,
-    },
-    {
-      type: "material_read",
-      title: "Membaca Materi: Hukum Hijab",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
-      daysAgo: 1,
-    },
-    {
-      type: "quiz_completed",
-      title: "Menyelesaikan Quiz: Adab Berpakaian",
-      description: "Skor 87/100",
-      xpEarned: 75,
-      daysAgo: 2,
-    },
-    {
-      type: "streak_maintained",
-      title: "Streak 10 Hari!",
-      description: "Login 10 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 0,
-      hoursOffset: 2,
-    },
-    {
-      type: "badge_earned",
-      title: "Badge: Streak 7 Hari",
-      description: "Semangat mingguan!",
-      xpEarned: 150,
-      daysAgo: 3,
-    },
-    {
-      type: "program_enrolled",
-      title: "Mendaftar Program Fiqih Kontemporer",
-      description: "Bergabung di program fiqih",
-      xpEarned: 40,
-      daysAgo: 4,
-    },
-    {
-      type: "friend_added",
-      title: "Berteman dengan Rafa Ardanza",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
-      daysAgo: 5,
-    },
-    {
       type: "attendance_marked",
-      title: "Hadir: Kajian Muslimah",
+      title: "Hadir: Kajian Mingguan",
       description: "Absensi kehadiran",
       xpEarned: 25,
       daysAgo: 6,
     },
+    {
+      type: "attendance_marked",
+      title: "Hadir: Halaqah Tahsin",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 10,
+    },
+    {
+      type: "attendance_marked",
+      title: "Hadir: Kajian Fiqih",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 12,
+    },
+    {
+      type: "attendance_marked",
+      title: "Hadir: Kajian Akidah",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 14,
+    },
   ];
 
-  // ── user6 (750 XP, Lv5) ──────────────────────────────────────────────
+  // ── user5 (instruktur — 0 XP, tidak mendapat XP) ──────────────────────
+  const user5Activities: ActivitySeed[] = [];
+
+  // ── user6 (890 XP, Lv6) ──────────────────────────────────────────────
+  // XP sources: quiz_completed(50), program_enrolled(40), attendance_marked(25), badge_earned(100)
   const user6Activities: ActivitySeed[] = [
     {
       type: "quiz_completed",
@@ -1374,10 +1188,10 @@ async function main() {
       daysAgo: 0,
     },
     {
-      type: "material_read",
-      title: "Membaca Materi: Aqidah Ahlus Sunnah",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Aqidah Dasar",
+      description: "Skor 80/100",
+      xpEarned: 75,
       daysAgo: 1,
     },
     {
@@ -1388,6 +1202,20 @@ async function main() {
       daysAgo: 2,
     },
     {
+      type: "attendance_marked",
+      title: "Hadir: Kajian Mingguan",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 3,
+    },
+    {
+      type: "attendance_marked",
+      title: "Hadir: Halaqah Tahsin",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 5,
+    },
+    {
       type: "badge_earned",
       title: "Badge: Naik Kelas",
       description: "Mencapai Level 5!",
@@ -1395,30 +1223,37 @@ async function main() {
       daysAgo: 1,
     },
     {
-      type: "streak_maintained",
-      title: "Streak 5 Hari!",
-      description: "Login 5 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 0,
-      hoursOffset: 3,
-    },
-    {
-      type: "friend_added",
-      title: "Berteman dengan Ustadz Ahmad Zaki",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
+      type: "badge_earned",
+      title: "Badge: Quiz Pertama",
+      description: "Menyelesaikan quiz pertama!",
+      xpEarned: 50,
       daysAgo: 4,
     },
     {
+      type: "badge_earned",
+      title: "Badge: Teman Pertama",
+      description: "Mendapatkan badge Teman Pertama!",
+      xpEarned: 30,
+      daysAgo: 5,
+    },
+    {
+      type: "badge_earned",
+      title: "Badge: Streak 3 Hari",
+      description: "Konsisten 3 hari!",
+      xpEarned: 75,
+      daysAgo: 3,
+    },
+    {
       type: "level_up",
-      title: "Naik ke Level 5!",
-      description: "Selamat! Kamu sekarang Pelajar",
+      title: "Naik ke Level 6!",
+      description: "Selamat! Kamu sekarang Pencari Ilmu",
       xpEarned: 0,
       daysAgo: 1,
     },
   ];
 
-  // ── user7 (320 XP, Lv3) ──────────────────────────────────────────────
+  // ── user7 (465 XP, Lv4) ──────────────────────────────────────────────
+  // XP sources: quiz_completed(50), program_enrolled(40), attendance_marked(25), badge_earned(100)
   const user7Activities: ActivitySeed[] = [
     {
       type: "quiz_completed",
@@ -1428,18 +1263,39 @@ async function main() {
       daysAgo: 0,
     },
     {
-      type: "material_read",
-      title: "Membaca Materi: Adab Penuntut Ilmu",
-      description: "Menyelesaikan bacaan",
-      xpEarned: 20,
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Adab Penuntut Ilmu",
+      description: "Skor 72/100",
+      xpEarned: 50,
       daysAgo: 1,
     },
     {
-      type: "friend_added",
-      title: "Berteman dengan Rafa Ardanza",
-      description: "Menambahkan teman baru",
-      xpEarned: 15,
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Taharah Dasar",
+      description: "Skor 78/100",
+      xpEarned: 50,
       daysAgo: 2,
+    },
+    {
+      type: "quiz_completed",
+      title: "Menyelesaikan Quiz: Sejarah Nabi",
+      description: "Skor 80/100",
+      xpEarned: 75,
+      daysAgo: 3,
+    },
+    {
+      type: "program_enrolled",
+      title: "Mendaftar Program Aqidah & Akhlak",
+      description: "Bergabung di program",
+      xpEarned: 40,
+      daysAgo: 4,
+    },
+    {
+      type: "attendance_marked",
+      title: "Hadir: Kajian Mingguan",
+      description: "Absensi kehadiran",
+      xpEarned: 25,
+      daysAgo: 3,
     },
     {
       type: "badge_earned",
@@ -1455,16 +1311,9 @@ async function main() {
       xpEarned: 30,
       daysAgo: 3,
     },
-    {
-      type: "streak_maintained",
-      title: "Streak 3 Hari!",
-      description: "Login 3 hari berturut-turut",
-      xpEarned: 35,
-      daysAgo: 1,
-    },
   ];
 
-  // ── user8 (90 XP, Lv1 — newbie) ──────────────────────────────────────
+  // ── user8 (50 XP, Lv1 — newbie) ──────────────────────────────────────
   const user8Activities: ActivitySeed[] = [
     {
       type: "quiz_completed",
@@ -1472,13 +1321,6 @@ async function main() {
       description: "Skor 65/100",
       xpEarned: 50,
       daysAgo: 0,
-    },
-    {
-      type: "program_enrolled",
-      title: "Mendaftar Program Aqidah & Akhlak",
-      description: "Bergabung di program",
-      xpEarned: 40,
-      daysAgo: 1,
     },
   ];
 
@@ -1521,22 +1363,14 @@ async function main() {
     { userId: user1.id, code: "level_5", daysAgo: 6 },
     { userId: user1.id, code: "points_1000", daysAgo: 2 },
 
-    // user2: 8 badges (instruktur, top)
-    { userId: user2.id, code: "first_quiz", daysAgo: 15 },
-    { userId: user2.id, code: "first_friend", daysAgo: 14 },
-    { userId: user2.id, code: "quiz_master", daysAgo: 2 },
-    { userId: user2.id, code: "streak_3", daysAgo: 12 },
-    { userId: user2.id, code: "streak_7", daysAgo: 8 },
-    { userId: user2.id, code: "level_5", daysAgo: 10 },
-    { userId: user2.id, code: "level_10", daysAgo: 2 },
-    { userId: user2.id, code: "points_1000", daysAgo: 5 },
+    // user2: 0 badges (instruktur — tidak mendapat badge)
 
     // user3: 3 badges
     { userId: user3.id, code: "first_quiz", daysAgo: 5 },
     { userId: user3.id, code: "first_friend", daysAgo: 4 },
     { userId: user3.id, code: "streak_3", daysAgo: 4 },
 
-    // user4: 10 badges (top player!)
+    // user4: 9 badges (top player!)
     { userId: user4.id, code: "first_quiz", daysAgo: 30 },
     { userId: user4.id, code: "first_friend", daysAgo: 28 },
     { userId: user4.id, code: "quiz_master", daysAgo: 10 },
@@ -1546,16 +1380,8 @@ async function main() {
     { userId: user4.id, code: "level_5", daysAgo: 18 },
     { userId: user4.id, code: "level_10", daysAgo: 8 },
     { userId: user4.id, code: "points_1000", daysAgo: 12 },
-    { userId: user4.id, code: "points_5000", daysAgo: 1 },
 
-    // user5: 7 badges
-    { userId: user5.id, code: "first_quiz", daysAgo: 20 },
-    { userId: user5.id, code: "first_friend", daysAgo: 18 },
-    { userId: user5.id, code: "streak_3", daysAgo: 16 },
-    { userId: user5.id, code: "streak_7", daysAgo: 3 },
-    { userId: user5.id, code: "level_5", daysAgo: 12 },
-    { userId: user5.id, code: "points_1000", daysAgo: 6 },
-    { userId: user5.id, code: "quiz_master", daysAgo: 4 },
+    // user5: 0 badges (instruktur — tidak mendapat badge)
 
     // user6: 4 badges
     { userId: user6.id, code: "first_quiz", daysAgo: 8 },
@@ -1586,7 +1412,7 @@ async function main() {
 
   console.log("✅ Data seeding completed!");
   console.log("📊 Summary:");
-  console.log(`   - Users: 8 main + 6 instructors = 14 total`);
+  console.log(`   - Users: 8 main + 1 admin + 6 instructors = 15 total`);
   console.log(`   - News: 5`);
   console.log(`   - Schedules: 3`);
   console.log(`   - Programs: 2`);
@@ -1598,22 +1424,22 @@ async function main() {
   console.log(`   - Activity Logs: ${totalActivities} entries`);
   console.log(`   - User Badges: ${totalBadgeAssignments} assigned`);
   console.log("");
-  console.log("🏅 Gamification test data:");
-  console.log(`   - user1 (Ahmad):   Lv7,  1250 XP, 6 badges,  14-day streak`);
+  console.log("🏅 Gamification test data (hanya role user yang dapat XP):");
+  console.log(`   - user1 (Ahmad):   Lv8,  1355 XP, 6 badges,  14-day streak`);
   console.log(
-    `   - user2 (Fatimah): Lv10, 2100 XP, 8 badges,  21-day streak [instruktur]`,
+    `   - user2 (Fatimah): Lv1,  0 XP,    0 badges  [instruktur - no XP]`,
   );
-  console.log(`   - user3 (Rafa):    Lv4,  480 XP,  3 badges,  7-day streak`);
+  console.log(`   - user3 (Rafa):    Lv5,  640 XP,  3 badges,  7-day streak`);
   console.log(
-    `   - user4 (Ali):     Lv14, 3500 XP, 10 badges, 30-day streak [TOP]`,
+    `   - user4 (Ali):     Lv12, 2495 XP, 9 badges,  30-day streak [TOP]`,
   );
   console.log(
-    `   - user5 (Aisyah):  Lv9,  1800 XP, 7 badges,  10-day streak [instruktur]`,
+    `   - user5 (Aisyah):  Lv1,  0 XP,    0 badges  [instruktur - no XP]`,
   );
-  console.log(`   - user6 (Hasan):   Lv5,  750 XP,  4 badges,  5-day streak`);
-  console.log(`   - user7 (Zahra):   Lv3,  320 XP,  2 badges,  3-day streak`);
+  console.log(`   - user6 (Hasan):   Lv6,  890 XP,  4 badges,  5-day streak`);
+  console.log(`   - user7 (Zahra):   Lv4,  465 XP,  2 badges,  3-day streak`);
   console.log(
-    `   - user8 (Umar):    Lv1,  90 XP,   0 badges,  1-day streak [NEWBIE]`,
+    `   - user8 (Umar):    Lv1,  50 XP,   0 badges,  1-day streak [NEWBIE]`,
   );
   console.log("");
   console.log("👥 Friendship graph:");
