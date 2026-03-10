@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
+import FollowButton from "@/components/ui/FollowButton";
 import {
   ArrowLeft,
   Mail,
@@ -20,6 +22,8 @@ import {
   Trophy,
   CheckCircle2,
   Crosshair,
+  MessageCircle,
+  ExternalLink,
 } from "lucide-react";
 import Loading from "@/components/ui/Loading";
 
@@ -60,14 +64,36 @@ interface MemberDetail {
 const MemberDetail = () => {
   const [member, setMember] = useState<MemberDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [friendshipStatus, setFriendshipStatus] = useState<{
+    isOwnProfile: boolean;
+    isFollowing: boolean;
+    isFollowedBy: boolean;
+    isMutual: boolean;
+  } | null>(null);
   const router = useRouter();
   const params = useParams();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (params?.id) {
       fetchMemberDetail(params.id as string);
+      if (session?.user?.id) {
+        fetchFriendshipStatus(params.id as string);
+      }
     }
-  }, [params?.id]);
+  }, [params?.id, session?.user?.id]);
+
+  const fetchFriendshipStatus = async (id: string) => {
+    try {
+      const res = await fetch(`/api/friends/status/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setFriendshipStatus(data);
+      }
+    } catch (error) {
+      console.error("Error fetching friendship status:", error);
+    }
+  };
 
   const fetchMemberDetail = async (id: string) => {
     try {
@@ -80,7 +106,9 @@ const MemberDetail = () => {
         name: data.name || "-",
         role: data.role || "-",
         class: data.class || "-",
-        avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name || "user"}`,
+        avatar:
+          data.avatar ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name || "user"}`,
         points: data.points || 0,
         status: data.status || "Aktif",
         email: data.email || "-",
@@ -88,7 +116,12 @@ const MemberDetail = () => {
         joinDate: data.createdAt ? data.createdAt.split("T")[0] : "-",
         totalEvents: data.totalEvents || 0,
         totalKajian: data.totalKajian || 0,
-        stats: data.stats || { eventsAttended: 0, kajianAttended: 0, tasksCompleted: 0, contributionRank: 0 },
+        stats: data.stats || {
+          eventsAttended: 0,
+          kajianAttended: 0,
+          tasksCompleted: 0,
+          contributionRank: 0,
+        },
         achievements: data.achievements || [],
         recentActivities: data.recentActivities || [],
       };
@@ -143,9 +176,7 @@ const MemberDetail = () => {
   }
 
   return (
-    <div
-      className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100"
-    >
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100">
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
@@ -177,7 +208,8 @@ const MemberDetail = () => {
                           alt={member.name}
                           className="w-full h-full object-cover"
                         />
-             nhjiop[-]         </div>
+                        nhjiop[-]{" "}
+                      </div>
                     </div>
 
                     {/* Name & Role */}
@@ -208,6 +240,37 @@ const MemberDetail = () => {
                         Peringkat #{member.stats.contributionRank} di IRMA
                       </div>
                     </div>
+
+                    {/* Action Buttons */}
+                    {friendshipStatus && !friendshipStatus.isOwnProfile && (
+                      <div className="space-y-3 mb-6">
+                        <FollowButton
+                          targetUserId={member.id}
+                          initialIsFollowing={friendshipStatus.isFollowing}
+                          initialIsMutual={friendshipStatus.isMutual}
+                          className="w-full"
+                          size="md"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          {friendshipStatus.isMutual && (
+                            <button
+                              onClick={() =>
+                                router.push(`/chat-rooms?userId=${member.id}`)
+                              }
+                              className="flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl border-2 border-blue-100 hover:bg-blue-100 transition-colors text-xs"
+                            >
+                              <MessageCircle className="h-4 w-4" /> Chat
+                            </button>
+                          )}
+                          <button
+                            onClick={() => router.push(`/u/${member.id}`)}
+                            className={`flex items-center justify-center gap-2 py-2.5 bg-slate-50 text-slate-600 font-bold rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs ${friendshipStatus.isMutual ? "" : "col-span-2"}`}
+                          >
+                            <ExternalLink className="h-4 w-4" /> Profil Publik
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Contact Info */}
                     <div className="space-y-3">
@@ -250,7 +313,7 @@ const MemberDetail = () => {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
-                              }
+                              },
                             )}
                           </p>
                         </div>
@@ -343,11 +406,17 @@ const MemberDetail = () => {
                       <div
                         key={achievement.id}
                         className="bg-linear-to-br from-slate-50 to-slate-100 rounded-2xl p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-1"
-                      > 
+                      >
                         <div className="text-4xl mb-3">
-                          {achievement.title === 'Top Contributor' && <Trophy className="h-8 w-8 text-amber-500" />}
-                          {achievement.title === 'Perfect Attendance' && <CheckCircle2 className="h-8 w-8 text-yellow-500" />}
-                          {achievement.title === 'Event Master' && <Crosshair className="h-8 w-8 text-pink-500" />}
+                          {achievement.title === "Top Contributor" && (
+                            <Trophy className="h-8 w-8 text-amber-500" />
+                          )}
+                          {achievement.title === "Perfect Attendance" && (
+                            <CheckCircle2 className="h-8 w-8 text-yellow-500" />
+                          )}
+                          {achievement.title === "Event Master" && (
+                            <Crosshair className="h-8 w-8 text-pink-500" />
+                          )}
                         </div>
                         <h3 className="font-bold text-slate-800 mb-2">
                           {achievement.title}
@@ -363,7 +432,7 @@ const MemberDetail = () => {
                               year: "numeric",
                               month: "short",
                               day: "numeric",
-                            }
+                            },
                           )}
                         </div>
                       </div>
@@ -395,7 +464,7 @@ const MemberDetail = () => {
                       >
                         <div
                           className={`w-12 h-12 rounded-xl flex items-center justify-center ${getActivityColor(
-                            activity.type
+                            activity.type,
                           )}`}
                         >
                           {getActivityIcon(activity.type)}
@@ -411,7 +480,7 @@ const MemberDetail = () => {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
-                              }
+                              },
                             )}
                           </p>
                         </div>

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { grantXp } from "@/lib/gamification";
 import { NextRequest, NextResponse } from "next/server";
 
 // POST - submit quiz answers and get score (with cooldown)
@@ -126,6 +127,28 @@ export async function POST(
         answers: detailedResults,
       },
     });
+
+    // Grant XP for quiz completion
+    try {
+      const percentage = Math.round((score / totalScore) * 100);
+      const bonusXp = percentage >= 80 ? 25 : 0;
+      await grantXp({
+        userId: session.user.id,
+        type: "quiz_completed",
+        title: `Menyelesaikan Quiz: ${quiz.title || "Quiz"}`,
+        description: `Skor: ${score}/${totalScore} (${percentage}%)`,
+        xpOverride: 50 + bonusXp,
+        metadata: {
+          quizId,
+          score,
+          totalScore,
+          percentage,
+          attemptId: attempt.id,
+        },
+      });
+    } catch (e) {
+      console.error("Gagal grant XP quiz:", e);
+    }
 
     // Calculate cooldown for the response
     const questionCount = quiz.questions.length;

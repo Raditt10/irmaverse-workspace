@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.user.update({
+    await prisma.user.updateMany({
       where: { id: session.user.id },
       data: { lastSeen: new Date() },
     });
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     console.error("Error updating last seen:", error);
     return NextResponse.json(
       { error: "Failed to update last seen" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -32,10 +32,7 @@ export async function GET(req: NextRequest) {
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "userId required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -52,7 +49,7 @@ export async function GET(req: NextRequest) {
     console.error("Error getting last seen:", error);
     return NextResponse.json(
       { error: "Failed to get last seen" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

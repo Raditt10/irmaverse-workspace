@@ -12,7 +12,7 @@ import {
   X,
   Camera,
   Check,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ImageCropDialog from "./ImageCropDialog";
@@ -30,24 +30,28 @@ interface UserProfile {
   avatar?: string;
 }
 
-const ProfileInformationForm = ({ stats, level, rank }: any) => {
+const ProfileInformationForm = ({ stats, level, rank, levelTitle }: any) => {
   const { data: session } = useSession();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // State Data User
   const [user, setUser] = useState<UserProfile | null>(null);
   const [editedUser, setEditedUser] = useState<UserProfile | null>(null);
-  
+
   // State Image Crop
   const [showCropDialog, setShowCropDialog] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // State Notifikasi (Toast)
-  const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   const avatarUrl = "https://api.dicebear.com/7.x/avataaars/svg?seed=Fatimah";
 
@@ -91,7 +95,7 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
 
     try {
       setIsSaving(true);
-      
+
       const response = await fetch("/api/users/profile", {
         method: "PATCH",
         headers: {
@@ -118,15 +122,15 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
       setToast({
         show: true,
         message: "Informasi profile berhasil diperbarui!",
-        type: 'success'
+        type: "success",
       });
-
     } catch (err) {
       console.error("Error saving user:", err);
       setToast({
         show: true,
-        message: err instanceof Error ? err.message : "Gagal memperbarui informasi",
-        type: 'error'
+        message:
+          err instanceof Error ? err.message : "Gagal memperbarui informasi",
+        type: "error",
       });
     } finally {
       setIsSaving(false);
@@ -153,13 +157,21 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
 
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      setToast({ show: true, message: "Format harus JPG, PNG, atau WebP", type: 'error' });
+      setToast({
+        show: true,
+        message: "Format harus JPG, PNG, atau WebP",
+        type: "error",
+      });
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setToast({ show: true, message: "Ukuran file maksimal 5MB", type: 'error' });
+      setToast({
+        show: true,
+        message: "Ukuran file maksimal 5MB",
+        type: "error",
+      });
       return;
     }
 
@@ -190,7 +202,7 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
       }
 
       const data = await response.json();
-      
+
       if (user) {
         const updatedUser = { ...user, avatar: data.avatarUrl };
         setUser(updatedUser);
@@ -203,15 +215,14 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
       setToast({
         show: true,
         message: "Foto profile berhasil diubah!",
-        type: 'success'
+        type: "success",
       });
-
     } catch (err) {
       console.error("Error uploading avatar:", err);
       setToast({
         show: true,
         message: "Gagal mengubah foto profile",
-        type: 'error'
+        type: "error",
       });
     } finally {
       setIsUploadingAvatar(false);
@@ -290,13 +301,12 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
       {/* --- AVATAR SECTION (DIPERBAIKI UNTUK MOBILE) --- */}
       {/* Gunakan 'flex-col items-center' untuk mobile agar foto di tengah, dan 'sm:flex-row' untuk desktop */}
       <div className="flex flex-col items-center sm:flex-row sm:items-center gap-6 mb-8">
-        
         {/* Wrapper Foto: Relative agar tombol kamera menempel pada wrapper ini */}
         <div className="relative shrink-0">
           <Avatar className="h-28 w-28 sm:h-32 sm:w-32 border-4 border-white shadow-xl ring-2 ring-slate-100">
-            <AvatarImage 
-              src={user.avatar || avatarUrl} 
-              alt={user.name} 
+            <AvatarImage
+              src={user.avatar || avatarUrl}
+              alt={user.name}
               className="object-cover"
             />
             <AvatarFallback className="bg-linear-to-br from-emerald-500 to-cyan-500 text-white text-3xl font-bold">
@@ -327,9 +337,13 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
 
         {/* Text Info: Center di mobile, Left di desktop */}
         <div className="space-y-2 w-full text-center sm:text-left">
-          <h3 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{user.name}</h3>
-          <p className="text-slate-500 font-medium text-sm md:text-base">{user.email}</p>
-          
+          <h3 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+            {user.name}
+          </h3>
+          <p className="text-slate-500 font-medium text-sm md:text-base">
+            {user.email}
+          </p>
+
           {/* Badge Container: Center di mobile, Start di desktop */}
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
             {session?.user?.role === "user" ? (
@@ -338,10 +352,10 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
                   Level {level}
                 </span>
                 <span className="px-3 py-1 rounded-full bg-linear-to-r from-amber-400 to-orange-500 text-white text-xs font-bold shadow-sm">
-                  Mashaallah
+                  {levelTitle || "Pemula"}
                 </span>
                 <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 text-xs font-bold">
-                  Peringkat #{rank}
+                  Peringkat #{rank || "-"}
                 </span>
               </>
             ) : (
@@ -372,7 +386,9 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
                 disabled={isSaving}
               />
             ) : (
-              <p className="px-4 py-3 rounded-xl bg-slate-50 text-slate-700 font-medium border-2 border-transparent">{user.name}</p>
+              <p className="px-4 py-3 rounded-xl bg-slate-50 text-slate-700 font-medium border-2 border-transparent">
+                {user.name}
+              </p>
             )}
           </div>
 
@@ -381,7 +397,9 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
               <Mail className="h-4 w-4 text-emerald-500" />
               Email
             </label>
-            <p className="px-4 py-3 rounded-xl bg-slate-50 text-slate-500 font-medium border-2 border-transparent select-none cursor-not-allowed opacity-80">{user.email}</p>
+            <p className="px-4 py-3 rounded-xl bg-slate-50 text-slate-500 font-medium border-2 border-transparent select-none cursor-not-allowed opacity-80">
+              {user.email}
+            </p>
           </div>
 
           <div>
@@ -416,7 +434,10 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
                 type="text"
                 value={editedUser.address ?? ""}
                 onChange={(e) =>
-                  setEditedUser({ ...editedUser, address: e.target.value || "" })
+                  setEditedUser({
+                    ...editedUser,
+                    address: e.target.value || "",
+                  })
                 }
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-200 focus:outline-none focus:border-emerald-400 focus:bg-white transition-all font-medium text-slate-700"
                 disabled={isSaving}
@@ -456,7 +477,9 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
             <Calendar className="h-4 w-4 text-emerald-500" />
             Bergabung Sejak
           </label>
-          <p className="px-4 py-3 rounded-xl bg-slate-50 text-slate-700 font-medium border-2 border-transparent">{joinDate}</p>
+          <p className="px-4 py-3 rounded-xl bg-slate-50 text-slate-700 font-medium border-2 border-transparent">
+            {joinDate}
+          </p>
         </div>
       </div>
 
@@ -468,7 +491,6 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
           onClose={handleCloseCropDialog}
         />
       )}
-
 
       {/* --- TOAST NOTIFICATION --- */}
       {toast && (
@@ -482,12 +504,24 @@ const ProfileInformationForm = ({ stats, level, rank }: any) => {
 
       <style jsx>{`
         @keyframes slideDown {
-          from { opacity: 0; transform: translate(-50%, -20px); }
-          to { opacity: 1; transform: translate(-50%, 0); }
+          from {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
         }
         @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>

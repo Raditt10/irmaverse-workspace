@@ -21,6 +21,8 @@ import {
   ChevronDown,
   Contact,
   Shield,
+  Heart,
+  Zap,
 } from "lucide-react";
 
 // Custom scrollbar styles - Cartoon Style
@@ -84,14 +86,16 @@ const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [expandedSubmenus, setExpandedSubmenus] = useState<{ [key: string]: boolean }>({});
+  const [expandedSubmenus, setExpandedSubmenus] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const role = session?.user?.role?.toLowerCase();
   const isInstruktur = role === "instruktur" || role === "instructor";
   const isAdmin = role === "admin";
 
   useEffect(() => {
-    const saved = localStorage.getItem('sidebar-expanded');
+    const saved = localStorage.getItem("sidebar-expanded");
     if (saved !== null) {
       setIsExpanded(JSON.parse(saved));
     } else {
@@ -103,235 +107,268 @@ const Sidebar = () => {
 
   useEffect(() => {
     if (mounted) {
-      localStorage.setItem('sidebar-expanded', JSON.stringify(isExpanded));
+      localStorage.setItem("sidebar-expanded", JSON.stringify(isExpanded));
     }
   }, [isExpanded, mounted]);
 
   useEffect(() => {
     const openHandler = () => setIsMobileOpen(true);
     const closeHandler = () => setIsMobileOpen(false);
-    window.addEventListener('open-mobile-sidebar', openHandler as EventListener);
-    window.addEventListener('close-mobile-sidebar', closeHandler as EventListener);
+    window.addEventListener(
+      "open-mobile-sidebar",
+      openHandler as EventListener,
+    );
+    window.addEventListener(
+      "close-mobile-sidebar",
+      closeHandler as EventListener,
+    );
     return () => {
-      window.removeEventListener('open-mobile-sidebar', openHandler as EventListener);
-      window.removeEventListener('close-mobile-sidebar', closeHandler as EventListener);
+      window.removeEventListener(
+        "open-mobile-sidebar",
+        openHandler as EventListener,
+      );
+      window.removeEventListener(
+        "close-mobile-sidebar",
+        closeHandler as EventListener,
+      );
     };
   }, []);
 
   // Lock body scroll when mobile sidebar is open
   useEffect(() => {
     if (isMobileOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
     } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
     }
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
     };
   }, [isMobileOpen]);
 
   const getDashboardPath = () => {
     if (role === "instruktur") return "/academy";
     if (role === "admin") return "/admin";
-    return "/overview"; 
+    return "/overview";
   };
 
   const toggleSubmenu = (id: string) => {
-    setExpandedSubmenus(prev => ({
+    setExpandedSubmenus((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
   const baseMenuItems: MenuItem[] = [
-    { 
-      icon: LayoutGrid, 
-      label: "Dashboard", 
-      path: getDashboardPath()
+    {
+      icon: LayoutGrid,
+      label: "Dashboard",
+      path: getDashboardPath(),
     },
-    { 
-      icon: BookOpen, 
-      label: (isInstruktur || isAdmin) ? "Kelola Kajian" : "Kajian Mingguanku", 
-      path: (isInstruktur || isAdmin) ? undefined : undefined,
+    {
+      icon: BookOpen,
+      label: isInstruktur || isAdmin ? "Kelola Kajian" : "Kajian Mingguanku",
+      path: isInstruktur || isAdmin ? undefined : undefined,
       id: "kajian",
-      submenu: (isInstruktur || isAdmin) ? [
-        {
-          icon: Calendar,
-          label: "Kelola Jadwal Kajian",
-          path: "/materials"
-        },
-        {
-          icon: BookMarked,
-          label: "Kelola Rekapan Materi",
-          path: "/materials/rekapan"
-        },
-        {
-          icon: HelpCircle,
-          label: "Kelola Kuis",
-          path: "/quiz"
-        }
-      ] : [
-        {
-          icon: Calendar,
-          label: "Jadwal Kajian",
-          path: "/materials"
-        },
-        {
-          icon: BookMarked,
-          label: "Rekapan Materi",
-          path: "/materials/rekapan"
-        },
-        {
-          icon: HelpCircle,
-          label: "Kuis",
-          path: "/quiz"
-        }
-      ]
+      submenu:
+        isInstruktur || isAdmin
+          ? [
+              {
+                icon: Calendar,
+                label: "Kelola Jadwal Kajian",
+                path: "/materials",
+              },
+              {
+                icon: BookMarked,
+                label: "Kelola Rekapan Materi",
+                path: "/materials/rekapan",
+              },
+              {
+                icon: HelpCircle,
+                label: "Kelola Kuis",
+                path: "/quiz",
+              },
+            ]
+          : [
+              {
+                icon: Calendar,
+                label: "Jadwal Kajian",
+                path: "/materials",
+              },
+              {
+                icon: BookMarked,
+                label: "Rekapan Materi",
+                path: "/materials/rekapan",
+              },
+              {
+                icon: HelpCircle,
+                label: "Kuis",
+                path: "/quiz",
+              },
+            ],
     },
   ];
 
   const menuItems: MenuItem[] = [
     ...baseMenuItems,
-    ...(!isInstruktur ? [
-      { 
-        icon: MessageSquare, 
-        label: "Forum Diskusi", 
-        path: "/chat-rooms" 
-      }
-    ] : []),
-    { 
-      icon: Award, 
-      label: "Peringkat", 
-      path: "/leaderboard" 
+    ...(!isInstruktur
+      ? [
+          {
+            icon: MessageSquare,
+            label: "Forum Diskusi",
+            path: "/chat-rooms",
+          },
+        ]
+      : []),
+    {
+      icon: Award,
+      label: "Peringkat",
+      path: "/leaderboard",
     },
-    { 
-      icon: Calendar, 
-      label: "Kegiatan", 
-      path: "/schedule" 
+    {
+      icon: Zap,
+      label: "Level & XP",
+      path: "/level",
     },
-    { 
-      icon: GraduationCap, 
-      label: "Program Kurikulum", 
-      path: "/programs" 
+    {
+      icon: Calendar,
+      label: "Kegiatan",
+      path: "/schedule",
     },
-    { 
-      icon: Trophy, 
-      label: "Info Perlombaan", 
-      path: "/competitions" 
+    {
+      icon: GraduationCap,
+      label: "Program Kurikulum",
+      path: "/programs",
+    },
+    {
+      icon: Trophy,
+      label: "Info Perlombaan",
+      path: "/competitions",
     },
     // --- UPDATED SECTION: INSTRUKTUR & DAFTAR ANGGOTA ---
-    ...(isInstruktur 
+    ...(isInstruktur
       ? [
-          { 
-            icon: Contact, 
-            label: "Instruktur", 
-            path: "/instructors" 
+          {
+            icon: Contact,
+            label: "Instruktur",
+            path: "/instructors",
           },
-          { 
-            icon: Users, 
-            label: "Daftar Anggota", 
+          {
+            icon: Users,
+            label: "Daftar Anggota",
             id: "menu-anggota",
             submenu: [
               {
                 icon: Users,
                 label: "List Anggota",
-                path: "/members"
+                path: "/members",
               },
               {
                 icon: MessageCircle,
                 label: "Chat Anggota",
-                path: "/academy/chat"
-              }
-            ]
-          }
+                path: "/academy/chat",
+              },
+            ],
+          },
+          {
+            icon: Heart,
+            label: "Teman Belajar",
+            path: "/friends",
+          },
         ]
       : [
-          { 
+          {
             icon: Contact,
-            label: "Instruktur", 
+            label: "Instruktur",
             id: "menu-instruktur",
             submenu: [
               {
                 icon: Contact,
                 label: "Daftar Instruktur",
-                path: "/instructors"
+                path: "/instructors",
               },
               {
                 icon: MessageCircle,
                 label: "Chat Instruktur",
-                path: "/instructors/chat"
-              }
-            ]
+                path: "/instructors/chat",
+              },
+            ],
           },
-          { 
-            icon: Users, 
-            label: "Daftar Anggota", 
-            path: "/members" 
-          }
-        ]
-    ),
+          {
+            icon: Users,
+            label: "Daftar Anggota",
+            path: "/members",
+          },
+          {
+            icon: Heart,
+            label: "Teman Belajar",
+            path: "/friends",
+          },
+        ]),
     // ----------------------------------------------------
-    { 
-      icon: Newspaper, 
-      label: (isInstruktur || isAdmin) ? "Kelola Berita" : "Berita IRMA", 
-      path: "/news" 
+    {
+      icon: Newspaper,
+      label: isInstruktur || isAdmin ? "Kelola Berita" : "Berita IRMA",
+      path: "/news",
     },
-    ...(isAdmin ? [
-      {
-        icon: Shield,
-        label: "Kelola Akun",
-        id: "menu-admin",
-        submenu: [
+    ...(isAdmin
+      ? [
           {
-            icon: Users,
-            label: "Kelola Akun User",
-            path: "/admin/users"
+            icon: Shield,
+            label: "Kelola Akun",
+            id: "menu-admin",
+            submenu: [
+              {
+                icon: Users,
+                label: "Kelola Akun User",
+                path: "/admin/users",
+              },
+              {
+                icon: Users,
+                label: "Kelola Akun Instruktur",
+                path: "/admin/instructors",
+              },
+            ],
           },
-          {
-            icon: Users,
-            label: "Kelola Akun Instruktur",
-            path: "/admin/instructors"
-          }
         ]
-      }
-    ] : [])
+      : []),
   ];
 
   return (
     <>
       <style>{scrollbarStyles}</style>
-      
-      {/* Spacer for Fixed Desktop Sidebar to maintain layout flow */}
-      <div className={`hidden lg:block shrink-0 transition-all duration-300 ${isExpanded ? 'w-72' : 'w-24'}`} aria-hidden="true" />
 
       {/* --- DESKTOP SIDEBAR --- */}
-      <div className={`hidden lg:flex flex-col fixed top-20 left-0 z-30 h-[calc(100vh-5rem)] bg-white border-r-2 border-slate-100 transition-all duration-300 ${isExpanded ? 'w-72' : 'w-24'}`}>
-        
+      <div
+        className={`hidden lg:flex flex-col shrink-0 sticky top-20 h-[calc(100vh-5rem)] bg-white border-r-2 border-slate-100 transition-all duration-300 ${isExpanded ? "w-72" : "w-24"}`}
+      >
         {/* Toggle Button */}
         <div className="px-6 pt-6 pb-2">
-            <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center justify-center p-3 rounded-xl text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all duration-300 w-full border-2 border-transparent hover:border-teal-100"
-                title={isExpanded ? "Persempit Sidebar" : "Perlebar Sidebar"}
-            >
-                {isExpanded ? (
-                <div className="flex items-center gap-2 w-full">
-                    <PanelLeftClose className="h-5 w-5 stroke-[2.5]" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Perkecil</span>
-                </div>
-                ) : (
-                <Menu className="h-6 w-6 stroke-[2.5]" />
-                )}
-            </button>
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center justify-center p-3 rounded-xl text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all duration-300 w-full border-2 border-transparent hover:border-teal-100"
+            title={isExpanded ? "Persempit Sidebar" : "Perlebar Sidebar"}
+          >
+            {isExpanded ? (
+              <div className="flex items-center gap-2 w-full">
+                <PanelLeftClose className="h-5 w-5 stroke-[2.5]" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  Perkecil
+                </span>
+              </div>
+            ) : (
+              <Menu className="h-6 w-6 stroke-[2.5]" />
+            )}
+          </button>
         </div>
 
         {/* Menu Items Container */}
@@ -354,56 +391,64 @@ const Sidebar = () => {
                   }}
                   className={`
                     w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 group relative overflow-hidden
-                    ${isActive && !hasSubmenu
-                      ? "bg-linear-to-r from-teal-400 to-emerald-500 text-white shadow-lg shadow-teal-200/50 translate-x-1"
-                      : "text-slate-500 hover:bg-slate-50 hover:text-teal-600"
+                    ${
+                      isActive && !hasSubmenu
+                        ? "bg-linear-to-r from-teal-400 to-emerald-500 text-white shadow-lg shadow-teal-200/50 translate-x-1"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-teal-600"
                     } 
-                    ${!isExpanded && 'justify-center px-0'}
+                    ${!isExpanded && "justify-center px-0"}
                   `}
-                  title={!isExpanded ? item.label : ''}
+                  title={!isExpanded ? item.label : ""}
                 >
-                  <IconComponent className={`h-[1.35rem] w-[1.35rem] shrink-0 stroke-[2.5] transition-colors ${isActive && !hasSubmenu ? 'text-white' : 'group-hover:text-teal-500'}`} />
-                  
+                  <IconComponent
+                    className={`h-[1.35rem] w-[1.35rem] shrink-0 stroke-[2.5] transition-colors ${isActive && !hasSubmenu ? "text-white" : "group-hover:text-teal-500"}`}
+                  />
+
                   {isExpanded && (
                     <>
-                      <span className={`text-sm font-bold flex-1 text-left ${isActive && !hasSubmenu ? 'font-black' : ''}`}>
+                      <span
+                        className={`text-sm font-bold flex-1 text-left ${isActive && !hasSubmenu ? "font-black" : ""}`}
+                      >
                         {item.label}
                       </span>
                       {hasSubmenu && (
-                        <ChevronDown 
-                          className={`h-4 w-4 stroke-3 transition-transform duration-300 ${isSubmenuOpen ? 'rotate-180 text-teal-500' : 'text-slate-300'}`}
+                        <ChevronDown
+                          className={`h-4 w-4 stroke-3 transition-transform duration-300 ${isSubmenuOpen ? "rotate-180 text-teal-500" : "text-slate-300"}`}
                         />
                       )}
                     </>
                   )}
                 </button>
-                
                 {/* Submenu Desktop */}
                 {hasSubmenu && isSubmenuOpen && isExpanded && (
                   <div className="mt-1 ml-5 pl-4 border-l-2 border-slate-100 space-y-1 animate-in slide-in-from-left-2 duration-200">
                     {item.submenu!.map((subitem: any, subidx: number) => {
                       const SubIconComponent = subitem.icon;
                       const isSubActive = pathname === subitem.path;
-                      
+
                       return (
                         <button
                           key={subidx}
                           onClick={() => router.push(subitem.path)}
                           className={`
                             w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-left text-sm font-bold
-                            ${isSubActive
-                              ? "bg-teal-50 text-teal-600"
-                              : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
+                            ${
+                              isSubActive
+                                ? "bg-teal-50 text-teal-600"
+                                : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
                             }
                           `}
                         >
-                          <SubIconComponent className={`h-4 w-4 shrink-0 stroke-[2.5] ${isSubActive ? "text-teal-500" : ""}`} />
+                          <SubIconComponent
+                            className={`h-4 w-4 shrink-0 stroke-[2.5] ${isSubActive ? "text-teal-500" : ""}`}
+                          />
                           <span>{subitem.label}</span>
                         </button>
                       );
                     })}
                   </div>
-                )} </div> 
+                )}{" "}
+              </div>
             );
           })}
         </div>
@@ -412,39 +457,48 @@ const Sidebar = () => {
       {/* --- MOBILE SIDEBAR DRAWER --- */}
       {isMobileOpen && (
         <div className="lg:hidden">
-            {/* Backdrop with enhanced blur */}
+          {/* Backdrop with enhanced blur */}
           <div
             className="fixed inset-0 z-40 bg-transparent animate-in fade-in duration-500"
             onClick={() => setIsMobileOpen(false)}
           />
-          
+
           {/* Drawer Panel - iOS style spring animation */}
-          <div className="fixed z-50 top-0 bottom-0 left-0 w-[82%] max-w-75 shadow-2xl animate-in slide-in-from-left duration-500 ease-out rounded-r-[2.5rem] overflow-hidden flex flex-col" style={{ zIndex: 2147483647, height: '100%' }}>
-            
+          <div
+            className="fixed z-50 top-0 bottom-0 left-0 w-[82%] max-w-75 shadow-2xl animate-in slide-in-from-left duration-500 ease-out rounded-r-[2.5rem] overflow-hidden flex flex-col"
+            style={{ zIndex: 2147483647, height: "100%" }}
+          >
             {/* Background Decorations */}
             <div className="absolute inset-0 bg-white z-0 pointer-events-none" />
             <div className="absolute top-0 right-0 w-full h-full opacity-5 bg-[radial-gradient(#14b8a6_1.5px,transparent_1.5px)] bg-size-[16px_16px] z-0 pointer-events-none" />
-            
+
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-teal-100/30 rounded-full blur-3xl pointer-events-none z-0" />
             <div className="absolute top-1/4 -left-10 w-48 h-48 bg-amber-100/30 rounded-full blur-3xl pointer-events-none z-0" />
             <div className="absolute bottom-0 right-0 w-64 h-64 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none z-0" />
 
             {/* --- Content Container --- */}
             <div className="relative z-20 flex flex-col h-full pointer-events-auto">
-              
               {/* Header Card - More compact */}
               <div className="px-5 pt-7 pb-3">
                 <div className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 flex items-center justify-center">
-                          <img src="/logo.webp" alt="IRMA Logo" className="h-9 w-9 object-contain" />
-                      </div>
-                      <div>
-                        <h2 className="text-base font-black text-slate-800 leading-none">IRMA VERSE</h2>
-                        <p className="text-[9px] font-extrabold text-teal-600 uppercase tracking-widest mt-1">Platform resmi IRMA13</p>
-                      </div>
-                   </div>
-                   <button
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 flex items-center justify-center">
+                      <img
+                        src="/logo.webp"
+                        alt="IRMA Logo"
+                        className="h-9 w-9 object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-black text-slate-800 leading-none">
+                        IRMA VERSE
+                      </h2>
+                      <p className="text-[9px] font-extrabold text-teal-600 uppercase tracking-widest mt-1">
+                        Platform resmi IRMA13
+                      </p>
+                    </div>
+                  </div>
+                  <button
                     className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all active:scale-95 border border-slate-100"
                     onClick={() => setIsMobileOpen(false)}
                   >
@@ -462,7 +516,10 @@ const Sidebar = () => {
                   const isSubmenuOpen = item.id && expandedSubmenus[item.id];
 
                   return (
-                    <div key={idx} className="bg-white rounded-3xl border-2 border-white shadow-sm overflow-hidden">
+                    <div
+                      key={idx}
+                      className="bg-white rounded-3xl border-2 border-white shadow-sm overflow-hidden"
+                    >
                       <button
                         onClick={() => {
                           if (hasSubmenu) {
@@ -474,30 +531,39 @@ const Sidebar = () => {
                         }}
                         className={`
                           w-full flex items-center gap-4 px-4 py-3.5 transition-all duration-300 text-left relative
-                          ${isActive && !hasSubmenu
-                            ? "bg-linear-to-r from-teal-400 to-emerald-500 text-white shadow-lg shadow-teal-100"
-                            : "text-slate-600 hover:bg-white/50 active:bg-white/80"
+                          ${
+                            isActive && !hasSubmenu
+                              ? "bg-linear-to-r from-teal-400 to-emerald-500 text-white shadow-lg shadow-teal-100"
+                              : "text-slate-600 hover:bg-white/50 active:bg-white/80"
                           }
                         `}
                       >
-                        <div className={`p-1.5 rounded-lg ${isActive && !hasSubmenu ? 'bg-white/20' : 'bg-slate-50'}`}>
-                           <IconComponent className={`h-4.5 w-4.5 shrink-0 stroke-[2.5] ${isActive && !hasSubmenu ? 'text-white' : 'text-slate-400'}`} />
+                        <div
+                          className={`p-1.5 rounded-lg ${isActive && !hasSubmenu ? "bg-white/20" : "bg-slate-50"}`}
+                        >
+                          <IconComponent
+                            className={`h-4.5 w-4.5 shrink-0 stroke-[2.5] ${isActive && !hasSubmenu ? "text-white" : "text-slate-400"}`}
+                          />
                         </div>
-                        <span className={`text-[15px] font-bold flex-1 ${isActive && !hasSubmenu ? 'font-black' : ''}`}>{item.label}</span>
+                        <span
+                          className={`text-[15px] font-bold flex-1 ${isActive && !hasSubmenu ? "font-black" : ""}`}
+                        >
+                          {item.label}
+                        </span>
                         {hasSubmenu && (
-                          <ChevronDown 
-                            className={`h-4 w-4 stroke-3 transition-transform duration-300 ${isSubmenuOpen ? 'rotate-180 text-teal-500' : 'text-slate-300'}`}
+                          <ChevronDown
+                            className={`h-4 w-4 stroke-3 transition-transform duration-300 ${isSubmenuOpen ? "rotate-180 text-teal-500" : "text-slate-300"}`}
                           />
                         )}
                       </button>
-                      
+
                       {/* Mobile Submenu */}
                       {hasSubmenu && isSubmenuOpen && (
                         <div className="bg-slate-50/50 border-t-2 border-slate-50 p-2 space-y-1">
                           {item.submenu!.map((subitem: any, subidx: number) => {
                             const SubIconComponent = subitem.icon;
                             const isSubActive = pathname === subitem.path;
-                            
+
                             return (
                               <button
                                 key={subidx}
@@ -507,13 +573,16 @@ const Sidebar = () => {
                                 }}
                                 className={`
                                   w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 text-left text-sm font-bold
-                                  ${isSubActive
-                                    ? "bg-teal-100 text-teal-700 border border-teal-200"
-                                    : "text-slate-500 hover:bg-white border border-transparent"
+                                  ${
+                                    isSubActive
+                                      ? "bg-teal-100 text-teal-700 border border-teal-200"
+                                      : "text-slate-500 hover:bg-white border border-transparent"
                                   }
                                 `}
                               >
-                                <SubIconComponent className={`h-4 w-4 shrink-0 stroke-[2.5] ${isSubActive ? "text-teal-600" : "text-slate-400"}`} />
+                                <SubIconComponent
+                                  className={`h-4 w-4 shrink-0 stroke-[2.5] ${isSubActive ? "text-teal-600" : "text-slate-400"}`}
+                                />
                                 <span>{subitem.label}</span>
                               </button>
                             );
@@ -524,16 +593,15 @@ const Sidebar = () => {
                   );
                 })}
               </div>
-              
+
               {/* Mobile Footer */}
               <div className="p-5">
-                  <div className="bg-white rounded-3xl border-2 border-white p-4 text-center shadow-sm">
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                        © 2026 Syntax 13
-                    </p>
-                  </div>
+                <div className="bg-white rounded-3xl border-2 border-white p-4 text-center shadow-sm">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    © 2026 Syntax 13
+                  </p>
+                </div>
               </div>
-
             </div>
           </div>
         </div>

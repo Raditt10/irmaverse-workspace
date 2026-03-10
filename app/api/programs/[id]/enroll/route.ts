@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { grantXp } from "@/lib/gamification";
 
 // POST: Enroll current user in program
 export async function POST(
@@ -44,6 +45,19 @@ export async function POST(
         userId: session.user.id,
       },
     });
+
+    // Grant XP for program enrollment
+    try {
+      await grantXp({
+        userId: session.user.id,
+        type: "program_enrolled",
+        title: `Mendaftar Program: ${program.title}`,
+        description: `Berhasil mendaftar di program ${program.title}`,
+        metadata: { programId: id, programName: program.title },
+      });
+    } catch (e) {
+      console.error("Gagal grant XP program enroll:", e);
+    }
 
     return NextResponse.json(
       { message: "Berhasil mendaftar di program" },
