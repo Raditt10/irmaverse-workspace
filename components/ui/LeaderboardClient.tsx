@@ -41,26 +41,12 @@ const avatarSrc = (u: LeaderboardUser) =>
   u.avatar ||
   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name ?? "user")}`;
 
-type RoleFilter = "all" | "user" | "instruktur";
-
-const ROLE_FILTERS: { key: RoleFilter; label: string; emoji: string }[] = [
-  { key: "all", label: "Semua", emoji: "👥" },
-  { key: "user", label: "Anggota", emoji: "🧑‍🎓" },
-  { key: "instruktur", label: "Instruktur", emoji: "👨‍🏫" },
-];
-
 export default function LeaderboardClient({ users, currentUserId }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
 
   const filtered = useMemo(() => {
     let result = users;
-
-    // Role filter
-    if (roleFilter !== "all") {
-      result = result.filter((u) => u.role === roleFilter);
-    }
 
     // Search filter
     if (search.trim()) {
@@ -70,7 +56,7 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
 
     // Re-rank after filtering
     return result.map((u, i) => ({ ...u, globalRank: i + 1 }));
-  }, [users, search, roleFilter]);
+  }, [users, search]);
 
   const topThree = filtered.slice(0, 3);
   const rest = filtered.slice(3);
@@ -255,24 +241,6 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
       {/* ── FILTERS & SEARCH ─────────────────────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-2">
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {/* Role Filter */}
-          <div className="flex gap-1.5 bg-white border-2 border-slate-200 rounded-2xl p-1.5 flex-shrink-0">
-            {ROLE_FILTERS.map((rf) => (
-              <button
-                key={rf.key}
-                onClick={() => setRoleFilter(rf.key)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all ${
-                  roleFilter === rf.key
-                    ? "bg-emerald-500 text-white shadow-[0_3px_0_0_#059669]"
-                    : "text-slate-500 hover:bg-slate-50"
-                }`}
-              >
-                <span className="text-sm">{rf.emoji}</span>
-                <span className="hidden sm:inline">{rf.label}</span>
-              </button>
-            ))}
-          </div>
-
           {/* Search */}
           <div className="relative flex-1 bg-white border-2 border-slate-200 rounded-2xl flex items-center px-4 py-2.5 transition-all focus-within:border-emerald-400 focus-within:shadow-[0_0_0_3px_#d1fae5]">
             <Search className="w-4 h-4 md:w-5 md:h-5 text-slate-400 mr-2 flex-shrink-0" />
@@ -287,17 +255,14 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
         </div>
 
         {/* Filter active indicator */}
-        {(roleFilter !== "all" || search.trim()) && (
+        {search.trim() && (
           <div className="flex items-center gap-2 mb-4 px-1">
             <Filter className="h-3.5 w-3.5 text-slate-400" />
             <span className="text-xs font-bold text-slate-400">
               Menampilkan {filtered.length} dari {users.length} peserta
             </span>
             <button
-              onClick={() => {
-                setRoleFilter("all");
-                setSearch("");
-              }}
+              onClick={() => setSearch("")}
               className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200"
             >
               Reset

@@ -22,7 +22,7 @@ import {
   Target,
   MessageCircle,
   Tag,
-  Share2,
+  Sparkles,
   Users,
   CheckCircle,
   XCircle,

@@ -586,6 +586,11 @@ const Profile = () => {
                           Program yang sedang kamu ikuti
                         </p>
                       </div>
+                      {programs.length > 0 && (
+                        <span className="text-xs font-black text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+                          {programs.length}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex flex-col gap-4">

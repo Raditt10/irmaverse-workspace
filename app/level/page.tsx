@@ -242,16 +242,19 @@ export default async function LevelPage() {
       dailyXpMap.set(key, (dailyXpMap.get(key) ?? 0) + a.xpEarned);
     }
   }
-  const dailyXp = Array.from(dailyXpMap.entries()).map(([dateStr, xpTotal]) => {
-    const d = new Date(dateStr);
-    return {
-      label:
-        d.toDateString() === today.toDateString()
-          ? "Hari Ini"
-          : d.toLocaleDateString("id-ID", { weekday: "short" }),
-      xp: xpTotal,
-    };
-  });
+  const dailyXp = Array.from(dailyXpMap.entries())
+    .map(([dateStr, xpTotal]) => {
+      const d = new Date(dateStr);
+      return {
+        label:
+          d.toDateString() === today.toDateString()
+            ? "Hari Ini"
+            : d.toLocaleDateString("id-ID", { weekday: "short" }),
+        xp: xpTotal,
+        isToday: d.toDateString() === today.toDateString(),
+      };
+    })
+    .reverse(); // oldest on left, today on right
   const maxDailyXp = Math.max(...dailyXp.map((d) => d.xp), 1);
 
   // ── Group activities by day ───────────────────────────────────────────
@@ -430,7 +433,7 @@ export default async function LevelPage() {
                   <div className="w-full flex justify-center">
                     <div
                       className={`w-full max-w-10 rounded-t-xl transition-all ${
-                        i === 0
+                        d.isToday
                           ? "bg-gradient-to-t from-emerald-500 to-emerald-400"
                           : "bg-gradient-to-t from-slate-200 to-slate-100"
                       }`}
@@ -441,7 +444,7 @@ export default async function LevelPage() {
                   </div>
                   <span
                     className={`text-[10px] font-bold ${
-                      i === 0 ? "text-emerald-600" : "text-slate-400"
+                      d.isToday ? "text-emerald-600" : "text-slate-400"
                     }`}
                   >
                     {d.label}
