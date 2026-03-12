@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
           select: { id: true, name: true, avatar: true },
         },
         materials: {
-          select: { id: true, kajianOrder: true },
+          select: { id: true, kajianOrder: true, instructorId: true },
         },
         enrollments: {
           select: { id: true, userId: true },
@@ -59,19 +59,23 @@ export async function GET(req: NextRequest) {
     // Semua user bisa melihat semua program kurikulum
     const result = programs.map((p) => {
       const isEnrolled = p.enrollments.some((e) => e.userId === user.id);
-      
-      const filteredMaterials = p.materials.filter(m => 
-        user.role === "instruktur" ? m.instructorId === user.id : true
+
+      const filteredMaterials = p.materials.filter((m) =>
+        user.role === "instruktur" ? m.instructorId === user.id : true,
       );
 
       let isCompleted = false;
       if (p.totalKajian > 0) {
         // Complete jika sudah ada semua materi sebanyak totalKajian DAN user menghadiri semuanya
         const hasAllMaterials = filteredMaterials.length >= p.totalKajian;
-        const attendedAll = filteredMaterials.length > 0 && filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
+        const attendedAll =
+          filteredMaterials.length > 0 &&
+          filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
         isCompleted = hasAllMaterials && attendedAll;
       } else {
-        isCompleted = filteredMaterials.length > 0 && filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
+        isCompleted =
+          filteredMaterials.length > 0 &&
+          filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
       }
 
       return {
