@@ -12,7 +12,7 @@ model User {
   id                                                String               @id @default(cuid())
   email                                             String               @unique
   name                                              String?
-  password                                          String
+  password                                          String?
   createdAt                                         DateTime             @default(now())
   updatedAt                                         DateTime             @updatedAt
   address                                           String?
@@ -29,6 +29,7 @@ model User {
   points                                            Int                  @default(0)
   quizzes                                           Int                  @default(0)
   streak                                            Int                  @default(0)
+  accounts                                          Account[]
   instructorConversations                           ChatConversation[]   @relation("instructorConversations")
   userConversations                                 ChatConversation[]   @relation("userConversations")
   sentMessages                                      ChatMessage[]        @relation("sentMessages")
@@ -55,6 +56,27 @@ model User {
   savedNews                                          SavedNews[]
 
   @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
 }
 
 model ActivityLog {

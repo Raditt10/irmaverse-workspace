@@ -564,7 +564,9 @@ export default function DashboardHeader() {
                     <span>Temanku</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors">
+                  <DropdownMenuItem 
+                    onClick={() => router.push("/settings")}
+                    className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors">
                     <Settings className="h-4 w-4 mr-2" strokeWidth={2.5} />
                     <span>Pengaturan</span>
                   </DropdownMenuItem>
