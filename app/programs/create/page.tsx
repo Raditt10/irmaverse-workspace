@@ -40,6 +40,7 @@ const CreateProgram = () => {
     grade: "Semua",
     thumbnailUrl: "",
     duration: "",
+    totalKajian: "",
     syllabus: [] as string[],
     requirements: [] as string[],
     benefits: [] as string[],
@@ -111,6 +112,10 @@ const CreateProgram = () => {
     }
     if (formData.title.length < 5) {
       showToast("Judul Program minimal 5 karakter", "error");
+      return;
+    }
+    if (!formData.thumbnailUrl) {
+      showToast("Banner Program wajib diunggah", "error");
       return;
     }
 
@@ -201,17 +206,33 @@ const CreateProgram = () => {
                         placeholder="Jelaskan visi dan materi yang akan dipelajari..."
                       />
                     </div>
-                    <div className="space-y-2 pt-4 border-t-2 border-slate-50">
-                      <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-emerald-500" /> Durasi
-                      </label>
-                      <Input
-                        type="text"
-                        name="duration"
-                        value={formData.duration}
-                        onChange={handleInputChange}
-                        placeholder="e.g. 12 Sesi / 3 Bulan"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t-2 border-slate-50">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-emerald-500" /> Durasi
+                        </label>
+                        <Input
+                          type="text"
+                          name="duration"
+                          value={formData.duration}
+                          onChange={handleInputChange}
+                          placeholder="e.g. 12 Sesi / 3 Bulan"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                          <Layers className="h-4 w-4 text-emerald-500" /> Total Kajian <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          type="number"
+                          name="totalKajian"
+                          min="1"
+                          required
+                          value={formData.totalKajian}
+                          onChange={handleInputChange}
+                          placeholder="Berapa banyak pertemuan/kajian?"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -391,7 +412,6 @@ const CreateProgram = () => {
                       disabled={uploading}
                       className="hidden"
                       id="upload-comp"
-                      required={!formData.thumbnailUrl}
                     />
                     {formData.thumbnailUrl ? (
                       <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-emerald-400 transition-all shadow-sm">

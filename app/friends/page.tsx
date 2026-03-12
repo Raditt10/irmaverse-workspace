@@ -177,9 +177,6 @@ export default function FriendsPage() {
           {/* ─── HEADER ─── */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 text-xs font-black text-emerald-700 uppercase tracking-wider mb-3">
-                <Users className="h-4 w-4" /> Komunitas
-              </div>
               <h1 className="text-3xl lg:text-4xl font-black text-slate-800 leading-tight">
                 Teman Belajar
               </h1>
@@ -306,9 +303,6 @@ export default function FriendsPage() {
                           {(user.name || "U").substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-white p-1.5 rounded-xl border-2 border-white shadow-sm">
-                        <Trophy className="h-4 w-4" fill="currentColor" />
-                      </div>
                     </div>
 
                     <div className="flex-1 min-w-0">

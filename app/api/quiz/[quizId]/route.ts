@@ -18,7 +18,7 @@ export async function GET(
     const quiz = await prisma.material_quiz.findUnique({
       where: { id: quizId },
       include: {
-        material: { select: { id: true, title: true, instructorId: true } },
+        material: { select: { id: true, title: true, instructorId: true, thumbnailUrl: true } },
         creator: { select: { id: true, name: true, avatar: true } },
         questions: {
           include: { options: true },
@@ -67,6 +67,7 @@ export async function GET(
       id: quiz.id,
       materialId: quiz.materialId || null,
       materialTitle: quiz.material?.title || null,
+      materialThumbnail: quiz.material?.thumbnailUrl || null,
       creatorName: quiz.creator?.name || null,
       title: quiz.title,
       description: quiz.description,

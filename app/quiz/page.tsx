@@ -6,6 +6,7 @@ import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import Loading from "@/components/ui/Loading";
 import EmptyState from "@/components/ui/EmptyState";
+import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import {
   Trophy,
   Play,
@@ -280,11 +281,14 @@ const QuizHome = () => {
                 icon="search"
                 title="Tidak Ada Kuis Ditemukan"
                 description="Coba gunakan kata kunci lain atau selesaikan kajian baru."
-                customIcon={<Target className="h-10 w-10 text-slate-400" />}
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            <div className="space-y-6">
+              {searchQuery && (
+                <SuccessDataFound message={`Ditemukan ${filteredQuizzes.length} kuis`} />
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
               {filteredQuizzes.map((quiz) => (
                 <div
                   key={quiz.id}
@@ -379,6 +383,7 @@ const QuizHome = () => {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
           )}
         </main>

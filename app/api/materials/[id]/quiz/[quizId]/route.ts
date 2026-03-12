@@ -19,7 +19,7 @@ export async function GET(
       where: { id: quizId },
       include: {
         material: {
-          select: { id: true, title: true, instructorId: true },
+          select: { id: true, title: true, instructorId: true, thumbnailUrl: true },
         },
         questions: {
           include: { options: true },
@@ -70,6 +70,7 @@ export async function GET(
       id: quiz.id,
       materialId: quiz.material?.id ?? quiz.materialId,
       materialTitle: quiz.material?.title ?? null,
+      materialThumbnail: quiz.material?.thumbnailUrl ?? null,
       title: quiz.title,
       description: quiz.description,
       questionCount: quiz.questions.length,

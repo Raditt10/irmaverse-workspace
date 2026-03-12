@@ -45,6 +45,7 @@ const EditProgram = () => {
     grade: "Semua",
     category: "Program Wajib",
     thumbnailUrl: "",
+    totalKajian: "",
     syllabus: [] as string[],
     requirements: [] as string[],
     benefits: [] as string[],
@@ -73,6 +74,7 @@ const EditProgram = () => {
         grade: program.level || "Semua",
         category: program.category || "Program Wajib",
         thumbnailUrl: program.image || "",
+        totalKajian: program.totalKajian ? program.totalKajian.toString() : "",
         syllabus: program.syllabus || [],
         requirements: program.requirements || [],
         benefits: program.benefits || [],
@@ -155,6 +157,7 @@ const EditProgram = () => {
           duration: formData.duration,
           grade: formData.grade,
           category: formData.category,
+          totalKajian: formData.totalKajian,
           syllabus: formData.syllabus,
           requirements: formData.requirements,
           benefits: formData.benefits,
@@ -248,17 +251,33 @@ const EditProgram = () => {
                         placeholder="Deskripsi program..."
                       />
                     </div>
-                    <div className="space-y-2 pt-4 border-t-2 border-slate-50">
-                      <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-emerald-500" /> Durasi
-                      </label>
-                      <Input
-                        type="text"
-                        name="duration"
-                        value={formData.duration}
-                        onChange={handleInputChange}
-                        placeholder="e.g. 12 Sesi / 3 Bulan"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t-2 border-slate-50">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-emerald-500" /> Durasi
+                        </label>
+                        <Input
+                          type="text"
+                          name="duration"
+                          value={formData.duration}
+                          onChange={handleInputChange}
+                          placeholder="e.g. 12 Sesi / 3 Bulan"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                          <Layers className="h-4 w-4 text-emerald-500" /> Total Kajian <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          type="number"
+                          name="totalKajian"
+                          min="1"
+                          required
+                          value={formData.totalKajian}
+                          onChange={handleInputChange}
+                          placeholder="Berapa banyak pertemuan/kajian?"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

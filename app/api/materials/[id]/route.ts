@@ -82,13 +82,15 @@ export async function GET(
     const isPrivileged = User.role === "instruktur" || User.role === "admin";
 
     // Access control: non-privileged users must be enrolled (courseenrollment)
-    // OR have an accepted invitation to view this material
-    if (!isPrivileged) {
+    // OR have an accepted invitation to view this material.
+    // Admins can see all.
+    if (User.role !== "admin") {
+      const isCreator = material.instructorId === User.id;
       const hasEnrollment = (material as any).courseenrollment?.length > 0;
       const hasAcceptedInvite = ((material as any).materialinvite || []).some(
         (inv: any) => inv.status === "accepted",
       );
-      if (!hasEnrollment && !hasAcceptedInvite) {
+      if (!isCreator && !hasEnrollment && !hasAcceptedInvite) {
         return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
       }
     }
@@ -116,6 +118,7 @@ export async function GET(
       description: m.description,
       date: m.date,
       instructor: m.users?.name || null,
+      instructorId: m.instructorId,
       instructorEmail: m.users?.email || null,
       instructorAvatar: m.users?.avatar || null,
       category:
@@ -204,9 +207,9 @@ export async function DELETE(
     }
 
     // Authorization removal as per previous request
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "admin" && material.instructorId !== session.user.id) {
       return NextResponse.json(
-        { error: "Hanya instruktur atau admin yang bisa menghapus kajian" },
+        { error: "Hanya pembuat materi atau admin yang bisa menghapus kajian" },
         { status: 403 },
       );
     }
@@ -257,6 +260,7 @@ export async function PUT(
       thumbnailUrl,
       invites,
       programId,
+      kajianOrder,
       materialType,
       materialContent,
       materialLink,
@@ -276,9 +280,9 @@ export async function PUT(
     }
 
     // Authorization removal
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "admin" && material.instructorId !== session.user.id) {
       return NextResponse.json(
-        { error: "Hanya instruktur atau admin yang bisa mengedit kajian" },
+        { error: "Hanya pembuat materi atau admin yang bisa mengedit kajian" },
         { status: 403 },
       );
     }
@@ -310,6 +314,7 @@ export async function PUT(
         grade: mappedGrade as any,
         thumbnailUrl: thumbnailUrl || null,
         programId: programId || null,
+        kajianOrder: kajianOrder ? parseInt(kajianOrder, 10) : null,
         materialType: materialType || null,
         content: materialContent || null,
         link: materialLink || null,

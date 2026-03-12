@@ -45,7 +45,13 @@ export async function GET(req: NextRequest) {
     // Normalizing role check to include both 'instruktur' and 'instructor'
     const isPrivileged = User.role === "instruktur" || User.role === "admin";
 
-    if (!isPrivileged) {
+    if (User.role === "instruktur") {
+      where.OR = [
+        { instructorId: User.id },
+        { courseenrollment: { some: { userId: User.id } } },
+        { materialinvite: { some: { userId: User.id, status: "accepted" } } },
+      ];
+    } else if (User.role !== "admin") {
       where.OR = [
         {
           courseenrollment: {
@@ -132,6 +138,7 @@ export async function GET(req: NextRequest) {
         description: m.description,
         date: m.date,
         instructor: m.users?.name || "TBA",
+        instructorId: m.instructorId,
         instructorAvatar: m.users?.avatar || null,
         category: CATEGORY_LABEL[m.category] || m.category,
         grade: GRADE_LABEL[m.grade as keyof typeof GRADE_LABEL] || m.grade,
@@ -199,6 +206,7 @@ export async function POST(req: NextRequest) {
       thumbnailUrl,
       invites,
       programId,
+      kajianOrder,
       materialType,
       materialContent,
       materialLink,
@@ -285,6 +293,7 @@ export async function POST(req: NextRequest) {
         thumbnailUrl: thumbnailUrl || null,
         instructorId: session.user.id,
         programId: programId || null,
+        kajianOrder: kajianOrder ? parseInt(kajianOrder, 10) : null,
         materialType: materialType || null,
         content: materialContent || null,
         link: materialLink || null,

@@ -149,7 +149,7 @@ export default function QuizManagePage() {
             </p>
             <button
               onClick={() => router.back()}
-              className="px-6 py-3 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all"
+              className="px-6 py-3 rounded-xl bg-emerald-400 text-white font-black border-2 border-emerald-600 border-b-4 hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5 transition-all"
             >
               Kembali
             </button>
@@ -184,7 +184,7 @@ export default function QuizManagePage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
               <div>
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1 flex items-center gap-3">
-                  <Settings className="h-8 w-8 text-teal-500" /> Kelola Quiz
+                 Kelola Quiz
                 </h1>
                 <p className="text-slate-500 font-medium text-sm lg:text-base">
                   Edit, hapus, dan pantau semua quiz yang kamu buat
@@ -192,7 +192,7 @@ export default function QuizManagePage() {
               </div>
               <button
                 onClick={() => router.push("/quiz/create")}
-                className="self-start sm:self-auto inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-teal-500 text-white font-black border-2 border-teal-700 border-b-4 hover:bg-teal-600 active:border-b-2 active:translate-y-0.5 transition-all shadow-sm"
+                className="self-start sm:self-auto inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500 text-white font-black border-2 border-emerald-700 border-b-4 hover:bg-emerald-600 active:border-b-2 active:translate-y-0.5 transition-all shadow-sm"
               >
                 <Plus className="h-5 w-5" strokeWidth={3} /> Quiz Baru
               </button>
@@ -205,13 +205,13 @@ export default function QuizManagePage() {
                   label: "Total Quiz",
                   value: quizzes.length,
                   icon: ListChecks,
-                  color: "text-teal-500 bg-teal-50 border-teal-100",
+                  color: "text-emerald-500 bg-emerald-50 border-emerald-100",
                 },
                 {
                   label: "Quiz Mandiri",
                   value: quizzes.filter((q) => q.isStandalone).length,
                   icon: Zap,
-                  color: "text-amber-500 bg-amber-50 border-amber-100",
+                  color: "text-emerald-500 bg-emerald-50 border-emerald-100",
                 },
                 {
                   label: "Quiz Materi",
@@ -246,7 +246,7 @@ export default function QuizManagePage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Cari judul quiz atau nama materi..."
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 bg-white text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-slate-200 bg-white text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 transition-colors"
                 />
               </div>
               <div className="flex gap-2">
@@ -256,8 +256,8 @@ export default function QuizManagePage() {
                     onClick={() => setFilter(tab.key)}
                     className={`px-4 py-2.5 rounded-2xl text-sm font-black border-2 transition-all ${
                       filter === tab.key
-                        ? "bg-teal-500 text-white border-teal-700 border-b-4 active:border-b-2 active:translate-y-0.5"
-                        : "bg-white text-slate-500 border-slate-200 hover:border-teal-300 hover:text-teal-600"
+                        ? "bg-emerald-500 text-white border-emerald-700 border-b-4 active:border-b-2 active:translate-y-0.5"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-emerald-300 hover:text-emerald-600"
                     }`}
                   >
                     {tab.label}
@@ -277,8 +277,8 @@ export default function QuizManagePage() {
 
             {filtered.length === 0 ? (
               <EmptyState
-                icon={search ? "search" : "calendar"}
-                title={search ? "Tidak ada hasil" : "Belum ada quiz"}
+                icon="search"
+                title={search ? "Tidak ada hasil pencarian" : "Belum ada quiz"}
                 description={
                   search ? "Coba kata kunci lain" : "Mulai buat quiz pertamamu!"
                 }
@@ -299,7 +299,7 @@ export default function QuizManagePage() {
                       <div
                         className={`w-12 h-12 rounded-2xl border-2 flex items-center justify-center shrink-0 ${
                           quiz.isStandalone
-                            ? "bg-amber-100 border-amber-200 text-amber-600"
+                            ? "bg-emerald-100 border-emerald-200 text-emerald-600"
                             : "bg-emerald-100 border-emerald-200 text-emerald-600"
                         }`}
                       >
@@ -319,7 +319,7 @@ export default function QuizManagePage() {
                           <span
                             className={`shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full border ${
                               quiz.isStandalone
-                                ? "bg-amber-50 text-amber-600 border-amber-200"
+                                ? "bg-emerald-50 text-emerald-600 border-emerald-200"
                                 : "bg-emerald-50 text-emerald-600 border-emerald-200"
                             }`}
                           >
@@ -357,7 +357,7 @@ export default function QuizManagePage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           onClick={() => router.push(`/quiz/manage/${quiz.id}`)}
-                          className="p-2.5 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50 transition-all"
+                          className="p-2.5 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
                           title="Edit quiz"
                         >
                           <Pencil className="h-4 w-4" />
@@ -377,7 +377,7 @@ export default function QuizManagePage() {
                                   `/quiz/${quiz.materialId}/${quiz.id}`,
                                 )
                           }
-                          className="p-2.5 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50 transition-all"
+                          className="p-2.5 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
                           title="Lihat / Preview quiz"
                         >
                           <ChevronRight className="h-4 w-4" />

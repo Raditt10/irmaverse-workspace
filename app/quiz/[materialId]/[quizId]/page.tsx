@@ -62,6 +62,7 @@ interface QuizData {
   id: string;
   materialId: string;
   materialTitle: string;
+  materialThumbnail: string | null;
   title: string;
   description: string | null;
   questionCount: number;
@@ -117,6 +118,7 @@ export default function QuizSessionPage() {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
 
   // Review state
@@ -189,7 +191,7 @@ export default function QuizSessionPage() {
             </h2>
             <button
               onClick={() => router.push("/quiz")}
-              className="mt-4 px-6 py-3 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all"
+              className="mt-4 px-6 py-3 rounded-xl bg-emerald-500 text-white font-black border-2 border-emerald-600 border-b-4 hover:bg-emerald-600 active:border-b-2 active:translate-y-0.5 transition-all"
             >
               Kembali
             </button>
@@ -222,11 +224,21 @@ export default function QuizSessionPage() {
 
   const handleNextQuestion = () => {
     if (currentQIndex < totalQuestions - 1) {
-      setCurrentQIndex((prev) => prev + 1);
-      setSelectedAnswer(null);
-      setIsAnswerSubmitted(false);
-    } else {
-      handleFinishQuiz();
+      const nextIdx = currentQIndex + 1;
+      const nextQId = quizData.questions[nextIdx].id;
+      setCurrentQIndex(nextIdx);
+      setSelectedAnswer(answers[nextQId] || null);
+      setIsAnswerSubmitted(!!answers[nextQId]);
+    }
+  };
+
+  const handlePrevQuestion = () => {
+    if (currentQIndex > 0) {
+      const prevIdx = currentQIndex - 1;
+      const prevQId = quizData.questions[prevIdx].id;
+      setCurrentQIndex(prevIdx);
+      setSelectedAnswer(answers[prevQId] || null);
+      setIsAnswerSubmitted(!!answers[prevQId]);
     }
   };
 
@@ -275,26 +287,26 @@ export default function QuizSessionPage() {
     // Cooldown-blocked state (429)
     if (cooldownError && !finalResult) {
       return (
-        <div className="min-h-screen bg-gradient-to-b from-[#FDFBF7] to-amber-50 flex flex-col items-center justify-center p-6">
-          <div className="bg-white rounded-[3rem] border-4 border-amber-200 shadow-[0_12px_0_0_#fcd34d] p-8 lg:p-12 max-w-lg w-full text-center">
-            <div className="w-20 h-20 mx-auto mb-6 bg-amber-100 rounded-full flex items-center justify-center border-4 border-amber-300">
-              <Clock className="h-10 w-10 text-amber-600" />
+        <div className="min-h-screen bg-linear-to-b from-[#FDFBF7] to-emerald-50 flex flex-col items-center justify-center p-6">
+          <div className="bg-white rounded-[3rem] border-4 border-emerald-200 shadow-[0_12px_0_0_#a7f3d0] p-8 lg:p-12 max-w-lg w-full text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-emerald-100 rounded-full flex items-center justify-center border-4 border-emerald-300">
+              <Clock className="h-10 w-10 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-black text-slate-800 mb-2">
               Cooldown Aktif ⏳
             </h1>
             <p className="text-slate-500 font-medium mb-6">{cooldownError}</p>
-            <div className="bg-amber-50 rounded-2xl p-6 border-2 border-amber-100 mb-6">
-              <p className="text-sm font-bold text-amber-700 uppercase tracking-wider mb-1">
+            <div className="bg-emerald-50 rounded-2xl p-6 border-2 border-emerald-100 mb-6">
+              <p className="text-sm font-bold text-emerald-700 uppercase tracking-wider mb-1">
                 Tersisa
               </p>
-              <p className="text-4xl font-black text-amber-600 font-mono">
+              <p className="text-4xl font-black text-emerald-600 font-mono">
                 {formatTime(cooldownRemaining)}
               </p>
             </div>
             <button
               onClick={() => router.push("/quiz")}
-              className="px-8 py-3.5 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 shadow-[0_4px_0_0_#0d9488] hover:bg-teal-500 active:translate-y-0.5 active:shadow-none transition-all"
+              className="px-8 py-3.5 rounded-xl bg-emerald-500 text-white font-black border-2 border-emerald-600 shadow-[0_4px_0_0_#059669] hover:bg-emerald-600 active:translate-y-0.5 active:shadow-none transition-all"
             >
               <Home className="inline h-5 w-5 mr-2" /> Kembali
             </button>
@@ -310,13 +322,13 @@ export default function QuizSessionPage() {
       Math.round((displayScore / displayTotal) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FDFBF7] to-teal-50 flex flex-col items-center p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-linear-to-b from-[#FDFBF7] to-emerald-50 flex flex-col items-center p-6 relative overflow-hidden">
         {/* Sparkle background */}
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(12)].map((_, i) => (
             <Sparkles
               key={i}
-              className="absolute text-yellow-300/60 animate-pulse"
+              className="absolute text-yellow-300/60"
               style={{
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
@@ -330,7 +342,7 @@ export default function QuizSessionPage() {
         <div className="relative z-10 max-w-2xl w-full space-y-6 mt-8">
           {/* Score Card */}
           <div className="bg-white rounded-[3rem] border-4 border-slate-200 shadow-[0_12px_0_0_#cbd5e1] p-8 lg:p-12 text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-yellow-300 to-amber-400 rounded-full flex items-center justify-center border-4 border-yellow-500 shadow-[0_6px_0_0_#d97706] animate-bounce">
+            <div className="w-24 h-24 mx-auto mb-6 bg-linear-to-br from-yellow-300 to-amber-400 rounded-full flex items-center justify-center border-4 border-yellow-500 shadow-[0_6px_0_0_#d97706]">
               <Trophy className="h-12 w-12 text-white" fill="currentColor" />
             </div>
 
@@ -338,7 +350,7 @@ export default function QuizSessionPage() {
               {percentage >= 70 ? "Luar Biasa! 🎉" : "Tetap Semangat! 💪"}
             </h1>
             <p className="text-slate-500 font-medium mb-2 flex items-center justify-center gap-2">
-              <BookOpen className="h-4 w-4 text-teal-400" />
+              <BookOpen className="h-4 w-4 text-emerald-400" />
               {quizData.title}
             </p>
             {quizData.materialTitle && (
@@ -351,7 +363,7 @@ export default function QuizSessionPage() {
               <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">
                 Skor Kamu
               </p>
-              <p className="text-5xl font-black text-teal-500">
+              <p className="text-5xl font-black text-emerald-500">
                 {displayScore}
                 <span className="text-2xl text-slate-400">/{displayTotal}</span>
               </p>
@@ -362,13 +374,13 @@ export default function QuizSessionPage() {
 
             {/* Cooldown timer */}
             {cooldownRemaining > 0 && (
-              <div className="bg-amber-50 rounded-2xl p-4 border-2 border-amber-200 mb-6 flex items-center justify-center gap-3">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="bg-emerald-50 rounded-2xl p-4 border-2 border-emerald-200 mb-6 flex items-center justify-center gap-3">
+                <Clock className="h-5 w-5 text-emerald-500" />
                 <div>
-                  <p className="text-xs font-bold text-amber-700 uppercase">
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-tight">
                     Cooldown sebelum mengulang
                   </p>
-                  <p className="text-2xl font-black text-amber-600 font-mono">
+                  <p className="text-2xl font-black text-emerald-600 font-mono">
                     {formatTime(cooldownRemaining)}
                   </p>
                 </div>
@@ -380,7 +392,7 @@ export default function QuizSessionPage() {
               {finalResult?.results && (
                 <button
                   onClick={() => setShowReview(!showReview)}
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-indigo-50 border-2 border-indigo-200 text-indigo-600 font-bold hover:bg-indigo-100 hover:border-indigo-300 transition-all shadow-[0_4px_0_0_#c7d2fe] active:translate-y-0.5 active:shadow-none"
+                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-100 hover:border-slate-300 transition-all shadow-[0_4px_0_0_#cbd5e1] active:translate-y-0.5 active:shadow-none"
                 >
                   <Eye className="h-5 w-5" />{" "}
                   {showReview ? "Sembunyikan Review" : "Review Jawaban"}
@@ -388,7 +400,7 @@ export default function QuizSessionPage() {
               )}
               <button
                 onClick={() => router.push("/quiz")}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 shadow-[0_4px_0_0_#0d9488] hover:bg-teal-500 active:translate-y-0.5 active:shadow-none transition-all"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-emerald-500 text-white font-black border-2 border-emerald-700 shadow-[0_4px_0_0_#065f46] hover:bg-emerald-600 active:translate-y-0.5 active:shadow-none transition-all"
               >
                 <Home className="h-5 w-5" /> Quiz Lainnya
               </button>
@@ -399,7 +411,7 @@ export default function QuizSessionPage() {
           {showReview && finalResult?.results && (
             <div className="space-y-4 pb-12">
               <h2 className="text-xl font-black text-slate-700 flex items-center gap-2">
-                <Eye className="h-6 w-6 text-indigo-500" /> Review Jawaban
+                <Eye className="h-6 w-6 text-slate-500" /> Review Jawaban
               </h2>
               {finalResult.results.map((result, idx) => {
                 const isExpanded = expandedReviewQ === idx;
@@ -530,6 +542,20 @@ export default function QuizSessionPage() {
         onCancel={() => setShowExitConfirm(false)}
       />
 
+      <CartoonConfirmDialog
+        isOpen={showSubmitConfirm}
+        title="Selesaikan Quiz?"
+        message="Pastikan semua jawaban sudah benar. Kamu tidak bisa mengubahnya setelah ini."
+        confirmText="Ya, Selesai"
+        cancelText="Belum"
+        type="info"
+        onConfirm={() => {
+          setShowSubmitConfirm(false);
+          handleFinishQuiz();
+        }}
+        onCancel={() => setShowSubmitConfirm(false)}
+      />
+
       {/* Top Bar */}
       <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b-2 border-slate-200 px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
@@ -549,7 +575,7 @@ export default function QuizSessionPage() {
             </div>
             <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden border border-slate-300">
               <div
-                className="h-full bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full transition-all duration-500 ease-out"
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500 ease-out"
                 style={{
                   width: `${((currentQIndex + (isAnswerSubmitted ? 1 : 0)) / totalQuestions) * 100}%`,
                 }}
@@ -563,13 +589,26 @@ export default function QuizSessionPage() {
       <main className="flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="max-w-2xl w-full space-y-6 lg:space-y-8">
           {/* Question Text */}
-          <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] p-6 lg:p-8 text-center">
-            <p className="text-xs font-black text-teal-500 uppercase tracking-wider mb-3">
-              {quizData.title}
-            </p>
-            <h2 className="text-lg lg:text-2xl font-black text-slate-800 leading-snug">
-              {currentQuestion.question}
-            </h2>
+          <div className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] overflow-hidden transition-all duration-300">
+            {quizData.materialThumbnail && (
+              <div className="h-48 lg:h-64 w-full relative overflow-hidden bg-slate-100 group">
+                <img
+                  src={quizData.materialThumbnail}
+                  alt={quizData.materialTitle || "Material Thumbnail"}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
+              </div>
+            )}
+            
+            <div className="p-6 lg:p-8 text-center">
+              <p className="text-xs font-black text-emerald-500 uppercase tracking-wider mb-2 flex items-center justify-center gap-1.5">
+                <BookOpen className="h-3.5 w-3.5" /> {quizData.materialTitle}
+              </p>
+              <h2 className="text-xl lg:text-3xl font-black text-slate-800 leading-tight">
+                {currentQuestion.question}
+              </h2>
+            </div>
           </div>
 
           {/* Options Grid */}
@@ -591,7 +630,7 @@ export default function QuizSessionPage() {
                   className={`
                     relative flex items-center gap-3 p-4 lg:p-5 rounded-2xl border-2 font-bold text-left transition-all duration-200
                     ${style.base} ${!isAnswerSubmitted ? style.hover : ""}
-                    ${isSelected && !isAnswerSubmitted ? "ring-4 ring-offset-2 ring-teal-300 scale-[1.02]" : ""}
+                    ${isSelected && !isAnswerSubmitted ? "ring-4 ring-offset-2 ring-emerald-300 scale-[1.02]" : ""}
                     ${stateClass}
                     ${isAnswerSubmitted ? "cursor-default" : "cursor-pointer active:translate-y-0.5 active:shadow-none"}
                   `}
@@ -605,38 +644,59 @@ export default function QuizSessionPage() {
             })}
           </div>
 
-          {/* Action Button */}
-          <div className="flex justify-center pt-2">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            {/* Back Button */}
+            <button
+              onClick={handlePrevQuestion}
+              disabled={currentQIndex === 0 || submitting}
+              className={`
+                px-8 py-4 rounded-2xl font-black text-lg transition-all border-b-4 flex items-center justify-center gap-2 min-w-35
+                ${
+                  currentQIndex > 0 && !submitting
+                    ? "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 active:border-b-0 active:translate-y-1"
+                    : "bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed"
+                }
+              `}
+            >
+              <ArrowRight className="h-5 w-5 rotate-180" /> Kembali
+            </button>
+
+            {/* Main Action Button */}
             {!isAnswerSubmitted ? (
               <button
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer || submitting}
                 className={`
-                  px-10 py-4 rounded-2xl font-black text-lg transition-all border-b-4 active:border-b-0 active:translate-y-1
+                  px-10 py-4 rounded-2xl font-black text-lg transition-all border-b-4 active:border-b-0 active:translate-y-1 min-w-40
                   ${
                     selectedAnswer
-                      ? "bg-teal-400 text-white border-teal-600 shadow-[0_4px_0_0_#0d9488] hover:bg-teal-500"
+                      ? "bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_0_#065f46] hover:bg-emerald-600"
                       : "bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed"
                   }
                 `}
               >
                 <Check className="inline h-5 w-5 mr-2 -mt-0.5" /> Jawab
               </button>
-            ) : (
+            ) : currentQIndex < totalQuestions - 1 ? (
               <button
                 onClick={handleNextQuestion}
                 disabled={submitting}
-                className="px-10 py-4 rounded-2xl font-black text-lg bg-indigo-500 text-white border-b-4 border-indigo-700 shadow-[0_4px_0_0_#4338ca] hover:bg-indigo-600 active:border-b-0 active:translate-y-1 transition-all"
+                className="px-10 py-4 rounded-2xl font-black text-lg bg-emerald-500 text-white border-b-4 border-emerald-700 shadow-[0_4px_0_0_#059669] hover:bg-emerald-600 active:border-b-0 active:translate-y-1 transition-all min-w-40"
+              >
+                Lanjut <ArrowRight className="inline h-5 w-5 ml-1" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowSubmitConfirm(true)}
+                disabled={submitting}
+                className="px-10 py-4 rounded-2xl font-black text-lg bg-emerald-500 text-white border-b-4 border-emerald-700 shadow-[0_4px_0_0_#059669] hover:bg-emerald-600 active:border-b-0 active:translate-y-1 transition-all min-w-50"
               >
                 {submitting ? (
                   "Mengirim..."
-                ) : currentQIndex < totalQuestions - 1 ? (
-                  <>
-                    Lanjut <ArrowRight className="inline h-5 w-5 ml-1" />
-                  </>
                 ) : (
                   <>
-                    Selesai <Trophy className="inline h-5 w-5 ml-1" />
+                    Selesaikan Quiz <Trophy className="inline h-5 w-5 ml-1" />
                   </>
                 )}
               </button>

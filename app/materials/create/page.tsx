@@ -34,6 +34,7 @@ import {
   FileText,
   CheckSquare,
   Square,
+  Layers,
 } from "lucide-react";
 import Loading from "@/components/ui/Loading";
 
@@ -44,10 +45,11 @@ const CreateMaterial = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [availablePrograms, setAvailablePrograms] = useState<
-    { id: string; title: string }[]
+    { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[] }[]
   >([]);
   const [fetchingPrograms, setFetchingPrograms] = useState(false);
   const [isProgramDropdownOpen, setIsProgramDropdownOpen] = useState(false);
+  const [isKajianDropdownOpen, setIsKajianDropdownOpen] = useState(false);
 
   // Toast State
   const [toast, setToast] = useState<{
@@ -65,6 +67,7 @@ const CreateMaterial = () => {
     grade: "Semua",
     thumbnailUrl: "",
     programId: queryProgramId,
+    kajianOrder: "",
     materialType: "editor" as "editor" | "link",
     materialContent: "",
     materialLink: "",
@@ -127,7 +130,12 @@ const CreateMaterial = () => {
       }
       const data = await res.json();
       setAvailablePrograms(
-        data.map((p: any) => ({ id: p.id, title: p.title })),
+        data.map((p: any) => ({ 
+          id: p.id, 
+          title: p.title, 
+          totalKajian: p.totalKajian, 
+          usedKajianOrders: p.usedKajianOrders 
+        })),
       );
     } catch (err) {
       console.error("Error fetching programs:", err);
@@ -154,7 +162,7 @@ const CreateMaterial = () => {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -497,10 +505,10 @@ const CreateMaterial = () => {
                         {/* --- PROGRAM (KURSUS) DROPDOWN --- */}
                         <div className="mt-4">
                           <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-2 ml-1 flex items-center gap-2">
-                            <Library className="h-4 w-4 text-emerald-500" />{" "}
-                            Kursus Induk
-                            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-black">
-                              Opsional
+                            <GraduationCap className="h-4 w-4 text-emerald-500" />{" "}
+                            Program Kurikulum
+                            <span className="text-[11px] text-slate-400 font-medium ml-1">
+                              (Opsional)
                             </span>
                           </label>
                           <div className="relative">
@@ -522,7 +530,7 @@ const CreateMaterial = () => {
                               <span className="truncate">
                                 {availablePrograms.find(
                                   (p) => p.id === formData.programId,
-                                )?.title || "--- Tidak terkait kursus ---"}
+                                )?.title || "--- Tidak terkait program ---"}
                               </span>
                               <ChevronDown
                                 className={`h-5 w-5 text-slate-400 transition-transform ${isProgramDropdownOpen ? "rotate-180" : ""}`}
@@ -547,15 +555,15 @@ const CreateMaterial = () => {
                                         : "text-slate-400 hover:bg-slate-50"
                                     }`}
                                   >
-                                    — Tanpa Kursus —
+                                    — Tanpa Program —
                                   </button>
                                   {fetchingPrograms ? (
                                     <div className="px-4 py-3 text-sm text-slate-500 font-bold italic">
-                                      Memuat kursus...
+                                      Memuat program...
                                     </div>
                                   ) : availablePrograms.length === 0 ? (
                                     <div className="px-4 py-3 text-sm text-slate-500 font-bold italic">
-                                      Tidak ada kursus tersedia
+                                      Tidak ada program tersedia
                                     </div>
                                   ) : (
                                     availablePrograms.map((program) => (
@@ -587,9 +595,94 @@ const CreateMaterial = () => {
                             )}
                           </div>
                           <p className="text-[10px] font-bold text-slate-400 mt-2 ml-1 italic">
-                            * Pilih kursus jika materi ini adalah bagian dari
-                            sebuah kursus.
+                            * Pilih program jika materi ini adalah bagian dari
+                            sebuah program kurikulum.
                           </p>
+
+                          {/* KAJIAN KE- Berapa (Muncul jika ada program yang dipilih) */}
+                          {availablePrograms.find((p) => p.id === formData.programId) && (
+                            <div className="mt-4 pt-4 border-t-2 border-slate-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                              <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-2 ml-1 flex items-center gap-2">
+                                <BookOpen className="h-4 w-4 text-emerald-500" /> Kajian Ke-
+                                <span className="text-red-500 ml-1 font-bold">*</span>
+                              </label>
+                              <div className="relative">
+                                {/* Trigger Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => setIsKajianDropdownOpen(!isKajianDropdownOpen)}
+                                  className={`w-full flex items-center justify-between rounded-2xl border-2 bg-white px-5 py-3.5 font-bold transition-all shadow-[0_4px_0_0_#e2e8f0] hover:border-teal-300 focus:outline-none focus:ring-4 focus:ring-teal-100 ${
+                                    isKajianDropdownOpen ? "border-teal-400" : "border-slate-200"
+                                  } ${formData.kajianOrder ? "text-slate-700" : "text-slate-400"}`}
+                                >
+                                  <span>
+                                    {formData.kajianOrder 
+                                      ? `Kajian Ke-${formData.kajianOrder}` 
+                                      : "-- Pilih Urutan Kajian --"}
+                                  </span>
+                                  <ChevronDown 
+                                    className={`h-5 w-5 text-slate-400 transition-transform ${isKajianDropdownOpen ? "rotate-180 text-teal-500" : ""}`} 
+                                  />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                {isKajianDropdownOpen && (
+                                  <>
+                                    <div 
+                                      className="fixed inset-0 z-40" 
+                                      onClick={() => setIsKajianDropdownOpen(false)} 
+                                    />
+                                    <div className="absolute z-50 w-full mt-2 bg-white border-2 border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 p-1.5">
+                                      {(() => {
+                                        const selectedProgram = availablePrograms.find((p) => p.id === formData.programId);
+                                        if (!selectedProgram || !selectedProgram.totalKajian) return (
+                                          <div className="p-4 text-center text-sm font-bold text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                            Data program tidak ditemukan
+                                          </div>
+                                        );
+                                        
+                                        return (
+                                          <div className="max-h-60 overflow-y-auto pr-1 space-y-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                                            {Array.from({ length: selectedProgram.totalKajian }, (_, i) => i + 1).map((num) => {
+                                              const isUsed = selectedProgram.usedKajianOrders?.includes(num);
+                                              return (
+                                                <button
+                                                  key={num}
+                                                  type="button"
+                                                  disabled={isUsed}
+                                                  onClick={() => {
+                                                    setFormData({ ...formData, kajianOrder: num.toString() });
+                                                    setIsKajianDropdownOpen(false);
+                                                  }}
+                                                  className={`w-full text-left px-4 py-3.5 text-sm font-bold rounded-xl transition-all flex items-center justify-between border ${
+                                                    isUsed 
+                                                      ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed" 
+                                                      : formData.kajianOrder === num.toString()
+                                                        ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
+                                                        : "bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-200 hover:text-teal-600"
+                                                  }`}
+                                                >
+                                                  <span>Kajian Ke-{num}</span>
+                                                  {isUsed && (
+                                                    <span className="text-[10px] bg-slate-200/50 text-slate-500 font-black px-2.5 py-1 rounded-lg border border-slate-200">
+                                                      Sudah Terisi
+                                                    </span>
+                                                  )}
+                                                  {formData.kajianOrder === num.toString() && !isUsed && (
+                                                    <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
+                                                  )}
+                                                </button>
+                                              );
+                                            })}
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -599,8 +692,8 @@ const CreateMaterial = () => {
                           <h3 className="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
                             <FileText className="h-4 w-4 text-emerald-500" />{" "}
                             Rekapan Materi
-                            <span className="text-[10px] bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full font-black border border-amber-200">
-                              Disarankan
+                            <span className="text-[11px] text-slate-400 font-medium ml-1">
+                              (Disarankan)
                             </span>
                           </h3>
 

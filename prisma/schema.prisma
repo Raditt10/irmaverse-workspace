@@ -295,6 +295,7 @@ model program {
   syllabus     Json?
   requirements Json?
   benefits     Json?
+  totalKajian  Int                  @default(0)
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
 
@@ -380,6 +381,7 @@ model material {
   materialType                                   String?
   parentId                                       String?
   programId                                      String?
+  kajianOrder                                    Int?
   courseenrollment                               courseenrollment[]
   users                                          User               @relation(fields: [instructorId], references: [id], map: "Material_instructorId_fkey")
   material_material_nextCourseIdTomaterial       material?          @relation("material_nextCourseIdTomaterial", fields: [nextCourseId], references: [id], map: "Material_nextCourseId_fkey")

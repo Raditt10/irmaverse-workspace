@@ -52,11 +52,14 @@ export async function GET(
       );
     }
 
-    const materialIds = program.materials.map((m) => m.id);
+    const instructorMaterials = program.materials.filter(m => 
+      user.role === "instruktur" ? m.instructorId === user.id : true
+    );
+    const materialIds = instructorMaterials.map((m) => m.id);
 
     let userProgress = {
       completed: 0,
-      total: materialIds.length,
+      total: program.totalKajian > 0 ? program.totalKajian : materialIds.length,
       percentage: 0,
     };
     const isEnrolled = program.enrollments.some((e) => e.userId === user.id);
@@ -72,8 +75,10 @@ export async function GET(
 
       userProgress = {
         completed: attendanceCount,
-        total: materialIds.length,
-        percentage: Math.round((attendanceCount / materialIds.length) * 100),
+        total: program.totalKajian > 0 ? program.totalKajian : materialIds.length,
+        percentage: program.totalKajian > 0 
+           ? Math.round((attendanceCount / program.totalKajian) * 100) 
+           : Math.round((attendanceCount / materialIds.length) * 100),
       };
     }
 
@@ -103,7 +108,19 @@ export async function GET(
       userAttendance.map((a) => [a.materialId, a.status]),
     );
 
-    const formattedMaterials = program.materials.map((m, idx) => ({
+    const userInvites =
+      materialIds.length > 0
+        ? await (prisma as any).materialinvite.findMany({
+            where: { userId: user.id, materialId: { in: materialIds } },
+            select: { materialId: true, status: true },
+          })
+        : [];
+
+    const inviteMap = new Map(
+      userInvites.map((inv: any) => [inv.materialId, inv.status]),
+    );
+
+    const formattedMaterials = instructorMaterials.map((m, idx) => ({
       id: m.id,
       title: m.title,
       description: m.description,
@@ -111,9 +128,10 @@ export async function GET(
       startedAt: m.startedAt,
       instructor: m.users?.name || program.instructor?.name || "TBA",
       thumbnailUrl: m.thumbnailUrl,
-      order: idx + 1,
+      order: m.kajianOrder || idx + 1,
       isCompleted: attendanceMap.get(m.id) === "hadir",
       attendanceStatus: attendanceMap.get(m.id) || null,
+      inviteStatus: inviteMap.get(m.id) || null,
       enrollmentCount: m.courseenrollment?.length || 0,
     }));
 
@@ -136,9 +154,13 @@ export async function GET(
       benefits: (program.benefits as string[]) || [],
       materials: formattedMaterials,
       enrollmentCount: program.enrollments.length,
+      totalKajian: program.totalKajian,
       isEnrolled,
       progress: userProgress,
       createdAt: program.createdAt,
+      usedKajianOrders: instructorMaterials
+        .map((m: any) => m.kajianOrder)
+        .filter((order: any) => order !== null && order !== undefined),
     };
 
     return NextResponse.json(result);
@@ -192,6 +214,7 @@ export async function PUT(
       syllabus,
       requirements,
       benefits,
+      totalKajian,
     } = body;
 
     if (!title || !title.trim()) {
@@ -232,6 +255,7 @@ export async function PUT(
         syllabus: Array.isArray(syllabus) ? syllabus : [],
         requirements: Array.isArray(requirements) ? requirements : [],
         benefits: Array.isArray(benefits) ? benefits : [],
+        totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
       },
     });
 

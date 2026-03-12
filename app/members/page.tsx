@@ -111,7 +111,7 @@ const Members = () => {
             <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2">
-                  Daftar Anggota
+                  Daftar Anggota IRMA
                 </h1>
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Temukan teman dan lihat siapa saja anggota aktif IRMA.

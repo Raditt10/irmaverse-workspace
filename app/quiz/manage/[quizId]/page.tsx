@@ -294,7 +294,7 @@ export default function EditQuizPage() {
             </p>
             <button
               onClick={() => router.back()}
-              className="px-6 py-3 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all"
+              className="px-6 py-3 rounded-xl bg-emerald-400 text-white font-black border-2 border-emerald-600 border-b-4 hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5 transition-all"
             >
               Kembali
             </button>
@@ -317,7 +317,7 @@ export default function EditQuizPage() {
             </h2>
             <button
               onClick={() => router.push("/quiz/manage")}
-              className="mt-4 px-6 py-3 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all"
+              className="mt-4 px-6 py-3 rounded-xl bg-emerald-400 text-white font-black border-2 border-emerald-600 border-b-4 hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5 transition-all"
             >
               Kembali ke Kelola Quiz
             </button>
@@ -338,22 +338,22 @@ export default function EditQuizPage() {
             <div className="flex flex-col gap-4 mb-8">
               <button
                 onClick={() => setShowDiscardConfirm(true)}
-                className="self-start inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-teal-400 hover:text-teal-600 transition-all text-sm"
+                className="self-start inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-emerald-400 hover:text-emerald-600 transition-all text-sm"
               >
                 <ArrowLeft className="h-4 w-4" strokeWidth={3} /> Kembali
               </button>
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                    <Pencil className="h-7 w-7 text-amber-500" /> Edit Quiz
+                    <Pencil className="h-7 w-7 text-emerald-500" /> Edit Quiz
                   </h1>
                 </div>
                 {/* Quiz type badge */}
                 <div
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black border-2 mt-1 ${
                     quizMeta.isStandalone
-                      ? "bg-indigo-50 text-indigo-600 border-indigo-200"
-                      : "bg-teal-50 text-teal-600 border-teal-200"
+                      ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                      : "bg-emerald-50 text-emerald-600 border-emerald-200"
                   }`}
                 >
                   {quizMeta.isStandalone ? (
@@ -374,7 +374,7 @@ export default function EditQuizPage() {
               {/* Quiz Info Card */}
               <div className="bg-white p-6 lg:p-8 rounded-3xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1]">
                 <h2 className="text-lg font-black text-slate-700 mb-4 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-amber-500" /> Info Quiz
+                  <Sparkles className="h-5 w-5 text-emerald-500" /> Info Quiz
                 </h2>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -414,8 +414,8 @@ export default function EditQuizPage() {
                     {/* Question Header */}
                     <div className="flex items-start justify-between mb-4 gap-3">
                       <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-2xl bg-amber-100 border-2 border-amber-200 flex items-center justify-center shrink-0">
-                          <span className="text-sm font-black text-amber-600">
+                        <div className="w-10 h-10 rounded-2xl bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center shrink-0">
+                          <span className="text-sm font-black text-emerald-600">
                             {qIdx + 1}
                           </span>
                         </div>
@@ -447,7 +447,7 @@ export default function EditQuizPage() {
                     <div className="space-y-2.5">
                       <span className="text-xs font-bold text-slate-500 ml-1">
                         Opsi Jawaban{" "}
-                        <span className="text-teal-500">
+                        <span className="text-emerald-500">
                           (klik ✓ untuk menandai jawaban benar)
                         </span>
                       </span>
@@ -488,7 +488,7 @@ export default function EditQuizPage() {
                       <button
                         type="button"
                         onClick={() => addOption(qIdx)}
-                        className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-dashed border-slate-200 text-slate-400 text-xs font-bold hover:border-teal-300 hover:text-teal-500 hover:bg-teal-50/50 transition-all"
+                        className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-dashed border-slate-200 text-slate-400 text-xs font-bold hover:border-emerald-300 hover:text-emerald-500 hover:bg-emerald-50/50 transition-all"
                       >
                         <Plus className="h-3.5 w-3.5" /> Tambah Opsi
                       </button>
@@ -501,18 +501,18 @@ export default function EditQuizPage() {
               <button
                 type="button"
                 onClick={addQuestion}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-amber-200 text-amber-500 font-black hover:border-amber-400 hover:bg-amber-50 transition-all"
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-emerald-200 text-emerald-500 font-black hover:border-emerald-400 hover:bg-emerald-50 transition-all"
               >
                 <Plus className="h-5 w-5" /> Tambah Soal Baru
               </button>
 
               {/* Save Button Panel */}
-              <div className="bg-amber-500 p-6 rounded-[2.5rem] text-white border-2 border-amber-600 shadow-[0_6px_0_0_#d97706]">
+              <div className="bg-emerald-500 p-6 rounded-[2.5rem] text-white border-2 border-emerald-600 shadow-[0_6px_0_0_#059669]">
                 <div className="flex items-center gap-3 mb-4">
-                  <ListChecks className="h-8 w-8 text-amber-100" />
+                  <ListChecks className="h-8 w-8 text-emerald-100" />
                   <div>
                     <h3 className="text-xl font-black">Simpan Perubahan</h3>
-                    <p className="text-sm text-amber-100 font-medium">
+                    <p className="text-sm text-emerald-100 font-medium">
                       {questions.length} soal ·{" "}
                       {questions.reduce(
                         (s, q) =>
@@ -526,7 +526,7 @@ export default function EditQuizPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-white text-amber-600 font-black text-lg rounded-2xl shadow-[0_4px_0_0_#fef3c7] border-2 border-amber-100 hover:bg-amber-50 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-white text-emerald-600 font-black text-lg rounded-2xl shadow-[0_4px_0_0_#d1fae5] border-2 border-emerald-100 hover:bg-emerald-50 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50"
                 >
                   {saving ? (
                     <>

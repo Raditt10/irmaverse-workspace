@@ -13,6 +13,8 @@ import {
   Filter,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import SuccessDataFound from "@/components/ui/SuccessDataFound";
+import EmptyState from "@/components/ui/EmptyState";
 
 export interface LeaderboardUser {
   id: string;
@@ -78,35 +80,28 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
   return (
     <>
       {/* ── STATS STRIP ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
         {[
           {
-            icon: <Users className="h-4 w-4 text-emerald-500" />,
-            label: "Peserta",
-            value: users.length,
-            bg: "bg-emerald-50",
+            icon: <Trophy className="h-4 w-4 text-emerald-500" />,
+            label: "Peringkatmu",
+            value: currentUserRank ? `#${currentUserRank}` : "—",
+            bg: "bg-emerald-50/80",
             border: "border-emerald-200",
           },
           {
-            icon: <Trophy className="h-4 w-4 text-amber-500" />,
-            label: "Peringkatmu",
-            value: currentUserRank ? `#${currentUserRank}` : "—",
-            bg: "bg-amber-50",
-            border: "border-amber-200",
-          },
-          {
-            icon: <Flame className="h-4 w-4 text-orange-500" />,
+            icon: <Flame className="h-4 w-4 text-emerald-500" />,
             label: "Streak Tertinggi",
             value: `${stats.highestStreak} hari`,
-            bg: "bg-orange-50",
-            border: "border-orange-200",
+            bg: "bg-teal-50/80",
+            border: "border-teal-200",
           },
           {
-            icon: <Award className="h-4 w-4 text-purple-500" />,
+            icon: <Award className="h-4 w-4 text-emerald-500" />,
             label: "Total Badge",
             value: stats.totalBadges,
-            bg: "bg-purple-50",
-            border: "border-purple-200",
+            bg: "bg-emerald-50/50",
+            border: "border-emerald-200",
           },
         ].map((s) => (
           <div
@@ -135,30 +130,30 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
           {topThree[1] && (
             <div className="flex flex-col items-center group order-1 shrink-0 w-[28%] sm:w-24 md:w-36">
               <div className="relative mb-[-15px] z-20 transition-transform group-hover:-translate-y-2">
-                <Avatar className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 border-[3px] border-slate-400 shadow-md mx-auto">
+                <Avatar className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 border-[3px] border-emerald-300 shadow-md mx-auto">
                   <AvatarImage src={avatarSrc(topThree[1])} />
-                  <AvatarFallback className="bg-slate-300 font-black text-slate-700 text-lg">
+                  <AvatarFallback className="bg-emerald-100 font-black text-emerald-700 text-lg">
                     {(topThree[1].name ?? "?")[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 bg-slate-500 text-white w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-[10px] sm:text-xs md:text-base">
+                <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-[10px] sm:text-xs md:text-base">
                   2
                 </div>
               </div>
               <div
                 onClick={() => router.push(`/u/${topThree[1].id}`)}
-                className="cursor-pointer w-full h-24 sm:h-28 md:h-40 bg-slate-100 rounded-t-3xl border-[3px] border-slate-300 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10 hover:bg-slate-200 transition-colors"
+                className="cursor-pointer w-full h-24 sm:h-28 md:h-40 bg-emerald-50/70 rounded-t-3xl border-[3px] border-emerald-200 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10 hover:bg-emerald-100/80 transition-colors"
               >
-                <p className="font-black text-slate-700 text-[9px] sm:text-[10px] md:text-sm px-1 text-center line-clamp-1 w-full">
+                <p className="font-black text-emerald-800 text-[9px] sm:text-[10px] md:text-sm px-1 text-center line-clamp-1 w-full">
                   {topThree[1].name}
                 </p>
-                <div className="mt-1 md:mt-2 bg-white px-1 sm:px-2 py-0.5 rounded-full border border-slate-200 w-[90%] sm:w-fit flex justify-center items-center gap-1">
-                  <Zap className="h-2.5 w-2.5 text-slate-500" />
-                  <p className="text-[8px] sm:text-[9px] md:text-xs font-black text-slate-500">
+                <div className="mt-1 md:mt-2 bg-white px-1 sm:px-2 py-0.5 rounded-full border border-emerald-200 w-[90%] sm:w-fit flex justify-center items-center gap-1">
+                  <Zap className="h-2.5 w-2.5 text-emerald-500" />
+                  <p className="text-[8px] sm:text-[9px] md:text-xs font-black text-emerald-600">
                     {topThree[1].points.toLocaleString()} XP
                   </p>
                 </div>
-                <span className="mt-1 text-[8px] font-bold text-slate-400 uppercase">
+                <span className="mt-1 text-[8px] font-bold text-emerald-600/70 uppercase">
                   Lv.{topThree[1].level} • {getRoleLabel(topThree[1].role)}
                 </span>
               </div>
@@ -170,32 +165,32 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
             <div className="flex flex-col items-center group order-2 -mt-6 sm:-mt-10 z-30 shrink-0 w-[36%] sm:w-32 md:w-44">
               <div className="relative mb-3 sm:mb-5 z-20 transition-transform group-hover:-translate-y-3">
                 <div className="absolute -top-6 sm:-top-8 left-1/2 -translate-x-1/2">
-                  <Crown className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-amber-400 fill-amber-400" />
+                  <Crown className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-amber-400 fill-amber-400 drop-shadow-sm" />
                 </div>
-                <Avatar className="w-18 h-18 sm:w-24 sm:h-24 md:w-32 md:h-32 border-4 border-amber-400 shadow-lg mx-auto">
+                <Avatar className="w-18 h-18 sm:w-24 sm:h-24 md:w-32 md:h-32 border-4 border-emerald-400 shadow-lg mx-auto bg-white">
                   <AvatarImage src={avatarSrc(topThree[0])} />
-                  <AvatarFallback className="bg-amber-200 font-black text-amber-800 text-2xl">
+                  <AvatarFallback className="bg-emerald-100 font-black text-emerald-800 text-2xl">
                     {(topThree[0].name ?? "?")[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-white w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-black border-[3px] border-white shadow-md text-xs sm:text-sm md:text-lg">
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-black border-[3px] border-white shadow-md text-xs sm:text-sm md:text-lg">
                   1
                 </div>
               </div>
               <div
                 onClick={() => router.push(`/u/${topThree[0].id}`)}
-                className="cursor-pointer w-full h-32 sm:h-40 md:h-56 bg-amber-50 rounded-t-[2.5rem] border-[3px] border-amber-300 border-b-0 flex flex-col items-center pt-8 sm:pt-10 md:pt-12 shadow-inner relative z-10 hover:bg-amber-100 transition-colors"
+                className="cursor-pointer w-full h-32 sm:h-40 md:h-56 bg-emerald-50 rounded-t-[2.5rem] border-[3px] border-emerald-300 border-b-0 flex flex-col items-center pt-8 sm:pt-10 md:pt-12 shadow-inner relative z-10 hover:bg-emerald-100/60 transition-colors"
               >
-                <p className="font-black text-amber-900 text-[10px] sm:text-xs md:text-lg px-1 sm:px-2 text-center line-clamp-1 w-full">
+                <p className="font-black text-emerald-900 text-[10px] sm:text-xs md:text-lg px-1 sm:px-2 text-center line-clamp-1 w-full">
                   {topThree[0].name}
                 </p>
-                <div className="mt-1 sm:mt-2 bg-amber-400 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-2 border-amber-500 shadow-sm w-[90%] sm:w-fit flex justify-center items-center gap-1">
+                <div className="mt-1 sm:mt-2 bg-emerald-500 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border-2 border-emerald-600 shadow-sm w-[90%] sm:w-fit flex justify-center items-center gap-1">
                   <Zap className="h-2.5 w-2.5 text-white" />
                   <p className="text-[8px] sm:text-[10px] md:text-sm font-black text-white">
                     {topThree[0].points.toLocaleString()} XP
                   </p>
                 </div>
-                <span className="mt-1 text-[8px] sm:text-[9px] font-bold text-amber-600 uppercase">
+                <span className="mt-1 text-[8px] sm:text-[9px] font-bold text-emerald-700 uppercase">
                   Lv.{topThree[0].level} • {getRoleLabel(topThree[0].role)}
                 </span>
               </div>
@@ -206,30 +201,30 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
           {topThree[2] && (
             <div className="flex flex-col items-center group order-3 shrink-0 w-[28%] sm:w-24 md:w-36">
               <div className="relative mb-[-15px] z-20 transition-transform group-hover:-translate-y-2">
-                <Avatar className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 border-[3px] border-orange-300 shadow-md mx-auto">
+                <Avatar className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 border-[3px] border-emerald-200 shadow-md mx-auto">
                   <AvatarImage src={avatarSrc(topThree[2])} />
-                  <AvatarFallback className="bg-orange-100 font-black text-orange-700 text-lg">
+                  <AvatarFallback className="bg-emerald-50 font-black text-emerald-600 text-lg">
                     {(topThree[2].name ?? "?")[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-[10px] sm:text-xs md:text-base">
+                <div className="absolute -bottom-1 -right-1 bg-emerald-400 text-white w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black border-2 border-white text-[10px] sm:text-xs md:text-base">
                   3
                 </div>
               </div>
               <div
                 onClick={() => router.push(`/u/${topThree[2].id}`)}
-                className="cursor-pointer w-full h-20 sm:h-24 md:h-32 bg-orange-50 rounded-t-3xl border-[3px] border-orange-200 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10 hover:bg-orange-100 transition-colors"
+                className="cursor-pointer w-full h-20 sm:h-24 md:h-32 bg-emerald-50/40 rounded-t-3xl border-[3px] border-emerald-100 border-b-0 flex flex-col items-center pt-8 md:pt-10 shadow-inner relative z-10 hover:bg-emerald-50/80 transition-colors"
               >
-                <p className="font-black text-orange-900 text-[9px] sm:text-[10px] md:text-sm px-1 text-center line-clamp-1 w-full">
+                <p className="font-black text-emerald-700 text-[9px] sm:text-[10px] md:text-sm px-1 text-center line-clamp-1 w-full">
                   {topThree[2].name}
                 </p>
-                <div className="mt-1 md:mt-2 bg-white px-1 sm:px-2 py-0.5 rounded-full border border-orange-100 w-[90%] sm:w-fit flex justify-center items-center gap-1">
-                  <Zap className="h-2.5 w-2.5 text-orange-500" />
-                  <p className="text-[8px] sm:text-[9px] md:text-xs font-black text-orange-500">
+                <div className="mt-1 md:mt-2 bg-white px-1 sm:px-2 py-0.5 rounded-full border border-emerald-100 w-[90%] sm:w-fit flex justify-center items-center gap-1">
+                  <Zap className="h-2.5 w-2.5 text-emerald-400" />
+                  <p className="text-[8px] sm:text-[9px] md:text-xs font-black text-emerald-500">
                     {topThree[2].points.toLocaleString()} XP
                   </p>
                 </div>
-                <span className="mt-1 text-[8px] font-bold text-orange-400 uppercase">
+                <span className="mt-1 text-[8px] font-bold text-emerald-400 uppercase">
                   Lv.{topThree[2].level} • {getRoleLabel(topThree[2].role)}
                 </span>
               </div>
@@ -255,29 +250,20 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
         </div>
 
         {/* Filter active indicator */}
-        {search.trim() && (
-          <div className="flex items-center gap-2 mb-4 px-1">
-            <Filter className="h-3.5 w-3.5 text-slate-400" />
-            <span className="text-xs font-bold text-slate-400">
-              Menampilkan {filtered.length} dari {users.length} peserta
-            </span>
-            <button
-              onClick={() => setSearch("")}
-              className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200"
-            >
-              Reset
-            </button>
-          </div>
+        {search.trim() && filtered.length > 0 && (
+          <SuccessDataFound
+            message={`Menampilkan ${filtered.length} dari ${users.length} peserta`}
+          />
         )}
 
         {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="font-bold text-slate-500">Tidak ditemukan</p>
-            <p className="text-sm text-slate-400 mt-1">
-              Coba ubah filter atau kata kunci pencarian
-            </p>
-          </div>
+          <EmptyState
+            icon="search"
+            title="Tidak ditemukan"
+            description="Coba gunakan kata kunci lain untuk mencari peserta."
+            actionLabel="Reset Pencarian"
+            onAction={() => setSearch("")}
+          />
         )}
 
         {/* Column headers */}
@@ -355,10 +341,10 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
                 <div className="col-span-3 flex flex-col justify-center items-end pr-1">
                   <div className="flex items-center gap-1">
                     <Zap
-                      className={`h-3.5 w-3.5 ${isMe ? "text-teal-500" : "text-amber-400"}`}
+                      className={`h-3.5 w-3.5 ${isMe ? "text-teal-500" : "text-emerald-500"}`}
                     />
                     <span
-                      className={`font-black text-sm md:text-xl leading-none ${isMe ? "text-teal-700" : "text-slate-700"}`}
+                      className={`font-black text-sm md:text-xl leading-none ${isMe ? "text-teal-700" : "text-emerald-700"}`}
                     >
                       {u.points.toLocaleString()}
                     </span>

@@ -170,7 +170,7 @@ export default function DashboardHeader() {
   return (
     <div className="w-full">
       {/* Spacer to maintain layout flow since header is fixed */}
-      <div className="h-20 shrink-0" aria-hidden="true" />
+      <div className="h-34 md:h-20 shrink-0" aria-hidden="true" />
       
       <div
         className="border-b-2 border-slate-200 bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-40 font-sans"

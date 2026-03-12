@@ -12,6 +12,31 @@ const LeaderboardPage = async () => {
   const session = await auth();
   if (!session?.user) redirect("/auth");
 
+  const currentUserId = session.user.id;
+
+  // Get current user's followers and followings to determine mutuals
+  const [followers, following] = await Promise.all([
+    prisma.friendship.findMany({
+      where: { followingId: currentUserId, status: "accepted" },
+      select: { followerId: true },
+    }),
+    prisma.friendship.findMany({
+      where: { followerId: currentUserId, status: "accepted" },
+      select: { followingId: true },
+    }),
+  ]);
+
+  const followerIds = new Set(followers.map((f) => f.followerId));
+  const followingIds = new Set(following.map((f) => f.followingId));
+
+  // A mutual friend is someone who follows the user AND the user follows them back
+  const mutualUserIds = new Set<string>();
+  for (const id of followingIds) {
+    if (followerIds.has(id)) {
+      mutualUserIds.add(id);
+    }
+  }
+
   const rawUsers = await prisma.user.findMany({
     where: { role: "user" },
     orderBy: { points: "desc" },
@@ -25,20 +50,29 @@ const LeaderboardPage = async () => {
       level: true,
       streak: true,
     },
-    take: 100,
+    take: 10, // Limit to Top 10 per user request
   });
 
-  const users: LeaderboardUser[] = rawUsers.map((u, i) => ({
-    id: u.id,
-    name: u.name ?? "Pengguna",
-    avatar: u.avatar,
-    role: u.role,
-    points: u.points,
-    badges: u.badges,
-    level: u.level,
-    streak: u.streak,
-    globalRank: i + 1,
-  }));
+  const users: LeaderboardUser[] = rawUsers.map((u, i) => {
+    const isMe = u.id === currentUserId;
+    const isMutual = mutualUserIds.has(u.id);
+
+    // Apply privacy rules: Hide name and avatar if not me and not mutual
+    const displayName = isMe || isMutual ? (u.name ?? "Pengguna") : "Hamba Allah";
+    const displayAvatar = isMe || isMutual ? u.avatar : null;
+
+    return {
+      id: u.id,
+      name: displayName,
+      avatar: displayAvatar,
+      role: u.role,
+      points: u.points,
+      badges: u.badges,
+      level: u.level,
+      streak: u.streak,
+      globalRank: i + 1,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
@@ -48,14 +82,12 @@ const LeaderboardPage = async () => {
         <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto pb-32 md:pb-8">
           <div className="text-center mb-8 md:mb-12 space-y-2">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <Trophy className="w-8 h-8 md:w-10 md:h-10 text-amber-500 fill-amber-400" />
               <h1 className="text-3xl md:text-5xl font-black text-slate-800 tracking-tight">
                 Peringkat XP
               </h1>
-              <Trophy className="w-8 h-8 md:w-10 md:h-10 text-amber-500 fill-amber-400" />
             </div>
             <p className="text-slate-500 font-bold text-sm md:text-lg">
-              Pantau pencapaian terbaik • {users.length} peserta
+              Pantau pencapaian 10 EXP terbaik disini
             </p>
           </div>
           <LeaderboardClient users={users} currentUserId={session.user.id} />

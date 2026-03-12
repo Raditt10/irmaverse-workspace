@@ -391,7 +391,7 @@ const RekapanListPage = () => {
                   )}
                   {filteredRekapan.length === 0 ? (
                     <EmptyState
-                      icon={searchQuery ? "search" : "calendar"}
+                      icon="search"
                       title="Belum ada rekapan"
                       description={
                         searchQuery

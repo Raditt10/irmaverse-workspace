@@ -609,6 +609,12 @@ const Dashboard = () => {
                             <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide border bg-emerald-50 text-emerald-600 border-emerald-200">
                               {material.category}
                             </span>
+                            {finishedMaterials.some((att: any) => att.materialId === material.id) && (
+                              <span className="px-3 py-1 rounded-lg text-[10px] font-black tracking-wide border bg-white text-emerald-600 border-emerald-200 shadow-sm flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3 fill-emerald-500 text-white" />
+                                SELESAI
+                              </span>
+                            )}
                           </div>
                           <h3 className="text-lg md:text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-emerald-700 transition-colors">
                             {material.title}
@@ -880,7 +886,7 @@ const Dashboard = () => {
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
                         <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
                         <p className="text-xs font-bold text-slate-700 flex-1">
-                          {todayMaterials.length} kajian hari ini
+                          {todayMaterials.filter(m => finishedMaterials.some((att: any) => att.materialId === m.id)).length}/{todayMaterials.length} kajian selesai hari ini
                         </p>
                         <Link
                           href="/materials"
@@ -904,12 +910,22 @@ const Dashboard = () => {
                         </Link>
                       </div>
                     )}
-                    {todayMaterials.length === 0 &&
+                    {todayMaterials.length > 0 && 
+                      todayMaterials.every(m => finishedMaterials.some((att: any) => att.materialId === m.id)) &&
                       dynamicStats.quizPending === 0 && (
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                          <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100 shadow-sm animate-pulse">
+                          <Sparkles className="w-4 h-4 text-emerald-500 shrink-0" />
                           <p className="text-xs font-bold text-emerald-700">
                             Semua misi selesai! Mashaallah 🌟
+                          </p>
+                        </div>
+                      )}
+                    {todayMaterials.length === 0 &&
+                      dynamicStats.quizPending === 0 && (
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                          <CheckCircle className="w-4 h-4 text-slate-400 shrink-0" />
+                          <p className="text-xs font-bold text-slate-500">
+                            Belum ada misi untuk hari ini.
                           </p>
                         </div>
                       )}

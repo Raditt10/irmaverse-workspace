@@ -41,6 +41,7 @@ interface MaterialItem {
   order: number;
   isCompleted: boolean;
   attendanceStatus: string | null;
+  inviteStatus: string | null;
   enrollmentCount: number;
 }
 
@@ -63,6 +64,7 @@ interface Program {
   benefits: string[];
   materials: MaterialItem[];
   enrollmentCount: number;
+  totalKajian: number;
   isEnrolled: boolean;
   progress: {
     completed: number;
@@ -358,7 +360,7 @@ const ProgramDetail = () => {
                           Daftar Materi
                         </h2>
                         <p className="text-sm text-slate-500 font-bold italic">
-                          {program.materials.length} materi dalam kursus ini
+                          {program.materials.length} {program.totalKajian > 0 ? `/ ${program.totalKajian}` : ""} materi dalam kursus ini
                         </p>
                       </div>
                     </div>
@@ -392,94 +394,247 @@ const ProgramDetail = () => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {program.materials.map((material, idx) => (
-                        <div
-                          key={material.id}
-                          onClick={() =>
-                            router.push(`/materials/${material.id}`)
-                          }
-                          className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 transition-all group cursor-pointer ${
-                            material.isCompleted
-                              ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-300"
-                              : "bg-slate-50 border-slate-100 hover:border-teal-200 hover:bg-teal-50/30"
-                          }`}
-                        >
-                          {/* Step number / check */}
-                          <div className="flex flex-col items-center gap-2">
-                            <div
-                              className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black shadow-sm transition-colors ${
-                                material.isCompleted
-                                  ? "bg-emerald-500 text-white border-2 border-emerald-600"
-                                  : "bg-white border-2 border-slate-200 text-teal-600 group-hover:border-teal-300"
-                              }`}
-                            >
-                              {material.isCompleted ? (
-                                <CheckCircle2 className="h-6 w-6" />
-                              ) : (
-                                <span>{material.order}</span>
-                              )}
-                            </div>
-                            {idx < program.materials.length - 1 && (
-                              <div
-                                className={`w-0.5 flex-1 rounded-full min-h-[20px] ${
-                                  material.isCompleted
-                                    ? "bg-emerald-300"
-                                    : "bg-slate-200"
-                                }`}
-                              />
-                            )}
-                          </div>
+                      {(() => {
+                        // Jika totalKajian ditentukan (> 0), buat slot sebanyak totalKajian.
+                        // Jika tidak, cukup render materi yang ada seperti biasa.
+                        if (program.totalKajian > 0) {
+                          return Array.from({ length: program.totalKajian }, (_, i) => i + 1).map((num) => {
+                            // Cari apakah ada materi untuk nomor kajian ini
+                            const materialForThisSlot = program.materials.find(m => m.order === num);
 
-                          {/* Content */}
-                          <div className="flex-1 space-y-2 py-1">
-                            <div className="flex items-start justify-between gap-3">
-                              <h4
-                                className={`font-black text-lg md:text-xl leading-tight transition-colors ${
+                            if (materialForThisSlot) {
+                              // Render Kajian Terisi
+                              return (
+                                <div
+                                  key={materialForThisSlot.id}
+                                  onClick={() => {
+                                    if (!isPrivileged && materialForThisSlot.inviteStatus === "rejected") {
+                                      showToast("Kamu tidak tergabung dalam kajian ini, kamu menolak kajian", "error");
+                                    } else {
+                                      router.push(`/materials/${materialForThisSlot.id}`);
+                                    }
+                                  }}
+                                  className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 transition-all group cursor-pointer ${
+                                    materialForThisSlot.isCompleted
+                                      ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-300"
+                                      : "bg-slate-50 border-slate-100 hover:border-teal-200 hover:bg-teal-50/30"
+                                  }`}
+                                >
+                                  {/* Step number / check */}
+                                  <div className="flex flex-col items-center gap-2">
+                                    <div
+                                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black shadow-sm transition-colors ${
+                                        materialForThisSlot.isCompleted
+                                          ? "bg-emerald-500 text-white border-2 border-emerald-600"
+                                          : "bg-white border-2 border-slate-200 text-teal-600 group-hover:border-teal-300"
+                                      }`}
+                                    >
+                                      {materialForThisSlot.isCompleted ? (
+                                        <CheckCircle2 className="h-6 w-6" />
+                                      ) : (
+                                        <span>{num}</span>
+                                      )}
+                                    </div>
+                                    {num < program.totalKajian && (
+                                      <div
+                                        className={`w-0.5 flex-1 rounded-full min-h-[20px] ${
+                                          materialForThisSlot.isCompleted
+                                            ? "bg-emerald-300"
+                                            : "bg-slate-200"
+                                        }`}
+                                      />
+                                    )}
+                                  </div>
+
+                                  {/* Content */}
+                                  <div className="flex-1 space-y-2 py-1">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <h4
+                                        className={`font-black text-lg md:text-xl leading-tight transition-colors ${
+                                          materialForThisSlot.isCompleted
+                                            ? "text-emerald-700"
+                                            : "text-slate-800 group-hover:text-teal-700"
+                                        }`}
+                                      >
+                                        {materialForThisSlot.title}
+                                      </h4>
+                                      <ChevronRight className="h-5 w-5 text-slate-300 shrink-0 mt-1 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
+                                    </div>
+
+                                    {materialForThisSlot.description && (
+                                      <p className="text-slate-500 font-bold text-sm leading-relaxed line-clamp-2">
+                                        {materialForThisSlot.description}
+                                      </p>
+                                    )}
+
+                                    <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-400 pt-1">
+                                      <div className="flex items-center gap-1.5">
+                                        <Calendar className="h-3.5 w-3.5 text-teal-400" />
+                                        <span>
+                                          {new Date(materialForThisSlot.date).toLocaleDateString(
+                                            "id-ID",
+                                            {
+                                              day: "numeric",
+                                              month: "short",
+                                              year: "numeric",
+                                            },
+                                          )}
+                                        </span>
+                                      </div>
+                                      {materialForThisSlot.startedAt && (
+                                        <div className="flex items-center gap-1.5">
+                                          <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                                          <span>{materialForThisSlot.startedAt} WIB</span>
+                                        </div>
+                                      )}
+                                      {materialForThisSlot.isCompleted && (
+                                        <span className="text-emerald-600 font-black">
+                                          ✓ Selesai
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Render Kajian Kosong (Belum dibuat)
+                            return (
+                              <div
+                                key={`empty-${num}`}
+                                className="flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 border-dashed border-slate-200 bg-white/50 opacity-70 transition-all"
+                              >
+                                {/* Step number */}
+                                <div className="flex flex-col items-center gap-2">
+                                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-black shadow-none bg-slate-50 border-2 border-slate-200 text-slate-400">
+                                    <span>{num}</span>
+                                  </div>
+                                  {num < program.totalKajian && (
+                                    <div className="w-0.5 flex-1 rounded-full min-h-[20px] bg-slate-100" />
+                                  )}
+                                </div>
+
+                                {/* Empty Content */}
+                                <div className="flex-1 space-y-2 py-1 flex flex-col justify-center">
+                                  <div className="flex items-center justify-between">
+                                    <h4 className="font-black text-lg md:text-xl leading-tight text-slate-400 italic">
+                                      Kajian Ke-{num} Belum Tersedia
+                                    </h4>
+                                    {isPrivileged && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          router.push(`/materials/create?programId=${program.id}&kajianOrder=${num}`);
+                                        }}
+                                        className="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-200 hover:bg-teal-100 transition-colors"
+                                      >
+                                        Buat Sekarang
+                                      </button>
+                                    )}
+                                  </div>
+                                  <p className="text-slate-400 font-bold text-sm leading-relaxed">
+                                    Materi untuk sesi ini belum dijadwalkan oleh instruktur.
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          });
+                        }
+
+                        // Fallback: Jika totalKajian tidak ada atau 0, gunakan mapping normal lama
+                        return program.materials.map((material, idx) => (
+                          <div
+                            key={material.id}
+                            onClick={() => {
+                              if (!isPrivileged && material.inviteStatus === "rejected") {
+                                showToast("Kamu tidak tergabung dalam kajian ini, kamu menolak kajian", "error");
+                              } else {
+                                router.push(`/materials/${material.id}`);
+                              }
+                            }}
+                            className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 transition-all group cursor-pointer ${
+                              material.isCompleted
+                                ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-300"
+                                : "bg-slate-50 border-slate-100 hover:border-teal-200 hover:bg-teal-50/30"
+                            }`}
+                          >
+                            {/* Step number / check */}
+                            <div className="flex flex-col items-center gap-2">
+                              <div
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black shadow-sm transition-colors ${
                                   material.isCompleted
-                                    ? "text-emerald-700"
-                                    : "text-slate-800 group-hover:text-teal-700"
+                                    ? "bg-emerald-500 text-white border-2 border-emerald-600"
+                                    : "bg-white border-2 border-slate-200 text-teal-600 group-hover:border-teal-300"
                                 }`}
                               >
-                                {material.title}
-                              </h4>
-                              <ChevronRight className="h-5 w-5 text-slate-300 shrink-0 mt-1 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
+                                {material.isCompleted ? (
+                                  <CheckCircle2 className="h-6 w-6" />
+                                ) : (
+                                  <span>{material.order}</span>
+                                )}
+                              </div>
+                              {idx < program.materials.length - 1 && (
+                                <div
+                                  className={`w-0.5 flex-1 rounded-full min-h-[20px] ${
+                                    material.isCompleted
+                                      ? "bg-emerald-300"
+                                      : "bg-slate-200"
+                                  }`}
+                                />
+                              )}
                             </div>
 
-                            {material.description && (
-                              <p className="text-slate-500 font-bold text-sm leading-relaxed line-clamp-2">
-                                {material.description}
-                              </p>
-                            )}
-
-                            <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-400 pt-1">
-                              <div className="flex items-center gap-1.5">
-                                <Calendar className="h-3.5 w-3.5 text-teal-400" />
-                                <span>
-                                  {new Date(material.date).toLocaleDateString(
-                                    "id-ID",
-                                    {
-                                      day: "numeric",
-                                      month: "short",
-                                      year: "numeric",
-                                    },
-                                  )}
-                                </span>
+                            {/* Content */}
+                            <div className="flex-1 space-y-2 py-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <h4
+                                  className={`font-black text-lg md:text-xl leading-tight transition-colors ${
+                                    material.isCompleted
+                                      ? "text-emerald-700"
+                                      : "text-slate-800 group-hover:text-teal-700"
+                                  }`}
+                                >
+                                  {material.title}
+                                </h4>
+                                <ChevronRight className="h-5 w-5 text-slate-300 shrink-0 mt-1 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
                               </div>
-                              {material.startedAt && (
+
+                              {material.description && (
+                                <p className="text-slate-500 font-bold text-sm leading-relaxed line-clamp-2">
+                                  {material.description}
+                                </p>
+                              )}
+
+                              <div className="flex flex-wrap items-center gap-3 text-[11px] font-bold text-slate-400 pt-1">
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="h-3.5 w-3.5 text-emerald-400" />
-                                  <span>{material.startedAt} WIB</span>
+                                  <Calendar className="h-3.5 w-3.5 text-teal-400" />
+                                  <span>
+                                    {new Date(material.date).toLocaleDateString(
+                                      "id-ID",
+                                      {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                      },
+                                    )}
+                                  </span>
                                 </div>
-                              )}
-                              {material.isCompleted && (
-                                <span className="text-emerald-600 font-black">
-                                  ✓ Selesai
-                                </span>
-                              )}
+                                {material.startedAt && (
+                                  <div className="flex items-center gap-1.5">
+                                    <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                                    <span>{material.startedAt} WIB</span>
+                                  </div>
+                                )}
+                                {material.isCompleted && (
+                                  <span className="text-emerald-600 font-black">
+                                    ✓ Selesai
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ));
+                      })()}
                     </div>
                   )}
                 </div>
@@ -576,7 +731,7 @@ const ProgramDetail = () => {
                           Total Materi
                         </p>
                         <p className="text-lg font-black text-slate-800">
-                          {program.materials.length}
+                          {program.materials.length} {program.totalKajian > 0 ? `/ ${program.totalKajian}` : ""}
                         </p>
                       </div>
                     </div>

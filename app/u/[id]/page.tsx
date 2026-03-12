@@ -30,6 +30,7 @@ import {
   BarChart3,
   FileText,
   Lock,
+  HelpCircle,
 } from "lucide-react";
 
 interface UserProfile {
@@ -170,30 +171,22 @@ export default function UserPublicProfile() {
 
   const getIcon = (t: string) => {
     const map: Record<string, React.ReactNode> = {
-      quiz_completed: <BarChart3 className="h-5 w-5 text-indigo-600" />,
-      badge_earned: <Award className="h-5 w-5 text-amber-600" />,
+      quiz_completed: <HelpCircle className="h-5 w-5 text-emerald-600" />,
+      badge_earned: <Award className="h-5 w-5 text-emerald-600" />,
       forum_post: <MessageCircle className="h-5 w-5 text-emerald-600" />,
-      material_read: <BookOpen className="h-5 w-5 text-blue-600" />,
-      level_up: <Trophy className="h-5 w-5 text-rose-600" />,
-      course_enrolled: <GraduationCap className="h-5 w-5 text-purple-600" />,
-      program_enrolled: <FileText className="h-5 w-5 text-teal-600" />,
-      friend_added: <Users className="h-5 w-5 text-pink-600" />,
-      attendance_marked: <CheckCircle2 className="h-5 w-5 text-green-600" />,
-      streak_maintained: <Flame className="h-5 w-5 text-orange-600" />,
+      material_read: <BookOpen className="h-5 w-5 text-emerald-600" />,
+      level_up: <Trophy className="h-5 w-5 text-emerald-600" />,
+      course_enrolled: <GraduationCap className="h-5 w-5 text-emerald-600" />,
+      program_enrolled: <FileText className="h-5 w-5 text-emerald-600" />,
+      friend_added: <Users className="h-5 w-5 text-emerald-600" />,
+      attendance_marked: <CheckCircle2 className="h-5 w-5 text-emerald-600" />,
+      streak_maintained: <Flame className="h-5 w-5 text-emerald-600" />,
     };
-    return map[t] || <Brain className="h-5 w-5 text-blue-600" />;
+    return map[t] || <Brain className="h-5 w-5 text-emerald-600" />;
   };
 
   const getBg = (t: string) => {
-    const map: Record<string, string> = {
-      quiz_completed: "bg-indigo-50",
-      badge_earned: "bg-amber-50",
-      level_up: "bg-rose-50",
-      course_enrolled: "bg-purple-50",
-      program_enrolled: "bg-teal-50",
-      friend_added: "bg-pink-50",
-    };
-    return map[t] || "bg-blue-50";
+    return "bg-emerald-50";
   };
 
   if (loading)
@@ -350,7 +343,7 @@ export default function UserPublicProfile() {
                       {friendshipStatus.isMutual && (
                         <button
                           onClick={handleStartChat}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl border-2 border-blue-100 hover:bg-blue-100 transition-colors text-sm"
+                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-50 text-emerald-600 font-bold rounded-xl border-2 border-emerald-100 hover:bg-emerald-100 transition-colors text-sm"
                         >
                           <MessageCircle className="h-4 w-4" /> Kirim Pesan
                         </button>
@@ -367,16 +360,16 @@ export default function UserPublicProfile() {
                   )}
                   <div className="mt-5 space-y-3">
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
-                        <Mail className="h-4 w-4 text-teal-600" />
+                      <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                        <Mail className="h-4 w-4 text-emerald-600" />
                       </div>
                       <span className="text-slate-600 font-medium truncate text-xs">
                         {profile.email}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="h-4 w-4 text-purple-600" />
+                      <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="h-4 w-4 text-emerald-600" />
                       </div>
                       <span className="text-slate-600 font-medium text-xs">
                         Bergabung{" "}
@@ -394,49 +387,31 @@ export default function UserPublicProfile() {
             {/* RIGHT: Stats & Activity */}
             <div className="lg:col-span-2 space-y-6">
               {/* Stat Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {[
                   {
-                    icon: (
-                      <Zap
-                        className="h-6 w-6 text-amber-500"
-                        fill="currentColor"
-                      />
-                    ),
+                    icon: <Zap className="h-6 w-6 text-emerald-500" />,
                     val: profile.level,
                     lbl: "Level",
-                    bg: "bg-amber-50",
-                    bdr: "border-amber-100",
-                    hv: "hover:border-amber-300 hover:shadow-[0_4px_0_0_#fbbf24]",
-                  },
-                  {
-                    icon: (
-                      <Star
-                        className="h-6 w-6 text-emerald-500"
-                        fill="currentColor"
-                      />
-                    ),
-                    val: profile.points.toLocaleString(),
-                    lbl: "Poin",
                     bg: "bg-emerald-50",
                     bdr: "border-emerald-100",
                     hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#34d399]",
                   },
                   {
-                    icon: <Flame className="h-6 w-6 text-orange-500" />,
+                    icon: <Flame className="h-6 w-6 text-emerald-500" />,
                     val: profile.streak,
                     lbl: "Streak",
-                    bg: "bg-orange-50",
-                    bdr: "border-orange-100",
-                    hv: "hover:border-orange-300 hover:shadow-[0_4px_0_0_#fb923c]",
+                    bg: "bg-emerald-50",
+                    bdr: "border-emerald-100",
+                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#34d399]",
                   },
                   {
-                    icon: <Trophy className="h-6 w-6 text-purple-500" />,
+                    icon: <Award className="h-6 w-6 text-emerald-500" />,
                     val: profile.badges,
                     lbl: "Badge",
-                    bg: "bg-purple-50",
-                    bdr: "border-purple-100",
-                    hv: "hover:border-purple-300 hover:shadow-[0_4px_0_0_#a855f7]",
+                    bg: "bg-emerald-50",
+                    bdr: "border-emerald-100",
+                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#34d399]",
                   },
                 ].map((s, i) => (
                   <div
@@ -464,7 +439,7 @@ export default function UserPublicProfile() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Zap
-                        className="h-5 w-5 text-amber-500"
+                        className="h-5 w-5 text-emerald-500"
                         fill="currentColor"
                       />
                       <span className="font-black text-slate-800">
@@ -474,7 +449,7 @@ export default function UserPublicProfile() {
                         • {xpProgress.levelTitle}
                       </span>
                     </div>
-                    <span className="text-sm font-black text-amber-600">
+                    <span className="text-sm font-black text-emerald-600">
                       {profile.points.toLocaleString()} XP
                     </span>
                   </div>
@@ -499,8 +474,8 @@ export default function UserPublicProfile() {
               {earnedBadges.length > 0 && (
                 <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center border border-purple-100">
-                      <Shield className="h-6 w-6 text-purple-600" />
+                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                      <Award className="h-6 w-6 text-emerald-600" />
                     </div>
                     <div>
                       <h2 className="text-xl font-black text-slate-800">
@@ -543,8 +518,8 @@ export default function UserPublicProfile() {
               {canViewPrivate && stats && (
                 <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
-                      <TrendingUp className="h-6 w-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                      <TrendingUp className="h-6 w-6 text-emerald-600" />
                     </div>
                     <div>
                       <h2 className="text-xl font-black text-slate-800">
@@ -556,10 +531,10 @@ export default function UserPublicProfile() {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
+                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
                       <div className="flex items-center gap-2 mb-2">
-                        <Brain className="h-5 w-5 text-blue-600" />
-                        <span className="text-xs font-bold text-blue-600 uppercase">
+                        <HelpCircle className="h-5 w-5 text-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-600 uppercase">
                           Quiz
                         </span>
                       </div>
@@ -570,7 +545,7 @@ export default function UserPublicProfile() {
                         Quiz dikerjakan
                       </div>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100">
+                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
                       <div className="flex items-center gap-2 mb-2">
                         <Target className="h-5 w-5 text-emerald-600" />
                         <span className="text-xs font-bold text-emerald-600 uppercase">
@@ -584,10 +559,10 @@ export default function UserPublicProfile() {
                         Rata-rata skor
                       </div>
                     </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-100">
+                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
                       <div className="flex items-center gap-2 mb-2">
-                        <BookOpen className="h-5 w-5 text-purple-600" />
-                        <span className="text-xs font-bold text-purple-600 uppercase">
+                        <GraduationCap className="h-5 w-5 text-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-600 uppercase">
                           Program
                         </span>
                       </div>
@@ -606,8 +581,8 @@ export default function UserPublicProfile() {
               {canViewPrivate && (
                 <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center border border-green-100">
-                      <Activity className="h-6 w-6 text-green-600" />
+                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                      <Activity className="h-6 w-6 text-emerald-600" />
                     </div>
                     <div>
                       <h2 className="text-xl font-black text-slate-800">

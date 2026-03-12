@@ -8,6 +8,64 @@ import {
 } from "@/lib/gamification";
 
 /**
+ * Hitung streak berdasarkan hari berturut-turut user mengikuti kajian (absen).
+ * Streak dihitung mundur dari hari ini — jika hari ini ada absen, cek kemarin, dst.
+ * Jika hari ini belum ada absen, cek dari kemarin.
+ */
+async function calculateStreak(userId: string): Promise<number> {
+  // Ambil semua tanggal unik attendance user, urut terbaru dulu
+  const attendances = await prisma.attendance.findMany({
+    where: { userId },
+    select: { createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (attendances.length === 0) return 0;
+
+  // Kumpulkan tanggal unik (YYYY-MM-DD) dalam Set
+  const uniqueDates = new Set<string>();
+  for (const att of attendances) {
+    const dateStr = new Date(att.createdAt).toLocaleDateString("en-CA"); // YYYY-MM-DD
+    uniqueDates.add(dateStr);
+  }
+
+  // Sort tanggal descending
+  const sortedDates = Array.from(uniqueDates).sort((a, b) => b.localeCompare(a));
+
+  const today = new Date();
+  const todayStr = today.toLocaleDateString("en-CA");
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toLocaleDateString("en-CA");
+
+  // Mulai hitung dari hari ini atau kemarin
+  let streak = 0;
+  let checkDate: Date;
+
+  if (sortedDates[0] === todayStr) {
+    checkDate = new Date(today);
+  } else if (sortedDates[0] === yesterdayStr) {
+    checkDate = new Date(yesterday);
+  } else {
+    // Terakhir absen lebih dari kemarin, streak = 0
+    return 0;
+  }
+
+  // Hitung streak berturut-turut
+  while (true) {
+    const checkStr = checkDate.toLocaleDateString("en-CA");
+    if (uniqueDates.has(checkStr)) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+/**
  * GET /api/users/gamification
  * Ambil data gamifikasi lengkap untuk user yang sedang login
  * (stats, XP progress, level info, badge summary)
@@ -25,8 +83,6 @@ export async function GET() {
         points: true,
         badges: true,
         quizzes: true,
-        streak: true,
-        averageScore: true,
         level: true,
       },
     });
@@ -56,6 +112,9 @@ export async function GET() {
       where: { points: { gt: user.points }, role: "user" },
     });
 
+    // Hitung streak dari data attendance (hari berturut-turut mengikuti kajian)
+    const streak = await calculateStreak(session.user.id);
+
     // Ambil program enrollments yang sudah selesai
     const completedPrograms = await prisma.program_enrollment.count({
       where: { userId: session.user.id },
@@ -71,8 +130,7 @@ export async function GET() {
         points: user.points,
         badges: user.badges,
         quizzes: quizAttempts,
-        streak: user.streak,
-        averageScore: user.averageScore,
+        streak,
         level: user.level,
         rank: rank + 1, // 1-indexed
       },

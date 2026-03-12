@@ -38,7 +38,6 @@ interface GamificationData {
     badges: number;
     quizzes: number;
     streak: number;
-    averageScore: number;
     level: number;
     rank: number;
   };
@@ -147,56 +146,48 @@ const Profile = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "quiz_completed":
-        return <BarChart3 className="h-5 w-5 text-indigo-600" />;
+        return <HelpCircle className="h-5 w-5 text-emerald-600" />;
       case "badge_earned":
-        return <Award className="h-5 w-5 text-amber-600" />;
+        return <Award className="h-5 w-5 text-emerald-600" />;
       case "forum_post":
         return <MessageCircle className="h-5 w-5 text-emerald-600" />;
       case "material_read":
-        return <BookOpen className="h-5 w-5 text-blue-600" />;
+        return <BookOpen className="h-5 w-5 text-emerald-600" />;
       case "level_up":
-        return <Trophy className="h-5 w-5 text-rose-600" />;
+        return <Trophy className="h-5 w-5 text-emerald-600" />;
       case "course_enrolled":
-        return <GraduationCap className="h-5 w-5 text-purple-600" />;
+        return <GraduationCap className="h-5 w-5 text-emerald-600" />;
       case "program_enrolled":
-        return <FileText className="h-5 w-5 text-teal-600" />;
+        return <FileText className="h-5 w-5 text-emerald-600" />;
       case "friend_added":
-        return <Users className="h-5 w-5 text-pink-600" />;
+        return <Users className="h-5 w-5 text-emerald-600" />;
       case "attendance_marked":
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+        return <CheckCircle2 className="h-5 w-5 text-emerald-600" />;
       case "streak_maintained":
-        return <Flame className="h-5 w-5 text-orange-600" />;
+        return <Flame className="h-5 w-5 text-emerald-600" />;
       case "profile_completed":
-        return <Star className="h-5 w-5 text-cyan-600" />;
+        return <Star className="h-5 w-5 text-emerald-600" />;
       default:
-        return <Zap className="h-5 w-5 text-slate-600" />;
+        return <Zap className="h-5 w-5 text-emerald-600" />;
     }
   };
 
   const getActivityBg = (type: string) => {
     switch (type) {
       case "quiz_completed":
-        return "bg-indigo-100 border-indigo-200";
-      case "badge_earned":
-        return "bg-amber-100 border-amber-200";
       case "forum_post":
-        return "bg-emerald-100 border-emerald-200";
       case "material_read":
-        return "bg-blue-100 border-blue-200";
-      case "level_up":
-        return "bg-rose-100 border-rose-200";
       case "course_enrolled":
-        return "bg-purple-100 border-purple-200";
       case "program_enrolled":
-        return "bg-teal-100 border-teal-200";
       case "friend_added":
-        return "bg-pink-100 border-pink-200";
       case "attendance_marked":
-        return "bg-green-100 border-green-200";
+      case "profile_completed":
+      case "badge_earned":
+      case "level_up":
       case "streak_maintained":
-        return "bg-orange-100 border-orange-200";
+        return "bg-emerald-100 border-emerald-200";
       default:
-        return "bg-slate-100 border-slate-200";
+        return "bg-emerald-100 border-emerald-200";
     }
   };
 
@@ -258,7 +249,6 @@ const Profile = () => {
                         badges: 0,
                         quizzes: 0,
                         streak: 0,
-                        averageScore: 0,
                         level: 1,
                         rank: 0,
                       }
@@ -378,10 +368,10 @@ const Profile = () => {
                 <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[4px_4px_0_0_#cbd5e1] p-6 lg:p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div
-                      className={`p-2 rounded-xl border ${isInstruktur ? "bg-emerald-50 border-emerald-100" : "bg-indigo-50 border-indigo-100"}`}
+                      className={`p-2 rounded-xl border bg-emerald-50 border-emerald-100`}
                     >
                       <Clock3
-                        className={`h-6 w-6 ${isInstruktur ? "text-emerald-500" : "text-indigo-500"}`}
+                        className={`h-6 w-6 text-emerald-500`}
                       />
                     </div>
                     <h2 className="text-xl lg:text-2xl font-black text-slate-800">
@@ -405,7 +395,7 @@ const Profile = () => {
                       {activities.map((activity) => (
                         <div
                           key={activity.id}
-                          className="flex items-center gap-4 p-4 rounded-3xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-indigo-200 hover:shadow-sm transition-all duration-300 group"
+                          className="flex items-center gap-4 p-4 rounded-3xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-200 hover:shadow-sm transition-all duration-300 group"
                         >
                           <div
                             className={`h-12 w-12 shrink-0 rounded-2xl flex items-center justify-center border-2 ${getActivityBg(activity.type)}`}
@@ -413,7 +403,7 @@ const Profile = () => {
                             {getActivityIcon(activity.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                            <p className="font-bold text-slate-800 truncate group-hover:text-emerald-600 transition-colors">
                               {activity.title}
                             </p>
                             <p className="text-xs font-bold text-slate-400 mt-0.5">
@@ -502,69 +492,56 @@ const Profile = () => {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-amber-100 bg-gradient-to-r from-amber-50 to-orange-50">
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
                           <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
                             <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-sm font-bold text-amber-800">
+                          <span className="text-sm font-bold text-emerald-800">
                             Total Poin
                           </span>
                         </div>
-                        <span className="text-xl font-black text-amber-600">
+                        <span className="text-xl font-black text-emerald-600">
                           {stats?.points?.toLocaleString() || 0}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-sky-100 bg-gradient-to-r from-sky-50 to-blue-50">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
-                            <Award className="h-5 w-5 text-emerald-500" />
-                          </div>
-                          <span className="text-sm font-bold text-sky-800">
-                            Badge
-                          </span>
-                        </div>
-                        <span className="text-xl font-black text-sky-600">
-                          {stats?.badges || 0}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-purple-100 bg-gradient-to-r from-purple-50 to-fuchsia-50">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
-                            <BookOpen className="h-5 w-5 text-emerald-500" />
-                          </div>
-                          <span className="text-sm font-bold text-purple-800">
-                            Quiz
-                          </span>
-                        </div>
-                        <span className="text-xl font-black text-purple-600">
-                          {stats?.quizzes || 0}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-rose-100 bg-gradient-to-r from-rose-50 to-red-50">
-                        <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
-                            <AlertCircle className="h-5 w-5 text-emerald-500" />
-                          </div>
-                          <span className="text-sm font-bold text-rose-800">
-                            Streak
-                          </span>
-                        </div>
-                        <span className="text-xl font-black text-rose-600">
-                          {stats?.streak || 0} Hari
                         </span>
                       </div>
                       <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50">
                         <div className="flex items-center gap-3">
                           <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
-                            <Target className="h-5 w-5 text-emerald-500" />
+                            <Award className="h-5 w-5 text-emerald-500" />
                           </div>
                           <span className="text-sm font-bold text-emerald-800">
-                            Rata-rata
+                            Badge
                           </span>
                         </div>
                         <span className="text-xl font-black text-emerald-600">
-                          {stats?.averageScore || 0}%
+                          {stats?.badges || 0}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <HelpCircle className="h-5 w-5 text-emerald-500" />
+                          </div>
+                          <span className="text-sm font-bold text-emerald-800">
+                            Quiz
+                          </span>
+                        </div>
+                        <span className="text-xl font-black text-emerald-600">
+                          {stats?.quizzes || 0}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 rounded-3xl border-2 border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-xs">
+                            <Flame className="h-5 w-5 text-emerald-500" />
+                          </div>
+                          <span className="text-sm font-bold text-emerald-800">
+                            Streak
+                          </span>
+                        </div>
+                        <span className="text-xl font-black text-emerald-600">
+                          {stats?.streak || 0} Hari
                         </span>
                       </div>
                     </div>

@@ -8,6 +8,8 @@ import ChatbotButton from "@/components/ui/Chatbot";
 import Toast from "@/components/ui/Toast";
 import CartoonConfirmDialog from "@/components/ui/ConfirmDialog"; // Import Confirm Dialog
 import Loading from "@/components/ui/Loading";
+import ButtonEdit from "@/components/ui/ButtonEdit";
+import DeleteButton from "@/components/ui/DeleteButton";
 import {
   Calendar,
   MapPin,
@@ -19,6 +21,7 @@ import {
   CheckCircle2,
   Info,
   BookOpen,
+  Book,
   Target,
   MessageCircle,
   Tag,
@@ -32,7 +35,6 @@ import {
   Plus,
   AlertCircle,
   Loader2,
-  Sparkles,
 } from "lucide-react";
 
 interface InviteDetail {
@@ -270,14 +272,42 @@ const MaterialDetail = () => {
         {/* Main Content Area */}
         <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 w-full max-w-[100vw] overflow-x-hidden">
           <div className="max-w-6xl mx-auto space-y-6 lg:space-y-8">
-            {/* Back Button */}
-            <button
-              onClick={() => router.push("/materials")}
-              className="inline-flex items-center gap-2 text-slate-500 hover:text-teal-600 font-bold transition-all group px-4 py-2 rounded-xl border-2 border-transparent hover:border-slate-200 hover:bg-white hover:shadow-sm"
-            >
-              <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform stroke-3" />
-              Kembali
-            </button>
+            {/* --- HEADER NAVIGATION & ACTIONS --- */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+                <button
+                  onClick={() => router.push("/materials")}
+                  className="self-start inline-flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#cbd5e1] active:translate-y-0.5 active:shadow-none transition-all text-sm lg:text-base"
+                >
+                  <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" strokeWidth={3} />
+                  Kembali
+                </button>
+
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 self-end sm:self-auto">
+                    {isPrivileged && (
+                        <>
+                            <button
+                              onClick={() => router.push(`/materials/${material.id}/attendance`)}
+                              className="px-4 h-12 rounded-xl bg-cyan-400 text-white font-black border-2 border-cyan-600 border-b-4 hover:bg-cyan-500 active:border-b-2 active:translate-y-0.5 transition-all shadow-sm flex items-center justify-center gap-2 group"
+                              title="Absensi"
+                            >
+                              <Book className="h-5 w-5 stroke-[2.5] group-hover:-rotate-12 transition-transform" />
+                              <span className="hidden sm:inline">Absensi</span>
+                            </button>
+                            <ButtonEdit 
+                                id={material.id} 
+                                basePath="/materials" 
+                                className="h-12 w-12" 
+                            />
+                            
+                            <DeleteButton 
+                                onClick={() => setShowConfirmDelete(true)}
+                                variant="icon-only"
+                                className="rounded-xl h-12 w-12"
+                            />
+                        </>
+                    )}
+                </div>
+            </div>
 
             {/* --- HERO SECTION --- */}
             <div className="relative bg-[#334155] rounded-[40px] md:rounded-[60px] border-4 border-slate-200 shadow-[0_12px_0_0_#cbd5e1] overflow-hidden min-h-[300px] md:min-h-[400px] flex flex-col justify-end p-8 md:p-12 group">
@@ -320,9 +350,9 @@ const MaterialDetail = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Tanggal */}
                   <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                    <div className="w-12 h-12 shrink-0 rounded-full bg-rose-50 flex items-center justify-center border-2 border-rose-100">
+                    <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-50 flex items-center justify-center border-2 border-emerald-100">
                       <Calendar
-                        className="h-6 w-6 text-rose-500"
+                        className="h-6 w-6 text-emerald-500"
                         strokeWidth={2.5}
                       />
                     </div>
@@ -342,9 +372,9 @@ const MaterialDetail = () => {
 
                   {/* Waktu */}
                   <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                    <div className="w-12 h-12 shrink-0 rounded-full bg-amber-50 flex items-center justify-center border-2 border-amber-100">
+                    <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-50 flex items-center justify-center border-2 border-emerald-100">
                       <Clock
-                        className="h-6 w-6 text-amber-500"
+                        className="h-6 w-6 text-emerald-500"
                         strokeWidth={2.5}
                       />
                     </div>
@@ -360,9 +390,9 @@ const MaterialDetail = () => {
 
                   {/* Lokasi */}
                   <div className="bg-white p-4 rounded-3xl border-2 border-slate-200 shadow-sm flex items-center gap-4 hover:-translate-y-1 transition-transform">
-                    <div className="w-12 h-12 shrink-0 rounded-full bg-teal-50 flex items-center justify-center border-2 border-teal-100">
+                    <div className="w-12 h-12 shrink-0 rounded-full bg-emerald-50 flex items-center justify-center border-2 border-emerald-100">
                       <MapPin
-                        className="h-6 w-6 text-teal-500"
+                        className="h-6 w-6 text-emerald-500"
                         strokeWidth={2.5}
                       />
                     </div>
@@ -380,9 +410,9 @@ const MaterialDetail = () => {
                 {/* Deskripsi Lengkap */}
                 <div className="bg-white p-8 md:p-10 rounded-[45px] border-4 border-slate-200 shadow-[0_10px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-5 mb-8">
-                    <div className="w-14 h-14 bg-indigo-100 rounded-2xl border-4 border-indigo-200 flex items-center justify-center">
-                      <Sparkles
-                        className="h-7 w-7 text-indigo-500"
+                    <div className="w-14 h-14 bg-emerald-100 rounded-2xl border-4 border-emerald-200 flex items-center justify-center">
+                      <Info
+                        className="h-7 w-7 text-emerald-500"
                         strokeWidth={3}
                       />
                     </div>
@@ -692,40 +722,7 @@ const MaterialDetail = () => {
                   )}
 
                 {/* CTA / Action Box */}
-                {isPrivileged ? (
-                  <div className="bg-slate-50 rounded-4xl p-6 text-center border-2 border-slate-200 border-dashed">
-                    <p className="text-slate-500 text-sm font-bold mb-4">
-                      Kelola Kajian Ini
-                    </p>
-                    <div className="space-y-3">
-                      <button
-                        onClick={() =>
-                          router.push(`/materials/${material.id}/attendance`)
-                        }
-                        className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all shadow-sm group"
-                      >
-                        <History className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                        Lihat Absensi
-                      </button>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          onClick={() =>
-                            router.push(`/materials/${material.id}/edit`)
-                          }
-                          className="w-full py-3 rounded-xl bg-white border-2 border-slate-200 text-slate-700 font-bold hover:border-amber-400 hover:text-amber-600 transition-all shadow-sm"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => setShowConfirmDelete(true)}
-                          className="w-full py-3 rounded-xl bg-white border-2 border-slate-200 text-slate-700 font-bold hover:border-red-400 hover:text-red-600 transition-all shadow-sm"
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
+                {!isPrivileged && (
                   <div className="bg-linear-to-br from-teal-400 to-cyan-400 rounded-4xl p-6 lg:p-8 text-white border-2 border-teal-600 shadow-[0_6px_0_0_#0f766e] text-center relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
 

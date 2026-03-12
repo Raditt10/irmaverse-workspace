@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
           select: { id: true, name: true, avatar: true },
         },
         materials: {
-          select: { id: true },
+          select: { id: true, kajianOrder: true },
         },
         enrollments: {
           select: { id: true, userId: true },
@@ -59,9 +59,20 @@ export async function GET(req: NextRequest) {
     // Semua user bisa melihat semua program kurikulum
     const result = programs.map((p) => {
       const isEnrolled = p.enrollments.some((e) => e.userId === user.id);
-      const isCompleted =
-        p.materials.length > 0 &&
-        p.materials.every((m) => attendedMaterialIds.has(m.id));
+      
+      const filteredMaterials = p.materials.filter(m => 
+        user.role === "instruktur" ? m.instructorId === user.id : true
+      );
+
+      let isCompleted = false;
+      if (p.totalKajian > 0) {
+        // Complete jika sudah ada semua materi sebanyak totalKajian DAN user menghadiri semuanya
+        const hasAllMaterials = filteredMaterials.length >= p.totalKajian;
+        const attendedAll = filteredMaterials.length > 0 && filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
+        isCompleted = hasAllMaterials && attendedAll;
+      } else {
+        isCompleted = filteredMaterials.length > 0 && filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
+      }
 
       return {
         id: p.id,
@@ -73,7 +84,11 @@ export async function GET(req: NextRequest) {
         thumbnail: p.thumbnailUrl,
         instructor: p.instructor?.name || "Instruktur IRMA",
         instructorAvatar: p.instructor?.avatar,
-        materialCount: p.materials.length,
+        materialCount: filteredMaterials.length,
+        totalKajian: p.totalKajian,
+        usedKajianOrders: filteredMaterials
+          .map((m: any) => m.kajianOrder)
+          .filter((order: any) => order !== null && order !== undefined),
         enrollmentCount: p.enrollments.length,
         isEnrolled,
         isCompleted,
@@ -120,6 +135,7 @@ export async function POST(req: Request) {
       syllabus,
       requirements,
       benefits,
+      totalKajian,
     } = body;
 
     if (!title || !title.trim()) {
@@ -164,6 +180,7 @@ export async function POST(req: Request) {
         syllabus: Array.isArray(syllabus) ? syllabus : [],
         requirements: Array.isArray(requirements) ? requirements : [],
         benefits: Array.isArray(benefits) ? benefits : [],
+        totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
       },
     });
 
