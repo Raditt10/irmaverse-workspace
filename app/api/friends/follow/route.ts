@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     // Guard: Hanya role "user"
     if ((session.user as any).role !== "user") {
       return NextResponse.json(
-        { error: "Hanya pengguna biasa yang dapat follow" },
+        { error: "Hanya pengguna biasa yang dapat mengikuti pengguna lain" },
         { status: 403 },
       );
     }

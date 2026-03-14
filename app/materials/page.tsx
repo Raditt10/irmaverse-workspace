@@ -23,6 +23,7 @@ interface Material {
   title: string;
   description: string;
   instructor: string;
+  instructorId: string;
   instructorAvatar?: string | null;
   category?: string;
   grade?: string;
@@ -43,7 +44,7 @@ const Materials = () => {
   const [selectedProgram, setSelectedProgram] = useState("Semua");
   const [selectedGrade, setSelectedGrade] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showJoinedOnly, setShowJoinedOnly] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<"all" | "today" | "mine">("all");
   
   const [toast, setToast] = useState<{
     show: boolean;
@@ -89,7 +90,7 @@ const Materials = () => {
 
   useEffect(() => {
     filterMaterials();
-  }, [materials, selectedProgram, selectedGrade, searchQuery, showJoinedOnly]);
+  }, [materials, selectedProgram, selectedGrade, searchQuery, activeFilter]);
 
   const filterMaterials = async () => {
     const today = new Date();
@@ -103,16 +104,17 @@ const Materials = () => {
         material.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         material.instructor.toLowerCase().includes(searchQuery.toLowerCase());
       
-      // Dynamic logic for second filter button
+      // Dynamic logic for filter buttons
       let matchesFilter = true;
-      if (showJoinedOnly) {
+      if (activeFilter === "today") {
+        const materialDate = new Date(material.date);
+        materialDate.setHours(0, 0, 0, 0);
+        matchesFilter = materialDate.getTime() === today.getTime();
+      } else if (activeFilter === "mine") {
         if (isPrivileged) {
-          // Instructors/Admins: filter by today's date
-          const materialDate = new Date(material.date);
-          materialDate.setHours(0, 0, 0, 0);
-          matchesFilter = materialDate.getTime() === today.getTime();
+          matchesFilter = material.instructorId === session?.user?.id;
         } else {
-          // Regular users: show materials where they have ALREADY filled attendance
+          // Regular users: "Kajian Diikuti" (joined and attended)
           matchesFilter = material.isJoined && !!material.attendedAt;
         }
       }
@@ -215,6 +217,8 @@ const Materials = () => {
 
   const todayMaterials = getTodayMaterials();
   const firstTodayMaterial = todayMaterials[0] || null;
+  const isOwnMaterial = firstTodayMaterial?.instructorId === session?.user?.id;
+  const reminderTitle = isOwnMaterial ? "Jadwal Kajianmu Hari Ini" : `Jadwal Kajian ${firstTodayMaterial?.instructor} Hari Ini`;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
@@ -260,7 +264,7 @@ const Materials = () => {
                     <div className="p-1.5 lg:p-2 bg-white rounded-lg lg:rounded-xl border border-teal-100 shadow-sm">
                       <BookOpen className="h-4 w-4 lg:h-5 lg:w-5 text-teal-500" strokeWidth={2.5} />
                     </div>
-                    <h2 className="text-sm lg:text-lg font-black text-slate-800 tracking-tight">Jadwal Kajianmu Hari Ini</h2>
+                    <h2 className="text-sm lg:text-lg font-black text-slate-800 tracking-tight">{reminderTitle}</h2>
                     {todayMaterials.length > 1 && (
                       <span className="px-2.5 py-1 bg-white border border-teal-200 text-teal-600 text-[10px] lg:text-xs font-black rounded-lg shadow-sm">
                         Dan {todayMaterials.length - 1} lainnya
@@ -270,9 +274,31 @@ const Materials = () => {
 
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 lg:gap-8">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl md:text-3xl font-black text-slate-800 mb-2 lg:mb-3 leading-tight truncate">
+                      <h3 className="text-xl md:text-3xl font-black text-slate-800 mb-3 lg:mb-4 leading-tight truncate">
                         {firstTodayMaterial?.title}
                       </h3>
+                      
+                      <div className="flex flex-wrap items-center gap-4 mb-5">
+                        <div className="flex items-center gap-2.5 bg-white/60 px-3 py-1.5 rounded-2xl border border-teal-100 shadow-xs">
+                          {firstTodayMaterial?.instructorAvatar ? (
+                            <img
+                              src={firstTodayMaterial.instructorAvatar}
+                              alt={firstTodayMaterial.instructor}
+                              className="w-6 h-6 lg:w-8 lg:h-8 rounded-full object-cover border-2 border-white shadow-sm"
+                            />
+                          ) : (
+                            <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-teal-100 flex items-center justify-center border border-teal-200 shadow-xs">
+                              <UserIcon className="w-3 h-3 lg:w-4 lg:h-4 text-teal-600" />
+                            </div>
+                          )}
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-teal-600/70 uppercase tracking-tighter leading-none mb-0.5">Oleh Pengajar</span>
+                            <span className="text-xs lg:text-sm font-black text-slate-700 leading-none">
+                              {firstTodayMaterial?.instructor}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                       
                       <div className="flex flex-wrap items-center gap-3">
                         <div className="flex items-center gap-2 text-xs md:text-sm font-bold text-slate-600 bg-white/80 px-3 py-2 rounded-xl border border-teal-100 shadow-sm">
@@ -301,9 +327,9 @@ const Materials = () => {
                 {/* Toggle Filter (Mobile & Desktop) */}
                 <div className="flex p-1.5 bg-slate-100 rounded-2xl w-fit border border-slate-200">
                   <button
-                    onClick={() => setShowJoinedOnly(false)}
+                    onClick={() => setActiveFilter("all")}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
-                      !showJoinedOnly
+                      activeFilter === "all"
                         ? "bg-white text-emerald-600 shadow-sm border border-slate-200"
                         : "text-slate-500 hover:text-slate-700"
                     }`}
@@ -312,16 +338,41 @@ const Materials = () => {
                     Semua Kajian
                   </button>
                   <button
-                    onClick={() => setShowJoinedOnly(true)}
+                    onClick={() => setActiveFilter("today")}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
-                      showJoinedOnly
+                      activeFilter === "today"
                         ? "bg-white text-emerald-600 shadow-sm border border-slate-200"
                         : "text-slate-500 hover:text-slate-700"
                     }`}
                   >
-                    {isPrivileged ? <Calendar className="h-4 w-4" /> : <CheckCheck className="h-4 w-4" />}
-                    {isPrivileged ? "Kajian Hari Ini" : "Kajian Diikuti"}
+                    <Calendar className="h-4 w-4" />
+                    Kajian Hari Ini
                   </button>
+                  {isPrivileged ? (
+                    <button
+                      onClick={() => setActiveFilter("mine")}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
+                        activeFilter === "mine"
+                          ? "bg-white text-emerald-600 shadow-sm border border-slate-200"
+                          : "text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      <UserIcon className="h-4 w-4" />
+                      Kajian Saya
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setActiveFilter("mine")}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
+                        activeFilter === "mine"
+                          ? "bg-white text-emerald-600 shadow-sm border border-slate-200"
+                          : "text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      <CheckCheck className="h-4 w-4" />
+                      Kajian Diikuti
+                    </button>
+                  )}
                 </div>
 
                 <SearchInput
@@ -409,7 +460,7 @@ const Materials = () => {
                             <span className={`px-2 py-1 rounded-lg text-white text-[10px] md:text-xs font-bold border-2 shadow-[0_2px_0_0_rgba(0,0,0,0.15)] ${
                               material.isCompleted
                                 ? "bg-emerald-500 border-emerald-700 shadow-[#047857]"
-                                : "bg-amber-500 border-amber-700 shadow-[#b45309]"
+                                : "bg-emerald-500 border-emerald-700 shadow-[#047857]"
                             }`}>
                               {material.isCompleted ? "Tuntas" : "Belum Tuntas"}
                             </span>
@@ -430,22 +481,25 @@ const Materials = () => {
                             {material.title}
                           </h3>
 
-                          <div className="flex items-center gap-2.5 mb-4">
-                            {material.instructorAvatar ? (
-                              <img
-                                src={material.instructorAvatar}
-                                alt={material.instructor || "Instructor"}
-                                className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-md"
-                              />
-                            ) : (
-                              <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 shadow-xs">
-                                <UserIcon className="w-3.5 h-3.5 text-indigo-500" fill="currentColor" />
+                            <div className="flex items-center gap-2.5 mb-4 group/inst">
+                              {material.instructorAvatar ? (
+                                <img
+                                  src={material.instructorAvatar}
+                                  alt={material.instructor || "Instructor"}
+                                  className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-md group-hover/inst:scale-110 transition-transform"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 shadow-xs group-hover/inst:scale-110 transition-transform">
+                                  <UserIcon className="w-4 h-4 text-indigo-500" fill="currentColor" />
+                                </div>
+                              )}
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Pengajar</span>
+                                <p className="text-slate-800 font-extrabold text-sm leading-none">
+                                  {material.instructor || "TBA"}
+                                </p>
                               </div>
-                            )}
-                            <p className="text-slate-600 font-bold text-sm">
-                              {material.instructor || "TBA"}
-                            </p>
-                          </div>
+                            </div>
 
                           <div className="flex items-center gap-3 md:gap-4 mb-6 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">

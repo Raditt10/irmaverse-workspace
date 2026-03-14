@@ -32,6 +32,7 @@ import {
 import Sidebar from "@/components/ui/Sidebar";
 import DashboardHeader from "@/components/ui/Header";
 import ChatbotButton from "@/components/ui/Chatbot";
+import AcademyLoading from "@/components/ui/Loading";
 
 export default function InstructorAcademy() {
   const [stats, setStats] = React.useState<any>(null);
@@ -43,19 +44,29 @@ export default function InstructorAcademy() {
 
   React.useEffect(() => {
     fetch("/api/academy/overview")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch");
+        return res.json();
+      })
       .then((data) => {
-        setStats(data.stats);
-        setUpcomingClasses(data.upcomingClasses);
-        setRecentActivities(data.recentActivities);
-        setCoursesOverview(data.coursesOverview);
-        setAchievement(data.achievement);
+        if (data) {
+          setStats(data.stats || null);
+          setUpcomingClasses(data.upcomingClasses || []);
+          setRecentActivities(data.recentActivities || []);
+          setCoursesOverview(data.coursesOverview || []);
+          setAchievement(data.achievement || null);
+        }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error("Academy Overview Error:", err);
+        setLoading(false);
+      });
   }, []);
 
 
+
+  if (loading) return <AcademyLoading />;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
@@ -200,7 +211,7 @@ export default function InstructorAcademy() {
                               <div className={`px-3 py-1 rounded-full text-xs font-black border ${
                                 kls.isCompleted
                                   ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : "bg-amber-100 text-amber-700 border-amber-200"
+                                  : "bg-teal-50 text-teal-700 border-teal-200"
                               }`}>
                                 {kls.isCompleted ? "Tuntas" : "Belum Tuntas"}
                               </div>
@@ -277,7 +288,7 @@ export default function InstructorAcademy() {
                             <span className={`font-black uppercase px-2 py-0.5 rounded-md ${
                               course.progress === 100 
                                 ? "bg-emerald-100 text-emerald-600" 
-                                : "bg-amber-100 text-amber-600"
+                                : "bg-teal-50 text-teal-600"
                             }`}>
                               {course.progress === 100 ? "Tuntas" : "Belum Tuntas"}
                             </span>

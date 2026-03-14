@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { recordActivity } from "@/lib/activity";
 
 // GET all schedules
 export async function GET(req: NextRequest) {
@@ -156,6 +157,18 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Log Activity
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_schedule_managed" as any,
+        title: "Membuat Jadwal Baru",
+        description: `Admin membuat jadwal baru: ${schedule.title}`,
+        metadata: { scheduleId: schedule.id }
+      });
+    }
 
     return NextResponse.json(schedule, { status: 201 });
   } catch (error) {

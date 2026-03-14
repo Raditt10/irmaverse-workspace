@@ -105,7 +105,7 @@ const ProgramDetail = () => {
     try {
       setLoading(true);
       const res = await fetch(`/api/programs/${programId}`);
-      if (!res.ok) throw new Error("Gagal mengambil data kursus");
+      if (!res.ok) throw new Error("Gagal mengambil data Program");
       const data = await res.json();
       setProgram(data);
     } catch (error) {
@@ -123,7 +123,7 @@ const ProgramDetail = () => {
         method: "POST",
       });
       if (!res.ok) throw new Error("Gagal mendaftar");
-      showToast("Berhasil mendaftar di kursus! 🎉", "success");
+      showToast("Berhasil mendaftar di Program Kurikulum!", "success");
       fetchProgramDetail();
     } catch (error: any) {
       showToast(error.message || "Gagal mendaftar", "error");
@@ -140,10 +140,10 @@ const ProgramDetail = () => {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error || "Gagal menghapus kursus");
+        throw new Error(error.error || "Gagal menghapus Program");
       }
 
-      showToast("Kursus berhasil dihapus", "success");
+      showToast("Program berhasil dihapus", "success");
       setTimeout(() => router.push("/programs"), 1500);
     } catch (error: any) {
       console.error("Delete Error:", error);
@@ -156,8 +156,8 @@ const ProgramDetail = () => {
   const handleShare = async () => {
     try {
       await navigator.share({
-        title: program?.title || "Program Kursus IRMA",
-        text: `Ikuti program kursus "${program?.title}" di IRMA!`,
+        title: program?.title || "Program Kurikulum IRMA",
+        text: `Ikuti program kurikulum "${program?.title}" di IRMA!`,
         url: window.location.href,
       });
     } catch (err) {
@@ -175,7 +175,7 @@ const ProgramDetail = () => {
         <div className="flex w-full">
           <Sidebar />
           <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh]">
-            <Loading text="Sedang memuat detail kursus..." size="lg" />
+            <Loading text="Sedang memuat detail Program Kurikulum..." size="lg" />
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ const ProgramDetail = () => {
               <Target className="h-10 w-10 text-slate-400" />
             </div>
             <h2 className="text-2xl font-black text-slate-700 mb-2">
-              Kursus Tidak Ditemukan
+              Program Tidak Ditemukan
             </h2>
             <button
               onClick={() => router.push("/programs")}
@@ -313,7 +313,7 @@ const ProgramDetail = () => {
                   </div>
                   <div className="flex-1">
                     <h2 className="text-xl font-black text-slate-800">
-                      Progress Kursus
+                      Progress Program
                     </h2>
                     <p className="text-sm text-slate-500 font-bold">
                       {program.progress.completed} dari {program.progress.total}{" "}
@@ -335,7 +335,7 @@ const ProgramDetail = () => {
                 {program.progress.percentage === 100 && (
                   <div className="mt-4 flex items-center gap-2 text-emerald-600 font-black">
                     <CheckCircle2 className="h-5 w-5" />
-                    <span>Selamat! Kursus telah selesai 🎉</span>
+                    <span>Selamat! Program ini telah selesai!</span>
                   </div>
                 )}
               </div>
@@ -360,7 +360,7 @@ const ProgramDetail = () => {
                           Daftar Materi
                         </h2>
                         <p className="text-sm text-slate-500 font-bold italic">
-                          {program.materials.length} {program.totalKajian > 0 ? `/ ${program.totalKajian}` : ""} materi dalam kursus ini
+                          {program.materials.length} {program.totalKajian > 0 ? `/ ${program.totalKajian}` : ""} materi dalam Program ini
                         </p>
                       </div>
                     </div>
@@ -389,7 +389,7 @@ const ProgramDetail = () => {
                         Belum ada materi
                       </h4>
                       <p className="text-slate-400 text-sm font-bold">
-                        Instruktur belum menambahkan materi ke kursus ini.
+                        Instruktur belum menambahkan materi ke Program Kurikulum ini.
                       </p>
                     </div>
                   ) : (
@@ -719,7 +719,7 @@ const ProgramDetail = () => {
                 {/* Stats */}
                 <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] p-6 lg:p-8">
                   <h3 className="text-lg font-black text-slate-800 mb-5">
-                    Informasi Kursus
+                    Informasi Program
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -760,7 +760,7 @@ const ProgramDetail = () => {
                       Tertarik Bergabung?
                     </h3>
                     <p className="text-teal-50 text-sm font-bold mb-6 leading-relaxed relative z-10">
-                      Daftar untuk mengikuti kursus dan mulai belajar.
+                      Daftar untuk mengikuti Program kami dan mulai belajar.
                     </p>
                     <button
                       onClick={handleEnroll}
@@ -780,7 +780,7 @@ const ProgramDetail = () => {
                   <div className="bg-emerald-50 border-2 border-emerald-200 rounded-3xl p-5 text-center">
                     <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
                     <p className="text-sm text-emerald-700 font-black">
-                      Anda terdaftar di kursus ini
+                      Anda terdaftar di Program ini
                     </p>
                   </div>
                 )}

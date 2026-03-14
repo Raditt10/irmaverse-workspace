@@ -140,7 +140,7 @@ const Dashboard = () => {
     if (status === "authenticated") {
       if (session?.user?.role === "instruktur") {
         router.replace("/academy");
-      } else if (session?.user?.role === "admin") {
+      } else if (session?.user?.role === "admin" || session?.user?.role === "super_admin") {
         router.replace("/admin");
       }
     }

@@ -17,6 +17,7 @@ model User {
   updatedAt                                         DateTime             @updatedAt
   address                                           String?
   bio                                               String?
+  jabatan                                           String?
   notelp                                            String?
   role                                              Role                 @default(user)
   bidangKeahlian                                    String?
@@ -405,7 +406,7 @@ model material {
   programId                                      String?
   kajianOrder                                    Int?
   courseenrollment                               courseenrollment[]
-  users                                          User               @relation(fields: [instructorId], references: [id], map: "Material_instructorId_fkey")
+  users                                          User               @relation(fields: [instructorId], references: [id], onDelete: Cascade, map: "Material_instructorId_fkey")
   material_material_nextCourseIdTomaterial       material?          @relation("material_nextCourseIdTomaterial", fields: [nextCourseId], references: [id], map: "Material_nextCourseId_fkey")
   other_material_material_nextCourseIdTomaterial material[]         @relation("material_nextCourseIdTomaterial")
   material_material_parentIdTomaterial           material?          @relation("material_parentIdTomaterial", fields: [parentId], references: [id], map: "Material_parentId_fkey")
@@ -432,7 +433,7 @@ model materialinvite {
   createdAt                                DateTime              @default(now())
   updatedAt                                DateTime              @updatedAt
   userId                                   String
-  users_materialinvite_instructorIdTousers User                  @relation("materialinvite_instructorIdTousers", fields: [instructorId], references: [id], map: "MaterialInvite_instructorId_fkey")
+  users_materialinvite_instructorIdTousers User                  @relation("materialinvite_instructorIdTousers", fields: [instructorId], references: [id], onDelete: Cascade, map: "MaterialInvite_instructorId_fkey")
   material                                 material              @relation(fields: [materialId], references: [id], onDelete: Cascade, map: "MaterialInvite_materialId_fkey")
   users_materialinvite_userIdTousers       User                  @relation("materialinvite_userIdTousers", fields: [userId], references: [id], onDelete: Cascade, map: "MaterialInvite_userId_fkey")
 
@@ -522,6 +523,7 @@ model quiz_attempt {
 enum Role {
   user
   admin
+  super_admin
   instruktur
 }
 
@@ -594,6 +596,14 @@ enum ActivityType {
   forum_post
   streak_maintained
   profile_completed
+  // Admin & Superadmin activities
+  admin_user_managed
+  admin_program_managed
+  admin_material_managed
+  admin_news_managed
+  admin_schedule_managed
+  admin_competition_managed
+  admin_admin_managed
 }
 
 enum BadgeCategory {

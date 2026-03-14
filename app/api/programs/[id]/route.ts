@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET(
   req: NextRequest,
@@ -259,6 +260,18 @@ export async function PUT(
       },
     });
 
+    // Log Activity for Admin/Superadmin
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_program_managed" as any,
+        title: "Memperbarui Program Kurikulum",
+        description: `Admin memperbarui program: ${updated.title}`,
+        metadata: { programId: updated.id }
+      });
+    }
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Error updating program:", error);
@@ -303,6 +316,18 @@ export async function DELETE(
       data: { programId: null },
     });
     await prisma.program.delete({ where: { id } });
+
+    // Log Activity for Admin/Superadmin
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_program_managed" as any,
+        title: "Menghapus Program Kurikulum",
+        description: `Admin menghapus program: ${program.title}`,
+        metadata: { programId: id }
+      });
+    }
 
     return NextResponse.json(
       { message: "Program berhasil dihapus" },

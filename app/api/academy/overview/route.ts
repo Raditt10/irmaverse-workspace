@@ -140,29 +140,31 @@ export async function GET() {
     prisma.news.findMany({ where: { authorId: instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 })
   ]);
 
+  const isNew = (created: Date, updated: Date) => Math.abs(updated.getTime() - created.getTime()) < 1000;
+
   const allActivities = [
     ...latestMaterials.map(m => ({
       id: `mat-${m.id}`,
       type: 'material',
-      title: `${m.createdAt.getTime() === m.updatedAt.getTime() ? 'Membuat' : 'Mengedit'} Kajian: ${m.title}`,
+      title: `${isNew(m.createdAt, m.updatedAt) ? 'Membuat' : 'Mengedit'} Kajian: ${m.title}`,
       updatedAt: m.updatedAt
     })),
     ...latestSchedules.map(s => ({
       id: `sch-${s.id}`,
       type: 'schedule',
-      title: `${s.createdAt.getTime() === s.updatedAt.getTime() ? 'Membuat' : 'Mengedit'} Kegiatan: ${s.title}`,
+      title: `${isNew(s.createdAt, s.updatedAt) ? 'Membuat' : 'Mengedit'} Kegiatan: ${s.title}`,
       updatedAt: s.updatedAt
     })),
     ...latestCompetitions.map(c => ({
       id: `comp-${c.id}`,
       type: 'competition',
-      title: `${c.createdAt.getTime() === c.updatedAt.getTime() ? 'Membuat' : 'Mengedit'} Lomba: ${c.title}`,
+      title: `${isNew(c.createdAt, c.updatedAt) ? 'Membuat' : 'Mengedit'} Lomba: ${c.title}`,
       updatedAt: c.updatedAt
     })),
     ...latestNews.map(n => ({
       id: `news-${n.id}`,
       type: 'news',
-      title: `${n.createdAt.getTime() === n.updatedAt.getTime() ? 'Menambahkan' : 'Mengedit'} Berita: ${n.title}`,
+      title: `${isNew(n.createdAt, n.updatedAt) ? 'Menambahkan' : 'Mengedit'} Berita: ${n.title}`,
       updatedAt: n.updatedAt
     }))
   ];

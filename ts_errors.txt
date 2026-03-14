@@ -1,0 +1,1 @@
+app/api/programs/route.ts(64,40): error TS2339: Property 'instructorId' does not exist on type '{ id: string; kajianOrder: number | null; }'.

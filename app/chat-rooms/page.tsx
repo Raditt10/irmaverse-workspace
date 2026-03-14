@@ -29,6 +29,7 @@ import {
   Globe2,
   ChevronDown,
   Loader2,
+  Shield,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -61,6 +62,8 @@ const GlobalForumPage = () => {
       router.push("/auth");
     },
   });
+  
+  const role = session?.user?.role?.toLowerCase();
 
   const { socket, isConnected, onlineUsers } = useSocket();
 
@@ -598,7 +601,7 @@ const GlobalForumPage = () => {
                                 }
                               `}
                             >
-                              <p className="whitespace-pre-wrap leading-relaxed break-words">
+                              <p className="whitespace-pre-wrap leading-relaxed wrap-break-word">
                                 {message.content}
                               </p>
                             </div>
@@ -657,30 +660,39 @@ const GlobalForumPage = () => {
               </div>
             )}
 
-            {/* ── Input area ────────────────────────────────────────────── */}
+            {/* ── Input area / Monitor Mode indicator ────────────────────────────── */}
             <div className="p-3 lg:p-4 bg-white border-t-2 border-slate-100 z-20 shrink-0">
-              <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-3xl border-2 border-slate-200 focus-within:border-teal-400 focus-within:shadow-[0_0_0_2px_rgba(45,212,191,0.2)] transition-all">
-                <Textarea
-                  value={messageDraft}
-                  onChange={(e) => handleDraftChange(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Kirim pesan ke forum…"
-                  className="flex-1 bg-transparent border-none shadow-none focus-visible:ring-0 min-h-11 max-h-32 py-2.5 px-3 text-sm md:text-base font-medium text-slate-700 placeholder:text-slate-400 resize-none"
-                  rows={1}
-                  disabled={isSending}
-                />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!messageDraft.trim() || isSending}
-                  className="p-2.5 bg-teal-500 text-white rounded-full hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none transition-all shrink-0"
-                >
-                  {isSending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} />
-                  ) : (
-                    <Send className="h-5 w-5" strokeWidth={3} />
-                  )}
-                </button>
-              </div>
+              {role === "admin" ? (
+                <div className="flex items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <Shield className="h-5 w-5" />
+                    <p className="text-sm font-bold uppercase tracking-widest">Mode Pemantauan: Admin tidak dapat mengirim pesan</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-3xl border-2 border-slate-200 focus-within:border-teal-400 focus-within:shadow-[0_0_0_2px_rgba(45,212,191,0.2)] transition-all">
+                  <Textarea
+                    value={messageDraft}
+                    onChange={(e) => handleDraftChange(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Kirim pesan ke forum…"
+                    className="flex-1 bg-transparent border-none shadow-none focus-visible:ring-0 min-h-11 max-h-32 py-2.5 px-3 text-sm md:text-base font-medium text-slate-700 placeholder:text-slate-400 resize-none"
+                    rows={1}
+                    disabled={isSending}
+                  />
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!messageDraft.trim() || isSending}
+                    className="p-2.5 bg-teal-500 text-white rounded-full hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none transition-all shrink-0"
+                  >
+                    {isSending ? (
+                      <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} />
+                    ) : (
+                      <Send className="h-5 w-5" strokeWidth={3} />
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </main>

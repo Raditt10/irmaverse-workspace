@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
           select: { id: true, name: true, avatar: true },
         },
         materials: {
-          select: { id: true, kajianOrder: true },
+          select: { id: true, kajianOrder: true, instructorId: true },
         },
         enrollments: {
           select: { id: true, userId: true },
@@ -183,6 +184,18 @@ export async function POST(req: Request) {
         totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
       },
     });
+
+    // Log Activity for Admin/Superadmin
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_program_managed" as any,
+        title: "Membuat Program Kurikulum",
+        description: `Admin membuat program baru: ${program.title}`,
+        metadata: { programId: program.id }
+      });
+    }
 
     return NextResponse.json(
       { id: program.id, message: "Program berhasil dibuat" },

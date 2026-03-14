@@ -32,8 +32,9 @@ import {
   Trash2,
   Check,
   CheckCheck,
-  Image as ImageIcon,
+  ImageIcon,
   File,
+  Shield,
 } from "lucide-react";
 
 interface Conversation {
@@ -114,9 +115,10 @@ const InstructorChatDashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  // Redirect if not instructor
+  // Redirect if not instructor or admin
   useEffect(() => {
-    if (status === "authenticated" && session?.user?.role !== "instruktur") {
+    const role = session?.user?.role?.toLowerCase();
+    if (status === "authenticated" && role !== "instruktur" && role !== "admin") {
       router.push("/overview");
     }
   }, [session, status, router]);
@@ -605,7 +607,8 @@ const InstructorChatDashboard = () => {
     );
   }
 
-  if (session?.user?.role !== "instruktur") {
+  const role = session?.user?.role?.toLowerCase();
+  if (status === "authenticated" && role !== "instruktur" && role !== "admin") {
     return null;
   }
 
@@ -988,51 +991,62 @@ const InstructorChatDashboard = () => {
                       )}
                     </div>
 
-                    {/* Message Input */}
+                    {/* Message Input / Monitor Mode indicator */}
                     <div className="p-3 lg:p-4 bg-white/80 backdrop-blur-sm relative z-20 shrink-0">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        onChange={handleFileSelect}
-                        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-                      />
-                      <div className="bg-white rounded-2xl lg:rounded-4xl border-2 border-slate-200 shadow-lg p-1.5 lg:p-2 flex items-end gap-2 focus-within:border-emerald-400 focus-within:shadow-[0_0_0_3px_rgba(52,211,153,0.2)] transition-all">
-                        <button
-                          type="button"
-                          className="p-2 lg:p-3 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-full transition-all disabled:opacity-50 shrink-0"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={uploadingFile}
-                        >
-                          {uploadingFile ? (
-                            <div className="flex items-center justify-center">
-                              <Loader2 className="h-5 w-5 animate-spin" />
-                            </div>
-                          ) : (
-                            <Paperclip className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
-                          )}
-                        </button>
-                        
-                        <Textarea
-                          placeholder="Ketik pesan..."
-                          value={messageDraft}
-                          onChange={(e) => {
-                            setMessageDraft(e.target.value);
-                            handleTyping();
-                          }}
-                          onKeyDown={handleKeyDown}
-                          className="flex-1 min-h-10 lg:min-h-12 max-h-28 lg:max-h-32 border-0 focus:ring-0 shadow-none resize-none py-2 lg:py-3 text-sm lg:text-base text-slate-700 font-medium placeholder:text-slate-400 bg-transparent"
-                          rows={1}
-                        />
-                        
-                        <button
-                          onClick={handleSendMessage}
-                          disabled={!messageDraft.trim()}
-                          className="p-2 lg:p-3 bg-linear-to-r from-emerald-400 to-teal-400 text-white rounded-full shadow-[0_3px_0_0_#059669] lg:shadow-[0_4px_0_0_#059669] hover:-translate-y-1 hover:shadow-[0_5px_0_0_#059669] lg:hover:shadow-[0_6px_0_0_#059669] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none shrink-0"
-                        >
-                          <Send className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
-                        </button>
-                      </div>
+                      {role === "admin" ? (
+                        <div className="flex items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
+                          <div className="flex items-center gap-3 text-slate-400">
+                            <Shield className="h-5 w-5" />
+                            <p className="text-sm font-bold uppercase tracking-widest text-center">Mode Pemantauan: Admin tidak dapat mengirim pesan</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            className="hidden"
+                            onChange={handleFileSelect}
+                            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                          />
+                          <div className="bg-white rounded-2xl lg:rounded-4xl border-2 border-slate-200 shadow-lg p-1.5 lg:p-2 flex items-end gap-2 focus-within:border-emerald-400 focus-within:shadow-[0_0_0_3px_rgba(52,211,153,0.2)] transition-all">
+                            <button
+                              type="button"
+                              className="p-2 lg:p-3 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-full transition-all disabled:opacity-50 shrink-0"
+                              onClick={() => fileInputRef.current?.click()}
+                              disabled={uploadingFile}
+                            >
+                              {uploadingFile ? (
+                                <div className="flex items-center justify-center">
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                </div>
+                              ) : (
+                                <Paperclip className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
+                              )}
+                            </button>
+                            
+                            <Textarea
+                              placeholder="Ketik pesan..."
+                              value={messageDraft}
+                              onChange={(e) => {
+                                setMessageDraft(e.target.value);
+                                handleTyping();
+                              }}
+                              onKeyDown={handleKeyDown}
+                              className="flex-1 min-h-10 lg:min-h-12 max-h-28 lg:max-h-32 border-0 focus:ring-0 shadow-none resize-none py-2 lg:py-3 text-sm lg:text-base text-slate-700 font-medium placeholder:text-slate-400 bg-transparent"
+                              rows={1}
+                            />
+                            
+                            <button
+                              onClick={handleSendMessage}
+                              disabled={!messageDraft.trim()}
+                              className="p-2 lg:p-3 bg-linear-to-r from-emerald-400 to-teal-400 text-white rounded-full shadow-[0_3px_0_0_#059669] lg:shadow-[0_4px_0_0_#059669] hover:-translate-y-1 hover:shadow-[0_5px_0_0_#059669] lg:hover:shadow-[0_6px_0_0_#059669] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none shrink-0"
+                            >
+                              <Send className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </>
                 ) : (

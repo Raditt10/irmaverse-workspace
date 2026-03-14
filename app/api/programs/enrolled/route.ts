@@ -21,6 +21,7 @@ export async function GET() {
             id: true,
             title: true,
             description: true,
+            thumbnailUrl: true,
           },
         },
       },

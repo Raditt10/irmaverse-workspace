@@ -159,7 +159,7 @@ const CreateSchedule = () => {
                 onClick={() => router.back()}
                 className="self-start inline-flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#cbd5e1] active:translate-y-0.5 active:shadow-none transition-all text-sm lg:text-base"
               >
-                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
+                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5 text-emerald-500" strokeWidth={3} />
                 Kembali
               </button>
               <div>
@@ -265,7 +265,7 @@ const CreateSchedule = () => {
 
                     <div className="space-y-2">
                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                        <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
+                        <MapPin className="h-4 w-4 text-emerald-500" /> Lokasi <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -279,7 +279,7 @@ const CreateSchedule = () => {
 
                     <div className="space-y-2">
                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                         <Headset className="h-4 w-4" /> Narahubung <span className="text-red-500">*</span>
+                         <Headset className="h-4 w-4 text-emerald-500" /> Narahubung <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="text"
@@ -302,7 +302,7 @@ const CreateSchedule = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
                         <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Phone className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Nomor Telepon (WA)
+                          <Phone className="w-4 h-4 text-emerald-600" strokeWidth={2.5}/> Nomor Telepon (WA)
                         </label>
                         <Input
                           type="tel"
@@ -315,7 +315,7 @@ const CreateSchedule = () => {
 
                       <div className="space-y-2">
                         <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Mail className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Email
+                          <Mail className="w-4 h-4 text-emerald-600" strokeWidth={2.5}/> Email
                         </label>
                         <Input
                           type="email"
@@ -379,7 +379,7 @@ const CreateSchedule = () => {
                           </svg>
                         ) : (
                           <>
-                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-teal-500 transition-colors" />
+                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-emerald-500 mb-2 group-hover:text-emerald-600 transition-colors" />
                             <span className="text-xs lg:text-sm font-bold text-slate-400 group-hover:text-teal-500 transition-colors">
                               Klik untuk Upload Thumbnail
                             </span>

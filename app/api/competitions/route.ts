@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET() {
   try {
@@ -131,6 +132,19 @@ export async function POST(request: NextRequest) {
     });
 
     console.log("Competition created:", competition.id);
+
+    // Log Activity
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_competition_managed" as any,
+        title: "Membuat Lomba Baru",
+        description: `Admin membuat lomba baru: ${competition.title}`,
+        metadata: { competitionId: competition.id }
+      });
+    }
+
     return NextResponse.json(competition, { status: 201 });
   } catch (error: any) {
     console.error("Error creating competition:", error);
@@ -197,6 +211,18 @@ export async function PUT(request: NextRequest) {
         maxParticipants,
       },
     });
+
+    // Log Activity
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_competition_managed" as any,
+        title: "Memperbarui Lomba",
+        description: `Admin memperbarui lomba: ${updatedCompetition.title}`,
+        metadata: { competitionId: updatedCompetition.id }
+      });
+    }
 
     return NextResponse.json(updatedCompetition, { status: 200 });
   } catch (error: any) {

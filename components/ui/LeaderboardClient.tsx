@@ -31,6 +31,7 @@ export interface LeaderboardUser {
 interface Props {
   users: LeaderboardUser[];
   currentUserId: string;
+  currentUserRole: string;
 }
 
 const getRoleLabel = (role: string) => {
@@ -43,7 +44,7 @@ const avatarSrc = (u: LeaderboardUser) =>
   u.avatar ||
   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(u.name ?? "user")}`;
 
-export default function LeaderboardClient({ users, currentUserId }: Props) {
+export default function LeaderboardClient({ users, currentUserId, currentUserRole }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
 
@@ -80,48 +81,50 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
   return (
     <>
       {/* ── STATS STRIP ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-        {[
-          {
-            icon: <Trophy className="h-4 w-4 text-emerald-500" />,
-            label: "Peringkatmu",
-            value: currentUserRank ? `#${currentUserRank}` : "—",
-            bg: "bg-emerald-50/80",
-            border: "border-emerald-200",
-          },
-          {
-            icon: <Flame className="h-4 w-4 text-emerald-500" />,
-            label: "Streak Tertinggi",
-            value: `${stats.highestStreak} hari`,
-            bg: "bg-teal-50/80",
-            border: "border-teal-200",
-          },
-          {
-            icon: <Award className="h-4 w-4 text-emerald-500" />,
-            label: "Total Badge",
-            value: stats.totalBadges,
-            bg: "bg-emerald-50/50",
-            border: "border-emerald-200",
-          },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className={`${s.bg} border-2 ${s.border} rounded-2xl p-3 flex items-center gap-3`}
-          >
-            <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-slate-100 flex-shrink-0">
-              {s.icon}
-            </div>
-            <div className="min-w-0">
-              <div className="text-lg font-black text-slate-800 leading-none">
-                {s.value}
+      {currentUserRole === "user" && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+          {[
+            {
+              icon: <Trophy className="h-4 w-4 text-emerald-500" />,
+              label: "Peringkatmu",
+              value: currentUserRank ? `#${currentUserRank}` : "—",
+              bg: "bg-emerald-50/80",
+              border: "border-emerald-200",
+            },
+            {
+              icon: <Flame className="h-4 w-4 text-emerald-500" />,
+              label: "Streak Tertinggi",
+              value: `${stats.highestStreak} hari`,
+              bg: "bg-teal-50/80",
+              border: "border-teal-200",
+            },
+            {
+              icon: <Award className="h-4 w-4 text-emerald-500" />,
+              label: "Total Badge",
+              value: stats.totalBadges,
+              bg: "bg-emerald-50/50",
+              border: "border-emerald-200",
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={`${s.bg} border-2 ${s.border} rounded-2xl p-3 flex items-center gap-3`}
+            >
+              <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-slate-100 flex-shrink-0">
+                {s.icon}
               </div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {s.label}
+              <div className="min-w-0">
+                <div className="text-lg font-black text-slate-800 leading-none">
+                  {s.value}
+                </div>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  {s.label}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* ── PODIUM ───────────────────────────────────────────────────────── */}
       {topThree.length >= 1 && (
@@ -360,7 +363,7 @@ export default function LeaderboardClient({ users, currentUserId }: Props) {
       </div>
 
       {/* ── STICKY CURRENT USER (mobile) ─────────────────────────────────── */}
-      {currentUser && (
+      {currentUser && currentUserRole === "user" && (
         <div className="md:hidden fixed bottom-4 left-4 right-20 z-40">
           <div className="bg-slate-900 text-white rounded-4xl p-1 shadow-xl border border-slate-700 overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 sm:px-5 sm:py-3 bg-slate-800 rounded-[1.8rem]">

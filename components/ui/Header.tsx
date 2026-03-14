@@ -136,9 +136,9 @@ export default function DashboardHeader() {
       case "trophy":
         return <Trophy className="h-5 w-5 text-amber-500" />;
       case "calendar":
-        return <Calendar className="h-5 w-5 text-blue-500" />;
+        return <Calendar className="h-5 w-5 text-teal-500" />;
       case "megaphone":
-        return <Megaphone className="h-5 w-5 text-purple-500" />;
+        return <Megaphone className="h-5 w-5 text-emerald-500" />;
       default:
         return <Info className="h-5 w-5 text-slate-500" />;
     }
@@ -548,21 +548,26 @@ export default function DashboardHeader() {
                     <span>Profile Saya</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => router.push("/level")}
-                    className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
-                  >
-                    <TrendingUp className="h-4 w-4 mr-2" strokeWidth={2.5} />
-                    <span>Level & Poin</span>
-                  </DropdownMenuItem>
+                  {/* Only show for regular users */}
+                  {(session?.user as any)?.role === "user" && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/level")}
+                        className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
+                      >
+                        <TrendingUp className="h-4 w-4 mr-2" strokeWidth={2.5} />
+                        <span>Level & Poin</span>
+                      </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => router.push("/friends")}
-                    className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
-                  >
-                    <Users className="h-4 w-4 mr-2" strokeWidth={2.5} />
-                    <span>Temanku</span>
-                  </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/friends")}
+                        className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
+                      >
+                        <Users className="h-4 w-4 mr-2" strokeWidth={2.5} />
+                        <span>Temanku</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
 
                   <DropdownMenuItem 
                     onClick={() => router.push("/settings")}

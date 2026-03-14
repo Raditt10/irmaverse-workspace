@@ -298,7 +298,6 @@ export async function POST(req: NextRequest) {
         content: materialContent || null,
         link: materialLink || null,
         location: location || null,
-        updatedAt: new Date(),
       } as any,
     });
 

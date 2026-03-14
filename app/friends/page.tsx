@@ -258,7 +258,7 @@ export default function FriendsPage() {
                   ? "Kamu sudah mengikuti semua pengguna!"
                   : "Mulai ikuti pengguna lain untuk membangun koneksi."}
               </p>
-              {activeTab !== "suggestions" && (
+              {activeTab !== "suggestions" && (activeTab as any) === "NEVER_SHOW_THIS" && (
                 <button
                   onClick={() => setActiveTab("suggestions")}
                   className="mt-4 flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors"
@@ -332,64 +332,13 @@ export default function FriendsPage() {
                   )}
 
                   {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {activeTab === "suggestions" ? (
-                      <>
-                        <FollowButton
-                          targetUserId={user.id}
-                          initialIsFollowing={false}
-                          size="sm"
-                          className="w-full"
-                          onStatusChange={(following) => {
-                            if (following) {
-                              setUsers((prev) =>
-                                prev.filter((u) => u.id !== user.id),
-                              );
-                              fetchCounts();
-                            }
-                          }}
-                        />
-                        <button
-                          onClick={() => router.push(`/u/${user.id}`)}
-                          className="flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
-                        >
-                          <UserIcon className="h-4 w-4" /> Profil
-                        </button>
-                      </>
-                    ) : activeTab === "followers" && !user.iFollowBack ? (
-                      <>
-                        <FollowButton
-                          targetUserId={user.id}
-                          initialIsFollowing={false}
-                          size="sm"
-                          className="w-full"
-                          onStatusChange={() => fetchCounts()}
-                        />
-                        <button
-                          onClick={() => router.push(`/u/${user.id}`)}
-                          className="flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
-                        >
-                          <UserIcon className="h-4 w-4" /> Profil
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() =>
-                            router.push(`/chat-rooms?userId=${user.id}`)
-                          }
-                          className="flex items-center justify-center gap-2 py-2 bg-emerald-50 text-emerald-600 font-black rounded-xl border-2 border-emerald-100 hover:bg-emerald-100 transition-colors text-xs"
-                        >
-                          <MessageCircle className="h-4 w-4" /> Chat
-                        </button>
-                        <button
-                          onClick={() => router.push(`/u/${user.id}`)}
-                          className="flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
-                        >
-                          <UserIcon className="h-4 w-4" /> Profil
-                        </button>
-                      </>
-                    )}
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => router.push(`/u/${user.id}`)}
+                      className="w-full flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
+                    >
+                      <UserIcon className="h-4 w-4" /> Profil
+                    </button>
                   </div>
                 </div>
               ))}

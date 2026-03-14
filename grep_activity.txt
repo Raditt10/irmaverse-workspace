@@ -1,0 +1,22 @@
+c:\laragon\www\irmaVerse\app\api/admin/admins/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/admin/admins/route.ts:    await recordActivity({
+c:\laragon\www\irmaVerse\app\api/admin/admins/route.ts:    await recordActivity({
+c:\laragon\www\irmaVerse\app\api/admin/admins/route.ts:    await recordActivity({
+c:\laragon\www\irmaVerse\app\api/admin/users/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/admin/users/route.ts:    await recordActivity({
+c:\laragon\www\irmaVerse\app\api/admin/users/route.ts:    await recordActivity({
+c:\laragon\www\irmaVerse\app\api/admin/users/route.ts:    await recordActivity({
+c:\laragon\www\irmaVerse\app\api/competitions/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/competitions/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/competitions/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/news/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/news/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/news/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/news/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/programs/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/programs/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/programs/[id]/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/programs/[id]/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/programs/[id]/route.ts:      await recordActivity({
+c:\laragon\www\irmaVerse\app\api/schedules/route.ts:import { recordActivity } from "@/lib/activity";
+c:\laragon\www\irmaVerse\app\api/schedules/route.ts:      await recordActivity({

@@ -52,22 +52,22 @@ const scrollbarStyles = `
     width: 8px;
   }
   .mobile-sidebar-scrollbar::-webkit-scrollbar-track {
-    background: linear-gradient(180deg, #fefce8 0%, #fefce8 100%);
+    background: linear-gradient(180deg, #f0fdf4 0%, #f0fdf4 100%);
     border-radius: 4px;
   }
   .mobile-sidebar-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #f59e0b 0%, #f97316 100%);
+    background: linear-gradient(180deg, #10b981 0%, #14b8a6 100%);
     border-radius: 4px;
-    border: 2px solid #ea580c;
-    box-shadow: 0 0 0 2px rgba(249,115,22,0.2);
+    border: 2px solid #059669;
+    box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
   }
   .mobile-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%);
-    border-color: #b45309;
+    background: linear-gradient(180deg, #059669 0%, #0d9488 100%);
+    border-color: #047857;
   }
   .mobile-sidebar-scrollbar::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(180deg, #b45309 0%, #92400e 100%);
-    box-shadow: inset 0 0 0 2px rgba(217,119,6,0.3);
+    background: linear-gradient(180deg, #047857 0%, #065f46 100%);
+    box-shadow: inset 0 0 0 2px rgba(5,150,105,0.3);
   }
 `;
 
@@ -91,7 +91,8 @@ const Sidebar = () => {
 
   const role = session?.user?.role?.toLowerCase();
   const isInstruktur = role === "instruktur" || role === "instructor";
-  const isAdmin = role === "admin";
+  const isAdmin = role === "admin" || role === "super_admin";
+  const isSuperAdmin = role === "super_admin";
 
   useEffect(() => {
     const saved = localStorage.getItem("sidebar-expanded");
@@ -156,7 +157,7 @@ const Sidebar = () => {
 
   const getDashboardPath = () => {
     if (role === "instruktur") return "/academy";
-    if (role === "admin") return "/admin";
+    if (role === "admin" || role === "super_admin") return "/admin";
     return "/overview";
   };
 
@@ -274,6 +275,19 @@ const Sidebar = () => {
             ],
           },
         ]
+      : isAdmin
+      ? [
+          {
+            icon: Contact,
+            label: "Instruktur",
+            path: "/instructors",
+          },
+          {
+            icon: Users,
+            label: "Daftar Anggota",
+            path: "/members",
+          },
+        ]
       : [
           {
             icon: Contact,
@@ -313,7 +327,7 @@ const Sidebar = () => {
             submenu: [
               {
                 icon: Users,
-                label: "Kelola Akun User",
+                label: "Kelola Akun Anggota",
                 path: "/admin/users",
               },
               {
@@ -321,6 +335,15 @@ const Sidebar = () => {
                 label: "Kelola Akun Instruktur",
                 path: "/admin/instructors",
               },
+              ...(isSuperAdmin
+                ? [
+                    {
+                      icon: Shield,
+                      label: "Kelola Akun Admin",
+                      path: "/admin/admins",
+                    },
+                  ]
+                : []),
             ],
           },
         ]
@@ -463,7 +486,7 @@ const Sidebar = () => {
             <div className="absolute top-0 right-0 w-full h-full opacity-5 bg-[radial-gradient(#14b8a6_1.5px,transparent_1.5px)] bg-size-[16px_16px] z-0 pointer-events-none" />
 
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-teal-100/30 rounded-full blur-3xl pointer-events-none z-0" />
-            <div className="absolute top-1/4 -left-10 w-48 h-48 bg-amber-100/30 rounded-full blur-3xl pointer-events-none z-0" />
+            <div className="absolute top-1/4 -left-10 w-48 h-48 bg-teal-50/30 rounded-full blur-3xl pointer-events-none z-0" />
             <div className="absolute bottom-0 right-0 w-64 h-64 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none z-0" />
 
             {/* --- Content Container --- */}

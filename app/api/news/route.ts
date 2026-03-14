@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 import { unlink } from "fs/promises";
 import { join } from "path";
 
@@ -234,6 +235,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Log Activity
+    const userRole = user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: user.id,
+        type: "admin_news_managed" as any,
+        title: "Membuat Berita",
+        description: `Admin membuat berita baru: ${news.title}`,
+        metadata: { newsId: news.id }
+      });
+    }
+
     return NextResponse.json(news, { status: 201 });
   } catch (error: any) {
     console.error("Error creating news:", error);
@@ -315,6 +328,18 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    // Log Activity
+    const userRole = user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: user.id,
+        type: "admin_news_managed" as any,
+        title: "Memperbarui Berita",
+        description: `Admin memperbarui berita: ${updatedNews.title}`,
+        metadata: { newsId: updatedNews.id }
+      });
+    }
+
     // Delete old image if it was replaced with a new one
     if (oldImage && oldImage.startsWith("/uploads/")) {
       try {
@@ -387,6 +412,18 @@ export async function DELETE(request: NextRequest) {
     await prisma.news.delete({
       where: { id },
     });
+
+    // Log Activity
+    const userRole = user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: user.id,
+        type: "admin_news_managed" as any,
+        title: "Menghapus Berita",
+        description: `Admin menghapus berita: ${existingNews.title}`,
+        metadata: { newsId: id }
+      });
+    }
 
     // Delete the image file if it's an uploaded file (starts with /uploads/)
     if (existingNews.image && existingNews.image.startsWith("/uploads/")) {

@@ -53,13 +53,16 @@ const LeaderboardPage = async () => {
     take: 10, // Limit to Top 10 per user request
   });
 
+  const viewerRole = (session.user as any).role;
+  const isPrivileged = viewerRole === "admin" || viewerRole === "instruktur";
+
   const users: LeaderboardUser[] = rawUsers.map((u, i) => {
     const isMe = u.id === currentUserId;
     const isMutual = mutualUserIds.has(u.id);
 
-    // Apply privacy rules: Hide name and avatar if not me and not mutual
-    const displayName = isMe || isMutual ? (u.name ?? "Pengguna") : "Hamba Allah";
-    const displayAvatar = isMe || isMutual ? u.avatar : null;
+    // Apply privacy rules: Hide name and avatar if not me, not mutual, and not privileged
+    const displayName = isMe || isMutual || isPrivileged ? (u.name ?? "Pengguna") : "Hamba Allah";
+    const displayAvatar = isMe || isMutual || isPrivileged ? u.avatar : null;
 
     return {
       id: u.id,
@@ -90,7 +93,11 @@ const LeaderboardPage = async () => {
               Pantau pencapaian 10 EXP terbaik disini
             </p>
           </div>
-          <LeaderboardClient users={users} currentUserId={session.user.id} />
+          <LeaderboardClient 
+            users={users} 
+            currentUserId={session.user.id} 
+            currentUserRole={(session.user as any).role}
+          />
         </main>
       </div>
       <ChatbotButton />
