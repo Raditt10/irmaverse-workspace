@@ -13,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
+import BackButton from "@/components/ui/BackButton";
 
 // --- SUB-COMPONENT: Password Input ---
 const PasswordInput = ({
@@ -176,6 +177,14 @@ const Auth = () => {
           <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
             {/* Main Card */}
             <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] p-6 sm:p-8 md:p-10 relative overflow-hidden">
+              {/* Back Button */}
+              <div className="absolute top-6 left-6 z-20">
+                <BackButton 
+                  onClick={() => router.push("/")} 
+                  className="px-3! py-1.5! rounded-xl! text-xs!"
+                />
+              </div>
+
               {/* Header */}
               <div className="flex flex-col items-center gap-3 mb-8">
                 <div className="w-16 h-16 flex items-center justify-center rounded-2xl">
