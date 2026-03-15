@@ -144,6 +144,7 @@ const ChatPage = () => {
   const [fileCaption, setFileCaption] = useState("");
   const [deletingConversation, setDeletingConversation] = useState(false);
   const [isDesktopChatFullscreen, setIsDesktopChatFullscreen] = useState(false);
+  const [modalSearchTerm, setModalSearchTerm] = useState("");
   
   const { confirm, alert: customAlert } = useConfirm();
   
@@ -1081,31 +1082,86 @@ const ChatPage = () => {
         </div>
       )}
 
-      {/* New Chat Modal */}
+      {/* New Chat Modal (Enhanced & Pro) */}
       {showNewChatModal && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md max-h-[80dvh] flex flex-col overflow-hidden border-4 border-white shadow-2xl">
-            <div className="p-4 border-b-2 border-slate-100 bg-emerald-50 flex justify-between items-center shrink-0">
-              <h3 className="text-lg font-black text-slate-800">Pilih Instruktur</h3>
-              <button onClick={() => setShowNewChatModal(false)} className="p-2 hover:bg-white rounded-xl"><X className="h-5 w-5 text-slate-500" /></button>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-md max-h-[85dvh] flex flex-col overflow-hidden border-4 border-emerald-500 shadow-[10px_10px_0_0_#065f46] animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 border-b-4 border-slate-100 bg-emerald-50 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight">Mulai Chat</h3>
+                <p className="text-xs font-bold text-emerald-600 mt-0.5">Pilih instruktur favoritmu</p>
+              </div>
+              <button 
+                onClick={() => { setShowNewChatModal(false); setModalSearchTerm(""); }} 
+                className="p-2.5 hover:bg-white rounded-2xl border-2 border-transparent hover:border-slate-200 transition-all active:scale-95 shadow-sm hover:shadow-orange-100"
+              >
+                <X className="h-6 w-6 text-slate-500" strokeWidth={3} />
+              </button>
             </div>
-            <div className="overflow-y-auto p-2">
-              {instructors.length === 0 ? (
-                <p className="text-center py-10 text-slate-400 font-medium">Tidak ada instruktur tersedia.</p>
+
+            {/* Search Bar within Modal */}
+            <div className="px-6 py-4 bg-white border-b-2 border-slate-50 shrink-0">
+              <div className="relative group">
+                <Input
+                  value={modalSearchTerm}
+                  onChange={(e) => setModalSearchTerm(e.target.value)}
+                  placeholder="Cari nama instruktur..."
+                  className="pl-24 lg:pl-28 py-4 rounded-3xl border-[3px] border-slate-200 focus:border-emerald-400 focus:ring-0 transition-all font-bold placeholder:text-slate-300 shadow-[0_8px_0_0_#34d399] h-14"
+                />
+                <Search className="absolute left-9 lg:left-11 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-emerald-500 transition-colors pointer-events-none" strokeWidth={3} />
+              </div>
+            </div>
+
+            {/* Instructor List Area */}
+            <div className="overflow-y-auto p-3 flex-1 custom-scrollbar bg-slate-50/30">
+              {instructors.filter(inst => inst.name.toLowerCase().includes(modalSearchTerm.toLowerCase())).length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 border-2 border-slate-200">
+                    <Search className="h-10 w-10 text-slate-300" strokeWidth={2} />
+                  </div>
+                  <p className="text-slate-500 font-black text-lg">Tidak ditemukan</p>
+                  <p className="text-sm text-slate-400 font-bold mt-1">Coba cari dengan nama atau kata kunci lain</p>
+                </div>
               ) : (
-                instructors.map(inst => (
-                  <button key={inst.id} onClick={() => startConversation(inst.id)} className="w-full flex items-center gap-3 p-3 mb-1 hover:bg-slate-50 rounded-2xl border-2 border-transparent hover:border-slate-100 transition-all text-left">
-                    <Avatar className="h-12 w-12 border-2 border-slate-100">
-                      <AvatarImage src={inst.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${inst.name}`} />
-                      <AvatarFallback>{inst.name.slice(0,2)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-bold text-slate-800">{inst.name}</p>
-                      <p className="text-xs text-slate-500 font-medium">{inst.bidangKeahlian || 'Instruktur'}</p>
-                    </div>
-                  </button>
-                ))
+                <div className="grid grid-cols-1 gap-2">
+                  {instructors
+                    .filter(inst => inst.name.toLowerCase().includes(modalSearchTerm.toLowerCase()))
+                    .map(inst => (
+                      <button 
+                        key={inst.id} 
+                        onClick={() => startConversation(inst.id)} 
+                        className="group w-full flex items-center gap-4 p-4 rounded-3xl bg-white border-[3px] border-slate-100 hover:border-emerald-200 shadow-[0_8px_0_0_#34d399] hover:shadow-[0_8px_0_0_#10b981] hover:-translate-y-1.5 active:translate-y-0 active:shadow-none transition-all text-left animate-in slide-in-from-bottom-2 duration-200"
+                      >
+                        <div className="relative shrink-0">
+                          <Avatar className="h-16 w-16 border-[3px] border-white shadow-sm group-hover:border-emerald-100 transition-colors">
+                            <AvatarImage src={inst.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${inst.name}`} />
+                            <AvatarFallback className="font-black text-lg">{inst.name.slice(0,2)}</AvatarFallback>
+                          </Avatar>
+                          <div className={`absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm`}>
+                            <div className={`w-3.5 h-3.5 rounded-full ${onlineUsers.has(inst.id) ? 'bg-emerald-400 animate-pulse' : 'bg-slate-300'}`} />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-slate-800 text-lg lg:text-xl truncate group-hover:text-emerald-600 transition-colors tracking-tight">{inst.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border-2 ${onlineUsers.has(inst.id) ? 'text-emerald-500 bg-emerald-50 border-emerald-100' : 'text-slate-400 bg-slate-50 border-slate-100'}`}>
+                              {onlineUsers.has(inst.id) ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 bg-emerald-50 p-3 rounded-2xl border-2 border-emerald-100 text-emerald-500">
+                          <MessageSquarePlus className="h-6 w-6" strokeWidth={3} />
+                        </div>
+                      </button>
+                    ))
+                  }
+                </div>
               )}
+            </div>
+            
+            <div className="p-4 bg-slate-50 border-t-2 border-slate-100 flex justify-center shrink-0">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IRMA Verse Messaging System</p>
             </div>
           </div>
         </div>
