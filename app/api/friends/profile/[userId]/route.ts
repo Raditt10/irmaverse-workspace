@@ -10,7 +10,7 @@ export async function GET(
   try {
     const { userId } = await params;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -40,17 +40,17 @@ export async function GET(
 
     // Hitung followers & following
     const [followersCount, followingCount] = await Promise.all([
-      prisma.friendship.count({ where: { followingId: userId } }),
-      prisma.friendship.count({ where: { followerId: userId } }),
+      prisma.friendships.count({ where: { followingId: userId } }),
+      prisma.friendships.count({ where: { followerId: userId } }),
     ]);
 
     // Ambil jumlah quiz attempts
-    const quizAttemptCount = await prisma.quiz_attempt.count({
+    const quizAttemptCount = await prisma.quiz_attempts.count({
       where: { userId },
     });
 
     // Ambil average quiz score
-    const quizStats = await prisma.quiz_attempt.aggregate({
+    const quizStats = await prisma.quiz_attempts.aggregate({
       where: { userId },
       _avg: { score: true },
       _count: { id: true },
@@ -58,12 +58,12 @@ export async function GET(
 
     // Ambil enrollment count (program + course)
     const [programEnrollCount, courseEnrollCount] = await Promise.all([
-      prisma.program_enrollment.count({ where: { userId } }),
+      prisma.program_enrollments.count({ where: { userId } }),
       prisma.courseenrollment.count({ where: { userId } }),
     ]);
 
     // Ambil aktivitas terkini dari ActivityLog (atau fallback ke quiz attempts)
-    const recentActivityLogs = await prisma.activityLog.findMany({
+    const recentActivityLogs = await prisma.activity_logs.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
       take: 10,
@@ -89,7 +89,7 @@ export async function GET(
       }));
     } else {
       // Fallback: kalau belum ada ActivityLog, tampilkan quiz attempts
-      const recentQuizzes = await prisma.quiz_attempt.findMany({
+      const recentQuizzes = await prisma.quiz_attempts.findMany({
         where: { userId },
         include: { quiz: { select: { title: true } } },
         orderBy: { completedAt: "desc" },
@@ -107,7 +107,7 @@ export async function GET(
     }
 
     // Ambil badges yang dimiliki user
-    const earnedBadges = await prisma.userBadge.findMany({
+    const earnedBadges = await prisma.user_badges.findMany({
       where: { userId },
       include: { badge: true },
       orderBy: { earnedAt: "desc" },

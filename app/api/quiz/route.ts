@@ -10,22 +10,22 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const isPrivileged = user.role === "instruktur" || user.role === "admin";
+    const isPrivileged = user.role === "instruktur" || user.role === "admin" || user.role === "super_admin";
 
     // 1. Standalone quizzes (materialId is null) — visible to everyone
-    const standaloneQuizzes = await prisma.material_quiz.findMany({
+    const standaloneQuizzes = await prisma.material_quizzes.findMany({
       where: { materialId: null },
       include: {
-        creator: { select: { id: true, name: true, avatar: true } },
-        questions: { select: { id: true } },
-        attempts: {
+        users: { select: { id: true, name: true, avatar: true } },
+        quiz_questions: { select: { id: true } },
+        quiz_attempts: {
           where: { userId: session.user.id },
           orderBy: { completedAt: "desc" },
           take: 1,
@@ -40,12 +40,12 @@ export async function GET(req: NextRequest) {
 
     if (isPrivileged) {
       // Instructors/admins can see all material quizzes
-      materialQuizzes = await prisma.material_quiz.findMany({
+      materialQuizzes = await prisma.material_quizzes.findMany({
         where: { materialId: { not: null } },
         include: {
           material: { select: { id: true, title: true, thumbnailUrl: true } },
-          questions: { select: { id: true } },
-          attempts: {
+          quiz_questions: { select: { id: true } },
+          quiz_attempts: {
             where: { userId: session.user.id },
             orderBy: { completedAt: "desc" },
             take: 1,
@@ -63,12 +63,12 @@ export async function GET(req: NextRequest) {
       const materialIds = acceptedInvites.map((i) => i.materialId);
 
       if (materialIds.length > 0) {
-        materialQuizzes = await prisma.material_quiz.findMany({
+        materialQuizzes = await prisma.material_quizzes.findMany({
           where: { materialId: { in: materialIds } },
           include: {
             material: { select: { id: true, title: true, thumbnailUrl: true } },
-            questions: { select: { id: true } },
-            attempts: {
+            quiz_questions: { select: { id: true } },
+            quiz_attempts: {
               where: { userId: session.user.id },
               orderBy: { completedAt: "desc" },
               take: 1,
@@ -88,12 +88,12 @@ export async function GET(req: NextRequest) {
         materialTitle: null,
         title: q.title,
         description: q.description,
-        questionCount: q.questions.length,
-        creatorName: q.creator?.name || "Unknown",
-        creatorAvatar: q.creator?.avatar || null,
+        questionCount: q.quiz_questions.length,
+        creatorName: q.users?.name || "Unknown",
+        creatorAvatar: q.users?.avatar || null,
         isStandalone: true,
         createdAt: q.createdAt,
-        lastAttempt: q.attempts[0] || null,
+        lastAttempt: q.quiz_attempts[0] || null,
       })),
       ...materialQuizzes.map((q: any) => ({
         id: q.id,
@@ -102,12 +102,12 @@ export async function GET(req: NextRequest) {
         materialThumbnail: q.material?.thumbnailUrl || null,
         title: q.title,
         description: q.description,
-        questionCount: q.questions.length,
+        questionCount: q.quiz_questions?.length || 0,
         creatorName: null,
         creatorAvatar: null,
         isStandalone: false,
         createdAt: q.createdAt,
-        lastAttempt: q.attempts[0] || null,
+        lastAttempt: q.quiz_attempts?.[0] || null,
       })),
     ];
 
@@ -129,10 +129,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa membuat quiz" },
         { status: 403 },
@@ -179,18 +179,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const quiz = await prisma.material_quiz.create({
+    const quiz = await prisma.material_quizzes.create({
       data: {
+        id: crypto.randomUUID(),
         materialId: null,
         creatorId: session.user.id,
         title: title.trim(),
         description: description?.trim() || null,
-        questions: {
+        updatedAt: new Date(),
+        quiz_questions: {
           create: questions.map((q: any, idx: number) => ({
+            id: crypto.randomUUID(),
             question: q.question.trim(),
             order: idx,
-            options: {
+            quiz_options: {
               create: q.options.map((o: any) => ({
+                id: crypto.randomUUID(),
                 text: o.text.trim(),
                 isCorrect: o.isCorrect === true,
               })),
@@ -199,8 +203,8 @@ export async function POST(req: NextRequest) {
         },
       },
       include: {
-        questions: {
-          include: { options: true },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
       },

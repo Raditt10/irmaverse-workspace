@@ -62,7 +62,7 @@ const ScheduleDetail = () => {
   const params = useParams();
   const scheduleId = params.id as string;
 
-  const isInstructor = session?.user?.role === "instruktur" || session?.user?.role === "admin";
+  const isInstructor = session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });

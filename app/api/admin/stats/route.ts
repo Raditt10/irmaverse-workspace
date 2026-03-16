@@ -6,7 +6,8 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session || session.user.role?.toLowerCase() !== "admin") {
+    const role = session?.user?.role?.toLowerCase();
+    if (!session || (role !== "admin" && role !== "super_admin")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -24,8 +25,12 @@ export async function GET() {
       instructorNews,
       userActivities
     ] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({
+      prisma.users.count({
+        where: {
+          role: "user"
+        }
+      }),
+      prisma.users.count({
         where: {
           role: "instruktur"
         }
@@ -73,7 +78,10 @@ export async function GET() {
           createdAt: 'desc'
         }
       }),
-      prisma.user.findMany({
+      prisma.users.findMany({
+        where: {
+          role: "user"
+        },
         take: 5,
         orderBy: {
           createdAt: 'desc'
@@ -88,17 +96,17 @@ export async function GET() {
       }),
       // Instructor Activities: Fetch from all users with role 'instruktur'
       prisma.material.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { users: { select: { name: true } } } }),
-      prisma.schedule.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { instructor: { select: { name: true } } } }),
-      prisma.competition.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { instructor: { select: { name: true } } } }),
-      prisma.news.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { author: { select: { name: true } } } }),
+      prisma.schedules.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { users: { select: { name: true } } } }),
+      prisma.competitions.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { users: { select: { name: true } } } }),
+      prisma.news.findMany({ orderBy: { updatedAt: 'desc' }, take: 5, include: { users: { select: { name: true } } } }),
       // User Activities: Fetch from all members
-      prisma.activityLog.findMany({
+      prisma.activity_logs.findMany({
         where: {
           type: { not: "profile_completed" }
         },
         orderBy: { createdAt: 'desc' },
         take: 5,
-        include: { user: { select: { name: true } } }
+        include: { users: { select: { name: true } } }
       })
     ]);
 
@@ -197,21 +205,21 @@ export async function GET() {
         id: `sch-${s.id}`,
         type: 'schedule',
         title: `${isNew(s.createdAt, s.updatedAt) ? 'Membuat' : 'Mengedit'} Kegiatan: ${s.title}`,
-        user: s.instructor?.name || "Instruktur",
+        user: s.users?.name || "Instruktur",
         updatedAt: s.updatedAt
       })),
       ...instructorCompetitions.map((c: any) => ({
         id: `comp-${c.id}`,
         type: 'competition',
         title: `${isNew(c.createdAt, c.updatedAt) ? 'Membuat' : 'Mengedit'} Lomba: ${c.title}`,
-        user: c.instructor?.name || "Instruktur",
+        user: c.users?.name || "Instruktur",
         updatedAt: c.updatedAt
       })),
       ...instructorNews.map((n: any) => ({
         id: `news-${n.id}`,
         type: 'news',
         title: `${isNew(n.createdAt, n.updatedAt) ? 'Menambahkan' : 'Mengedit'} Berita: ${n.title}`,
-        user: n.author?.name || "Instruktur",
+        user: n.users?.name || "Instruktur",
         updatedAt: n.updatedAt
       }))
     ];
@@ -230,7 +238,7 @@ export async function GET() {
     const formattedUserActivities = (userActivities as any[]).map(act => ({
       id: act.id,
       title: act.title,
-      user: act.user?.name || "Member",
+      user: act.users?.name || "Member",
       type: act.type,
       createdAt: act.createdAt
     }));

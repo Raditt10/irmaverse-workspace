@@ -40,7 +40,7 @@ export async function GET(
     const rawMat = await prisma.$queryRaw<any[]>`SELECT isAttendanceOpen FROM material WHERE id = ${materialId}`;
     const rawAttendanceOpen = rawMat.length > 0 ? (rawMat[0].isAttendanceOpen !== 0 && rawMat[0].isAttendanceOpen !== false) : true;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -48,7 +48,7 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (user.role !== "instruktur" && user.role !== "admin") {
+    if (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin") {
       return NextResponse.json(
         { error: "Forbidden: Only instructor or admin can view attendance" },
         { status: 403 },
@@ -66,7 +66,7 @@ export async function GET(
 
     const attendanceWithUsers = await Promise.all(
       attendances.map(async (att: any) => {
-        const attendanceUser = await prisma.user.findUnique({
+        const attendanceUser = await prisma.users.findUnique({
           where: { id: att.userId },
           select: {
             id: true,

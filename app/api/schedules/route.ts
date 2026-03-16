@@ -14,10 +14,10 @@ export async function GET(req: NextRequest) {
       where.status = status;
     }
 
-    const schedules = await prisma.schedule.findMany({
+    const schedules = await prisma.schedules.findMany({
       where,
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -30,7 +30,15 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(schedules);
+    const mappedSchedules = schedules.map(schedule => {
+      const { users, ...rest } = schedule as any;
+      return {
+        ...rest,
+        instructor: users
+      };
+    });
+
+    return NextResponse.json(mappedSchedules);
   } catch (error) {
     console.error("Error fetching schedules:", error);
     return NextResponse.json(
@@ -54,7 +62,7 @@ export async function POST(req: NextRequest) {
     console.log('User ID:', session.user.id);
     
     // Check if user exists
-    const userExists = await prisma.user.findUnique({
+    const userExists = await prisma.users.findUnique({
       where: { id: session.user.id }
     });
     
@@ -65,10 +73,13 @@ export async function POST(req: NextRequest) {
     
     console.log('User found:', userExists.email, userExists.role);
 
-    // Check if user is instructor
-    if (session.user.role !== "instruktur") {
+    // Check if user is instructor, admin, or super_admin
+    const userRoleLower = session.user.role?.toLowerCase();
+    const isAllowed = userRoleLower === "instruktur" || userRoleLower === "admin" || userRoleLower === "super_admin";
+
+    if (!isAllowed) {
       return NextResponse.json(
-        { error: "Only instructors can create schedules" },
+        { error: "Only instructors and admins can create schedules" },
         { status: 403 }
       );
     }
@@ -132,7 +143,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const schedule = await prisma.schedule.create({
+    const schedule = await prisma.schedules.create({
       data: {
         title,
         description,
@@ -146,9 +157,11 @@ export async function POST(req: NextRequest) {
         contactEmail: contactEmail || null,
         instructorId: session.user.id,
         status: bodyStatus || "segera_hadir",
+        updatedAt: new Date(),
+        id: crypto.randomUUID(),
       },
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,

@@ -18,7 +18,7 @@ export async function GET(
     }
 
     // Check if user exists
-    const User = await prisma.user.findUnique({
+    const User = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
 
@@ -81,12 +81,12 @@ export async function GET(
       );
     }
 
-    const isPrivileged = User.role === "instruktur" || User.role === "admin";
+    const isPrivileged = User.role === "instruktur" || User.role === "admin" || User.role === "super_admin";
 
     // Access control: non-privileged users must be enrolled (courseenrollment)
     // OR have an accepted invitation to view this material.
     // Admins can see all.
-    if (User.role !== "admin") {
+    if (User.role !== "admin" && User.role !== "super_admin") {
       const isCreator = material.instructorId === User.id;
       const hasEnrollment = (material as any).courseenrollment?.length > 0;
       const hasAcceptedInvite = ((material as any).materialinvite || []).some(
@@ -209,7 +209,7 @@ export async function DELETE(
     }
 
     // Authorization removal as per previous request
-    if (session.user.role !== "admin" && material.instructorId !== session.user.id) {
+    if (session.user.role !== "admin" && session.user.role !== "super_admin" && material.instructorId !== session.user.id) {
       return NextResponse.json(
         { error: "Hanya pembuat materi atau admin yang bisa menghapus kajian" },
         { status: 403 },
@@ -282,7 +282,7 @@ export async function PUT(
     }
 
     // Authorization removal
-    if (session.user.role !== "admin" && material.instructorId !== session.user.id) {
+    if (session.user.role !== "admin" && session.user.role !== "super_admin" && material.instructorId !== session.user.id) {
       return NextResponse.json(
         { error: "Hanya pembuat materi atau admin yang bisa mengedit kajian" },
         { status: 403 },
@@ -333,7 +333,7 @@ export async function PUT(
     // --- Process New Invites ---
     if (invites && Array.isArray(invites) && invites.length > 0) {
       // 1. Find users by emails
-      const usersToInvite = await prisma.user.findMany({
+      const usersToInvite = await prisma.users.findMany({
         where: { email: { in: invites } },
         select: { id: true, email: true },
       });

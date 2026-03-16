@@ -558,9 +558,9 @@ const GlobalForumPage = () => {
                                     Instruktur
                                   </span>
                                 )}
-                                {message.sender.role === "admin" && (
+                                {(message.sender.role === "admin" || message.sender.role === "super_admin") && (
                                   <span className="bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wide border border-violet-200">
-                                    Admin
+                                    {message.sender.role === "super_admin" ? "Super Admin" : "Admin"}
                                   </span>
                                 )}
                               </span>
@@ -638,11 +638,11 @@ const GlobalForumPage = () => {
 
             {/* ── Input area / Monitor Mode indicator ────────────────────────────── */}
             <div className="p-3 lg:p-4 bg-white border-t-2 border-slate-100 z-20 shrink-0">
-              {role === "admin" ? (
+              {role === "admin" || role === "super_admin" ? (
                 <div className="flex items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
                   <div className="flex items-center gap-3 text-slate-400">
                     <Shield className="h-5 w-5" />
-                    <p className="text-sm font-bold uppercase tracking-widest">Mode Pemantauan: Admin tidak dapat mengirim pesan</p>
+                    <p className="text-sm font-bold uppercase tracking-widest">Mode Pemantauan: {role === "super_admin" ? "Super Admin" : "Admin"} tidak dapat mengirim pesan</p>
                   </div>
                 </div>
               ) : (

@@ -69,7 +69,7 @@ const Materials = () => {
   };
 
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "instruktur" || role === "admin" || role === "instructor";
+  const isPrivileged = role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
   const programCategories = ["Semua", "Program Wajib", "Program Ekstra", "Program Next Level"];
   const classCategories = ["Semua", "Kelas 10", "Kelas 11", "Kelas 12"];
 

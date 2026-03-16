@@ -50,7 +50,7 @@ const Instructors = () => {
   const { data: session } = useSession();
   
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "admin" || role === "instruktur";
+  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
 
   // Menutup dropdown saat klik di luar
   useEffect(() => {

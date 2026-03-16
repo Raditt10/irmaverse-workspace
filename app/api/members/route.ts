@@ -7,7 +7,7 @@ export async function GET() {
     const session = await auth();
     const currentUserId = session?.user?.id;
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       where: {
         NOT: { role: "instruktur" },
       },
@@ -25,7 +25,7 @@ export async function GET() {
     // If session exists, fetch mutual follow status
     let mutualIds: Set<string> = new Set();
     if (currentUserId) {
-      const friendships = await prisma.friendship.findMany({
+      const friendships = await prisma.friendships.findMany({
         where: {
           OR: [
             { followerId: currentUserId, status: "accepted" },

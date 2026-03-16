@@ -70,7 +70,7 @@ const News = () => {
   const router = useRouter();
   const { data: session } = useSession();
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "admin" || role === "instruktur";
+  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
   const [news, setNews] = useState<NewsItem[]>([]);
   const [filteredNews, setFilteredNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,11 +1,11 @@
 import prisma from "@/lib/prisma";
-import { ActivityType } from "@prisma/client";
+import { activity_logs_type } from "@prisma/client";
 
 // ─── XP CONFIG ──────────────────────────────────────────────────────────────────
 // Hanya 4 sumber XP yang aktif:
 //   quiz_completed, program_enrolled, attendance_marked, badge_earned
 // Sumber lain dinonaktifkan (0 XP).
-export const XP_REWARDS: Record<ActivityType, number> = {
+export const XP_REWARDS: Record<activity_logs_type, number> = {
   quiz_completed: 50,
   material_read: 0, // dinonaktifkan
   course_enrolled: 0, // dinonaktifkan
@@ -20,7 +20,7 @@ export const XP_REWARDS: Record<ActivityType, number> = {
 };
 
 // Tipe aktivitas yang diizinkan mendapatkan XP
-const ALLOWED_XP_TYPES: Set<ActivityType> = new Set([
+const ALLOWED_XP_TYPES: Set<activity_logs_type> = new Set([
   "quiz_completed",
   "program_enrolled",
   "attendance_marked",
@@ -88,7 +88,7 @@ export function getLevelTitle(level: number): string {
 // Hanya tipe aktivitas yang ada di ALLOWED_XP_TYPES yang memberikan XP.
 export async function grantXp(params: {
   userId: string;
-  type: ActivityType;
+  type: activity_logs_type;
   title: string;
   description?: string;
   xpOverride?: number; // Gunakan jika ingin memberikan XP berbeda dari default
@@ -111,7 +111,7 @@ export async function grantXp(params: {
   };
 
   // ── Guard: Hanya role "user" yang boleh mendapat XP ──
-  const currentUser = await prisma.user.findUnique({
+  const currentUser = await prisma.users.findUnique({
     where: { id: userId },
     select: { role: true, points: true, level: true },
   });
@@ -124,7 +124,7 @@ export async function grantXp(params: {
   if (xpEarned <= 0) return EMPTY_RESULT;
 
   // 1. Update user points
-  const user = await prisma.user.update({
+  const user = await prisma.users.update({
     where: { id: userId },
     data: { points: { increment: xpEarned } },
     select: { points: true, level: true, id: true },
@@ -136,14 +136,14 @@ export async function grantXp(params: {
 
   // 3. Update level jika naik
   if (leveledUp) {
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: userId },
       data: { level: newLevel },
     });
   }
 
   // 4. Log activity
-  await prisma.activityLog.create({
+  await prisma.activity_logs.create({
     data: {
       userId,
       type,
@@ -156,7 +156,7 @@ export async function grantXp(params: {
 
   // 5. Jika level up, log juga sebagai aktivitas
   if (leveledUp) {
-    await prisma.activityLog.create({
+    await prisma.activity_logs.create({
       data: {
         userId,
         type: "level_up",
@@ -184,7 +184,7 @@ export async function grantXp(params: {
 // Cek semua badge dan berikan yang belum dimiliki jika syarat terpenuhi
 // PENTING: Hanya role "user" yang bisa mendapatkan badge.
 export async function checkAndAwardBadges(userId: string): Promise<string[]> {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.users.findUnique({
     where: { id: userId },
     select: {
       id: true,
@@ -203,18 +203,18 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
   if (user.role !== "user") return [];
 
   const ownedCodes = new Set(user.earnedBadges.map((ub) => ub.badge.code));
-  const allBadges = await prisma.badge.findMany();
+  const allBadges = await prisma.badges.findMany();
   const earned: string[] = [];
 
   // Hitung stats tambahan untuk badge check
   const [activityCount, quizAttemptCount, friendCount, forumPostCount] =
     await Promise.all([
-      prisma.activityLog.count({ where: { userId } }),
-      prisma.quiz_attempt.count({ where: { userId } }),
-      prisma.friendship.count({
+      prisma.activity_logs.count({ where: { userId } }),
+      prisma.quiz_attempts.count({ where: { userId } }),
+      prisma.friendships.count({
         where: { followerId: userId, status: "accepted" },
       }),
-      prisma.activityLog.count({ where: { userId, type: "forum_post" } }),
+      prisma.activity_logs.count({ where: { userId, type: "forum_post" } }),
     ]);
 
   for (const badge of allBadges) {
@@ -286,18 +286,18 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
     }
 
     if (qualifies) {
-      await prisma.userBadge.create({
+      await prisma.user_badges.create({
         data: { userId, badgeId: badge.id },
       });
 
       // Update badge count pada user
-      await prisma.user.update({
+      await prisma.users.update({
         where: { id: userId },
         data: { badges: { increment: 1 } },
       });
 
       // Log badge earned
-      await prisma.activityLog.create({
+      await prisma.activity_logs.create({
         data: {
           userId,
           type: "badge_earned",
@@ -310,7 +310,7 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
 
       // Tambah XP dari badge reward
       if (badge.xpReward > 0) {
-        await prisma.user.update({
+        await prisma.users.update({
           where: { id: userId },
           data: { points: { increment: badge.xpReward } },
         });

@@ -68,7 +68,7 @@ export default function CreateQuizPage() {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
-    role === "instruktur" || role === "admin" || role === "instructor";
+    role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   // --- Question management ---
   const addQuestion = () => {

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
       select: { password: true, role: true },
     });
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Admin cannot delete their own account
-    if (user.role === "admin") {
+    if (user.role === "admin" || user.role === "super_admin") {
       return NextResponse.json(
         { error: "Admin tidak dapat menghapus akun sendiri" },
         { status: 403 },
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Delete user — Cascade will handle related records
-    await prisma.user.delete({
+    await prisma.users.delete({
       where: { id: session.user.id },
     });
 

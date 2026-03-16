@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId") || session.user.id;
 
     // Ambil semua badge
-    const allBadges = await prisma.badge.findMany({
+    const allBadges = await prisma.badges.findMany({
       orderBy: [{ category: "asc" }, { name: "asc" }],
     });
 
     // Ambil badge yang sudah dimiliki user
-    const earnedBadges = await prisma.userBadge.findMany({
+    const earnedBadges = await prisma.user_badges.findMany({
       where: { userId },
       select: {
         badgeId: true,

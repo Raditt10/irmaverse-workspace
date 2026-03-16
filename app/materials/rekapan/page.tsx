@@ -174,7 +174,7 @@ const RekapanListPage = () => {
     totalKajian > 0 ? Math.round((totalHadir / totalKajian) * 100) : 0;
 
   const isInstructor =
-    session?.user?.role === "instruktur" || session?.user?.role === "admin";
+    session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin";
 
   if (status === "loading" || loading) {
     return (

@@ -126,8 +126,13 @@ const EditCompetition = () => {
     }
   };
 
-  if (status === "authenticated" && session?.user?.role !== "instruktur" && session?.user?.role !== "admin") {
-    router.push("/competitions");
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role !== "instruktur" && session?.user?.role !== "admin" && session?.user?.role !== "super_admin") {
+      router.push("/competitions");
+    }
+  }, [status, session, router]);
+
+  if (status === "authenticated" && session?.user?.role !== "instruktur" && session?.user?.role !== "admin" && session?.user?.role !== "super_admin") {
     return null;
   }
 

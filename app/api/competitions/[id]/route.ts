@@ -8,10 +8,10 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const competition = await prisma.competition.findUnique({
+    const competition = await prisma.competitions.findUnique({
       where: { id },
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -46,7 +46,7 @@ export async function GET(
       contactEmail: competition.contactEmail,
       maxParticipants: competition.maxParticipants,
       instructorId: competition.instructorId,
-      instructor: competition.instructor,
+      instructor: competition.users,
       createdAt: competition.createdAt,
       status: getCompetitionStatus(competition.date),
     };
@@ -68,7 +68,7 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    const competition = await prisma.competition.findUnique({
+    const competition = await prisma.competitions.findUnique({
       where: { id },
     });
 
@@ -79,7 +79,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.competition.delete({
+    await prisma.competitions.delete({
       where: { id },
     });
 

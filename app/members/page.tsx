@@ -189,7 +189,7 @@ const Members = () => {
                         {/* Points Section */}
                         <div className="mt-3 md:mt-4 px-3 md:px-6">
                             {(() => {
-                                const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instruktur";
+                                const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instruktur" || session?.user?.role === "super_admin";
                                 const isMe = member.id === session?.user?.id;
                                 const isVisibleXp = isPrivileged || isMe || member.isMutual;
 

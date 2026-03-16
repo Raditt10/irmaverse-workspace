@@ -17,7 +17,7 @@ export async function PATCH(
     const { content } = await req.json();
 
     // Get message
-    const message = await prisma.chatMessage.findUnique({
+    const message = await prisma.chat_messages.findUnique({
       where: { id: messageId },
     });
 
@@ -42,7 +42,7 @@ export async function PATCH(
     }
 
     // Update message
-    const updatedMessage = await prisma.chatMessage.update({
+    const updatedMessage = await prisma.chat_messages.update({
       where: { id: messageId },
       data: {
         content,
@@ -75,7 +75,7 @@ export async function DELETE(
     const { messageId } = await params;
 
     // Get message
-    const message = await prisma.chatMessage.findUnique({
+    const message = await prisma.chat_messages.findUnique({
       where: { id: messageId },
     });
 
@@ -100,7 +100,7 @@ export async function DELETE(
     }
 
     // Soft delete message
-    const deletedMessage = await prisma.chatMessage.update({
+    const deletedMessage = await prisma.chat_messages.update({
       where: { id: messageId },
       data: {
         isDeleted: true,

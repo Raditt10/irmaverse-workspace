@@ -1051,11 +1051,11 @@ const InstructorChatDashboard = () => {
 
                     {/* Message Input / Monitor Mode indicator */}
                     <div className="p-3 lg:p-4 bg-white/80 backdrop-blur-sm relative z-20 shrink-0">
-                      {role === "admin" ? (
+                      {role === "admin" || role === "super_admin" ? (
                         <div className="flex items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
                           <div className="flex items-center gap-3 text-slate-400">
                             <Shield className="h-5 w-5" />
-                            <p className="text-sm font-bold uppercase tracking-widest text-center">Mode Pemantauan: Admin tidak dapat mengirim pesan</p>
+                            <p className="text-sm font-bold uppercase tracking-widest text-center">Mode Pemantauan: {role === "super_admin" ? "Super Admin" : "Admin"} tidak dapat mengirim pesan</p>
                           </div>
                         </div>
                       ) : (

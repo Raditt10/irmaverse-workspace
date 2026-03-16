@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     }
 
     // Hapus friendship
-    const deleted = await prisma.friendship.deleteMany({
+    const deleted = await prisma.friendships.deleteMany({
       where: {
         followerId: userId,
         followingId: targetUserId,
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     }
 
     // Jika ada reverse follow, set ke pending (bukan mutual lagi)
-    await prisma.friendship.updateMany({
+    await prisma.friendships.updateMany({
       where: {
         followerId: targetUserId,
         followingId: userId,

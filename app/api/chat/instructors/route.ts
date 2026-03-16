@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all instructors
-      const instructors = await prisma.user.findMany({
+      const instructors = await prisma.users.findMany({
         where: {
           role: "instruktur",
         },
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       });
 
     // Get existing conversations for this user
-    const userConversations = await prisma.chatConversation.findMany({
+    const userConversations = await prisma.chat_conversations.findMany({
       where: { userId: session.user.id },
       select: { instructorId: true },
     });

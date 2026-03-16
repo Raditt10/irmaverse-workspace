@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
@@ -37,10 +37,15 @@ export default function CreateNewsPage() {
   };
 
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "admin" || role === "instruktur";
+  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
+
+  useEffect(() => {
+    if (status === "authenticated" && !isPrivileged) {
+      router.push("/news");
+    }
+  }, [status, isPrivileged, router]);
 
   if (status === "authenticated" && !isPrivileged) {
-    router.push("/news");
     return null;
   }
   const [user, setUser] = useState<any>({
@@ -98,10 +103,10 @@ export default function CreateNewsPage() {
         ...prev,
         image: data.url,
       }));
-      showToast("Gambar berhasil diupload!", "success");
+      showToast("Tumbnail berhasil diupload!", "success");
     } catch (error) {
       console.error("Error uploading image:", error);
-      showToast("Gagal mengupload gambar. Silakan coba lagi.", "error");
+      showToast("Gagal mengupload tumbnail. Silakan coba lagi.", "error");
     } finally {
       setUploadingImage(false);
     }
@@ -126,7 +131,7 @@ export default function CreateNewsPage() {
         return;
       }
 
-      showToast("Berita berhasil dibuat!", "success");
+      showToast("Berita berhasil dibuat! Mengalihkan...", "success");
       
       // Tunggu toast selesai sebelum redirect
       setTimeout(() => {

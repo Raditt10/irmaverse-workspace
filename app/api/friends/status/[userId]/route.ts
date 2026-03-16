@@ -26,7 +26,7 @@ export async function GET(
     }
 
     // Cek apakah saya follow dia
-    const myFollow = await prisma.friendship.findUnique({
+    const myFollow = await prisma.friendships.findUnique({
       where: {
         followerId_followingId: {
           followerId: userId,
@@ -36,7 +36,7 @@ export async function GET(
     });
 
     // Cek apakah dia follow saya
-    const theirFollow = await prisma.friendship.findUnique({
+    const theirFollow = await prisma.friendships.findUnique({
       where: {
         followerId_followingId: {
           followerId: targetUserId,

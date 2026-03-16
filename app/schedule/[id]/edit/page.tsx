@@ -89,7 +89,7 @@ const EditSchedule = () => {
         status === "authenticated" &&
         session?.user?.id !== data.instructorId &&
         session?.user?.role !== "admin" &&
-        session?.user?.role !== "instruktur"
+        session?.user?.role !== "super_admin"
       ) {
         showToast("Anda tidak memiliki akses untuk mengedit event ini", "error");
         setTimeout(() => router.push("/schedule"), 2000);
@@ -120,11 +120,13 @@ const EditSchedule = () => {
     }
   };
 
-  // Redirect jika bukan instruktur atau admin
+  // Redirect jika bukan instruktur, admin, atau super_admin
+  const role = session?.user?.role;
+  const isPrivileged = role === "instruktur" || role === "admin" || role === "super_admin";
+
   if (
     status === "authenticated" &&
-    session?.user?.role !== "instruktur" &&
-    session?.user?.role !== "admin"
+    !isPrivileged
   ) {
     router.push("/schedule");
     return null;

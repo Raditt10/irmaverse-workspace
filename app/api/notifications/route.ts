@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     }
 
     const [notifications, unreadCount] = await Promise.all([
-      prisma.notification.findMany({
+      prisma.notifications.findMany({
         where,
         include: {
           sender: {
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         take: limit,
       }),
-      prisma.notification.count({
+      prisma.notifications.count({
         where: {
           userId: session.user.id,
           status: "unread",
@@ -101,7 +101,7 @@ export async function PATCH(req: NextRequest) {
 
     // Mark all unread as read (bulk)
     if (ids && Array.isArray(ids)) {
-      await prisma.notification.updateMany({
+      await prisma.notifications.updateMany({
         where: {
           id: { in: ids },
           userId: session.user.id,
@@ -121,7 +121,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Verify ownership
-    const notification = await prisma.notification.findFirst({
+    const notification = await prisma.notifications.findFirst({
       where: { id, userId: session.user.id },
     });
 
@@ -204,7 +204,7 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    const updated = await prisma.notification.update({
+    const updated = await prisma.notifications.update({
       where: { id },
       data: { status },
       include: {
@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await prisma.notification.updateMany({
+    const result = await prisma.notifications.updateMany({
       where: {
         userId: session.user.id,
         status: "unread",

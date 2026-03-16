@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       where: whereClause,
       select: {
         id: true,
@@ -88,21 +88,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Nama, email, dan password wajib diisi" }, { status: 400 });
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.users.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
+        id: crypto.randomUUID(),
         name,
         email,
         password: hashedPassword,
         role: role || "user",
         notelp: notelp || null,
         address: address || null,
+        updatedAt: new Date(),
       },
     });
 
@@ -151,7 +153,13 @@ export async function PUT(req: NextRequest) {
       data.password = await bcrypt.hash(password, 10);
     }
 
-    await prisma.user.update({ where: { id }, data });
+    await prisma.users.update({ 
+      where: { id }, 
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      } 
+    });
 
     // Update jabatan via raw query
     if (jabatan !== undefined) {
@@ -188,9 +196,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Get info for logging before deletion
-    const targetUser = await prisma.user.findUnique({ where: { id }, select: { name: true, email: true } });
+    const targetUser = await prisma.users.findUnique({ where: { id }, select: { name: true, email: true } });
 
-    await prisma.user.delete({ where: { id } });
+    await prisma.users.delete({ where: { id } });
 
     // Log Activity
     await recordActivity({

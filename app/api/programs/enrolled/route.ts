@@ -13,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const enrollments = await prisma.program_enrollment.findMany({
+    const enrollments = await prisma.program_enrollments.findMany({
       where: { userId: session.user.id },
       include: {
         program: {

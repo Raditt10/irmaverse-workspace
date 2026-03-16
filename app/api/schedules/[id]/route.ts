@@ -9,12 +9,12 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const schedule = await prisma.schedule.findUnique({
+    const schedule = await prisma.schedules.findUnique({
       where: {
         id: id,
       },
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -32,7 +32,14 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(schedule);
+    // Map users to instructor for frontend compatibility
+    const responseData = {
+      ...schedule,
+      instructor: (schedule as any).users,
+    };
+    delete (responseData as any).users;
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error("Error fetching schedule:", error);
     return NextResponse.json(
@@ -56,7 +63,7 @@ export async function PATCH(
     }
 
     // Get the schedule to check ownership
-    const existingSchedule = await prisma.schedule.findUnique({
+    const existingSchedule = await prisma.schedules.findUnique({
       where: { id: id },
     });
 
@@ -73,7 +80,7 @@ export async function PATCH(
     if (
       existingSchedule.instructorId !== session.user.id &&
       userRole !== "admin" &&
-      userRole !== "instruktur"
+      userRole !== "super_admin"
     ) {
       return NextResponse.json(
         { error: "You can only update your own schedules" },
@@ -109,11 +116,11 @@ export async function PATCH(
     if (contactNumber !== undefined) updateData.contactNumber = contactNumber || null;
     if (contactEmail !== undefined) updateData.contactEmail = contactEmail || null;
 
-    const updatedSchedule = await prisma.schedule.update({
+    const updatedSchedule = await prisma.schedules.update({
       where: { id: id },
       data: updateData,
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -123,7 +130,14 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json(updatedSchedule);
+    // Map users to instructor for frontend compatibility
+    const responseData = {
+      ...updatedSchedule,
+      instructor: (updatedSchedule as any).users,
+    };
+    delete (responseData as any).users;
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error("Error updating schedule:", error);
     return NextResponse.json(
@@ -147,7 +161,7 @@ export async function DELETE(
     }
 
     // Get the schedule to check ownership
-    const existingSchedule = await prisma.schedule.findUnique({
+    const existingSchedule = await prisma.schedules.findUnique({
       where: { id: id },
     });
 
@@ -164,7 +178,7 @@ export async function DELETE(
     if (
       existingSchedule.instructorId !== session.user.id &&
       userRole !== "admin" &&
-      userRole !== "instruktur"
+      userRole !== "super_admin"
     ) {
       return NextResponse.json(
         { error: "You can only delete your own schedules" },
@@ -172,7 +186,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.schedule.delete({
+    await prisma.schedules.delete({
       where: { id: id },
     });
 

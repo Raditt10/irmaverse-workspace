@@ -15,7 +15,7 @@ export async function GET(
 
     const { quizId } = await params;
 
-    const quiz = await prisma.material_quiz.findUnique({
+    const quiz = await prisma.material_quizzes.findUnique({
       where: { id: quizId },
       include: {
         material: { select: { id: true, title: true, instructorId: true, thumbnailUrl: true } },
@@ -45,10 +45,10 @@ export async function GET(
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    const isPrivileged = user?.role === "instruktur" || user?.role === "admin";
+    const isPrivileged = user?.role === "instruktur" || user?.role === "admin" || user?.role === "super_admin";
 
     const questions = quiz.questions.map((q) => ({
       id: q.id,
@@ -96,10 +96,10 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -115,10 +115,10 @@ export async function PUT(
     }
 
     // Delete old questions (cascade deletes options)
-    await prisma.quiz_question.deleteMany({ where: { quizId } });
+    await prisma.quiz_questions.deleteMany({ where: { quizId } });
 
     // Update quiz and recreate questions
-    const quiz = await prisma.material_quiz.update({
+    const quiz = await prisma.material_quizzes.update({
       where: { id: quizId },
       data: {
         title: title.trim(),
@@ -162,16 +162,16 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { quizId } = await params;
 
-    await prisma.material_quiz.delete({ where: { id: quizId } });
+    await prisma.material_quizzes.delete({ where: { id: quizId } });
 
     return NextResponse.json({
       success: true,

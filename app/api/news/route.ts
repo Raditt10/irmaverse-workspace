@@ -43,14 +43,14 @@ export async function GET(request: NextRequest) {
     let savedNewsIds: Set<string> = new Set();
     
     if (session?.user?.email) {
-      const user = await prisma.user.findUnique({
+      const user = await prisma.users.findUnique({
         where: { email: session.user.email },
         select: { id: true }
       });
       if (user) {
         userId = user.id;
         // Fetch saved news separately to avoid Prisma inclusion error if client is out of sync
-        const saved = await (prisma as any).savedNews.findMany({
+        const saved = await prisma.saved_news.findMany({
           where: { userId: user.id },
           select: { newsId: true }
         });
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
       const news = await prisma.news.findUnique({
         where: { slug },
         include: {
-          author: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -78,8 +78,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
+      const { users, ...newsData } = news;
       const result = {
-        ...news,
+        ...newsData,
+        author: users,
         isSaved: savedNewsIds.has(news.id),
       };
 
@@ -91,7 +93,7 @@ export async function GET(request: NextRequest) {
       const news = await prisma.news.findUnique({
         where: { id },
         include: {
-          author: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -106,8 +108,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
+      const { users, ...newsData } = news;
       const result = {
-        ...news,
+        ...newsData,
+        author: users,
         isSaved: savedNewsIds.has(news.id),
       };
 
@@ -123,7 +127,7 @@ export async function GET(request: NextRequest) {
     const allNews = await prisma.news.findMany({
       where,
       include: {
-        author: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -137,11 +141,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Map to include isSaved and sort
-    const mappedNews = allNews.map((n: any) => ({
-      ...n,
-      isSaved: savedNewsIds.has(n.id),
-    }));
+    // Map to include isSaved, rename users to author, and sort
+    const mappedNews = allNews.map((n: any) => {
+      const { users, ...newsData } = n;
+      return {
+        ...newsData,
+        author: users,
+        isSaved: savedNewsIds.has(n.id),
+      };
+    });
 
     if (userId) {
       // Sort: saved first, then by createdAt desc
@@ -175,11 +183,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is admin or instructor
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email! },
     });
 
-    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur" || user?.role === "super_admin";
 
     if (!user || !isPrivileged) {
       return NextResponse.json(
@@ -222,9 +230,11 @@ export async function POST(request: NextRequest) {
         content,
         image: image || null,
         authorId: user.id,
+        updatedAt: new Date(),
+        id: crypto.randomUUID(),
       },
       include: {
-        author: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -247,7 +257,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json(news, { status: 201 });
+    const { users, ...newsData } = news;
+    const result = {
+      ...newsData,
+      author: users,
+    };
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
     console.error("Error creating news:", error);
     return NextResponse.json(
@@ -269,11 +285,11 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email! },
     });
 
-    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur" || user?.role === "super_admin";
 
     if (!user || !isPrivileged) {
       return NextResponse.json(
@@ -317,7 +333,7 @@ export async function PUT(request: NextRequest) {
         ...(image !== undefined && { image }),
       },
       include: {
-        author: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -351,7 +367,13 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(updatedNews);
+    const { users, ...newsData } = updatedNews;
+    const result = {
+      ...newsData,
+      author: users,
+    };
+
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error("Error updating news:", error);
     return NextResponse.json(
@@ -373,11 +395,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email! },
     });
 
-    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur" || user?.role === "super_admin";
 
     if (!user || !isPrivileged) {
       return NextResponse.json(

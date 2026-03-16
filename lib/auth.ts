@@ -21,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await prisma.users.findUnique({
           where: { email: credentials.email as string },
         });
 
@@ -63,7 +63,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = user.email;
         if (!email) return false;
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.users.findUnique({
           where: { email },
           include: { accounts: true },
         });
@@ -74,8 +74,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             (a) => a.provider === "google",
           );
           if (!hasGoogle) {
-            await prisma.account.create({
+            await prisma.accounts.create({
               data: {
+                id: crypto.randomUUID(),
                 userId: existingUser.id,
                 type: account.type,
                 provider: account.provider,
@@ -93,27 +94,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // Update avatar from Google if user doesn't have one
           if (!existingUser.avatar && user.image) {
-            await prisma.user.update({
+            await prisma.users.update({
               where: { id: existingUser.id },
-              data: { avatar: user.image },
+              data: { 
+                avatar: user.image,
+                updatedAt: new Date()
+              },
             });
           }
 
           return true;
         } else {
           // New user from Google
-          const newUser = await prisma.user.create({
+          const newUser = await prisma.users.create({
             data: {
+              id: crypto.randomUUID(),
               email,
               name: user.name || email.split("@")[0],
               password: null,
               avatar: user.image,
               role: "user",
+              updatedAt: new Date()
             },
           });
 
-          await prisma.account.create({
+          await prisma.accounts.create({
             data: {
+              id: crypto.randomUUID(),
               userId: newUser.id,
               type: account.type,
               provider: account.provider,
@@ -138,7 +145,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, account, trigger, session }) {
       if (user) {
         if (account?.provider === "google") {
-          const dbUser = await prisma.user.findUnique({
+          const dbUser = await prisma.users.findUnique({
             where: { email: user.email! },
           });
           if (dbUser) {

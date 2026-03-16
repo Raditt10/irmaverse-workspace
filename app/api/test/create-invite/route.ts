@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check user exists
-    const targetUser = await prisma.user.findUnique({
+    const targetUser = await prisma.users.findUnique({
       where: { id: userId },
     });
     if (!targetUser) {
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 // GET to fetch all users and materials for testing
 export async function GET() {
   try {
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       select: {
         id: true,
         email: true,

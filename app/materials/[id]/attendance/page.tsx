@@ -66,7 +66,7 @@ const AttendanceList = () => {
   });
 
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "instruktur" || role === "admin" || role === "instructor";
+  const isPrivileged = role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   useEffect(() => {
     if (status === "authenticated" && !isPrivileged) {

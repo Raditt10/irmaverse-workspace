@@ -557,9 +557,8 @@ export default function Home() {
       <section id="faq" className="py-14 sm:py-24 relative">
         <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 mb-4 sm:mb-6 bg-white/10 border-2 border-white/20 rounded-2xl backdrop-blur-md shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transform rotate-2 hover:rotate-0 transition-all duration-300">
-              <MessageCircleQuestion className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-300 stroke-[3px]" />
-              <span className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider">Tanya Jawab</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-4 sm:mb-6 bg-white/10 border-2 border-white/20 rounded-xl backdrop-blur-md shadow-[3px_3px_0px_0px_rgba(0,0,0,0.1)] transform rotate-2 hover:rotate-0 transition-all duration-300">
+              <span className="text-[10px] sm:text-xs font-extrabold text-white uppercase tracking-wider">Tanya Jawab</span>
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-6 leading-tight drop-shadow-[3px_3px_0px_rgba(0,0,0,0.15)]">
                FAQ <span className="bg-linear-to-r from-emerald-200 to-cyan-200 bg-clip-text text-transparent" style={{ textShadow: "2px 2px 0px rgba(0,0,0,0.2)" }}>Terkait</span>

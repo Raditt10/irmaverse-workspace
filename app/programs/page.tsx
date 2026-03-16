@@ -59,7 +59,7 @@ const OurPrograms = () => {
   const { data: session } = useSession({ required: false });
 
   const isPrivileged =
-    session?.user?.role === "instruktur" || session?.user?.role === "admin";
+    session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });

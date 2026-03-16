@@ -237,6 +237,7 @@ const MemberDetail = () => {
     friendshipStatus?.isOwnProfile === true ||
     friendshipStatus?.isMutual === true ||
     userRole === "admin" ||
+    userRole === "super_admin" ||
     userRole === "instruktur";
 
   return (
@@ -285,12 +286,12 @@ const MemberDetail = () => {
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-black text-emerald-700 uppercase tracking-wider">
                       {profile.role === "instruktur" ? (
                         <GraduationCap className="h-3.5 w-3.5" />
-                      ) : profile.role === "admin" ? (
+                      ) : profile.role === "admin" || profile.role === "super_admin" ? (
                         <Star className="h-3.5 w-3.5" />
                       ) : (
                         <Users className="h-3.5 w-3.5" />
                       )}
-                      {profile.role}
+                      {profile.role === "super_admin" ? "Super Admin" : profile.role}
                     </div>
                     {xpProgress && (
                       <div className="mt-2 flex justify-center">

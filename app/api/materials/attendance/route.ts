@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get user from database
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -178,7 +178,7 @@ export async function GET(req: NextRequest) {
     }
 
     const materialId = req.nextUrl.searchParams.get("materialId");
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 

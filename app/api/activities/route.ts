@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const cursor = searchParams.get("cursor");
     const userId = searchParams.get("userId") || session.user.id;
 
-    const activities = await prisma.activityLog.findMany({
+    const activities = await prisma.activity_logs.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
       take: limit + 1,

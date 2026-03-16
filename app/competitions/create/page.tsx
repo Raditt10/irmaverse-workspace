@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
@@ -53,8 +53,16 @@ const CreateCompetition = () => {
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
 
-  if (status === "authenticated" && session?.user?.role !== "instruktur") {
-    router.push("/competitions");
+  const role = session?.user?.role?.toLowerCase();
+  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
+
+  useEffect(() => {
+    if (status === "authenticated" && !isPrivileged) {
+      router.push("/competitions");
+    }
+  }, [status, isPrivileged, router]);
+
+  if (status === "authenticated" && !isPrivileged) {
     return null;
   }
 
@@ -218,7 +226,7 @@ const CreateCompetition = () => {
 
       const data = await response.json();
       showToast("Perlombaan berhasil dibuat. Mengalihkan...", "success");
-      setTimeout(() => router.push(`/competitions/${data.id}`), 2000);
+      setTimeout(() => router.push("/competitions"), 2000);
     } catch (error: any) {
       console.error("Error creating competition:", error);
       showToast(error.message || "Terjadi kesalahan saat membuat perlombaan", "error");

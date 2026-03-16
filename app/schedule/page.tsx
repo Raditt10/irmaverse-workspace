@@ -178,7 +178,7 @@ const Schedule = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {session?.user?.role === "instruktur" && (
+                {(session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin") && (
                   <AddButton
                     label="Buat Kegiatan"
                     onClick={() => router.push("/schedule/create")}

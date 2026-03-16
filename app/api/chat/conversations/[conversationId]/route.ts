@@ -16,7 +16,7 @@ export async function DELETE(
     const { conversationId } = await params;
 
     // Verify user is a participant of this conversation
-    const conversation = await prisma.chatConversation.findFirst({
+    const conversation = await prisma.chat_conversations.findFirst({
       where: {
         id: conversationId,
         OR: [
@@ -34,12 +34,12 @@ export async function DELETE(
     }
 
     // Delete all messages in the conversation
-    await prisma.chatMessage.deleteMany({
+    await prisma.chat_messages.deleteMany({
       where: { conversationId },
     });
 
     // Delete the conversation
-    await prisma.chatConversation.delete({
+    await prisma.chat_conversations.delete({
       where: { id: conversationId },
     });
 

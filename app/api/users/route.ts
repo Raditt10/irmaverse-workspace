@@ -6,11 +6,11 @@ export async function GET() {
   try {
     const session = await auth();
     // Hanya admin/instruktur yang boleh lihat list user
-    if (!session || (session.user.role !== "instruktur" && session.user.role !== "admin")) {
+    if (!session || (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin")) {
         return NextResponse.json([], { status: 403 });
     }
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       where: {
         role: 'user' // Hanya ambil siswa biasa
       },

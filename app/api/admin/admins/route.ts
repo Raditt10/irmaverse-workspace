@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    const admins = await prisma.user.findMany({
+    const admins = await prisma.users.findMany({
       where: whereClause,
       select: {
         id: true,
@@ -81,21 +81,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Nama, email, dan password wajib diisi" }, { status: 400 });
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.users.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
+        id: crypto.randomUUID(),
         name,
         email,
         password: hashedPassword,
         role: "admin",
         notelp: notelp || null,
         address: address || null,
+        updatedAt: new Date(),
       },
     });
 
@@ -138,14 +140,14 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID admin wajib diisi" }, { status: 400 });
     }
 
-    const existingAdmin = await prisma.user.findUnique({ where: { id } });
+    const existingAdmin = await prisma.users.findUnique({ where: { id } });
     if (!existingAdmin) {
       return NextResponse.json({ error: "Admin tidak ditemukan" }, { status: 404 });
     }
 
     // Check if new email is already taken by another user
     if (email && email !== existingAdmin.email) {
-      const emailTaken = await prisma.user.findUnique({ where: { email } });
+      const emailTaken = await prisma.users.findUnique({ where: { email } });
       if (emailTaken) {
         return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 400 });
       }
@@ -160,7 +162,13 @@ export async function PUT(req: NextRequest) {
       data.password = await bcrypt.hash(password, 10);
     }
 
-    await prisma.user.update({ where: { id }, data });
+    await prisma.users.update({ 
+      where: { id }, 
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      } 
+    });
 
     // Update jabatan via raw query
     if (jabatan !== undefined) {
@@ -199,7 +207,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID admin wajib diisi" }, { status: 400 });
     }
 
-    const target = await prisma.user.findUnique({ where: { id } });
+    const target = await prisma.users.findUnique({ where: { id } });
     if (!target) {
       return NextResponse.json({ error: "Admin tidak ditemukan" }, { status: 404 });
     }
@@ -209,7 +217,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Tidak dapat menghapus Super Admin" }, { status: 403 });
     }
 
-    await prisma.user.delete({ where: { id } });
+    await prisma.users.delete({ where: { id } });
 
     // Log Activity
     await recordActivity({

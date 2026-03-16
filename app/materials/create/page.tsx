@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import BackButton from "@/components/ui/BackButton";
@@ -48,8 +49,17 @@ const CreateMaterial = () => {
     { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[] }[]
   >([]);
   const [fetchingPrograms, setFetchingPrograms] = useState(false);
+  const [availableInstructors, setAvailableInstructors] = useState<
+    { id: string; name: string; avatar?: string; email: string }[]
+  >([]);
+  const [fetchingInstructors, setFetchingInstructors] = useState(false);
   const [isProgramDropdownOpen, setIsProgramDropdownOpen] = useState(false);
   const [isKajianDropdownOpen, setIsKajianDropdownOpen] = useState(false);
+  const [isInstructorDropdownOpen, setIsInstructorDropdownOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const userRole = session?.user?.role?.toLowerCase();
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
 
   // Toast State
   const [toast, setToast] = useState<{
@@ -73,6 +83,7 @@ const CreateMaterial = () => {
     materialLink: "",
     rekapanContent: "",
     location: "",
+    instructorId: "",
   });
 
   const [inviteInput, setInviteInput] = useState("");
@@ -110,9 +121,26 @@ const CreateMaterial = () => {
         console.error(err);
       }
     }
+
+    async function fetchInstructors() {
+      if (!isAdmin) return;
+      try {
+        setFetchingInstructors(true);
+        const res = await fetch("/api/admin/instructors");
+        if (!res.ok) throw new Error("Gagal mengambil data instruktur");
+        const data = await res.json();
+        setAvailableInstructors(data);
+      } catch (err) {
+        console.error("Error fetching instructors:", err);
+      } finally {
+        setFetchingInstructors(false);
+      }
+    }
+
     fetchUsers();
     fetchPrograms();
-  }, []);
+    fetchInstructors();
+  }, [isAdmin]);
 
   const fetchPrograms = async () => {
     try {
@@ -258,6 +286,11 @@ const CreateMaterial = () => {
       showToast("Jam kajian harus dipilih", "error");
       return;
     }
+    if (isAdmin && !formData.instructorId) {
+      showToast("Silakan pilih instruktur kajian", "error");
+      return;
+    }
+
     if (invitedUsers.length === 0) {
       showToast("Minimal 1 anggota harus diundang ke dalam kajian", "error");
       return;
@@ -372,6 +405,103 @@ const CreateMaterial = () => {
                   </h2>
 
                   <div className="space-y-4 lg:space-y-6">
+                    {/* --- INSTRUCTOR SELECTOR (Admin only) --- */}
+                    {isAdmin && (
+                      <div className="space-y-2">
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                          <Plus className="h-4 w-4 text-emerald-500" />{" "}
+                          Instruktur Kajian <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setIsInstructorDropdownOpen(!isInstructorDropdownOpen)
+                            }
+                            className={`
+                              w-full flex items-center justify-between rounded-2xl border-2 bg-white px-5 py-3.5 
+                              font-bold text-slate-700 transition-all cursor-pointer
+                              ${
+                                isInstructorDropdownOpen
+                                  ? "border-teal-400 shadow-[0_4px_0_0_#34d399]"
+                                  : "border-slate-200 shadow-[0_4px_0_0_#e2e8f0] hover:border-teal-300"
+                              }
+                            `}
+                          >
+                            <div className="flex items-center gap-3 truncate">
+                              {formData.instructorId ? (
+                                <>
+                                  <div className="w-6 h-6 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                                    <img 
+                                      src={availableInstructors.find(i => i.id === formData.instructorId)?.avatar || "/img/icons/default-avatar.png"} 
+                                      alt="avatar"
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => (e.currentTarget.src = "/img/icons/default-avatar.png")}
+                                    />
+                                  </div>
+                                  <span className="truncate">
+                                    {availableInstructors.find(i => i.id === formData.instructorId)?.name}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-slate-400 italic font-medium">— Pilih Instruktur —</span>
+                              )}
+                            </div>
+                            <ChevronDown
+                              className={`h-5 w-5 text-slate-400 transition-transform ${isInstructorDropdownOpen ? "rotate-180" : ""}`}
+                            />
+                          </button>
+
+                          {isInstructorDropdownOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-2 z-20 bg-white border-2 border-slate-200 rounded-2xl shadow-[0_8px_0_0_#cbd5e1] overflow-hidden max-h-60 overflow-y-auto">
+                              <div className="p-1.5 space-y-1">
+                                {fetchingInstructors ? (
+                                  <div className="px-4 py-3 text-sm text-slate-500 font-bold italic">
+                                    Memuat instruktur...
+                                  </div>
+                                ) : availableInstructors.length === 0 ? (
+                                  <div className="px-4 py-3 text-sm text-slate-500 font-bold italic">
+                                    Tidak ada instruktur tersedia
+                                  </div>
+                                ) : (
+                                  availableInstructors.map((inst) => (
+                                    <button
+                                      key={inst.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setFormData({
+                                          ...formData,
+                                          instructorId: inst.id,
+                                        });
+                                        setIsInstructorDropdownOpen(false);
+                                      }}
+                                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                                        formData.instructorId === inst.id
+                                          ? "bg-teal-50 text-teal-700"
+                                          : "text-slate-600 hover:bg-slate-50"
+                                      }`}
+                                    >
+                                      <div className="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                                        <img 
+                                          src={inst.avatar || "/img/icons/default-avatar.png"} 
+                                          alt={inst.name}
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => (e.currentTarget.src = "/img/icons/default-avatar.png")}
+                                        />
+                                      </div>
+                                      <div className="flex flex-col items-start leading-tight truncate">
+                                        <span className="truncate">{inst.name}</span>
+                                        <span className="text-[10px] text-slate-400 font-medium truncate">{inst.email}</span>
+                                      </div>
+                                    </button>
+                                  ))
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
                         Judul Kajian <span className="text-red-500">*</span>

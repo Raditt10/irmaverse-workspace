@@ -1,0 +1,326 @@
+app/api/badges/route.ts(22,36): error TS2551: Property 'badge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'badges'?
+app/api/badges/route.ts(27,39): error TS2551: Property 'userBadge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'user_badges'?
+app/api/badges/route.ts(36,25): error TS7006: Parameter 'eb' implicitly has an 'any' type.
+app/api/badges/route.ts(39,35): error TS7006: Parameter 'badge' implicitly has an 'any' type.
+app/api/chat/conversations/[conversationId]/messages/route.ts(19,39): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/[conversationId]/messages/route.ts(42,35): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/conversations/[conversationId]/messages/route.ts(61,18): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/conversations/[conversationId]/messages/route.ts(115,39): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/[conversationId]/messages/route.ts(133,34): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/conversations/[conversationId]/messages/route.ts(152,18): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/[conversationId]/route.ts(19,39): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/[conversationId]/route.ts(37,18): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/conversations/[conversationId]/route.ts(42,18): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/route.ts(20,36): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/route.ts(50,28): error TS7006: Parameter 'conv' implicitly has an 'any' type.
+app/api/chat/conversations/route.ts(60,36): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/route.ts(91,28): error TS7006: Parameter 'conv' implicitly has an 'any' type.
+app/api/chat/conversations/route.ts(128,37): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/chat/conversations/route.ts(143,47): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/conversations/route.ts(157,39): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/forum/messages/route.ts(27,37): error TS2551: Property 'forumMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'forum_messages'?
+app/api/chat/forum/messages/route.ts(47,37): error TS2551: Property 'forumMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'forum_messages'?
+app/api/chat/forum/messages/route.ts(104,34): error TS2551: Property 'forumMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'forum_messages'?
+app/api/chat/instructors/route.ts(14,40): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/chat/instructors/route.ts(30,44): error TS2551: Property 'chatConversation' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_conversations'?
+app/api/chat/instructors/route.ts(36,30): error TS7006: Parameter 'c' implicitly has an 'any' type.
+app/api/chat/instructors/route.ts(40,64): error TS7006: Parameter 'instructor' implicitly has an 'any' type.
+app/api/chat/messages/[messageId]/route.ts(20,34): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/messages/[messageId]/route.ts(45,41): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/messages/[messageId]/route.ts(78,34): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/messages/[messageId]/route.ts(103,41): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/chat/messages/read/route.ts(23,18): error TS2551: Property 'chatMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'chat_messages'?
+app/api/competitions/[id]/route.ts(11,38): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/competitions/[id]/route.ts(71,38): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/competitions/[id]/route.ts(82,18): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/competitions/route.ts(8,39): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/competitions/route.ts(23,53): error TS7006: Parameter 'comp' implicitly has an 'any' type.
+app/api/competitions/route.ts(104,38): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/competitions/route.ts(185,38): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/competitions/route.ts(194,45): error TS2551: Property 'competition' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'competitions'?
+app/api/debug/all-invites-detail/route.ts(23,32): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/debug/session/route.ts(22,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/debug/users/route.ts(6,35): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/friends/count/route.ts(16,14): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/count/route.ts(17,14): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/count/route.ts(21,38): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/count/route.ts(25,43): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/count/route.ts(27,38): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/follow/route.ts(40,37): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/friends/follow/route.ts(53,35): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/follow/route.ts(70,40): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/follow/route.ts(82,37): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/follow/route.ts(92,20): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/follow/route.ts(100,20): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/friends/profile/[userId]/route.ts(13,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/friends/profile/[userId]/route.ts(43,14): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/profile/[userId]/route.ts(44,14): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/profile/[userId]/route.ts(48,43): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/friends/profile/[userId]/route.ts(53,36): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/friends/profile/[userId]/route.ts(61,14): error TS2551: Property 'program_enrollment' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'program_enrollments'?
+app/api/friends/profile/[userId]/route.ts(66,45): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+app/api/friends/profile/[userId]/route.ts(82,50): error TS7006: Parameter 'a' implicitly has an 'any' type.
+app/api/friends/profile/[userId]/route.ts(92,42): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/friends/profile/[userId]/route.ts(98,45): error TS7006: Parameter 'qa' implicitly has an 'any' type.
+app/api/friends/profile/[userId]/route.ts(110,39): error TS2551: Property 'userBadge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'user_badges'?
+app/api/friends/profile/[userId]/route.ts(139,39): error TS7006: Parameter 'ub' implicitly has an 'any' type.
+app/api/friends/route.ts(29,38): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/route.ts(53,40): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/route.ts(56,45): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(61,26): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(65,24): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(76,38): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/route.ts(100,24): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(110,43): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/route.ts(114,58): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(116,40): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/friends/route.ts(141,38): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/route.ts(145,43): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(147,40): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/route.ts(171,13): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(172,16): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/status/[userId]/route.ts(29,35): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/status/[userId]/route.ts(39,38): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/unfollow/route.ts(33,34): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/friends/unfollow/route.ts(48,18): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/instructors/route.ts(6,38): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/instructors/route.ts(28,30): error TS7006: Parameter 'instructor' implicitly has an 'any' type.
+app/api/instructors/route.ts(31,12): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/instructors/route.ts(35,54): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'Role'.
+app/api/leaderboard/route.ts(37,42): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+app/api/leaderboard/route.ts(50,42): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(53,24): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/leaderboard/route.ts(66,16): error TS7006: Parameter 'u' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(70,15): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(70,18): error TS7006: Parameter 'i' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(74,19): error TS2339: Property 'id' does not exist on type '{}'.
+app/api/leaderboard/route.ts(75,21): error TS2339: Property 'name' does not exist on type '{}'.
+app/api/leaderboard/route.ts(76,23): error TS2339: Property 'avatar' does not exist on type '{}'.
+app/api/leaderboard/route.ts(77,21): error TS2339: Property 'role' does not exist on type '{}'.
+app/api/leaderboard/route.ts(78,23): error TS2339: Property 'points' does not exist on type '{}'.
+app/api/leaderboard/route.ts(80,23): error TS2339: Property 'badges' does not exist on type '{}'.
+app/api/leaderboard/route.ts(81,22): error TS2339: Property 'level' does not exist on type '{}'.
+app/api/leaderboard/route.ts(82,23): error TS2339: Property 'streak' does not exist on type '{}'.
+app/api/leaderboard/route.ts(90,10): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(104,35): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/leaderboard/route.ts(120,33): error TS7006: Parameter 'u' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(120,36): error TS7006: Parameter 'i' implicitly has an 'any' type.
+app/api/leaderboard/route.ts(134,36): error TS7006: Parameter 'u' implicitly has an 'any' type.
+app/api/materials/[id]/attendance/route.ts(43,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/attendance/route.ts(69,45): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/invite/route.ts(23,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/invite/route.ts(101,28): error TS7006: Parameter 'n' implicitly has an 'any' type.
+app/api/materials/[id]/invite/route.ts(138,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/invite/route.ts(160,32): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(18,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(50,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(55,43): error TS7006: Parameter 'q' implicitly has an 'any' type.
+app/api/materials/[id]/quiz/[quizId]/route.ts(59,31): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/materials/[id]/quiz/[quizId]/route.ts(102,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(121,18): error TS2551: Property 'quiz_question' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_questions'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(126,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(173,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/quiz/[quizId]/route.ts(182,18): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/materials/[id]/quiz/[quizId]/submit/route.ts(20,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/materials/[id]/quiz/[quizId]/submit/route.ts(38,38): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/materials/[id]/quiz/[quizId]/submit/route.ts(95,52): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/materials/[id]/quiz/[quizId]/submit/route.ts(98,10): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/materials/[id]/quiz/[quizId]/submit/route.ts(112,40): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/materials/[id]/quiz/[quizId]/submit/route.ts(121,34): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/materials/[id]/quiz/route.ts(18,34): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/materials/[id]/quiz/route.ts(34,33): error TS7006: Parameter 'q' implicitly has an 'any' type.
+app/api/materials/[id]/quiz/route.ts(65,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/quiz/route.ts(131,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/materials/[id]/rekapan/route.ts(79,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/rekapan/route.ts(116,7): error TS2322: Type '{ materialId: string; content: any; }' is not assignable to type '(Without<rekapanCreateInput, rekapanUncheckedCreateInput> & rekapanUncheckedCreateInput) | (Without<...> & rekapanCreateInput)'.
+  Type '{ materialId: string; content: any; }' is not assignable to type 'Without<rekapanCreateInput, rekapanUncheckedCreateInput> & rekapanUncheckedCreateInput'.
+    Type '{ materialId: string; content: any; }' is missing the following properties from type 'rekapanUncheckedCreateInput': id, updatedAt
+app/api/materials/[id]/rekapan/route.ts(146,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/route.ts(21,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/route.ts(336,42): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/[id]/route.ts(342,43): error TS7006: Parameter 'u' implicitly has an 'any' type.
+app/api/materials/[id]/route.ts(354,43): error TS7006: Parameter 'uid' implicitly has an 'any' type.
+app/api/materials/[id]/route.ts(392,32): error TS7006: Parameter 'n' implicitly has an 'any' type.
+app/api/materials/attendance/route.ts(25,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/attendance/route.ts(92,7): error TS2322: Type '{ id: string; userId: any; materialId: any; status: any; session: any; date: any; time: any; location: any; notes: any; reason: any; instructorArrival: any; startTime: any; endTime: any; rating: any; clarity: any; relevance: any; feedback: any; }' is not assignable to type '(Without<attendanceCreateInput, attendanceUncheckedCreateInput> & attendanceUncheckedCreateInput) | (Without<...> & attendanceCreateInput)'.
+  Type '{ id: string; userId: any; materialId: any; status: any; session: any; date: any; time: any; location: any; notes: any; reason: any; instructorArrival: any; startTime: any; endTime: any; rating: any; clarity: any; relevance: any; feedback: any; }' is not assignable to type 'Without<attendanceUncheckedCreateInput, attendanceCreateInput> & attendanceCreateInput'.
+    Property 'updatedAt' is missing in type '{ id: string; userId: any; materialId: any; status: any; session: any; date: any; time: any; location: any; notes: any; reason: any; instructorArrival: any; startTime: any; endTime: any; rating: any; clarity: any; relevance: any; feedback: any; }' but required in type 'attendanceCreateInput'.
+app/api/materials/attendance/route.ts(181,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/invitations/route.ts(13,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/invitations/route.ts(75,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/materials/invitations/route.ts(144,20): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/materials/invitations/route.ts(190,22): error TS2551: Property 'program_enrollment' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'program_enrollments'?
+app/api/materials/route.ts(352,28): error TS7006: Parameter 'n' implicitly has an 'any' type.
+app/api/members/[id]/route.ts(9,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/members/route.ts(10,32): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/members/route.ts(28,40): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/api/members/route.ts(38,18): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/members/route.ts(39,15): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/members/route.ts(41,18): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/members/route.ts(42,15): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/members/route.ts(44,29): error TS7006: Parameter 'id' implicitly has an 'any' type.
+app/api/members/route.ts(62,43): error TS7006: Parameter 'user' implicitly has an 'any' type.
+app/api/news/route.ts(46,33): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/news/route.ts(66,11): error TS2353: Object literal may only specify known properties, and 'author' does not exist in type 'newsInclude<DefaultArgs>'.
+app/api/news/route.ts(94,11): error TS2353: Object literal may only specify known properties, and 'author' does not exist in type 'newsInclude<DefaultArgs>'.
+app/api/news/route.ts(126,9): error TS2353: Object literal may only specify known properties, and 'author' does not exist in type 'newsInclude<DefaultArgs>'.
+app/api/news/route.ts(178,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/news/route.ts(217,7): error TS2322: Type '{ title: any; slug: string; category: any; deskripsi: string; content: any; image: any; authorId: any; }' is not assignable to type '(Without<newsCreateInput, newsUncheckedCreateInput> & newsUncheckedCreateInput) | (Without<...> & newsCreateInput)'.
+  Type '{ title: any; slug: string; category: any; deskripsi: string; content: any; image: any; authorId: any; }' is not assignable to type 'Without<newsUncheckedCreateInput, newsCreateInput> & newsCreateInput'.
+    Type '{ title: any; slug: string; category: any; deskripsi: string; content: any; image: any; authorId: any; }' is missing the following properties from type 'newsCreateInput': id, updatedAt, users
+app/api/news/route.ts(227,9): error TS2353: Object literal may only specify known properties, and 'author' does not exist in type 'newsInclude<DefaultArgs>'.
+app/api/news/route.ts(272,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/news/route.ts(320,9): error TS2353: Object literal may only specify known properties, and 'author' does not exist in type 'newsInclude<DefaultArgs>'.
+app/api/news/route.ts(376,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/news/save/route.ts(12,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/news/save/route.ts(35,39): error TS2551: Property 'savedNews' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'saved_news'?
+app/api/news/save/route.ts(46,20): error TS2551: Property 'savedNews' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'saved_news'?
+app/api/news/save/route.ts(57,20): error TS2551: Property 'savedNews' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'saved_news'?
+app/api/news/save/route.ts(84,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/news/save/route.ts(97,39): error TS2551: Property 'savedNews' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'saved_news'?
+app/api/notifications/route.ts(30,14): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/notifications/route.ts(45,14): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/notifications/route.ts(104,20): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/notifications/route.ts(124,39): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/notifications/route.ts(207,34): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/notifications/route.ts(244,33): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+app/api/programs/[id]/enroll/route.ts(22,34): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/[id]/enroll/route.ts(31,35): error TS2551: Property 'program_enrollment' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'program_enrollments'?
+app/api/programs/[id]/enroll/route.ts(42,18): error TS2551: Property 'program_enrollment' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'program_enrollments'?
+app/api/programs/[id]/route.ts(18,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/programs/[id]/route.ts(26,34): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/[id]/route.ts(56,58): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/programs/[id]/route.ts(59,50): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/programs/[id]/route.ts(66,50): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/api/programs/[id]/route.ts(124,57): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/programs/[id]/route.ts(124,60): error TS7006: Parameter 'idx' implicitly has an 'any' type.
+app/api/programs/[id]/route.ts(199,35): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/[id]/route.ts(247,34): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/[id]/route.ts(305,34): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/[id]/route.ts(318,18): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/enrolled/route.ts(16,38): error TS2551: Property 'program_enrollment' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'program_enrollments'?
+app/api/programs/enrolled/route.ts(32,37): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/api/programs/route.ts(14,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/programs/route.ts(24,35): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/programs/route.ts(61,34): error TS7006: Parameter 'p' implicitly has an 'any' type.
+app/api/programs/route.ts(62,46): error TS7006: Parameter 'e' implicitly has an 'any' type.
+app/api/programs/route.ts(64,52): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/programs/route.ts(72,86): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/programs/route.ts(75,80): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/programs/route.ts(172,34): error TS2551: Property 'program' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'programs'?
+app/api/public/stats/route.ts(7,14): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/public/stats/route.ts(12,14): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/quiz/[quizId]/route.ts(18,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/quiz/[quizId]/route.ts(48,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/quiz/[quizId]/route.ts(53,43): error TS7006: Parameter 'q' implicitly has an 'any' type.
+app/api/quiz/[quizId]/route.ts(57,31): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/quiz/[quizId]/route.ts(99,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/quiz/[quizId]/route.ts(118,18): error TS2551: Property 'quiz_question' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_questions'?
+app/api/quiz/[quizId]/route.ts(121,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/quiz/[quizId]/route.ts(165,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/quiz/[quizId]/route.ts(174,18): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/quiz/[quizId]/submit/route.ts(19,31): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/quiz/[quizId]/submit/route.ts(37,38): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/quiz/[quizId]/submit/route.ts(93,52): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/quiz/[quizId]/submit/route.ts(96,10): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/quiz/[quizId]/submit/route.ts(110,40): error TS7006: Parameter 'o' implicitly has an 'any' type.
+app/api/quiz/[quizId]/submit/route.ts(119,34): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/quiz/manage/route.ts(13,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/quiz/manage/route.ts(31,34): error TS2551: Property 'material_quiz' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'material_quizzes'?
+app/api/quiz/manage/route.ts(42,33): error TS7006: Parameter 'q' implicitly has an 'any' type.
+app/api/quiz/route.ts(13,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/quiz/route.ts(132,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/schedules/[id]/route.ts(12,35): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/schedules/[id]/route.ts(59,43): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/schedules/[id]/route.ts(112,42): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/schedules/[id]/route.ts(150,43): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/schedules/[id]/route.ts(175,18): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/schedules/route.ts(17,36): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/schedules/route.ts(57,37): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/schedules/route.ts(135,35): error TS2551: Property 'schedule' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'schedules'?
+app/api/settings/security/delete-account/route.ts(23,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/delete-account/route.ts(58,18): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/google/route.ts(13,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/google/route.ts(49,18): error TS2551: Property 'account' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'accounts'?
+app/api/settings/security/password/route.ts(24,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/password/route.ts(45,18): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/password/route.ts(80,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/password/route.ts(101,18): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/route.ts(13,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/settings/security/route.ts(35,47): error TS7006: Parameter 'a' implicitly has an 'any' type.
+app/api/test/create-invite/route.ts(41,37): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/test/create-invite/route.ts(57,7): error TS2322: Type '{ materialId: any; instructorId: any; userId: any; token: string; status: "pending"; }' is not assignable to type '(Without<materialinviteCreateInput, materialinviteUncheckedCreateInput> & materialinviteUncheckedCreateInput) | (Without<...> & materialinviteCreateInput)'.
+  Type '{ materialId: any; instructorId: any; userId: any; token: string; status: "pending"; }' is not assignable to type 'Without<materialinviteUncheckedCreateInput, materialinviteCreateInput> & materialinviteCreateInput'.
+    Type '{ materialId: any; instructorId: any; userId: any; token: string; status: "pending"; }' is missing the following properties from type 'materialinviteCreateInput': id, updatedAt, users_materialinvite_instructorIdTousers, material, users_materialinvite_userIdTousers
+app/api/test/create-invite/route.ts(80,28): error TS2551: Property 'material' does not exist on type '{ userId: string; id: string; createdAt: Date; updatedAt: Date; instructorId: string; materialId: string; status: materialinvite_status; token: string; reason: string | null; }'. Did you mean 'materialId'?
+app/api/test/create-invite/route.ts(101,32): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/avatar/route.ts(54,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/avatar/route.ts(85,38): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/gamification/route.ts(80,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/gamification/route.ts(100,20): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/gamification/route.ts(111,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/gamification/route.ts(119,44): error TS2551: Property 'program_enrollment' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'program_enrollments'?
+app/api/users/gamification/route.ts(124,39): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+app/api/users/last-seen/route.ts(13,18): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/last-seen/route.ts(38,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/profile/route.ts(20,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/profile/route.ts(87,38): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/route.ts(13,32): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/api/users/stats/route.ts(15,31): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/leaderboard/page.tsx(19,12): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/leaderboard/page.tsx(23,12): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+app/leaderboard/page.tsx(29,46): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/leaderboard/page.tsx(30,47): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/leaderboard/page.tsx(36,25): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+app/leaderboard/page.tsx(40,33): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/leaderboard/page.tsx(59,50): error TS7006: Parameter 'u' implicitly has an 'any' type.
+app/leaderboard/page.tsx(59,53): error TS7006: Parameter 'i' implicitly has an 'any' type.
+app/level/page.tsx(194,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/level/page.tsx(210,18): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/level/page.tsx(221,12): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+app/level/page.tsx(226,12): error TS2551: Property 'userBadge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'user_badges'?
+app/level/page.tsx(231,12): error TS2551: Property 'badge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'badges'?
+app/level/page.tsx(232,12): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+app/level/page.tsx(281,49): error TS7006: Parameter 'ub' implicitly has an 'any' type.
+app/level/page.tsx(282,44): error TS7006: Parameter 'b' implicitly has an 'any' type.
+app/level/page.tsx(511,45): error TS7006: Parameter 'a' implicitly has an 'any' type.
+app/level/page.tsx(639,54): error TS7006: Parameter 'b' implicitly has an 'any' type.
+app/level/page.tsx(696,40): error TS7006: Parameter 'ub' implicitly has an 'any' type.
+lib/activity.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'ActivityType'.
+lib/activity.ts(24,25): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+lib/gamification.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'ActivityType'.
+lib/gamification.ts(114,36): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+lib/gamification.ts(127,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+lib/gamification.ts(139,18): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+lib/gamification.ts(146,16): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+lib/gamification.ts(159,18): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+lib/gamification.ts(187,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+lib/gamification.ts(205,53): error TS7006: Parameter 'ub' implicitly has an 'any' type.
+lib/gamification.ts(206,34): error TS2551: Property 'badge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'badges'?
+lib/gamification.ts(212,14): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+lib/gamification.ts(213,14): error TS2551: Property 'quiz_attempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'quiz_attempts'?
+lib/gamification.ts(214,14): error TS2551: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'friendships'?
+lib/gamification.ts(217,14): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+lib/gamification.ts(289,20): error TS2551: Property 'userBadge' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'user_badges'?
+lib/gamification.ts(294,20): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+lib/gamification.ts(300,20): error TS2551: Property 'activityLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'activity_logs'?
+lib/gamification.ts(313,22): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+lib/notifications.ts(2,15): error TS2724: '"@prisma/client"' has no exported member named 'NotificationType'. Did you mean 'notifications_type'?
+lib/notifications.ts(31,37): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+scripts/api_check.ts(6,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/diagnostic_db.ts(6,30): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/diagnostic_db.ts(20,22): error TS7006: Parameter 'u' implicitly has an 'any' type.
+scripts/diagnostic_user.ts(7,30): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/diagnostic_user.ts(11,53): error TS7006: Parameter 'u' implicitly has an 'any' type.
+scripts/diagnostic_user.ts(15,40): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+scripts/diagnostic_user.ts(18,62): error TS7006: Parameter 'n' implicitly has an 'any' type.
+scripts/migrate-plain-passwords.ts(11,30): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/migrate-plain-passwords.ts(17,20): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/simulate_accept.ts(7,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/simulate_accept.ts(20,16): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+scripts/trace_accept.ts(11,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?
+scripts/trace_accept.ts(37,37): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+scripts/trace_kwh2.ts(35,40): error TS2551: Property 'notification' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'notifications'?
+scripts/trace_kwh2.ts(41,26): error TS7006: Parameter 'n' implicitly has an 'any' type.
+scripts/trace_kwh2.ts(53,29): error TS2551: Property 'user' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'. Did you mean 'users'?

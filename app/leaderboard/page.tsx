@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/ui/Sidebar";
@@ -16,11 +16,11 @@ const LeaderboardPage = async () => {
 
   // Get current user's followers and followings to determine mutuals
   const [followers, following] = await Promise.all([
-    prisma.friendship.findMany({
+    prisma.friendships.findMany({
       where: { followingId: currentUserId, status: "accepted" },
       select: { followerId: true },
     }),
-    prisma.friendship.findMany({
+    prisma.friendships.findMany({
       where: { followerId: currentUserId, status: "accepted" },
       select: { followingId: true },
     }),
@@ -37,7 +37,7 @@ const LeaderboardPage = async () => {
     }
   }
 
-  const rawUsers = await prisma.user.findMany({
+  const rawUsers = await prisma.users.findMany({
     where: { role: "user" },
     orderBy: { points: "desc" },
     select: {
@@ -54,7 +54,7 @@ const LeaderboardPage = async () => {
   });
 
   const viewerRole = (session.user as any).role;
-  const isPrivileged = viewerRole === "admin" || viewerRole === "instruktur";
+  const isPrivileged = viewerRole === "admin" || viewerRole === "instruktur" || viewerRole === "super_admin";
 
   const users: LeaderboardUser[] = rawUsers.map((u, i) => {
     const isMe = u.id === currentUserId;

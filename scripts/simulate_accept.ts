@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   const email = "iniakuraditt@gmail.com"
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await prisma.users.findUnique({ where: { email } })
   if (!user) return console.log("User not found")
   
   const token = "b3ogo97wwfnjhd5v3zegb" // KWH 2 token
@@ -17,7 +17,7 @@ async function main() {
   })
   
   // 2. Update notification
-  await prisma.notification.updateMany({
+  await prisma.notifications.updateMany({
     where: { inviteToken: token },
     data: { status: 'accepted' }
   })

@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email as string },
     });
 
@@ -23,13 +23,13 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const program = await prisma.program.findUnique({
+    const program = await prisma.programs.findUnique({
       where: { id },
       include: {
-        instructor: {
+        users: {
           select: { id: true, name: true, avatar: true, email: true },
         },
-        materials: {
+        material: {
           include: {
             users: {
               select: { name: true },
@@ -40,7 +40,7 @@ export async function GET(
           },
           orderBy: { date: "asc" },
         },
-        enrollments: {
+        program_enrollments: {
           select: { id: true, userId: true, enrolledAt: true },
         },
       },
@@ -53,7 +53,7 @@ export async function GET(
       );
     }
 
-    const instructorMaterials = program.materials.filter(m => 
+    const instructorMaterials = program.material.filter(m => 
       user.role === "instruktur" ? m.instructorId === user.id : true
     );
     const materialIds = instructorMaterials.map((m) => m.id);
@@ -63,7 +63,7 @@ export async function GET(
       total: program.totalKajian > 0 ? program.totalKajian : materialIds.length,
       percentage: 0,
     };
-    const isEnrolled = program.enrollments.some((e) => e.userId === user.id);
+    const isEnrolled = program.program_enrollments.some((e) => e.userId === user.id);
 
     if (materialIds.length > 0) {
       const attendanceCount = await prisma.attendance.count({
@@ -127,7 +127,7 @@ export async function GET(
       description: m.description,
       date: m.date,
       startedAt: m.startedAt,
-      instructor: m.users?.name || program.instructor?.name || "TBA",
+      instructor: m.users?.name || program.users?.name || "TBA",
       thumbnailUrl: m.thumbnailUrl,
       order: m.kajianOrder || idx + 1,
       isCompleted: attendanceMap.get(m.id) === "hadir",
@@ -145,16 +145,16 @@ export async function GET(
       category: CATEGORY_LABEL[program.category] || program.category,
       image: program.thumbnailUrl,
       instructor: {
-        id: program.instructor?.id,
-        name: program.instructor?.name || "Instruktur IRMA",
-        avatar: program.instructor?.avatar,
-        email: program.instructor?.email,
+        id: program.users?.id,
+        name: program.users?.name || "Instruktur IRMA",
+        avatar: program.users?.avatar,
+        email: program.users?.email,
       },
       syllabus: (program.syllabus as string[]) || [],
       requirements: (program.requirements as string[]) || [],
       benefits: (program.benefits as string[]) || [],
       materials: formattedMaterials,
-      enrollmentCount: program.enrollments.length,
+      enrollmentCount: program.program_enrollments.length,
       totalKajian: program.totalKajian,
       isEnrolled,
       progress: userProgress,
@@ -189,14 +189,14 @@ export async function PUT(
       );
     }
 
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin") {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa mengubah program" },
         { status: 403 },
       );
     }
 
-    const existing = await prisma.program.findUnique({ where: { id } });
+    const existing = await prisma.programs.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json(
         { error: "Program tidak ditemukan" },
@@ -244,7 +244,7 @@ export async function PUT(
       XII: "XII",
     };
 
-    const updated = await prisma.program.update({
+    const updated = await prisma.programs.update({
       where: { id },
       data: {
         title: title.trim(),
@@ -294,7 +294,7 @@ export async function DELETE(
         { status: 401 },
       );
     }
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin") {
       return NextResponse.json(
         { error: "Tidak memiliki akses" },
         { status: 403 },
@@ -302,7 +302,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const program = await prisma.program.findUnique({ where: { id } });
+    const program = await prisma.programs.findUnique({ where: { id } });
     if (!program) {
       return NextResponse.json(
         { error: "Program tidak ditemukan" },
@@ -315,7 +315,7 @@ export async function DELETE(
       where: { programId: id },
       data: { programId: null },
     });
-    await prisma.program.delete({ where: { id } });
+    await prisma.programs.delete({ where: { id } });
 
     // Log Activity for Admin/Superadmin
     const userRole = session.user.role?.toLowerCase();

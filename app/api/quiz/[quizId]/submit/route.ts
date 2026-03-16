@@ -16,7 +16,7 @@ export async function POST(
 
     const { quizId } = await params;
 
-    const quiz = await prisma.material_quiz.findUnique({
+    const quiz = await prisma.material_quizzes.findUnique({
       where: { id: quizId },
       include: {
         questions: {
@@ -34,7 +34,7 @@ export async function POST(
     }
 
     // --- COOLDOWN CHECK ---
-    const lastAttempt = await prisma.quiz_attempt.findFirst({
+    const lastAttempt = await prisma.quiz_attempts.findFirst({
       where: { quizId, userId: session.user.id },
       orderBy: { completedAt: "desc" },
       select: { completedAt: true },
@@ -116,7 +116,7 @@ export async function POST(
     }
 
     // Save attempt
-    const attempt = await prisma.quiz_attempt.create({
+    const attempt = await prisma.quiz_attempts.create({
       data: {
         quizId,
         userId: session.user.id,

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     if (userRole === "instruktur") {
       // Instruktur: get all conversations where they are the instructor
-      conversations = await prisma.chatConversation.findMany({
+      conversations = await prisma.chat_conversations.findMany({
         where: { instructorId: userId },
         include: {
           user: {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       );
     } else {
       // User: get all conversations where they are the user
-      conversations = await prisma.chatConversation.findMany({
+      conversations = await prisma.chat_conversations.findMany({
         where: { userId },
         include: {
           instructor: {
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if instructor exists and is actually an instructor
-    const instructor = await prisma.user.findFirst({
+    const instructor = await prisma.users.findFirst({
       where: {
         id: instructorId,
         role: "instruktur",
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if conversation already exists
-    const existingConversation = await prisma.chatConversation.findUnique({
+    const existingConversation = await prisma.chat_conversations.findUnique({
       where: {
         userId_instructorId: {
           userId: session.user.id,
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new conversation
-    const conversation = await prisma.chatConversation.create({
+    const conversation = await prisma.chat_conversations.create({
       data: {
         userId: session.user.id,
         instructorId,

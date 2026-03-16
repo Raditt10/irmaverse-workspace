@@ -60,7 +60,7 @@ const QuizHome = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const isInstructor =
-    session?.user?.role === "instruktur" || session?.user?.role === "admin";
+    session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
@@ -69,7 +69,7 @@ const QuizHome = () => {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
-    role === "instruktur" || role === "admin" || role === "instructor";
+    role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   useEffect(() => {
     if (authStatus === "authenticated") {

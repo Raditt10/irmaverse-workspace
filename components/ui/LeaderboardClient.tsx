@@ -37,6 +37,7 @@ interface Props {
 const getRoleLabel = (role: string) => {
   if (role === "instruktur") return "Instruktur";
   if (role === "admin") return "Admin";
+  if (role === "super_admin") return "Super Admin";
   return "Anggota";
 };
 

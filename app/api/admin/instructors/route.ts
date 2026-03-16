@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
     const search = req.nextUrl.searchParams.get("search") || "";
 
-    const instructors = await prisma.user.findMany({
+    const instructors = await prisma.users.findMany({
       where: {
         role: "instruktur",
         ...(search
@@ -97,15 +97,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Nama, email, dan password wajib diisi" }, { status: 400 });
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.users.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
+        id: crypto.randomUUID(),
         name,
         email,
         password: hashedPassword,
@@ -114,7 +115,8 @@ export async function POST(req: NextRequest) {
         pengalaman: pengalaman || null,
         bio: bio || null,
         notelp: notelp || null,
-      } as any,
+        updatedAt: new Date(),
+      },
     });
 
     // Log Activity
@@ -158,7 +160,13 @@ export async function PUT(req: NextRequest) {
       data.password = await bcrypt.hash(password, 10);
     }
 
-    await prisma.user.update({ where: { id }, data });
+    await prisma.users.update({ 
+      where: { id }, 
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      } 
+    });
 
     // Log Activity
     await recordActivity({
@@ -188,7 +196,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID instruktur wajib diisi" }, { status: 400 });
     }
 
-    await prisma.user.delete({ where: { id } });
+    await prisma.users.delete({ where: { id } });
 
     // Log Activity
     await recordActivity({

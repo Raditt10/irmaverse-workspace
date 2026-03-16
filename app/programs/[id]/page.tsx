@@ -84,7 +84,7 @@ const ProgramDetail = () => {
   const { data: session } = useSession({ required: false });
 
   const isPrivileged =
-    session?.user?.role === "instruktur" || session?.user?.role === "admin";
+    session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin";
 
   const [toast, setToast] = useState<{
     show: boolean;

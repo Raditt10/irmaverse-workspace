@@ -58,8 +58,11 @@ const CreateSchedule = () => {
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
 
-  // Redirect jika bukan instruktur
-  if (status === "authenticated" && session?.user?.role !== "instruktur") {
+  // Redirect jika bukan instruktur, admin, atau super_admin
+  const role = session?.user?.role;
+  const isPrivileged = role === "instruktur" || role === "admin" || role === "super_admin";
+
+  if (status === "authenticated" && !isPrivileged) {
     router.push("/schedule");
     return null;
   }
@@ -137,7 +140,7 @@ const CreateSchedule = () => {
 
       const data = await response.json();
       showToast("Kegiatan berhasil dibuat. Mengalihkan...", "success");
-      setTimeout(() => router.push(`/schedule/${data.id}`), 1500);
+      setTimeout(() => router.push(`/schedule`), 1500);
     } catch (error: any) {
       console.error("Error creating schedule:", error);
       showToast(error.message || "Terjadi kesalahan saat membuat jadwal", "error");

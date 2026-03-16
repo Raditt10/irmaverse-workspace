@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 50);
 
-    const activities = await prisma.activityLog.findMany({
+    const activities = await prisma.activity_logs.findMany({
       where: {
-        user: {
+        users: {
           role: {
             in: ["admin", "super_admin"] as any[]
           }
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
         description: true,
         xpEarned: true,
         createdAt: true,
-        user: {
+        users: {
           select: {
             id: true,
             name: true,

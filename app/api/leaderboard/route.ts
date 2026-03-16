@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       }
 
       // For period-based, we aggregate XP from activity logs
-      const periodRanking = await prisma.activityLog.groupBy({
+      const periodRanking = await prisma.activity_logs.groupBy({
         by: ["userId"],
         where: {
           createdAt: { gte: startDate },
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       const userIds = periodRanking.map((r) => r.userId);
       const usersMap = new Map(
         (
-          await prisma.user.findMany({
+          await prisma.users.findMany({
             where: { id: { in: userIds } },
             select: {
               id: true,
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
     }
 
     // ── All-time leaderboard ────────────────────────────────────────────
-    const rawUsers = await prisma.user.findMany({
+    const rawUsers = await prisma.users.findMany({
       where,
       orderBy: { points: "desc" },
       select: {

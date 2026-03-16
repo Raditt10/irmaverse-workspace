@@ -1,9 +1,9 @@
 import prisma from "@/lib/prisma";
-import { ActivityType } from "@prisma/client";
+import { activity_logs_type } from "@prisma/client";
 
 interface RecordActivityParams {
   userId: string;
-  type: ActivityType;
+  type: activity_logs_type;
   title: string;
   description?: string;
   metadata?: Record<string, any>;
@@ -21,7 +21,7 @@ export async function recordActivity({
   metadata,
 }: RecordActivityParams) {
   try {
-    return await prisma.activityLog.create({
+    return await prisma.activity_logs.create({
       data: {
         userId,
         type,

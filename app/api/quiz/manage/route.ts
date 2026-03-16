@@ -10,16 +10,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // For admins, show all quizzes. For instruktur, show only their own.
     const whereClause =
-      user.role === "admin"
+      user.role === "admin" || user.role === "super_admin"
         ? {}
         : {
             OR: [
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
             ],
           };
 
-    const quizzes = await prisma.material_quiz.findMany({
+    const quizzes = await prisma.material_quizzes.findMany({
       where: whereClause,
       include: {
         material: { select: { id: true, title: true } },

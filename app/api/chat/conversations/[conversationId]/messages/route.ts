@@ -16,7 +16,7 @@ export async function GET(
     const { conversationId } = await params;
 
     // Verify user is part of this conversation
-    const conversation = await prisma.chatConversation.findFirst({
+    const conversation = await prisma.chat_conversations.findFirst({
       where: {
         id: conversationId,
         OR: [
@@ -39,7 +39,7 @@ export async function GET(
     const limit = parseInt(searchParams.get("limit") || "50");
 
     // Fetch messages
-    const messages = await prisma.chatMessage.findMany({
+    const messages = await prisma.chat_messages.findMany({
       where: { conversationId },
       include: {
         sender: {
@@ -58,7 +58,7 @@ export async function GET(
     });
 
     // Mark unread messages as read
-    await prisma.chatMessage.updateMany({
+    await prisma.chat_messages.updateMany({
       where: {
         conversationId,
         isRead: false,
@@ -95,6 +95,12 @@ export async function POST(
     }
 
     const { conversationId } = await params;
+    const userRole = session.user.role;
+
+    if (userRole === "admin" || userRole === "super_admin") {
+      return NextResponse.json({ error: "Monitoring mode: Admins cannot send messages" }, { status: 403 });
+    }
+
     const body = await request.json();
     const { content, attachmentUrl, attachmentType } = body;
 
@@ -106,7 +112,7 @@ export async function POST(
     }
 
     // Verify user is part of this conversation
-    const conversation = await prisma.chatConversation.findFirst({
+    const conversation = await prisma.chat_conversations.findFirst({
       where: {
         id: conversationId,
         OR: [
@@ -124,7 +130,7 @@ export async function POST(
     }
 
     // Create message
-    const message = await prisma.chatMessage.create({
+    const message = await prisma.chat_messages.create({
       data: {
         conversationId,
         senderId: session.user.id,
@@ -143,7 +149,7 @@ export async function POST(
     });
 
     // Update conversation timestamp
-    await prisma.chatConversation.update({
+    await prisma.chat_conversations.update({
       where: { id: conversationId },
       data: { updatedAt: new Date() },
     });

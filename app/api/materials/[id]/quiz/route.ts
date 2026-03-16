@@ -15,7 +15,7 @@ export async function GET(
 
     const { id: materialId } = await params;
 
-    const quizzes = await prisma.material_quiz.findMany({
+    const quizzes = await prisma.material_quizzes.findMany({
       where: { materialId },
       include: {
         questions: {
@@ -62,10 +62,10 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa membuat quiz" },
         { status: 403 },
@@ -128,7 +128,7 @@ export async function POST(
     }
 
     // Create quiz with nested questions and options
-    const quiz = await prisma.material_quiz.create({
+    const quiz = await prisma.material_quizzes.create({
       data: {
         materialId,
         title: title.trim(),

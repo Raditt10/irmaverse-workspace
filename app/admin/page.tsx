@@ -128,7 +128,7 @@ export default function AdminDashboard() {
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
                   {(stats.totalUsers ?? 0).toLocaleString("id-ID")}
                 </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Total Anggota IRMA</div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Total Anggota IRMA</div>
               </div>
             </div>
 
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
                   {(stats.totalInstructors ?? 0).toLocaleString("id-ID")}
                 </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Total Instruktur</div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Total Instruktur</div>
               </div>
             </div>
 
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
                   {(stats.totalActiveMaterials ?? 0).toLocaleString("id-ID")}
                 </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Kajian Ongoing</div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Kajian Ongoing</div>
               </div>
             </div>
 
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
                   {(stats.totalCompletedMaterials ?? 0).toLocaleString("id-ID")}
                 </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Total Kajian Tuntas</div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Total Kajian Tuntas</div>
               </div>
             </div>
           </div>
@@ -248,8 +248,9 @@ export default function AdminDashboard() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-10">
-                      <p className="text-slate-400 font-bold italic">Belum ada kajian terbaru.</p>
+                    <div className="text-center py-12 flex flex-col items-center justify-center">
+                      <BookOpen className="w-16 h-16 text-slate-200 mb-4" strokeWidth={1} />
+                      <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Belum ada kajian terbaru</p>
                     </div>
                   )}
                 </div>
@@ -268,9 +269,10 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
                   {!stats.recentNews || stats.recentNews.length === 0 ? (
-                    <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2 italic">
-                      Belum ada kabar terbaru
-                    </p>
+                    <div className="col-span-1 md:col-span-2 bg-white rounded-4xl border-2 border-dashed border-slate-100 p-12 text-center flex flex-col items-center justify-center">
+                      <Newspaper className="w-16 h-16 text-slate-200 mb-4" strokeWidth={1} />
+                      <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Belum ada kabar terbaru</p>
+                    </div>
                   ) : (
                     stats.recentNews.map((news) => (
                       <Link
@@ -327,8 +329,9 @@ export default function AdminDashboard() {
                 <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 shadow-[0_8px_0_0_#f1f5f9] overflow-hidden mb-10 group/list transition-all hover:shadow-md">
                   <div className="divide-y divide-slate-100">
                     {!stats.recentUsers || stats.recentUsers.length === 0 ? (
-                      <div className="p-10 text-center text-slate-400 font-bold italic">
-                        Belum ada anggota baru yang mendaftar.
+                      <div className="p-16 text-center flex flex-col items-center justify-center">
+                        <Users className="w-16 h-16 text-slate-200 mb-4" strokeWidth={1} />
+                        <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Belum ada anggota baru</p>
                       </div>
                     ) : (
                       stats.recentUsers.map((user: any) => (
@@ -415,14 +418,15 @@ export default function AdminDashboard() {
                         <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
                             <History className="w-5 h-5 text-slate-800" />
                         </div>
-                        <h4 className="font-black text-slate-800 text-lg tracking-tight uppercase">Log Aktivitas Instruktur</h4>
+                        <h4 className="font-black text-slate-800 text-lg tracking-tight">Log Aktivitas Instruktur</h4>
                     </div>
                 </div>
 
                 <div className="space-y-4">
                   {!stats.instructorActivities || stats.instructorActivities.length === 0 ? (
-                    <div className="p-8 text-center text-slate-400 font-bold italic border-2 border-dashed border-slate-100 rounded-3xl">
-                      Belum ada aktivitas instruktur
+                    <div className="p-10 text-center flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-4xl bg-slate-50/50">
+                      <History className="w-12 h-12 text-slate-200 mb-3" strokeWidth={1} />
+                      <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Belum ada aktivitas</p>
                     </div>
                   ) : (
                     stats.instructorActivities.map((act: any) => (
@@ -449,10 +453,6 @@ export default function AdminDashboard() {
                     ))
                   )}
                 </div>
-                
-                <button className="w-full mt-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 font-black text-xs uppercase tracking-widest rounded-2xl border-2 border-dashed border-slate-200 transition-all">
-                    Lihat Selengkapnya
-                </button>
               </div>
 
               {/* User Activity Section */}
@@ -462,14 +462,15 @@ export default function AdminDashboard() {
                         <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
                             <History className="w-5 h-5 text-slate-800" />
                         </div>
-                        <h4 className="font-black text-slate-800 text-lg tracking-tight uppercase">Log Aktivitas Anggota</h4>
+                        <h4 className="font-black text-slate-800 text-lg tracking-tight">Log Aktivitas Anggota</h4>
                     </div>
                 </div>
 
                 <div className="space-y-4">
                   {!stats.userActivities || stats.userActivities.length === 0 ? (
-                    <div className="p-8 text-center text-slate-400 font-bold italic border-2 border-dashed border-slate-100 rounded-3xl">
-                      Belum ada aktivitas anggota
+                    <div className="p-10 text-center flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-4xl bg-slate-50/50">
+                      <Activity className="w-12 h-12 text-slate-200 mb-3" strokeWidth={1} />
+                      <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Belum ada aktivitas</p>
                     </div>
                   ) : (
                     stats.userActivities.map((act: any) => (
@@ -500,10 +501,6 @@ export default function AdminDashboard() {
                     ))
                   )}
                 </div>
-                
-                <button className="w-full mt-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 font-black text-xs uppercase tracking-widest rounded-2xl border-2 border-dashed border-slate-200 transition-all">
-                    Lihat Selengkapnya
-                </button>
               </div>
             </div>
           </div>

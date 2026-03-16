@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       // ── Load older messages (pagination) ──────────────────────────────────
       const beforeDate = new Date(before);
 
-      const messages = await prisma.forumMessage.findMany({
+      const messages = await prisma.forum_messages.findMany({
         where: { createdAt: { lt: beforeDate } },
         orderBy: { createdAt: "desc" },
         take: PAGE_SIZE + 1, // +1 to detect whether there are more
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       });
     } else {
       // ── Initial load: last 100 messages ───────────────────────────────────
-      const messages = await prisma.forumMessage.findMany({
+      const messages = await prisma.forum_messages.findMany({
         orderBy: { createdAt: "desc" },
         take: INITIAL_LOAD + 1,
         include: {
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const message = await prisma.forumMessage.create({
+    const message = await prisma.forum_messages.create({
       data: { content, senderId: session.user.id },
       include: {
         sender: {

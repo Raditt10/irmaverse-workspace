@@ -191,7 +191,7 @@ export default async function LevelPage() {
   // Hanya role "user" yang bisa mengakses halaman Level & XP
   if ((session.user as any).role !== "user") redirect("/overview");
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.users.findUnique({
     where: { id: session.user.id },
     select: {
       name: true,
@@ -207,7 +207,7 @@ export default async function LevelPage() {
   // Sync level if drift
   const calculatedLevel = getLevelFromXp(user.points);
   if (calculatedLevel !== user.level) {
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: session.user.id },
       data: { level: calculatedLevel },
     });
@@ -218,18 +218,18 @@ export default async function LevelPage() {
   const levelTitle = getLevelTitle(user.level);
 
   const [activities, earnedBadges, allBadges, rank] = await Promise.all([
-    prisma.activityLog.findMany({
+    prisma.activity_logs.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
       take: 50,
     }),
-    prisma.userBadge.findMany({
+    prisma.user_badges.findMany({
       where: { userId: session.user.id },
       include: { badge: true },
       orderBy: { earnedAt: "desc" },
     }),
-    prisma.badge.findMany(),
-    prisma.user.count({
+    prisma.badges.findMany(),
+    prisma.users.count({
       where: { points: { gt: user.points } },
     }),
   ]);

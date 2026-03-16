@@ -5,14 +5,14 @@ import { auth } from "@/lib/auth";
 export async function GET() {
   const session = await auth();
 
-  if (!session?.user || (session.user.role !== "instruktur" && session.user.role !== "admin")) {
+  if (!session?.user || (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const instructorId = session.user.id;
 
   // 1. Total Siswa: Total count of users with role 'user' on the platform
-  const totalStudents = await prisma.user.count({ 
+  const totalStudents = await prisma.users.count({ 
     where: { role: "user" } 
   });
 
@@ -135,33 +135,33 @@ export async function GET() {
   // 6. Recent Activities (Heuristic from multiple models)
   const [latestMaterials, latestSchedules, latestCompetitions, latestNews] = await Promise.all([
     prisma.material.findMany({ where: { instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 }),
-    prisma.schedule.findMany({ where: { instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 }),
-    prisma.competition.findMany({ where: { instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 }),
+    prisma.schedules.findMany({ where: { instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 }),
+    prisma.competitions.findMany({ where: { instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 }),
     prisma.news.findMany({ where: { authorId: instructorId }, orderBy: { updatedAt: 'desc' }, take: 3 })
   ]);
 
   const isNew = (created: Date, updated: Date) => Math.abs(updated.getTime() - created.getTime()) < 1000;
 
   const allActivities = [
-    ...latestMaterials.map(m => ({
+    ...latestMaterials.map((m: any) => ({
       id: `mat-${m.id}`,
       type: 'material',
       title: `${isNew(m.createdAt, m.updatedAt) ? 'Membuat' : 'Mengedit'} Kajian: ${m.title}`,
       updatedAt: m.updatedAt
     })),
-    ...latestSchedules.map(s => ({
+    ...latestSchedules.map((s: any) => ({
       id: `sch-${s.id}`,
       type: 'schedule',
       title: `${isNew(s.createdAt, s.updatedAt) ? 'Membuat' : 'Mengedit'} Kegiatan: ${s.title}`,
       updatedAt: s.updatedAt
     })),
-    ...latestCompetitions.map(c => ({
+    ...latestCompetitions.map((c: any) => ({
       id: `comp-${c.id}`,
       type: 'competition',
       title: `${isNew(c.createdAt, c.updatedAt) ? 'Membuat' : 'Mengedit'} Lomba: ${c.title}`,
       updatedAt: c.updatedAt
     })),
-    ...latestNews.map(n => ({
+    ...latestNews.map((n: any) => ({
       id: `news-${n.id}`,
       type: 'news',
       title: `${isNew(n.createdAt, n.updatedAt) ? 'Menambahkan' : 'Mengedit'} Berita: ${n.title}`,

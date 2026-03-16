@@ -49,7 +49,7 @@ const Competitions = () => {
 
   const router = useRouter();
   const { data: session } = useSession();
-  const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instructor";
+  const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instructor" || session?.user?.role === "super_admin";
 
   // Helper Toast
   const showToast = (message: string, type: "success" | "error") => {
@@ -128,7 +128,7 @@ const Competitions = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {session?.user?.role === "instruktur" && (
+                {(session?.user?.role === "instruktur" || isPrivileged) && (
                   <AddButton
                     label="Tambah Lomba"
                     onClick={() => router.push("/competitions/create")}

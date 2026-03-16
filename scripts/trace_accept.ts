@@ -8,7 +8,7 @@ async function main() {
   
   console.log(`--- TRACING ${materialTitle} for ${email} ---`)
   
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await prisma.users.findUnique({ where: { email } })
   if (!user) return console.log("User not found")
   console.log("User ID:", user.id)
 
@@ -34,7 +34,7 @@ async function main() {
   })
   console.log("Enrollment:", enrollment)
 
-  const notification = await prisma.notification.findFirst({
+  const notification = await prisma.notifications.findFirst({
     where: {
       userId: user.id,
       resourceId: material.id,

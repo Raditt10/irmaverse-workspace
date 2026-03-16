@@ -32,7 +32,7 @@ async function main() {
     );
 
     // Find all notifications related to this material
-    const notifications = await prisma.notification.findMany({
+    const notifications = await prisma.notifications.findMany({
       where: { resourceId: material.id, resourceType: "material" },
       include: { user: { select: { email: true } } },
     });
@@ -50,7 +50,7 @@ async function main() {
 
   console.log("\n--- USER STATUS CHECK ---");
   const email = "iniakuraditt@gmail.com";
-  const user = await prisma.user.findUnique({
+  const user = await prisma.users.findUnique({
     where: { email },
     include: {
       courseenrollment: true,
