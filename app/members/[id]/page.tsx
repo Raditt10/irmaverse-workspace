@@ -591,7 +591,7 @@ const MemberDetail = () => {
                         {stats.totalEnrollments}
                       </div>
                       <div className="text-[11px] text-slate-500 font-bold">
-                        Modul yang sedang diikuti
+                        Program Kurikulum yang sedang diikuti
                       </div>
                     </div>
                   </div>

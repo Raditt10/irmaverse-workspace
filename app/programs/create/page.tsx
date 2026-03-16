@@ -90,14 +90,14 @@ const CreateProgram = () => {
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         if (!res.ok) {
           const error = await res.json();
-          showToast(error.error || "Gagal mengunggah gambar", "error");
+          showToast(error.error || "Gagal mengunggah Tumbnail", "error");
           return;
         }
         const data = await res.json();
         setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
-        showToast("Banner Program berhasil diunggah", "success");
+        showToast("Tumbnail Program berhasil diunggah", "success");
       } catch {
-        showToast("Terjadi kesalahan saat mengunggah gambar", "error");
+        showToast("Terjadi kesalahan saat mengunggah Tumbnail", "error");
       } finally {
         setUploading(false);
       }
@@ -115,7 +115,7 @@ const CreateProgram = () => {
       return;
     }
     if (!formData.thumbnailUrl) {
-      showToast("Banner Program wajib diunggah", "error");
+      showToast("Tumbnail Program wajib diunggah", "error");
       return;
     }
 
@@ -402,7 +402,7 @@ const CreateProgram = () => {
                 {/* Thumbnail Card */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Banner Program
+                    TUmbnail Program
                   </label>
                   <div className="relative group cursor-pointer">
                     <input

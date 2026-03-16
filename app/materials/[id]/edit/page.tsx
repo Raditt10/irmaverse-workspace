@@ -233,15 +233,15 @@ const EditMaterial = () => {
 
         if (!res.ok) {
           const error = await res.json();
-          showToast(error.message || "Gagal mengunggah gambar", "error");
+          showToast(error.message || "Gagal mengunggah Tumbnail", "error");
           return;
         }
 
         const data = await res.json();
         setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
-        showToast("Gambar berhasil diunggah", "success");
+        showToast("Tumbnail berhasil diunggah", "success");
       } catch (error) {
-        showToast("Gagal mengunggah gambar", "error");
+        showToast("Gagal mengunggah Tumbnail", "error");
       } finally {
         setUploading(false);
       }

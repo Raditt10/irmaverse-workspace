@@ -122,9 +122,9 @@ const CreateCompetition = () => {
         ...prev,
         thumbnailUrl: data.url,
       }));
-      showToast("Gambar berhasil diunggah", "success");
+      showToast("Tumbnail berhasil diunggah", "success");
     } catch (error: any) {
-      showToast("Gagal mengunggah gambar", "error");
+      showToast("Gagal mengunggah Tumbnail", "error");
     } finally {
       setUploadingImage(false);
     }

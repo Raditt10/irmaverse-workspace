@@ -8,10 +8,10 @@ import {
   ArrowRight,
   Award,
   BookMarked,
-  BookOpen,
   Calendar,
   CalendarDays,
   Camera,
+  MessageCircleQuestion,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -44,6 +44,7 @@ export default function Home() {
   const [galleryLoading, setGalleryLoading] = useState(true);
   const [latestNews, setLatestNews] = useState<Array<{ id: string; title: string; category: string | null; deskripsi?: string; slug: string; image?: string | null }>>([]);
   const [newsLoading, setNewsLoading] = useState(false);
+  const [stats, setStats] = useState({ totalMembers: 0, totalInstructors: 0 });
   // State untuk Galeri
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -254,6 +255,21 @@ export default function Home() {
     };
 
     fetchNews();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/public/stats");
+        const data = await res.json();
+        if (data.totalMembers !== undefined) {
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats", error);
+      }
+    };
+    fetchStats();
   }, []);
 
   return (
@@ -542,7 +558,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 mb-4 sm:mb-6 bg-white/10 border-2 border-white/20 rounded-2xl backdrop-blur-md shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transform rotate-2 hover:rotate-0 transition-all duration-300">
-              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-300 stroke-[3px]" />
+              <MessageCircleQuestion className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-300 stroke-[3px]" />
               <span className="text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider">Tanya Jawab</span>
             </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-6 leading-tight drop-shadow-[3px_3px_0px_rgba(0,0,0,0.15)]">
@@ -693,7 +709,7 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-4">
-            <Link href="/auth" className="w-full sm:w-auto">
+            <Link href="/auth?mode=signup" className="w-full sm:w-auto">
               <button className="w-full sm:w-auto px-6 sm:px-12 py-4 sm:py-6 text-sm sm:text-lg group font-extrabold bg-white text-emerald-800 rounded-2xl border-b-6 sm:border-b-8 border-emerald-900 active:border-b-0 active:translate-y-2 transition-all duration-150 flex items-center justify-center gap-2 sm:gap-3 hover:brightness-105 shadow-2xl">
                 <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 stroke-[3px]" />
                 <span>Daftar Sekarang Gratis!</span>
@@ -709,11 +725,11 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border-2 border-white/10">
               <Users className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.5px]" />
-              <span className="text-xs sm:text-base">70+ Anggota Aktif</span>
+              <span className="text-xs sm:text-base">{stats.totalMembers} Anggota Aktif</span>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border-2 border-white/10">
-              <Star className="h-4 w-4 sm:h-6 sm:w-6 fill-yellow-400 text-yellow-400 stroke-[2.5px]" />
-              <span className="text-xs sm:text-base">Rating 5.0</span>
+              <Contact className="h-4 w-4 sm:h-6 sm:w-6 stroke-[2.5px]" />
+              <span className="text-xs sm:text-base">{stats.totalInstructors} Instruktur</span>
             </div>
           </div>
         </div>
@@ -745,9 +761,39 @@ export default function Home() {
             <div className="flex-1 min-w-45">
               <h3 className="font-extrabold text-white text-base sm:text-lg mb-3 sm:mb-4 drop-shadow-sm">Quick Links</h3>
               <ul className="space-y-2 sm:space-y-3">
-                {['Login / Register', 'Struktur Organisasi', 'Jadwal Kajian', 'Pengumuman', 'Galeri', 'Kontak'].map((link, i) => (
-                    <li key={i}><Link href="#" className="text-white/80 hover:text-white font-bold transition-colors duration-300 text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 group"><ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[3px] group-hover:translate-x-1 transition-transform" />{link}</Link></li>
-                ))}
+                {[
+                  { name: 'Halaman utama', id: 'beranda' },
+                  { name: 'Fitur Aplikasi', id: 'fitur' },
+                  { name: 'Keunggulan', id: 'keunggulan' },
+                  { name: 'Galeri Kegiatan', id: 'galeri' },
+                  { name: 'Pertanyaan Umum', id: 'faq' },
+                  { name: 'Hubungi Kami', id: 'kontak' },
+                ].map((link, i) => {
+                  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                    e.preventDefault();
+                    if (link.id === 'beranda') {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    } else {
+                      const element = document.getElementById(link.id);
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }
+                  };
+                  return (
+                    <li key={i}>
+                      <Link 
+                        href={`#${link.id}`} 
+                        onClick={handleClick}
+                        className="text-white/80 hover:text-white font-bold transition-all duration-300 text-xs sm:text-sm flex items-center gap-2.5 group hover:translate-x-1"
+                      >
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 group-hover:bg-white group-hover:scale-125 transition-all shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+                        <span>{link.name}</span>
+                        <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div className="flex-1 min-w-50">

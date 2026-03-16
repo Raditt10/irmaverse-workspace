@@ -265,7 +265,7 @@ export default function CreateNewsPage() {
                 {/* Upload Image */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Gambar Berita <span className="text-red-500">*</span>
+                    Tumbnail Berita<span className="text-red-500">*</span>
                   </label>
                   <div className="relative group cursor-pointer">
                     <input

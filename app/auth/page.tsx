@@ -60,6 +60,16 @@ const Auth = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState("signin");
+
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    if (mode === "signup") {
+      setActiveTab("signup");
+    } else {
+      setActiveTab("signin");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (searchParams.get("registered") === "true") {
@@ -168,7 +178,7 @@ const Auth = () => {
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-full h-full opacity-[0.03] bg-[radial-gradient(#10b981_1.5px,transparent_1.5px)] bg-size-[24px_24px]"></div>
         <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-teal-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-125 h-125 bg-emerald-200/30 rounded-full blur-3xl"></div>
       </div>
 
       <div className="flex flex-1 items-center justify-center px-4 py-8 relative z-10 w-full">
@@ -204,7 +214,11 @@ const Auth = () => {
                 </div>
               </div>
 
-              <Tabs defaultValue="signin" className="w-full">
+              <Tabs 
+                value={activeTab} 
+                onValueChange={setActiveTab} 
+                className="w-full"
+              >
                 <AuthTabsList />
 
                 {/* === FORM SIGN IN === */}

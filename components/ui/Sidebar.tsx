@@ -18,6 +18,7 @@ import {
   BookMarked,
   MessageSquare,
   Award,
+  Medal,
   ChevronDown,
   Contact,
   Shield,
@@ -230,7 +231,7 @@ const Sidebar = () => {
         ]
       : []),
     {
-      icon: Award,
+      icon: Trophy,
       label: "Peringkat",
       path: "/leaderboard",
     },
@@ -245,7 +246,7 @@ const Sidebar = () => {
       path: "/programs",
     },
     {
-      icon: Trophy,
+      icon: Medal,
       label: "Info Perlombaan",
       path: "/competitions",
     },

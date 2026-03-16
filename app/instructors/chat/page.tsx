@@ -145,6 +145,7 @@ const ChatPage = () => {
   const [deletingConversation, setDeletingConversation] = useState(false);
   const [isDesktopChatFullscreen, setIsDesktopChatFullscreen] = useState(false);
   const [modalSearchTerm, setModalSearchTerm] = useState("");
+  const [favoriteInstructorIds, setFavoriteInstructorIds] = useState<string[]>([]);
   
   const { confirm, alert: customAlert } = useConfirm();
   
@@ -179,6 +180,18 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching instructors:", error);
+    }
+  }, []);
+
+  const fetchFavorites = useCallback(async () => {
+    try {
+      const res = await fetch("/api/instructors/favorites");
+      if (res.ok) {
+        const data = await res.json();
+        setFavoriteInstructorIds(data.favoriteIds || []);
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
     }
   }, []);
 
@@ -221,7 +234,8 @@ const ChatPage = () => {
   useEffect(() => {
     fetchConversations();
     fetchInstructors();
-  }, [fetchConversations, fetchInstructors]);
+    fetchFavorites();
+  }, [fetchConversations, fetchInstructors, fetchFavorites]);
 
   useEffect(() => {
     if (loading) return; // tunggu sampai fetchConversations selesai
@@ -631,6 +645,29 @@ const ChatPage = () => {
     }
   };
 
+  const handleToggleFavorite = async (instructorId: string) => {
+    try {
+      const res = await fetch("/api/instructors/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instructorId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.action === "added") {
+          setFavoriteInstructorIds((prev) => [...prev, instructorId]);
+          setToast({ show: true, message: 'Berhasil ditambahkan ke Favorit!', type: 'success' });
+        } else {
+          setFavoriteInstructorIds((prev) => prev.filter(id => id !== instructorId));
+          setToast({ show: true, message: 'Berhasil dihapus dari Favorit!', type: 'success' });
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      setToast({ show: true, message: 'Gagal mengubah status favorit.', type: 'error' });
+    }
+  };
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -865,12 +902,22 @@ const ChatPage = () => {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                setToast({ show: true, message: 'Berhasil ditambahkan ke Favorit!', type: 'success' });
+                                handleToggleFavorite(selectedConversation.participant.id);
                               }}
-                              className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                              className={favoriteInstructorIds.includes(selectedConversation.participant.id) 
+                                ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50" 
+                                : "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                              }
                             >
-                              <Heart className="h-4 w-4 mr-3" fill="currentColor" />
-                              Tambahkan ke Favorit
+                              <Heart 
+                                className="h-4 w-4 mr-3" 
+                                fill={favoriteInstructorIds.includes(selectedConversation.participant.id) ? "currentColor" : "none"} 
+                                strokeWidth={favoriteInstructorIds.includes(selectedConversation.participant.id) ? 0 : 3}
+                              />
+                              {favoriteInstructorIds.includes(selectedConversation.participant.id) 
+                                ? "- Hapus dari Favorit" 
+                                : "+ Instruktur Favorit"
+                              }
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

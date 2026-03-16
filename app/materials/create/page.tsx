@@ -183,15 +183,15 @@ const CreateMaterial = () => {
 
         if (!res.ok) {
           const error = await res.json();
-          showToast(error.error || "Gagal mengunggah gambar", "error");
+          showToast(error.error || "Gagal mengunggah Tumbnail", "error");
           return;
         }
 
         const data = await res.json();
         setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
-        showToast("Gambar berhasil diunggah", "success");
+        showToast("Tumbnail berhasil diunggah", "success");
       } catch (error: any) {
-        showToast("Terjadi kesalahan saat mengunggah gambar", "error");
+        showToast("Terjadi kesalahan saat mengunggah Tumbnail", "error");
       } finally {
         setUploading(false);
       }
