@@ -165,14 +165,7 @@ const Profile = () => {
         }
       }
       
-      // If admin, fetch admin activities
-      if (isAdmin) {
-        const adminActRes = await fetch("/api/admin/activities?limit=10");
-        if (adminActRes.ok) {
-          const adminActData = await adminActRes.json();
-          setActivities(adminActData.activities || []);
-        }
-      }
+
     } catch (err) {
       console.error("Error loading profile data:", err);
     } finally {
@@ -795,64 +788,7 @@ const Profile = () => {
                   </div>
                 )}
 
-                {/* Log Aktivitas Admin & Superadmin */}
-                {isAdmin && (
-                  <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[4px_4px_0_0_#cbd5e1] p-6 lg:p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-100">
-                        <Clock3 className="h-6 w-6 text-emerald-500" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl lg:text-2xl font-black text-slate-800">
-                          Log Aktivitas
-                        </h2>
-                        <p className="text-xs font-bold text-slate-400">
-                          Riwayat tindakan administratif
-                        </p>
-                      </div>
-                    </div>
 
-                    {isLoading ? (
-                      <div className="flex justify-center py-8">
-                        <Loading text="Memuat log..." />
-                      </div>
-                    ) : activities.length === 0 ? (
-                      <div className="text-center py-10 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                        <Clock3 className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-                        <p className="text-slate-400 font-bold text-sm">
-                          Belum ada catatan aktivitas admin.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {activities.map((activity) => (
-                          <div
-                            key={activity.id}
-                            className="flex items-center gap-4 p-4 rounded-3xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-200 hover:shadow-sm transition-all duration-300 group"
-                          >
-                            <div
-                              className={`h-12 w-12 shrink-0 rounded-2xl flex items-center justify-center border-2 ${getActivityBg(activity.type)}`}
-                            >
-                              {getActivityIcon(activity.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold text-slate-800 truncate group-hover:text-emerald-600 transition-colors">
-                                {activity.title}
-                              </p>
-                              <p className="text-[10px] sm:text-xs text-slate-500 line-clamp-1 mb-0.5">
-                                {activity.description}
-                              </p>
-                              <p className="text-[10px] font-bold text-slate-400">
-                                {formatDate(activity.createdAt)}
-                                {activity.user && ` • oleh ${activity.user.name}`}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
           </div>

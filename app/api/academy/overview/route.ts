@@ -253,6 +253,13 @@ export async function GET() {
     ? Number((validDailyRatings.reduce((acc, curr) => acc + curr, 0) / validDailyRatings.length).toFixed(1))
     : 0;
 
+  // Count total attendance for today's materials
+  const dailyAttendance = await prisma.attendance.count({
+    where: {
+      materialId: { in: dailyMaterials.map(m => m.id) }
+    }
+  });
+
   return NextResponse.json({
     stats: {
       totalStudents,
@@ -265,7 +272,8 @@ export async function GET() {
     coursesOverview,
     achievement: {
       dailySessions,
-      dailyRating
+      dailyRating,
+      dailyAttendance
     }
   });
 }

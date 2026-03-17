@@ -16,7 +16,7 @@ export async function GET() {
     const enrollments = await prisma.program_enrollments.findMany({
       where: { userId: session.user.id },
       include: {
-        program: {
+        programs: {
           select: {
             id: true,
             title: true,
@@ -31,7 +31,7 @@ export async function GET() {
     return NextResponse.json({
       enrollments: enrollments.map((e) => ({
         id: e.id,
-        program: e.program,
+        program: (e as any).programs,
         enrolledAt: e.enrolledAt.toISOString(),
       })),
     });

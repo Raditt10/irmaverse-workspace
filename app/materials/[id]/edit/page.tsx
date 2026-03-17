@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
@@ -44,6 +45,7 @@ const EditMaterial = () => {
   const router = useRouter();
   const params = useParams();
   const materialId = params.id as string;
+  const { data: session } = useSession();
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +72,8 @@ const EditMaterial = () => {
     materialLink: "",
     location: "",
   });
+
+  const [instructorName, setInstructorName] = useState<string | null>(null);
 
   const [availablePrograms, setAvailablePrograms] = useState<
     { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[] }[]
@@ -182,6 +186,8 @@ const EditMaterial = () => {
             materialLink: material.link || "",
             location: material.location || "",
           });
+
+          setInstructorName(material.instructor || null);
 
           // Load existing invite details with status
           if (material.inviteDetails && Array.isArray(material.inviteDetails)) {
@@ -379,7 +385,9 @@ const EditMaterial = () => {
               </button>
               <div>
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-2 lg:gap-3">
-                  Edit Jadwal Kajianmu
+                  {(session?.user?.role === "admin" || session?.user?.role === "super_admin") && instructorName
+                    ? `Edit jadwal kajian ${instructorName}`
+                    : "Edit Jadwal Kajianmu"}
                 </h1>
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Update detail kajian yang sudah dibuat.

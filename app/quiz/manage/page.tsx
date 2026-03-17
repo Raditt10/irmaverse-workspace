@@ -168,7 +168,7 @@ export default function QuizManagePage() {
     },
     {
       key: "material",
-      label: "Materi",
+      label: "Kajian",
       count: quizzes.filter((q) => !q.isStandalone).length,
     },
   ];
@@ -370,15 +370,9 @@ export default function QuizManagePage() {
                           <Trash2 className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() =>
-                            quiz.isStandalone
-                              ? router.push(`/quiz/standalone/${quiz.id}`)
-                              : router.push(
-                                  `/quiz/${quiz.materialId}/${quiz.id}`,
-                                )
-                          }
+                          onClick={() => router.push(`/quiz/manage/${quiz.id}/stats`)}
                           className="p-2.5 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
-                          title="Lihat / Preview quiz"
+                          title="Lihat Statistik & Detail"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>

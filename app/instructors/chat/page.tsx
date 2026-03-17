@@ -202,17 +202,23 @@ const ChatPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ instructorId }),
       });
+      
+      const data = await res.json();
+      
       if (res.ok) {
-        const conv = await res.json();
         await fetchConversations();
-        setSelectedConversationId(conv.id);
+        setSelectedConversationId(data.id);
         setShowNewChatModal(false);
         if (window.innerWidth < 1024) {
           setIsMobileViewingChat(true);
         }
+      } else {
+        console.error("Failed to start conversation:", data);
+        setToast({ show: true, message: data.error || "Gagal memulai percakapan", type: "error" });
       }
     } catch (error) {
       console.error("Error starting conversation:", error);
+      setToast({ show: true, message: "Terjadi kesalahan saat memulai percakapan", type: "error" });
     }
   }, [fetchConversations]);
 
@@ -1208,7 +1214,7 @@ const ChatPage = () => {
             </div>
             
             <div className="p-4 bg-slate-50 border-t-2 border-slate-100 flex justify-center shrink-0">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IRMA Verse Messaging System</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tetap ingat batasan dalam konsultasi!</p>
             </div>
           </div>
         </div>

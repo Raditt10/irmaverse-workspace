@@ -70,6 +70,7 @@ const QuizHome = () => {
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
     role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
+  const isStaffRole = role === "admin" || role === "super_admin" || role === "instruktur" || role === "instructor";
 
   useEffect(() => {
     if (authStatus === "authenticated") {
@@ -140,7 +141,14 @@ const QuizHome = () => {
       ? `/quiz/${quiz.materialId}/${quiz.id}`
       : `/quiz/standalone/${quiz.id}`;
     
-    const url = mode === "review" ? `${baseUrl}?review=true` : baseUrl;
+    // Staff roles always go to the detailed stats/management page
+    if (isStaffRole) {
+      router.push(`/quiz/manage/${quiz.id}/stats`);
+      return;
+    }
+
+    const isReview = mode === "review";
+    const url = isReview ? `${baseUrl}?review=true` : baseUrl;
     router.push(url);
   };
 
@@ -334,23 +342,25 @@ const QuizHome = () => {
                       )}
                     </div>
 
-                    <div className="relative z-10 p-5">
-                      {quiz.status === "completed" ? (
-                        <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white shadow-[0_4px_0_0_#d97706] transform group-hover:rotate-12 transition-transform">
-                          <Medal
-                            className="h-6 w-6 text-white"
-                            fill="currentColor"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-slate-100 shadow-[0_4px_0_0_#e2e8f0] transform group-hover:scale-110 transition-transform">
-                          <Play
-                            className="h-6 w-6 text-emerald-500 ml-1"
-                            fill="currentColor"
-                          />
-                        </div>
-                      )}
-                    </div>
+                    {!isStaffRole && (
+                      <div className="relative z-10 p-5">
+                        {quiz.status === "completed" ? (
+                          <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white shadow-[0_4px_0_0_#d97706] transform group-hover:rotate-12 transition-transform">
+                            <Medal
+                              className="h-6 w-6 text-white"
+                              fill="currentColor"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border-2 border-slate-100 shadow-[0_4px_0_0_#e2e8f0] transform group-hover:scale-110 transition-transform">
+                            <Play
+                              className="h-6 w-6 text-emerald-500 ml-1"
+                              fill="currentColor"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Card Body */}
@@ -387,7 +397,7 @@ const QuizHome = () => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {quiz.status === "completed" ? (
+                        {quiz.status === "completed" || isStaffRole ? (
                           <>
                             <button
                               onClick={(e) => {
@@ -396,17 +406,19 @@ const QuizHome = () => {
                               }}
                               className="px-3 py-2 rounded-xl text-[10px] font-black bg-slate-100 text-slate-600 border-b-4 border-slate-300 hover:bg-slate-200 active:border-b-0 active:translate-y-1 transition-all whitespace-nowrap"
                             >
-                              Lihat Hasil
+                              Lihat Detail
                             </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQuizClick(quiz, "retake");
-                              }}
-                              className="px-3 py-2 rounded-xl text-[10px] font-black bg-emerald-400 text-white border-b-4 border-emerald-600 hover:bg-emerald-500 active:border-b-0 active:translate-y-1 transition-all shadow-sm whitespace-nowrap"
-                            >
-                              Kerjakan Ulang
-                            </button>
+                            {!isStaffRole && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleQuizClick(quiz, "retake");
+                                }}
+                                className="px-3 py-2 rounded-xl text-[10px] font-black bg-emerald-400 text-white border-b-4 border-emerald-600 hover:bg-emerald-500 active:border-b-0 active:translate-y-1 transition-all shadow-sm whitespace-nowrap"
+                              >
+                                Kerjakan Ulang
+                              </button>
+                            )}
                           </>
                         ) : (
                           <button

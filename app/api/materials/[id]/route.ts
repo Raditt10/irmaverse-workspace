@@ -54,7 +54,7 @@ export async function GET(
             title: true,
           },
         },
-        program: {
+        programs: {
           select: {
             id: true,
             title: true,
@@ -142,10 +142,10 @@ export async function GET(
             title: m.material_material_parentIdTomaterial.title,
           }
         : null,
-      program: m.program
+      program: m.programs
         ? {
-            id: m.program.id,
-            title: m.program.title,
+            id: m.programs.id,
+            title: m.programs.title,
           }
         : null,
       // For editing: flat email list of all invited users
@@ -216,9 +216,21 @@ export async function DELETE(
       );
     }
 
-    await (prisma as any).material.delete({
-      where: { id },
-    });
+    // Proactively unset relations using Prisma Client (now updated on Windows)
+    // We use a transaction to ensure either everything works or nothing happens
+    await prisma.$transaction([
+      (prisma as any).material_quizzes.updateMany({
+        where: { materialId: id },
+        data: { materialId: null },
+      }),
+      (prisma as any).rekapan.updateMany({
+        where: { materialId: id },
+        data: { materialId: null },
+      }),
+      (prisma as any).material.delete({
+        where: { id },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Kajian berhasil dihapus" },

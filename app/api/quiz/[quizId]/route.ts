@@ -15,17 +15,23 @@ export async function GET(
 
     const { quizId } = await params;
 
+    const user = await prisma.users.findUnique({
+      where: { id: session.user.id },
+    });
+    const isStaffRole = user?.role === "instruktur" || user?.role === "admin" || user?.role === "super_admin";
+
+    // If staff, fetch all attempts. Otherwise, only own attempts.
     const quiz = await prisma.material_quizzes.findUnique({
       where: { id: quizId },
       include: {
         material: { select: { id: true, title: true, instructorId: true, thumbnailUrl: true } },
-        creator: { select: { id: true, name: true, avatar: true } },
-        questions: {
-          include: { options: true },
+        users: { select: { id: true, name: true, avatar: true } },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
-        attempts: {
-          where: { userId: session.user.id },
+        quiz_attempts: {
+          where: isStaffRole ? undefined : { userId: session.user.id },
           orderBy: { completedAt: "desc" },
           select: {
             id: true,
@@ -33,6 +39,7 @@ export async function GET(
             totalScore: true,
             completedAt: true,
             answers: true,
+            users: { select: { id: true, name: true, avatar: true } },
           },
         },
       },
@@ -45,19 +52,14 @@ export async function GET(
       );
     }
 
-    const user = await prisma.users.findUnique({
-      where: { id: session.user.id },
-    });
-    const isPrivileged = user?.role === "instruktur" || user?.role === "admin" || user?.role === "super_admin";
-
-    const questions = quiz.questions.map((q) => ({
+    const questions = quiz.quiz_questions.map((q) => ({
       id: q.id,
       question: q.question,
       order: q.order,
-      options: q.options.map((o) => ({
+      options: q.quiz_options.map((o) => ({
         id: o.id,
         text: o.text,
-        ...(isPrivileged || quiz.attempts.length > 0
+        ...(isStaffRole || quiz.quiz_attempts.some(a => a.users.id === session.user.id)
           ? { isCorrect: o.isCorrect }
           : {}),
       })),
@@ -68,12 +70,12 @@ export async function GET(
       materialId: quiz.materialId || null,
       materialTitle: quiz.material?.title || null,
       materialThumbnail: quiz.material?.thumbnailUrl || null,
-      creatorName: quiz.creator?.name || null,
+      creatorName: quiz.users?.name || null,
       title: quiz.title,
       description: quiz.description,
-      questionCount: quiz.questions.length,
+      questionCount: quiz.quiz_questions.length,
       questions,
-      attempts: quiz.attempts,
+      attempts: quiz.quiz_attempts,
       createdAt: quiz.createdAt,
     });
   } catch (error) {
@@ -118,16 +120,16 @@ export async function PUT(
     await prisma.quiz_questions.deleteMany({ where: { quizId } });
 
     // Update quiz and recreate questions
-    const quiz = await prisma.material_quizzes.update({
+    const quiz = await (prisma as any).material_quizzes.update({
       where: { id: quizId },
       data: {
         title: title.trim(),
         description: description?.trim() || null,
-        questions: {
+        quiz_questions: {
           create: (questions || []).map((q: any, idx: number) => ({
             question: q.question.trim(),
             order: idx,
-            options: {
+            quiz_options: {
               create: (q.options || []).map((o: any) => ({
                 text: o.text.trim(),
                 isCorrect: o.isCorrect === true,
@@ -137,7 +139,7 @@ export async function PUT(
         },
       },
       include: {
-        questions: { include: { options: true }, orderBy: { order: "asc" } },
+        quiz_questions: { include: { quiz_options: true }, orderBy: { order: "asc" } },
       },
     });
 

@@ -104,6 +104,8 @@ export default function StandaloneQuizSessionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
+  const { data: session } = useSession();
+  const isStaffRole = session?.user?.role === "admin" || session?.user?.role === "super_admin" || session?.user?.role === "instruktur";
 
   // Review state
   const [showReview, setShowReview] = useState(false);
@@ -292,7 +294,7 @@ export default function StandaloneQuizSessionPage() {
               <div className="flex items-center justify-center gap-2">
                 {formatTime(cooldownRemaining).split(':').map((part, i) => (
                   <React.Fragment key={i}>
-                    <div className="bg-white border-2 border-slate-200 rounded-xl px-4 py-2 shadow-[0_4px_0_0_#e2e8f0] min-w-[60px]">
+                    <div className="bg-white border-2 border-slate-200 rounded-xl px-4 py-2 shadow-[0_4px_0_0_#e2e8f0] min-w-15">
                       <span className="text-4xl font-bold text-slate-700 font-mono tracking-tighter">
                         {part}
                       </span>
@@ -534,6 +536,14 @@ export default function StandaloneQuizSessionPage() {
         onCancel={() => setShowSubmitConfirm(false)}
       />
 
+      {/* Admin/Staff Preview Banner */}
+      {isStaffRole && (
+        <div className="bg-amber-100 border-b border-amber-200 px-4 py-2 text-center text-amber-800 text-sm font-bold flex items-center justify-center gap-2">
+          <Eye className="h-4 w-4" />
+          <span>Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat menyimpan progress</span>
+        </div>
+      )}
+
       {/* Top Bar / HUD */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
@@ -707,11 +717,17 @@ export default function StandaloneQuizSessionPage() {
             </button>
           ) : (
             <button
-              onClick={() => setShowSubmitConfirm(true)}
+              onClick={() => {
+                if (isStaffRole) {
+                  router.push("/quiz");
+                } else {
+                  setShowSubmitConfirm(true);
+                }
+              }}
               disabled={submitting}
               className="h-12 px-10 rounded-xl font-bold text-base bg-yellow-500 text-white border-2 border-yellow-600 shadow-[0_4px_0_0_#b45309] hover:-translate-y-0.5 hover:shadow-[0_6px_0_0_#b45309] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 flex-1 max-w-xs"
             >
-              {submitting ? "Memproses..." : "Selesai!"}
+              {submitting ? "Memproses..." : (isStaffRole ? "Selesai Preview" : "Selesai!")}
             </button>
           )}
         </div>

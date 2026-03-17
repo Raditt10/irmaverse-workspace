@@ -84,7 +84,7 @@ export default function InstructorAcademy() {
                 Pusat Instruktur
               </h1>
               <p className="text-slate-500 mt-1 font-bold text-base md:text-lg ml-1">
-                Kelola kajian dan bimbing siswa dengan penuh dedikasi.
+                Kelola kajian dan bimbing anggota IRMA dengan penuh dedikasi.
               </p>
             </div>
 
@@ -191,9 +191,12 @@ export default function InstructorAcademy() {
                 </div>
 
                 {upcomingClasses.length === 0 ? (
-                    <div className="bg-white p-8 rounded-4xl border-2 border-slate-100 text-center">
-                    <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
-                    <p className="text-slate-400 font-bold">Belum ada kajian yang mendatang</p>
+                  <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl text-center h-full min-h-40">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                      <Calendar className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                    </div>
+                    <p className="text-sm text-slate-500 font-bold">Belum ada kajian yang mendatang</p>
+                    <p className="text-xs text-slate-400 mt-1">Jadwal kajian yang akan datang akan muncul di sini</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -255,9 +258,12 @@ export default function InstructorAcademy() {
                 </div>
 
                 {coursesOverview.length === 0 ? (
-                    <div className="bg-white p-8 rounded-4xl border-2 border-slate-100 text-center">
-                    <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
-                    <p className="text-slate-400 font-bold">Belum ada kajian aktif</p>
+                  <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl text-center h-full min-h-40">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                      <BookOpen className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                    </div>
+                    <p className="text-sm text-slate-500 font-bold">Belum ada kajian aktif</p>
+                    <p className="text-xs text-slate-400 mt-1">Buat kajian baru untuk mulai membagikan ilmu Anda</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -269,7 +275,7 @@ export default function InstructorAcademy() {
                         <h3 className="font-black text-slate-800 mb-4 group-hover:text-emerald-600 transition-colors">{course.title}</h3>
                         <div className="space-y-2 text-sm">
                           <div className="flex items-center justify-between">
-                            <span className="text-slate-500 font-bold flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Siswa</span>
+                            <span className="text-slate-500 font-bold flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Peserta Kajian</span>
                             <span className="font-black text-slate-800">{course.students}</span>
                           </div>
                           <div className="flex items-center justify-between">
@@ -341,7 +347,13 @@ export default function InstructorAcademy() {
                 </div>
 
                 {recentActivities.length === 0 ? (
-                  <p className="text-xs text-slate-400 font-bold text-center py-4">Belum ada aktivitas</p>
+                  <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl text-center h-full min-h-40">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                      <History className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                    </div>
+                    <p className="text-sm text-slate-500 font-bold">Belum ada aktivitas</p>
+                    <p className="text-xs text-slate-400 mt-1">Aktivitas terbaru Anda akan tercatat di sini</p>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {recentActivities.map((activity) => {
@@ -357,16 +369,16 @@ export default function InstructorAcademy() {
                       return (
                         <div
                           key={activity.id}
-                          className="flex items-start gap-4 p-4 rounded-3xl bg-slate-50 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/50 transition-all group cursor-pointer"
+                          className="flex items-center gap-4 p-4 rounded-4xl bg-slate-50 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/50 transition-all group cursor-pointer"
                         >
-                          <div className={`p-2.5 ${bgColor} border-2 ${borderColor} rounded-2xl shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-sm`}>
-                            <ActivityIcon className={`w-4 h-4 ${iconColor}`} strokeWidth={2.5} />
+                          <div className={`w-12 h-12 rounded-full ${bgColor} border-2 flex items-center justify-center ${borderColor} shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
+                            <ActivityIcon className={`w-5 h-5 ${iconColor}`} strokeWidth={2.5} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-bold text-slate-800 text-[13px] leading-snug group-hover:text-emerald-600 transition-colors line-clamp-2">
                               {activity.title}
                             </p>
-                            <p className="text-[11px] text-slate-400 font-black mt-1.5 flex items-center gap-1.5">
+                            <p className="text-[11px] text-slate-400 font-bold mt-1.5 flex items-center gap-1.5">
                               <Clock className="w-3 h-3 text-slate-300" /> {activity.time}
                             </p>
                           </div>
@@ -377,8 +389,8 @@ export default function InstructorAcademy() {
                 )}
               </div>
 
-              {/* Motivational Card - Only show if there's at least 1 session today */}
-              {achievement?.dailySessions > 0 && (
+              {/* Motivational Card - Only show if there's at least 1 session today AND at least 1 student attended */}
+              {achievement?.dailySessions > 0 && achievement?.dailyAttendance > 0 && (
                 <div className="bg-white p-5 rounded-4xl border-2 border-slate-100 shadow-sm relative overflow-hidden group">
                   <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:scale-125 transition-transform" />
                   <div className="flex items-center gap-3 mb-3 relative z-10">

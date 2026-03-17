@@ -217,43 +217,46 @@ export default function AdminDashboard() {
                   </Link>
                 </div>
                 
-                <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 space-y-4 shadow-sm">
                   {stats.recentMaterials && stats.recentMaterials.length > 0 ? (
-                    stats.recentMaterials.map((material) => (
-                      <div key={material.id} className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white transition-all group">
-                          <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 font-black text-xl shrink-0">
-                                  {material.title.charAt(0)}
-                              </div>
-                              <div className="min-w-0">
-                                  <h3 className="font-black text-slate-700 group-hover:text-emerald-600 transition-colors truncate uppercase tracking-tight">{material.title}</h3>
-                                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest truncate">Oleh: {material.instructor}</p>
-                              </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
-                                material.isCompleted 
-                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
-                                : 'bg-amber-50 text-amber-600 border-amber-100'
-                              }`}>
-                                  {material.isCompleted ? 'Tuntas' : 'Belum Tuntas'}
-                              </span>
-                              <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
-                                {new Date(material.createdAt).toLocaleDateString('id-ID', {
-                                  day: '2-digit',
-                                  month: 'short'
-                                })}
-                              </p>
-                          </div>
-                      </div>
-                    ))
+                    <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 space-y-4 shadow-sm">
+                      {stats.recentMaterials.map((material) => (
+                        <div key={material.id} className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 hover:bg-white transition-all group">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 font-black text-xl shrink-0">
+                                    {material.title.charAt(0)}
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="font-black text-slate-700 group-hover:text-emerald-600 transition-colors truncate uppercase tracking-tight">{material.title}</h3>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest truncate">Oleh: {material.instructor}</p>
+                                </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
+                                  material.isCompleted 
+                                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                                  : 'bg-amber-50 text-amber-600 border-amber-100'
+                                }`}>
+                                    {material.isCompleted ? 'Tuntas' : 'Belum Tuntas'}
+                                </span>
+                                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                                  {new Date(material.createdAt).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'short'
+                                  })}
+                                </p>
+                            </div>
+                        </div>
+                      ))}
+                    </div>
                   ) : (
-                    <div className="text-center py-12 flex flex-col items-center justify-center">
-                      <BookOpen className="w-16 h-16 text-slate-200 mb-4" strokeWidth={1} />
-                      <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Belum ada kajian terbaru</p>
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <BookOpen className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada kajian terbaru</p>
+                      <p className="text-xs text-slate-400 mt-1">Tambahkan sesi kajian baru untuk anggota</p>
                     </div>
                   )}
-                </div>
               </section>
 
               {/* News Section */}
@@ -269,9 +272,12 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
                   {!stats.recentNews || stats.recentNews.length === 0 ? (
-                    <div className="col-span-1 md:col-span-2 bg-white rounded-4xl border-2 border-dashed border-slate-100 p-12 text-center flex flex-col items-center justify-center">
-                      <Newspaper className="w-16 h-16 text-slate-200 mb-4" strokeWidth={1} />
-                      <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Belum ada kabar terbaru</p>
+                    <div className="col-span-1 md:col-span-2 flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <Newspaper className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada kabar terbaru</p>
+                      <p className="text-xs text-slate-400 mt-1">Buat berita untuk menyampaikan informasi ke anggota</p>
                     </div>
                   ) : (
                     stats.recentNews.map((news) => (
@@ -326,18 +332,20 @@ export default function AdminDashboard() {
                   </h2>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 shadow-[0_8px_0_0_#f1f5f9] overflow-hidden mb-10 group/list transition-all hover:shadow-md">
-                  <div className="divide-y divide-slate-100">
-                    {!stats.recentUsers || stats.recentUsers.length === 0 ? (
-                      <div className="p-16 text-center flex flex-col items-center justify-center">
-                        <Users className="w-16 h-16 text-slate-200 mb-4" strokeWidth={1} />
-                        <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Belum ada anggota baru</p>
-                      </div>
-                    ) : (
-                      stats.recentUsers.map((user: any) => (
+                {!stats.recentUsers || stats.recentUsers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] mb-10 text-center h-full min-h-40">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                      <Users className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                    </div>
+                    <p className="text-sm text-slate-500 font-bold">Belum ada anggota baru</p>
+                    <p className="text-xs text-slate-400 mt-1">Anggota yang baru mendaftar akan tampil di sini</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 space-y-4 shadow-sm mb-10 transition-all hover:shadow-md">
+                      {stats.recentUsers.map((user: any) => (
                         <div
                           key={user.id}
-                          className="flex items-center justify-between p-5 hover:bg-slate-50 transition-colors group cursor-default"
+                          className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 hover:bg-white hover:border-emerald-200 transition-all group"
                         >
                           <div className="flex items-center gap-4">
                             <div className="relative">
@@ -380,10 +388,9 @@ export default function AdminDashboard() {
                             </span>
                           </div>
                         </div>
-                      ))
-                    )}
+                      ))}
                   </div>
-                </div>
+                )}
               </section>
             </div>
 
@@ -424,27 +431,32 @@ export default function AdminDashboard() {
 
                 <div className="space-y-4">
                   {!stats.instructorActivities || stats.instructorActivities.length === 0 ? (
-                    <div className="p-10 text-center flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-4xl bg-slate-50/50">
-                      <History className="w-12 h-12 text-slate-200 mb-3" strokeWidth={1} />
-                      <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Belum ada aktivitas</p>
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <History className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada aktivitas</p>
+                      <p className="text-xs text-slate-400 mt-1">Aktivitas instruktur terbaru akan tercatat di sini</p>
                     </div>
                   ) : (
                     stats.instructorActivities.map((act: any) => (
-                      <div key={act.id} className="flex gap-4 p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white hover:border-emerald-100 transition-all group">
-                          <div className={`mt-1 p-2 rounded-xl h-fit border-2 bg-emerald-50 border-emerald-100 text-emerald-500`}>
+                      <div key={act.id} className="flex items-center gap-4 p-4 rounded-4xl bg-emerald-50/50 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 bg-white border-emerald-100 text-emerald-500 shadow-sm group-hover:scale-110 transition-transform`}>
                             {act.type === 'material' && <BookOpen className="h-5 w-5" />}
                             {act.type === 'schedule' && <Calendar className="h-5 w-5" />}
                             {act.type === 'competition' && <Award className="h-5 w-5" />}
                             {act.type === 'news' && <Newspaper className="h-5 w-5" />}
+                            {(!['material', 'schedule', 'competition', 'news'].includes(act.type)) && <History className="h-5 w-5" />}
                           </div>
-                          <div className="min-w-0">
-                            <p className="font-black text-slate-700 leading-tight mb-1 text-sm group-hover:text-emerald-600 transition-colors uppercase tracking-tight line-clamp-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-emerald-700 leading-tight mb-1 text-[13.5px] group-hover:text-emerald-600 transition-colors line-clamp-2">
                               {act.title}
                             </p>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{act.user}</span>
-                              <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                              <span className="text-[10px] font-black text-slate-400 border border-slate-200 px-1.5 py-0.5 rounded-md uppercase tracking-tight">
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100/50 px-2 py-0.5 rounded-md">{act.user}</span>
+                              <span className="w-1 h-1 bg-emerald-200 rounded-full" />
+                              <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-slate-300" />
                                 {new Date(act.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             </div>
@@ -468,14 +480,17 @@ export default function AdminDashboard() {
 
                 <div className="space-y-4">
                   {!stats.userActivities || stats.userActivities.length === 0 ? (
-                    <div className="p-10 text-center flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-4xl bg-slate-50/50">
-                      <Activity className="w-12 h-12 text-slate-200 mb-3" strokeWidth={1} />
-                      <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">Belum ada aktivitas</p>
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <Activity className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada aktivitas</p>
+                      <p className="text-xs text-slate-400 mt-1">Aktivitas anggota terbaru akan tercatat di sini</p>
                     </div>
                   ) : (
                     stats.userActivities.map((act: any) => (
-                      <div key={act.id} className="flex gap-4 p-4 rounded-3xl bg-emerald-50/50 border-2 border-emerald-50 hover:bg-white hover:border-emerald-100 transition-all group">
-                          <div className={`mt-1 p-2 rounded-xl h-fit border-2 bg-white border-emerald-100 text-emerald-500`}>
+                      <div key={act.id} className="flex items-center gap-4 p-4 rounded-4xl bg-emerald-50/50 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 bg-white border-emerald-100 text-emerald-500 shadow-sm group-hover:scale-110 transition-transform`}>
                             {act.type === 'quiz_completed' && <Zap className="h-5 w-5" />}
                             {act.type === 'material_read' && <Book className="h-5 w-5" />}
                             {act.type === 'badge_earned' && <Award className="h-5 w-5" />}
@@ -485,14 +500,15 @@ export default function AdminDashboard() {
                             {act.type === 'attendance_marked' && <CheckCircle2 className="h-5 w-5" />}
                             {(!['quiz_completed', 'material_read', 'badge_earned', 'forum_post', 'level_up', 'friend_added', 'attendance_marked'].includes(act.type)) && <History className="h-5 w-5" />}
                           </div>
-                          <div className="min-w-0">
-                            <p className="font-bold text-slate-700 leading-tight mb-1 text-sm group-hover:text-emerald-600 transition-colors uppercase tracking-tight line-clamp-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-emerald-700 leading-tight mb-1 text-[13.5px] group-hover:text-emerald-600 transition-colors line-clamp-2">
                               {act.title}
                             </p>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{act.user}</span>
-                              <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                              <span className="text-[10px] font-black text-slate-400 border border-slate-200 px-1.5 py-0.5 rounded-md uppercase tracking-tight">
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100/50 px-2 py-0.5 rounded-md">{act.user}</span>
+                              <span className="w-1 h-1 bg-emerald-200 rounded-full" />
+                              <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-slate-300" />
                                 {new Date(act.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             </div>

@@ -91,14 +91,14 @@ export async function GET(
       // Fallback: kalau belum ada ActivityLog, tampilkan quiz attempts
       const recentQuizzes = await prisma.quiz_attempts.findMany({
         where: { userId },
-        include: { quiz: { select: { title: true } } },
+        include: { material_quizzes: { select: { title: true } } },
         orderBy: { completedAt: "desc" },
         take: 5,
       });
       recentActivities = recentQuizzes.map((qa) => ({
         id: qa.id,
         type: "quiz_completed",
-        title: `Menyelesaikan quiz: ${qa.quiz.title}`,
+        title: `Menyelesaikan quiz: ${qa.material_quizzes.title}`,
         date: qa.completedAt.toISOString(),
         xpEarned: 50,
         score: qa.score,
@@ -109,7 +109,7 @@ export async function GET(
     // Ambil badges yang dimiliki user
     const earnedBadges = await prisma.user_badges.findMany({
       where: { userId },
-      include: { badge: true },
+      include: { badges: true },
       orderBy: { earnedAt: "desc" },
       take: 6,
     });
@@ -137,12 +137,12 @@ export async function GET(
       },
       recentActivities,
       earnedBadges: earnedBadges.map((ub) => ({
-        id: ub.badge.id,
-        code: ub.badge.code,
-        name: ub.badge.name,
-        description: ub.badge.description,
-        icon: ub.badge.icon,
-        category: ub.badge.category,
+        id: ub.badges.id,
+        code: ub.badges.code,
+        name: ub.badges.name,
+        description: ub.badges.description,
+        icon: ub.badges.icon,
+        category: ub.badges.category,
         earnedAt: ub.earnedAt.toISOString(),
       })),
       xpProgress: {

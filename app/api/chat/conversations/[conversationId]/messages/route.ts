@@ -42,7 +42,7 @@ export async function GET(
     const messages = await prisma.chat_messages.findMany({
       where: { conversationId },
       include: {
-        sender: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -70,9 +70,14 @@ export async function GET(
       },
     });
 
+    const mappedMessages = messages.map((msg: any) => {
+      const { users, ...rest } = msg;
+      return { ...rest, sender: users };
+    });
+
     return NextResponse.json({
-      messages,
-      nextCursor: messages.length === limit ? messages[messages.length - 1]?.id : null,
+      messages: mappedMessages,
+      nextCursor: mappedMessages.length === limit ? mappedMessages[mappedMessages.length - 1]?.id : null,
     });
   } catch (error: any) {
     console.error("Error fetching messages:", error);
@@ -132,6 +137,7 @@ export async function POST(
     // Create message
     const message = await prisma.chat_messages.create({
       data: {
+        id: crypto.randomUUID(),
         conversationId,
         senderId: session.user.id,
         content: content?.trim() || "",
@@ -139,7 +145,7 @@ export async function POST(
         attachmentType,
       },
       include: {
-        sender: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -148,13 +154,16 @@ export async function POST(
       },
     });
 
+    const { users, ...restMessage } = message as any;
+    const mappedMessage = { ...restMessage, sender: users };
+
     // Update conversation timestamp
     await prisma.chat_conversations.update({
       where: { id: conversationId },
       data: { updatedAt: new Date() },
     });
 
-    return NextResponse.json(message, { status: 201 });
+    return NextResponse.json(mappedMessage, { status: 201 });
   } catch (error: any) {
     console.error("Error sending message:", error);
     return NextResponse.json(

@@ -660,9 +660,13 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {latestNews.length === 0 ? (
-                    <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2">
-                      Belum ada kabar terbaru
-                    </p>
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl col-span-1 md:col-span-2 text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3">
+                        <Newspaper className="w-8 h-8 text-slate-300" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada kabar terbaru</p>
+                      <p className="text-xs text-slate-400 mt-1">Nantikan informasi menarik seputar IRMA</p>
+                    </div>
                   ) : (
                     latestNews.map((news) => (
                       <Link
@@ -726,9 +730,13 @@ const Dashboard = () => {
 
                 <div className="space-y-3">
                   {finishedMaterials.length === 0 ? (
-                    <p className="text-center text-xs text-slate-400 font-bold py-10">
-                      Belum ada kajian yang diselesaikan
-                    </p>
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3">
+                        <BookMarked className="w-8 h-8 text-slate-300" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada kajian yang diselesaikan</p>
+                      <p className="text-xs text-slate-400 mt-1">Ikuti kajian dan selesaikan untuk melihat rekapan di sini</p>
+                    </div>
                   ) : (
                     finishedMaterials.map((material) => (
                       <div
@@ -813,9 +821,13 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {upcomingQuizzes.length === 0 ? (
-                    <p className="text-center text-xs text-slate-400 font-bold py-10 col-span-1 md:col-span-2 lg:col-span-3">
-                      Yey! Tidak ada kuis kajian yang tertunda.
-                    </p>
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl col-span-1 md:col-span-2 lg:col-span-3 text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <HelpCircle className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Yey! Tidak ada kuis yang tertunda.</p>
+                      <p className="text-xs text-slate-400 mt-1">Anda sudah menyelesaikan semua kuis yang ada</p>
+                    </div>
                   ) : (
                     upcomingQuizzes.map((quiz, index) => {
                       const buttonColor = getRandomButtonColor(index);

@@ -18,10 +18,10 @@ export async function GET(
     const quizzes = await prisma.material_quizzes.findMany({
       where: { materialId },
       include: {
-        questions: {
+        quiz_questions: {
           select: { id: true },
         },
-        attempts: {
+        quiz_attempts: {
           where: { userId: session.user.id },
           orderBy: { completedAt: "desc" },
           take: 1,
@@ -36,9 +36,9 @@ export async function GET(
       materialId: q.materialId,
       title: q.title,
       description: q.description,
-      questionCount: q.questions.length,
+      questionCount: q.quiz_questions.length,
       createdAt: q.createdAt,
-      lastAttempt: q.attempts[0] || null,
+      lastAttempt: q.quiz_attempts[0] || null,
     }));
 
     return NextResponse.json(result);
@@ -130,15 +130,20 @@ export async function POST(
     // Create quiz with nested questions and options
     const quiz = await prisma.material_quizzes.create({
       data: {
+        id: crypto.randomUUID(),
         materialId,
+        creatorId: session.user.id,
         title: title.trim(),
         description: description?.trim() || null,
-        questions: {
+        updatedAt: new Date(),
+        quiz_questions: {
           create: questions.map((q: any, idx: number) => ({
+            id: crypto.randomUUID(),
             question: q.question.trim(),
             order: idx,
-            options: {
+            quiz_options: {
               create: q.options.map((o: any) => ({
+                id: crypto.randomUUID(),
                 text: o.text.trim(),
                 isCorrect: o.isCorrect === true,
               })),
@@ -147,8 +152,8 @@ export async function POST(
         },
       },
       include: {
-        questions: {
-          include: { options: true },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
       },

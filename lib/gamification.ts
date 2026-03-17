@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { activity_logs_type } from "@prisma/client";
+import crypto from "crypto";
 
 // ─── XP CONFIG ──────────────────────────────────────────────────────────────────
 // Hanya 4 sumber XP yang aktif:
@@ -17,6 +18,13 @@ export const XP_REWARDS: Record<activity_logs_type, number> = {
   forum_post: 0, // dinonaktifkan
   streak_maintained: 0, // dinonaktifkan
   profile_completed: 0, // dinonaktifkan
+  admin_user_managed: 0,
+  admin_program_managed: 0,
+  admin_material_managed: 0,
+  admin_news_managed: 0,
+  admin_schedule_managed: 0,
+  admin_competition_managed: 0,
+  admin_admin_managed: 0,
 };
 
 // Tipe aktivitas yang diizinkan mendapatkan XP
@@ -145,6 +153,7 @@ export async function grantXp(params: {
   // 4. Log activity
   await prisma.activity_logs.create({
     data: {
+      id: crypto.randomUUID(),
       userId,
       type,
       title,
@@ -158,6 +167,7 @@ export async function grantXp(params: {
   if (leveledUp) {
     await prisma.activity_logs.create({
       data: {
+        id: crypto.randomUUID(),
         userId,
         type: "level_up",
         title: `Naik ke Level ${newLevel}!`,
@@ -193,7 +203,7 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
       level: true,
       streak: true,
       quizzes: true,
-      earnedBadges: { select: { badge: { select: { code: true } } } },
+      user_badges: { select: { badges: { select: { code: true } } } },
     },
   });
 
@@ -202,7 +212,7 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
   // ── Guard: Hanya role "user" ──
   if (user.role !== "user") return [];
 
-  const ownedCodes = new Set(user.earnedBadges.map((ub) => ub.badge.code));
+  const ownedCodes = new Set(user.user_badges.map((ub: any) => ub.badges.code));
   const allBadges = await prisma.badges.findMany();
   const earned: string[] = [];
 
@@ -287,7 +297,7 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
 
     if (qualifies) {
       await prisma.user_badges.create({
-        data: { userId, badgeId: badge.id },
+        data: { id: crypto.randomUUID(), userId, badgeId: badge.id },
       });
 
       // Update badge count pada user
@@ -299,6 +309,7 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
       // Log badge earned
       await prisma.activity_logs.create({
         data: {
+          id: crypto.randomUUID(),
           userId,
           type: "badge_earned",
           title: `Mendapatkan badge: ${badge.name}`,

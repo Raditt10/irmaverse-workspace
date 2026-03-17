@@ -125,6 +125,8 @@ export default function QuizSessionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
+  const { data: session } = useSession();
+  const isStaffRole = session?.user?.role === "admin" || session?.user?.role === "super_admin" || session?.user?.role === "instruktur";
 
   // Review state
   const [showReview, setShowReview] = useState(false);
@@ -584,6 +586,14 @@ export default function QuizSessionPage() {
         onCancel={() => setShowSubmitConfirm(false)}
       />
 
+      {/* Admin/Staff Preview Banner */}
+      {isStaffRole && (
+        <div className="bg-amber-100 border-b border-amber-200 px-4 py-2 text-center text-amber-800 text-sm font-bold flex items-center justify-center gap-2">
+          <Eye className="h-4 w-4" />
+          <span>Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat menyimpan progress</span>
+        </div>
+      )}
+
       {/* Top Bar */}
       <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b-2 border-slate-200 px-4 py-3">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
@@ -716,7 +726,13 @@ export default function QuizSessionPage() {
               </button>
             ) : (
               <button
-                onClick={() => setShowSubmitConfirm(true)}
+                onClick={() => {
+                  if (isStaffRole) {
+                    router.push("/quiz");
+                  } else {
+                    setShowSubmitConfirm(true);
+                  }
+                }}
                 disabled={submitting}
                 className="px-10 py-4 rounded-2xl font-black text-lg bg-emerald-500 text-white border-b-4 border-emerald-700 shadow-[0_4px_0_0_#059669] hover:bg-emerald-600 active:border-b-0 active:translate-y-1 transition-all min-w-50"
               >
@@ -724,7 +740,7 @@ export default function QuizSessionPage() {
                   "Mengirim..."
                 ) : (
                   <>
-                    Selesaikan Quiz <Trophy className="inline h-5 w-5 ml-1" />
+                    {isStaffRole ? "Selesai Preview" : "Selesaikan Quiz"} <Trophy className="inline h-5 w-5 ml-1" />
                   </>
                 )}
               </button>

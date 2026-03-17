@@ -16,12 +16,24 @@ export async function POST(
 
     const { quizId } = await params;
 
+    // Block admins and super admins from submitting
+    const userRole = await prisma.users.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    if (userRole?.role === "admin" || userRole?.role === "super_admin" || userRole?.role === "instruktur") {
+      return NextResponse.json(
+        { error: "Staff tidak diperbolehkan mengerjakan kuis" },
+        { status: 403 },
+      );
+    }
+
     // Get quiz with correct answers
     const quiz = await prisma.material_quizzes.findUnique({
       where: { id: quizId },
       include: {
-        questions: {
-          include: { options: true },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
       },
@@ -42,7 +54,7 @@ export async function POST(
     });
 
     if (lastAttempt) {
-      const questionCount = quiz.questions.length;
+      const questionCount = quiz.quiz_questions.length;
       const cooldownMinutes = questionCount < 10 ? 1 : 5;
       const cooldownMs = cooldownMinutes * 60 * 1000;
       const timeSinceLastAttempt =
@@ -79,7 +91,7 @@ export async function POST(
 
     // Calculate score
     let score = 0;
-    const totalScore = quiz.questions.length;
+    const totalScore = quiz.quiz_questions.length;
     const detailedResults: {
       questionId: string;
       question: string;
@@ -91,10 +103,10 @@ export async function POST(
       options: { id: string; text: string; isCorrect: boolean }[];
     }[] = [];
 
-    for (const question of quiz.questions) {
-      const correctOption = question.options.find((o) => o.isCorrect);
+    for (const question of quiz.quiz_questions) {
+      const correctOption = question.quiz_options.find((o) => o.isCorrect);
       const selectedOptionId = answers[question.id] || null;
-      const selectedOption = question.options.find(
+      const selectedOption = question.quiz_options.find(
         (o) => o.id === selectedOptionId,
       );
       const isCorrect = selectedOptionId === correctOption?.id;
@@ -109,7 +121,7 @@ export async function POST(
         correctOptionId: correctOption?.id || "",
         correctOptionText: correctOption?.text || "",
         isCorrect,
-        options: question.options.map((o) => ({
+        options: question.quiz_options.map((o) => ({
           id: o.id,
           text: o.text,
           isCorrect: o.isCorrect,
@@ -118,8 +130,9 @@ export async function POST(
     }
 
     // Save attempt
-    const attempt = await prisma.quiz_attempts.create({
+    const attempt = await (prisma as any).quiz_attempts.create({
       data: {
+        id: crypto.randomUUID(),
         quizId,
         userId: session.user.id,
         score,
@@ -155,7 +168,7 @@ export async function POST(
     }
 
     // Calculate cooldown for the response
-    const questionCount = quiz.questions.length;
+    const questionCount = quiz.quiz_questions.length;
     const cooldownMinutes = questionCount < 10 ? 1 : 5;
 
     return NextResponse.json({

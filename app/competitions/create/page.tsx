@@ -307,7 +307,7 @@ const CreateCompetition = () => {
 
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
-                        Deskripsi Singkat <span className="text-red-500">*</span>
+                        Deskripsi Perlombaan <span className="text-red-500">*</span>
                       </label>
                       <Textarea
                         name="description"

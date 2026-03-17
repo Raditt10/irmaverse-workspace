@@ -920,26 +920,16 @@ const CreateMaterial = () => {
                           <Target className="h-4 w-4 text-emerald-500" />{" "}
                           Tingkat Kelas / Sasaran
                         </h3>
-                        <div className="flex flex-wrap gap-2 lg:gap-3">
-                          {["Semua", "Kelas 10", "Kelas 11", "Kelas 12"].map(
-                            (grade) => (
-                              <button
-                                key={grade}
-                                type="button"
-                                onClick={() =>
-                                  setFormData({ ...formData, grade })
-                                }
-                                className={`px-4 py-2 rounded-full font-bold transition-all border-2 text-sm ${
-                                  formData.grade === grade
-                                    ? "bg-teal-500 text-white border-teal-600 shadow-[0_4px_0_0_#0d9488]"
-                                    : "bg-white text-slate-600 border-slate-200 hover:border-teal-300 hover:bg-slate-50 hover:-translate-y-px shadow-sm"
-                                }`}
-                              >
-                                {grade}
-                              </button>
-                            ),
-                          )}
-                        </div>
+                        <CategoryFilter
+                          categories={["Semua", "Kelas 10", "Kelas 11", "Kelas 12"]}
+                          subCategories={[]}
+                          selectedCategory={formData.grade}
+                          selectedSubCategory=""
+                          onCategoryChange={(grade) =>
+                            setFormData({ ...formData, grade })
+                          }
+                          onSubCategoryChange={() => {}}
+                        />
                       </div>
                     </div>
                   </div>

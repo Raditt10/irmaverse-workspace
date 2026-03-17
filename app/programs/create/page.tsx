@@ -376,24 +376,16 @@ const CreateProgram = () => {
                   <h3 className="text-sm font-bold text-slate-700 mb-4 ml-1 flex items-center gap-2">
                     <Target className="h-4 w-4 text-emerald-500" /> Target Kelas
                   </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {["Semua", "Kelas 10", "Kelas 11", "Kelas 12"].map(
-                      (grade) => (
-                        <button
-                          key={grade}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, grade })}
-                          className={`px-6 py-2.5 rounded-full font-black text-sm transition-all border-2 ${
-                            formData.grade === grade
-                              ? "bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_0_#059669]"
-                              : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300"
-                          }`}
-                        >
-                          {grade}
-                        </button>
-                      ),
-                    )}
-                  </div>
+                  <CategoryFilter
+                    categories={["Semua", "Kelas 10", "Kelas 11", "Kelas 12"]}
+                    subCategories={[]}
+                    selectedCategory={formData.grade}
+                    selectedSubCategory=""
+                    onCategoryChange={(grade) =>
+                      setFormData({ ...formData, grade })
+                    }
+                    onSubCategoryChange={() => {}}
+                  />
                 </div>
               </div>
 

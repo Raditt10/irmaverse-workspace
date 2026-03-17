@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       conversations = await prisma.chat_conversations.findMany({
         where: { instructorId: userId },
         include: {
-          user: {
+          users_chat_conversations_userIdTousers: {
             select: {
               id: true,
               name: true,
@@ -28,13 +28,13 @@ export async function GET(request: NextRequest) {
               avatar: true,
             },
           },
-          messages: {
+          chat_messages: {
             orderBy: { createdAt: "desc" },
             take: 1,
           },
           _count: {
             select: {
-              messages: {
+              chat_messages: {
                 where: {
                   isRead: false,
                   senderId: { not: userId },
@@ -49,9 +49,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         conversations.map((conv) => ({
           id: conv.id,
-          participant: conv.user,
-          lastMessage: conv.messages[0] || null,
-          unreadCount: conv._count.messages,
+          participant: conv.users_chat_conversations_userIdTousers,
+          lastMessage: conv.chat_messages[0] || null,
+          unreadCount: conv._count.chat_messages,
           updatedAt: conv.updatedAt,
         }))
       );
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       conversations = await prisma.chat_conversations.findMany({
         where: { userId },
         include: {
-          instructor: {
+          users_chat_conversations_instructorIdTousers: {
             select: {
               id: true,
               name: true,
@@ -69,13 +69,13 @@ export async function GET(request: NextRequest) {
               avatar: true,
             },
           },
-          messages: {
+          chat_messages: {
             orderBy: { createdAt: "desc" },
             take: 1,
           },
           _count: {
             select: {
-              messages: {
+              chat_messages: {
                 where: {
                   isRead: false,
                   senderId: { not: userId },
@@ -90,9 +90,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         conversations.map((conv) => ({
           id: conv.id,
-          participant: conv.instructor,
-          lastMessage: conv.messages[0] || null,
-          unreadCount: conv._count.messages,
+          participant: conv.users_chat_conversations_instructorIdTousers,
+          lastMessage: conv.chat_messages[0] || null,
+          unreadCount: conv._count.chat_messages,
           updatedAt: conv.updatedAt,
         }))
       );
@@ -156,11 +156,13 @@ export async function POST(request: NextRequest) {
     // Create new conversation
     const conversation = await prisma.chat_conversations.create({
       data: {
+        id: crypto.randomUUID(),
         userId: session.user.id,
         instructorId,
+        updatedAt: new Date(),
       },
       include: {
-        instructor: {
+        users_chat_conversations_instructorIdTousers: {
           select: {
             id: true,
             name: true,
@@ -171,7 +173,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(conversation, { status: 201 });
+    return NextResponse.json({
+      id: conversation.id,
+      participant: conversation.users_chat_conversations_instructorIdTousers,
+      lastMessage: null,
+      unreadCount: 0,
+      updatedAt: conversation.updatedAt,
+    }, { status: 201 });
   } catch (error: any) {
     console.error("Error creating conversation:", error);
     return NextResponse.json(

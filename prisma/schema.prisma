@@ -245,7 +245,7 @@ model material_quizzes {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime
   users          users?           @relation(fields: [creatorId], references: [id])
-  material       material?        @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  material       material?        @relation(fields: [materialId], references: [id])
   quiz_attempts  quiz_attempts[]
   quiz_questions quiz_questions[]
 
@@ -386,12 +386,12 @@ model quiz_questions {
 }
 
 model rekapan {
-  id         String   @id
-  materialId String   @unique
-  content    String   @db.LongText
-  createdAt  DateTime @default(now())
+  id         String    @id
+  materialId String?   @unique
+  content    String    @db.LongText
+  createdAt  DateTime  @default(now())
   updatedAt  DateTime
-  material   material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  material   material? @relation(fields: [materialId], references: [id])
 
   @@index([materialId])
 }

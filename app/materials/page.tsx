@@ -349,17 +349,19 @@ const Materials = () => {
                     Kajian Hari Ini
                   </button>
                   {isPrivileged ? (
-                    <button
-                      onClick={() => setActiveFilter("mine")}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
-                        activeFilter === "mine"
-                          ? "bg-white text-emerald-600 shadow-sm border border-slate-200"
-                          : "text-slate-500 hover:text-slate-700"
-                      }`}
-                    >
-                      <UserIcon className="h-4 w-4" />
-                      Kajian Saya
-                    </button>
+                    (role === "admin" || role === "super_admin") && (
+                      <button
+                        onClick={() => setActiveFilter("mine")}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
+                          activeFilter === "mine"
+                            ? "bg-white text-emerald-600 shadow-sm border border-slate-200"
+                            : "text-slate-500 hover:text-slate-700"
+                        }`}
+                      >
+                        <UserIcon className="h-4 w-4" />
+                        Kajian Saya
+                      </button>
+                    )
                   ) : (
                     <button
                       onClick={() => setActiveFilter("mine")}

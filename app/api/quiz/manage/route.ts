@@ -32,9 +32,9 @@ export async function GET(req: NextRequest) {
       where: whereClause,
       include: {
         material: { select: { id: true, title: true } },
-        creator: { select: { id: true, name: true } },
-        questions: { select: { id: true } },
-        attempts: { select: { id: true } },
+        users: { select: { id: true, name: true } },
+        quiz_questions: { select: { id: true } },
+        quiz_attempts: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -45,9 +45,9 @@ export async function GET(req: NextRequest) {
       description: q.description,
       materialId: q.materialId,
       materialTitle: q.material?.title ?? null,
-      creatorName: q.creator?.name ?? null,
-      questionCount: q.questions.length,
-      attemptCount: q.attempts.length,
+      creatorName: q.users?.name ?? null,
+      questionCount: q.quiz_questions.length,
+      attemptCount: q.quiz_attempts.length,
       createdAt: q.createdAt,
       isStandalone: q.materialId === null,
     }));

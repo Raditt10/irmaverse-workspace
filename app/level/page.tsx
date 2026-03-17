@@ -225,7 +225,7 @@ export default async function LevelPage() {
     }),
     prisma.user_badges.findMany({
       where: { userId: session.user.id },
-      include: { badge: true },
+      include: { badges: true },
       orderBy: { earnedAt: "desc" },
     }),
     prisma.badges.findMany(),
@@ -278,7 +278,7 @@ export default async function LevelPage() {
   }
 
   // ── Next badge to earn ────────────────────────────────────────────────
-  const earnedCodes = new Set(earnedBadges.map((ub) => ub.badge.code));
+  const earnedCodes = new Set(earnedBadges.map((ub) => ub.badges.code));
   const unearnedBadges = allBadges.filter((b) => !earnedCodes.has(b.code));
 
   const currentMilestone =
@@ -696,12 +696,12 @@ export default async function LevelPage() {
                     {earnedBadges.map((ub) => (
                       <div
                         key={ub.id}
-                        title={ub.badge.description}
+                        title={ub.badges.description}
                         className="flex flex-col items-center gap-1 p-2 rounded-xl bg-amber-50 border border-amber-100 text-center"
                       >
-                        <span className="text-2xl">{ub.badge.icon}</span>
+                        <span className="text-2xl">{ub.badges.icon}</span>
                         <span className="text-[10px] font-black text-slate-600 leading-tight line-clamp-2">
-                          {ub.badge.name}
+                          {ub.badges.name}
                         </span>
                       </div>
                     ))}
