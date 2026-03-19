@@ -140,7 +140,10 @@ const Dashboard = () => {
     if (status === "authenticated") {
       if (session?.user?.role === "instruktur") {
         router.replace("/academy");
-      } else if (session?.user?.role === "admin" || session?.user?.role === "super_admin") {
+      } else if (
+        session?.user?.role === "admin" ||
+        session?.user?.role === "super_admin"
+      ) {
         router.replace("/admin");
       }
     }
@@ -457,7 +460,9 @@ const Dashboard = () => {
   return (
     // Background hangat (Warm White)
     <div className="min-h-screen bg-[#FDFBF7]">
-      {isLoading && <Loading fullScreen text="Membuat dashboard..." size="lg" />}
+      {isLoading && (
+        <Loading fullScreen text="Membuat dashboard..." size="lg" />
+      )}
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
@@ -609,7 +614,9 @@ const Dashboard = () => {
                             <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide border bg-emerald-50 text-emerald-600 border-emerald-200">
                               {material.category}
                             </span>
-                            {finishedMaterials.some((att: any) => att.materialId === material.id) && (
+                            {finishedMaterials.some(
+                              (att: any) => att.materialId === material.id,
+                            ) && (
                               <span className="px-3 py-1 rounded-lg text-[10px] font-black tracking-wide border bg-white text-emerald-600 border-emerald-200 shadow-sm flex items-center gap-1">
                                 <CheckCircle className="w-3 h-3 fill-emerald-500 text-white" />
                                 SELESAI
@@ -662,10 +669,17 @@ const Dashboard = () => {
                   {latestNews.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl col-span-1 md:col-span-2 text-center h-full min-h-40">
                       <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3">
-                        <Newspaper className="w-8 h-8 text-slate-300" strokeWidth={1.5} />
+                        <Newspaper
+                          className="w-8 h-8 text-slate-300"
+                          strokeWidth={1.5}
+                        />
                       </div>
-                      <p className="text-sm text-slate-500 font-bold">Belum ada kabar terbaru</p>
-                      <p className="text-xs text-slate-400 mt-1">Nantikan informasi menarik seputar IRMA</p>
+                      <p className="text-sm text-slate-500 font-bold">
+                        Belum ada kabar terbaru
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Nantikan informasi menarik seputar IRMA
+                      </p>
                     </div>
                   ) : (
                     latestNews.map((news) => (
@@ -732,10 +746,18 @@ const Dashboard = () => {
                   {finishedMaterials.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl text-center h-full min-h-40">
                       <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3">
-                        <BookMarked className="w-8 h-8 text-slate-300" strokeWidth={1.5} />
+                        <BookMarked
+                          className="w-8 h-8 text-slate-300"
+                          strokeWidth={1.5}
+                        />
                       </div>
-                      <p className="text-sm text-slate-500 font-bold">Belum ada kajian yang diselesaikan</p>
-                      <p className="text-xs text-slate-400 mt-1">Ikuti kajian dan selesaikan untuk melihat rekapan di sini</p>
+                      <p className="text-sm text-slate-500 font-bold">
+                        Belum ada kajian yang diselesaikan
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Ikuti kajian dan selesaikan untuk melihat rekapan di
+                        sini
+                      </p>
                     </div>
                   ) : (
                     finishedMaterials.map((material) => (
@@ -823,10 +845,17 @@ const Dashboard = () => {
                   {upcomingQuizzes.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl col-span-1 md:col-span-2 lg:col-span-3 text-center h-full min-h-40">
                       <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
-                        <HelpCircle className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                        <HelpCircle
+                          className="w-8 h-8 text-slate-300 mx-auto"
+                          strokeWidth={1.5}
+                        />
                       </div>
-                      <p className="text-sm text-slate-500 font-bold">Yey! Tidak ada kuis yang tertunda.</p>
-                      <p className="text-xs text-slate-400 mt-1">Anda sudah menyelesaikan semua kuis yang ada</p>
+                      <p className="text-sm text-slate-500 font-bold">
+                        Yey! Tidak ada kuis yang tertunda.
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Anda sudah menyelesaikan semua kuis yang ada
+                      </p>
                     </div>
                   ) : (
                     upcomingQuizzes.map((quiz, index) => {
@@ -898,7 +927,14 @@ const Dashboard = () => {
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
                         <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
                         <p className="text-xs font-bold text-slate-700 flex-1">
-                          {todayMaterials.filter(m => finishedMaterials.some((att: any) => att.materialId === m.id)).length}/{todayMaterials.length} kajian selesai hari ini
+                          {
+                            todayMaterials.filter((m) =>
+                              finishedMaterials.some(
+                                (att: any) => att.materialId === m.id,
+                              ),
+                            ).length
+                          }
+                          /{todayMaterials.length} kajian selesai hari ini
                         </p>
                         <Link
                           href="/materials"
@@ -922,8 +958,12 @@ const Dashboard = () => {
                         </Link>
                       </div>
                     )}
-                    {todayMaterials.length > 0 && 
-                      todayMaterials.every(m => finishedMaterials.some((att: any) => att.materialId === m.id)) &&
+                    {todayMaterials.length > 0 &&
+                      todayMaterials.every((m) =>
+                        finishedMaterials.some(
+                          (att: any) => att.materialId === m.id,
+                        ),
+                      ) &&
                       dynamicStats.quizPending === 0 && (
                         <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100 shadow-sm animate-pulse">
                           <Sparkles className="w-4 h-4 text-emerald-500 shrink-0" />

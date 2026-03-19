@@ -126,7 +126,10 @@ export default function QuizSessionPage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
   const { data: session } = useSession();
-  const isStaffRole = session?.user?.role === "admin" || session?.user?.role === "super_admin" || session?.user?.role === "instruktur";
+  const isStaffRole =
+    session?.user?.role === "admin" ||
+    session?.user?.role === "super_admin" ||
+    session?.user?.role === "instruktur";
 
   // Review state
   const [showReview, setShowReview] = useState(false);
@@ -149,7 +152,7 @@ export default function QuizSessionPage() {
         const results = Array.isArray(latest.answers)
           ? latest.answers
           : JSON.parse(latest.answers as any);
-        
+
         setFinalResult({
           score: latest.score,
           totalScore: latest.totalScore,
@@ -157,7 +160,7 @@ export default function QuizSessionPage() {
           results: results,
           xpAwarded: false, // Review doesn't award XP
           cooldownMinutes: 0,
-          retryAt: new Date().toISOString()
+          retryAt: new Date().toISOString(),
         });
         setIsFinished(true);
       }
@@ -590,7 +593,10 @@ export default function QuizSessionPage() {
       {isStaffRole && (
         <div className="bg-amber-100 border-b border-amber-200 px-4 py-2 text-center text-amber-800 text-sm font-bold flex items-center justify-center gap-2">
           <Eye className="h-4 w-4" />
-          <span>Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat menyimpan progress</span>
+          <span>
+            Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat
+            menyimpan progress
+          </span>
         </div>
       )}
 
@@ -638,7 +644,7 @@ export default function QuizSessionPage() {
                 <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
               </div>
             )}
-            
+
             <div className="p-6 lg:p-8 text-center">
               <p className="text-xs font-black text-emerald-500 uppercase tracking-wider mb-2 flex items-center justify-center gap-1.5">
                 <BookOpen className="h-3.5 w-3.5" /> {quizData.materialTitle}
@@ -740,7 +746,8 @@ export default function QuizSessionPage() {
                   "Mengirim..."
                 ) : (
                   <>
-                    {isStaffRole ? "Selesai Preview" : "Selesaikan Quiz"} <Trophy className="inline h-5 w-5 ml-1" />
+                    {isStaffRole ? "Selesai Preview" : "Selesaikan Quiz"}{" "}
+                    <Trophy className="inline h-5 w-5 ml-1" />
                   </>
                 )}
               </button>

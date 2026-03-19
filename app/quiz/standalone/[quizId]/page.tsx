@@ -105,7 +105,10 @@ export default function StandaloneQuizSessionPage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
   const { data: session } = useSession();
-  const isStaffRole = session?.user?.role === "admin" || session?.user?.role === "super_admin" || session?.user?.role === "instruktur";
+  const isStaffRole =
+    session?.user?.role === "admin" ||
+    session?.user?.role === "super_admin" ||
+    session?.user?.role === "instruktur";
 
   // Review state
   const [showReview, setShowReview] = useState(false);
@@ -209,7 +212,7 @@ export default function StandaloneQuizSessionPage() {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: selectedAnswer }));
 
     const selectedOpt = currentQuestion.options.find(
-      (o) => o.id === selectedAnswer
+      (o) => o.id === selectedAnswer,
     );
     if (selectedOpt?.isCorrect) {
       setScore((prev) => prev + 1);
@@ -286,22 +289,30 @@ export default function StandaloneQuizSessionPage() {
             <h1 className="text-2xl font-bold text-slate-800 mb-2">
               Waktu Cooldown ⏳
             </h1>
-            <p className="text-slate-500 font-medium mb-8 text-sm">{cooldownError}</p>
+            <p className="text-slate-500 font-medium mb-8 text-sm">
+              {cooldownError}
+            </p>
             <div className="bg-slate-50 rounded-2xl p-8 border-2 border-slate-100 mb-8 shadow-inner">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
                 Sisa Waktu
               </p>
               <div className="flex items-center justify-center gap-2">
-                {formatTime(cooldownRemaining).split(':').map((part, i) => (
-                  <React.Fragment key={i}>
-                    <div className="bg-white border-2 border-slate-200 rounded-xl px-4 py-2 shadow-[0_4px_0_0_#e2e8f0] min-w-15">
-                      <span className="text-4xl font-bold text-slate-700 font-mono tracking-tighter">
-                        {part}
-                      </span>
-                    </div>
-                    {i === 0 && <span className="text-2xl font-bold text-slate-300">:</span>}
-                  </React.Fragment>
-                ))}
+                {formatTime(cooldownRemaining)
+                  .split(":")
+                  .map((part, i) => (
+                    <React.Fragment key={i}>
+                      <div className="bg-white border-2 border-slate-200 rounded-xl px-4 py-2 shadow-[0_4px_0_0_#e2e8f0] min-w-15">
+                        <span className="text-4xl font-bold text-slate-700 font-mono tracking-tighter">
+                          {part}
+                        </span>
+                      </div>
+                      {i === 0 && (
+                        <span className="text-2xl font-bold text-slate-300">
+                          :
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
               </div>
             </div>
             <button
@@ -351,9 +362,12 @@ export default function StandaloneQuizSessionPage() {
             <h1 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
               {percentage >= 70 ? "Luar Biasa! 🎉" : "Terus Semangat! 💪"}
             </h1>
-            
+
             <p className="text-slate-500 font-medium mb-8">
-              Kamu telah menyelesaikan <span className="text-emerald-600 font-bold">{quizData.title}</span>
+              Kamu telah menyelesaikan{" "}
+              <span className="text-emerald-600 font-bold">
+                {quizData.title}
+              </span>
             </p>
 
             <div className="bg-slate-50 rounded-2xl p-8 border-2 border-slate-100 mb-8 shadow-inner">
@@ -424,7 +438,9 @@ export default function StandaloneQuizSessionPage() {
                     }`}
                   >
                     <button
-                      onClick={() => setExpandedReviewQ(isExpanded ? null : idx)}
+                      onClick={() =>
+                        setExpandedReviewQ(isExpanded ? null : idx)
+                      }
                       className="w-full flex items-center gap-4 p-4 lg:p-5 text-left hover:bg-slate-50 transition-colors"
                     >
                       <div
@@ -441,7 +457,9 @@ export default function StandaloneQuizSessionPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${result.isCorrect ? "text-emerald-500" : "text-red-500"}`}>
+                        <p
+                          className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${result.isCorrect ? "text-emerald-500" : "text-red-500"}`}
+                        >
                           SOAL {idx + 1}
                         </p>
                         <p className="text-base font-bold text-slate-700 truncate">
@@ -464,22 +482,33 @@ export default function StandaloneQuizSessionPage() {
                         </p>
                         <div className="space-y-3">
                           {result.options.map((opt, oIdx) => {
-                            const isSelected = opt.id === result.selectedOptionId;
+                            const isSelected =
+                              opt.id === result.selectedOptionId;
                             const isCorrectOpt = opt.isCorrect;
-                            
+
                             // Style dinamis layaknya Duolingo
-                            let optClass = "bg-slate-50 border-slate-200 text-slate-600 border-2";
+                            let optClass =
+                              "bg-slate-50 border-slate-200 text-slate-600 border-2";
                             let icon: React.ReactNode = null;
 
                             if (isCorrectOpt && isSelected) {
-                              optClass = "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm";
-                              icon = <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />;
+                              optClass =
+                                "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm";
+                              icon = (
+                                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                              );
                             } else if (isCorrectOpt) {
-                              optClass = "bg-emerald-50 border-emerald-300 text-emerald-600 border-dashed";
-                              icon = <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 opacity-50" />;
+                              optClass =
+                                "bg-emerald-50 border-emerald-300 text-emerald-600 border-dashed";
+                              icon = (
+                                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 opacity-50" />
+                              );
                             } else if (isSelected && !isCorrectOpt) {
-                              optClass = "bg-red-50 border-red-500 text-red-700 shadow-sm";
-                              icon = <XCircle className="h-5 w-5 text-red-500 shrink-0" />;
+                              optClass =
+                                "bg-red-50 border-red-500 text-red-700 shadow-sm";
+                              icon = (
+                                <XCircle className="h-5 w-5 text-red-500 shrink-0" />
+                              );
                             }
 
                             return (
@@ -487,9 +516,11 @@ export default function StandaloneQuizSessionPage() {
                                 key={opt.id}
                                 className={`flex items-center gap-3 p-4 rounded-2xl font-bold ${optClass}`}
                               >
-                                <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black shrink-0 ${isSelected ? 'bg-white text-current' : 'bg-slate-200 text-slate-500'}`}>
+                                <span
+                                  className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black shrink-0 ${isSelected ? "bg-white text-current" : "bg-slate-200 text-slate-500"}`}
+                                >
                                   {String.fromCharCode(65 + oIdx)}
-                               </span>
+                                </span>
                                 <span className="flex-1">{opt.text}</span>
                                 {icon}
                               </div>
@@ -540,7 +571,10 @@ export default function StandaloneQuizSessionPage() {
       {isStaffRole && (
         <div className="bg-amber-100 border-b border-amber-200 px-4 py-2 text-center text-amber-800 text-sm font-bold flex items-center justify-center gap-2">
           <Eye className="h-4 w-4" />
-          <span>Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat menyimpan progress</span>
+          <span>
+            Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat
+            menyimpan progress
+          </span>
         </div>
       )}
 
@@ -566,8 +600,8 @@ export default function StandaloneQuizSessionPage() {
           </div>
 
           <div className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg font-bold text-sm border-2 border-emerald-400 shadow-[0_3px_0_0_#10b981]">
-             <Zap className="h-4 w-4 fill-emerald-500 text-emerald-500" /> 
-             <span>{score}</span>
+            <Zap className="h-4 w-4 fill-emerald-500 text-emerald-500" />
+            <span>{score}</span>
           </div>
         </div>
       </div>
@@ -580,18 +614,21 @@ export default function StandaloneQuizSessionPage() {
               <BookOpen className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest leading-none mb-1">Status Progress</p>
+              <p className="text-[10px] font-bold text-emerald-200 uppercase tracking-widest leading-none mb-1">
+                Status Progress
+              </p>
               <p className="text-sm font-bold text-white leading-none">
                 {Object.keys(answers).length} / {totalQuestions} Terjawab
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
             {quizData.questions.map((q, idx) => {
-              const isAnswered = !!answers[q.id] || (idx === currentQIndex && isAnswerSubmitted);
+              const isAnswered =
+                !!answers[q.id] || (idx === currentQIndex && isAnswerSubmitted);
               const isCurrent = idx === currentQIndex;
-              
+
               return (
                 <div
                   key={q.id}
@@ -611,19 +648,18 @@ export default function StandaloneQuizSessionPage() {
 
       {/* Question Area */}
       <main className="flex-1 flex flex-col items-center py-8 lg:py-12 px-4 w-full max-w-3xl mx-auto">
-        
         {/* Question Header */}
         <div className="w-full mb-8">
-           <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 lg:p-10 shadow-[0_6px_0_0_#e2e8f0] relative overflow-hidden transition-all duration-300">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
-                  Pertanyaan {currentQIndex + 1}
-                </span>
-              </div>
-              <h2 className="text-xl lg:text-2xl font-bold text-slate-800 leading-snug">
-                {currentQuestion.question}
-              </h2>
-           </div>
+          <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 lg:p-10 shadow-[0_6px_0_0_#e2e8f0] relative overflow-hidden transition-all duration-300">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
+                Pertanyaan {currentQIndex + 1}
+              </span>
+            </div>
+            <h2 className="text-xl lg:text-2xl font-bold text-slate-800 leading-snug">
+              {currentQuestion.question}
+            </h2>
+          </div>
         </div>
 
         {/* Options Grid */}
@@ -631,17 +667,21 @@ export default function StandaloneQuizSessionPage() {
           {currentQuestion.options.map((option, idx) => {
             const isSelected = selectedAnswer === option.id;
 
-            let baseStyle = "bg-white border-2 border-slate-200 text-slate-600 shadow-[0_6px_0_0_#e2e8f0]";
-            let numberStyle = "border-2 border-slate-200 text-slate-400 bg-slate-50";
+            let baseStyle =
+              "bg-white border-2 border-slate-200 text-slate-600 shadow-[0_6px_0_0_#e2e8f0]";
+            let numberStyle =
+              "border-2 border-slate-200 text-slate-400 bg-slate-50";
 
             if (isSelected) {
-              baseStyle = "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-[0_6px_0_0_#10b981] -translate-y-0.5";
-              numberStyle = "border-2 border-emerald-200 text-emerald-600 bg-white";
+              baseStyle =
+                "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 shadow-[0_6px_0_0_#10b981] -translate-y-0.5";
+              numberStyle =
+                "border-2 border-emerald-200 text-emerald-600 bg-white";
             }
 
             if (isAnswerSubmitted) {
-              baseStyle = isSelected 
-                ? "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 cursor-default shadow-[0_6px_0_0_#10b981]" 
+              baseStyle = isSelected
+                ? "bg-emerald-50 border-2 border-emerald-500 text-emerald-700 cursor-default shadow-[0_6px_0_0_#10b981]"
                 : "bg-white border-2 border-slate-100 text-slate-300 cursor-default opacity-60 shadow-[0_6px_0_0_#f1f5f9]";
             }
 
@@ -657,10 +697,14 @@ export default function StandaloneQuizSessionPage() {
                   ${!isAnswerSubmitted && isSelected ? "active:translate-y-1 active:shadow-none" : ""}
                 `}
               >
-                <span className={`w-10 h-10 shrink-0 rounded-lg flex items-center justify-center text-sm border-2 ${numberStyle} font-bold transition-transform ${isSelected ? "scale-110" : ""}`}>
+                <span
+                  className={`w-10 h-10 shrink-0 rounded-lg flex items-center justify-center text-sm border-2 ${numberStyle} font-bold transition-transform ${isSelected ? "scale-110" : ""}`}
+                >
                   {String.fromCharCode(65 + idx)}
                 </span>
-                <span className="text-base lg:text-lg flex-1">{option.text}</span>
+                <span className="text-base lg:text-lg flex-1">
+                  {option.text}
+                </span>
                 {isSelected && (
                   <div className="shrink-0 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center animate-in zoom-in duration-200 border-2 border-emerald-600">
                     <Check className="text-white w-3.5 h-3.5" strokeWidth={5} />
@@ -670,13 +714,11 @@ export default function StandaloneQuizSessionPage() {
             );
           })}
         </div>
-
       </main>
 
       {/* Bottom Action Bar */}
       <div className="sticky bottom-0 bg-white border-t border-slate-100 p-4 lg:p-6 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          
           <button
             onClick={handlePrevQuestion}
             disabled={currentQIndex === 0 || submitting}
@@ -727,7 +769,11 @@ export default function StandaloneQuizSessionPage() {
               disabled={submitting}
               className="h-12 px-10 rounded-xl font-bold text-base bg-yellow-500 text-white border-2 border-yellow-600 shadow-[0_4px_0_0_#b45309] hover:-translate-y-0.5 hover:shadow-[0_6px_0_0_#b45309] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 flex-1 max-w-xs"
             >
-              {submitting ? "Memproses..." : (isStaffRole ? "Selesai Preview" : "Selesai!")}
+              {submitting
+                ? "Memproses..."
+                : isStaffRole
+                  ? "Selesai Preview"
+                  : "Selesai!"}
             </button>
           )}
         </div>

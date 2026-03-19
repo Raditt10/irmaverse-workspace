@@ -143,14 +143,14 @@ export async function PATCH(req: NextRequest) {
     if (notification.type === "invitation") {
       const inviteToken = notification.inviteToken;
       const materialId = notification.resourceId;
-      
+
       console.log("[PATCH /api/notifications] Handling invitation response:", {
         inviteToken,
         materialId,
         status,
-        notificationId: id
+        notificationId: id,
       });
-      
+
       if (status === "accepted" || status === "rejected") {
         // Update the materialinvite
         // Strategy: Try by token first, if fails, try by materialId + userId (fallback)
@@ -160,31 +160,40 @@ export async function PATCH(req: NextRequest) {
             where: { token: inviteToken },
           });
         }
-        
+
         if (!invite && materialId) {
-          console.log("[PATCH /api/notifications] token failed, trying fallback by materialId:", materialId);
+          console.log(
+            "[PATCH /api/notifications] token failed, trying fallback by materialId:",
+            materialId,
+          );
           invite = await prisma.materialinvite.findFirst({
-            where: { 
+            where: {
               materialId: materialId,
-              userId: session.user.id
+              userId: session.user.id,
             },
           });
         }
 
         if (invite) {
-          console.log("[PATCH /api/notifications] Found invite, updating status to:", status);
+          console.log(
+            "[PATCH /api/notifications] Found invite, updating status to:",
+            status,
+          );
           await prisma.materialinvite.update({
             where: { id: invite.id },
-            data: { 
-              status, 
+            data: {
+              status,
               reason: status === "rejected" ? reason : null,
-              updatedAt: new Date() 
+              updatedAt: new Date(),
             } as any,
           });
 
           // If accepted, create course enrollment
           if (status === "accepted") {
-            console.log("[PATCH /api/notifications] Accepted! Creating enrollment for user:", session.user.id);
+            console.log(
+              "[PATCH /api/notifications] Accepted! Creating enrollment for user:",
+              session.user.id,
+            );
             await prisma.courseenrollment.upsert({
               where: {
                 materialId_userId: {
@@ -192,9 +201,9 @@ export async function PATCH(req: NextRequest) {
                   userId: session.user.id,
                 },
               },
-              update: { 
+              update: {
                 role: "user",
-                enrolledAt: new Date()
+                enrolledAt: new Date(),
               },
               create: {
                 id: `enr-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -206,7 +215,10 @@ export async function PATCH(req: NextRequest) {
             });
           }
         } else {
-          console.log("[PATCH /api/notifications] WARNING: No invite record found even with fallback for token:", inviteToken);
+          console.log(
+            "[PATCH /api/notifications] WARNING: No invite record found even with fallback for token:",
+            inviteToken,
+          );
         }
       }
     }

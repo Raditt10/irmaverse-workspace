@@ -6,7 +6,20 @@ import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
 import SearchInput from "@/components/ui/SearchInput";
 import CategoryFilter from "@/components/ui/CategoryFilter";
-import { ArrowRight, Calendar, Eye, Share2, Bookmark, Filter, Plus, Pencil, Trash2, Search, HelpCircle, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Eye,
+  Share2,
+  Bookmark,
+  Filter,
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  HelpCircle,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -39,7 +52,7 @@ const categoryStyles: Record<NewsItem["category"], string> = {
   Kerjasama: "bg-cyan-500 text-white",
   Update: "bg-blue-500 text-white",
   Event: "bg-purple-500 text-white",
-  Pengumuman: "bg-amber-500 text-white"
+  Pengumuman: "bg-amber-500 text-white",
 };
 
 // Algoritma Levenshtein untuk mengecek kemiripan string (Typos)
@@ -58,7 +71,7 @@ const getLevenshteinDistance = (a: string, b: string) => {
       } else {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1,
-          Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+          Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1),
         );
       }
     }
@@ -70,13 +83,14 @@ const News = () => {
   const router = useRouter();
   const { data: session } = useSession();
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
+  const isPrivileged =
+    role === "admin" || role === "instruktur" || role === "super_admin";
   const [news, setNews] = useState<NewsItem[]>([]);
   const [filteredNews, setFilteredNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // State untuk Suggestion / "Mungkin maksud Anda"
   const [suggestion, setSuggestion] = useState<string | null>(null);
 
@@ -129,20 +143,21 @@ const News = () => {
   const filterNews = () => {
     let filtered = news;
     setSuggestion(null); // Reset suggestion awal
-    
+
     // Filter by Category
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(item => item.category === selectedCategory);
+      filtered = filtered.filter((item) => item.category === selectedCategory);
     }
-    
+
     // Filter by Search Term
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
-      const exactMatches = filtered.filter(item =>
-        item.title.toLowerCase().includes(lowerTerm) ||
-        item.deskripsi.toLowerCase().includes(lowerTerm)
+      const exactMatches = filtered.filter(
+        (item) =>
+          item.title.toLowerCase().includes(lowerTerm) ||
+          item.deskripsi.toLowerCase().includes(lowerTerm),
       );
-      
+
       filtered = exactMatches;
 
       // Logika "Did you mean..." hanya jalan jika hasil sedikit atau 0
@@ -152,13 +167,21 @@ const News = () => {
 
         // Cek kemiripan dengan semua Judul Berita
         news.forEach((item) => {
-          const titleDistance = getLevenshteinDistance(lowerTerm, item.title.toLowerCase());
-          
+          const titleDistance = getLevenshteinDistance(
+            lowerTerm,
+            item.title.toLowerCase(),
+          );
+
           // Normalisasi jarak berdasarkan panjang string (agar kata pendek vs panjang fair)
-          const relativeDistance = titleDistance - (Math.abs(item.title.length - lowerTerm.length) * 0.5);
+          const relativeDistance =
+            titleDistance -
+            Math.abs(item.title.length - lowerTerm.length) * 0.5;
 
           // Threshold toleransi typo (bisa disesuaikan)
-          if (relativeDistance < lowestDistance && titleDistance < item.title.length * 0.6) {
+          if (
+            relativeDistance < lowestDistance &&
+            titleDistance < item.title.length * 0.6
+          ) {
             lowestDistance = relativeDistance;
             bestMatch = item.title;
           }
@@ -170,7 +193,7 @@ const News = () => {
         }
       }
     }
-    
+
     setFilteredNews(filtered);
   };
 
@@ -188,7 +211,7 @@ const News = () => {
   const handleToggleSave = async (e: React.MouseEvent, newsId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     try {
       const response = await fetch("/api/news/save", {
         method: "POST",
@@ -197,21 +220,23 @@ const News = () => {
       });
 
       if (!response.ok) throw new Error("Gagal menyimpan berita");
-      
+
       const data = await response.json();
-      
+
       // Update local state and re-sort
-      setNews(prev => {
-        const updated = prev.map(item => 
-          item.id === newsId ? { ...item, isSaved: data.isSaved } : item
+      setNews((prev) => {
+        const updated = prev.map((item) =>
+          item.id === newsId ? { ...item, isSaved: data.isSaved } : item,
         );
         return [...updated].sort((a, b) => {
           if (a.isSaved && !b.isSaved) return -1;
           if (!a.isSaved && b.isSaved) return 1;
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         });
       });
-      
+
       setNotification({
         type: data.isSaved ? "success" : "info",
         title: data.isSaved ? "Tersimpan" : "Dihapus",
@@ -264,11 +289,18 @@ const News = () => {
     }
   };
 
-  const categories = ["Semua", "Prestasi", "Kerjasama", "Update", "Event", "Pengumuman"];
+  const categories = [
+    "Semua",
+    "Prestasi",
+    "Kerjasama",
+    "Update",
+    "Event",
+    "Pengumuman",
+  ];
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100">
-      <DashboardHeader/>
+      <DashboardHeader />
       <div className="flex">
         <Sidebar />
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
@@ -308,31 +340,31 @@ const News = () => {
                 />
               </div>
 
-                {/* --- PROFESSIONAL "DID YOU MEAN" SUGGESTION UI --- */}
-                {suggestion && filteredNews.length === 0 && (
-                   <div className="flex items-center gap-2 px-2 animate-[fadeIn_0.5s_ease-out]">
-                      <Sparkles className="h-4 w-4 text-amber-500" />
-                      <p className="text-slate-500 text-sm">
-                        Mungkin maksud Anda:{" "}
-                        <button 
-                          onClick={handleSuggestionClick}
-                          className="font-bold text-teal-600 hover:text-teal-700 hover:underline italic transition-colors"
-                        >
-                        &quot;{suggestion}&quot;
-                        </button>
-                        ?
-                      </p>
-                   </div>
-                )}
-                {/* --- SUCCESS DATA FOUND --- */}
-                {searchTerm && filteredNews.length > 0 && !suggestion && (
-                  <div className="mb-2">
-                    <SuccessDataFound
-                      message={`Ditemukan ${filteredNews.length} berita sesuai pencarian`}
-                      icon="sparkles"
-                    />
-                  </div>
-                )}
+              {/* --- PROFESSIONAL "DID YOU MEAN" SUGGESTION UI --- */}
+              {suggestion && filteredNews.length === 0 && (
+                <div className="flex items-center gap-2 px-2 animate-[fadeIn_0.5s_ease-out]">
+                  <Sparkles className="h-4 w-4 text-amber-500" />
+                  <p className="text-slate-500 text-sm">
+                    Mungkin maksud Anda:{" "}
+                    <button
+                      onClick={handleSuggestionClick}
+                      className="font-bold text-teal-600 hover:text-teal-700 hover:underline italic transition-colors"
+                    >
+                      &quot;{suggestion}&quot;
+                    </button>
+                    ?
+                  </p>
+                </div>
+              )}
+              {/* --- SUCCESS DATA FOUND --- */}
+              {searchTerm && filteredNews.length > 0 && !suggestion && (
+                <div className="mb-2">
+                  <SuccessDataFound
+                    message={`Ditemukan ${filteredNews.length} berita sesuai pencarian`}
+                    icon="sparkles"
+                  />
+                </div>
+              )}
               <div className="relative min-w-0 pr-1 overflow-hidden">
                 <CategoryFilter
                   categories={categories}
@@ -355,7 +387,11 @@ const News = () => {
                   icon="search"
                   title="Tidak ada berita ditemukan"
                   description="Coba kata kunci lain atau ubah filter kategori."
-                  actionLabel={suggestion ? `Cari &quot;${suggestion}&quot; saja` : undefined}
+                  actionLabel={
+                    suggestion
+                      ? `Cari &quot;${suggestion}&quot; saja`
+                      : undefined
+                  }
                   onAction={suggestion ? handleSuggestionClick : undefined}
                 />
               </div>
@@ -370,7 +406,10 @@ const News = () => {
                       {/* Image Area */}
                       <div className="w-full sm:w-60 h-44 sm:h-full shrink-0 relative overflow-hidden bg-slate-100">
                         <img
-                          src={item.image || "https://images.unsplash.com/photo-1633613286991-611bcfb63dba?auto=format&fit=crop&w=800&q=80"}
+                          src={
+                            item.image ||
+                            "https://images.unsplash.com/photo-1633613286991-611bcfb63dba?auto=format&fit=crop&w=800&q=80"
+                          }
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
@@ -393,7 +432,16 @@ const News = () => {
                         <div className="flex-1 flex flex-col justify-center min-h-0">
                           <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
                             <Calendar className="h-3 w-3" />
-                            <span>{new Date(item.createdAt).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })}</span>
+                            <span>
+                              {new Date(item.createdAt).toLocaleDateString(
+                                "id-ID",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                },
+                              )}
+                            </span>
                           </div>
 
                           <h2 className="text-lg sm:text-xl font-black text-slate-800 mb-1 group-hover:text-teal-600 transition-colors line-clamp-1 leading-tight">
@@ -416,7 +464,9 @@ const News = () => {
                               />
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-teal-400 border-2 border-teal-500 flex shrink-0 items-center justify-center text-xs text-white font-black shadow-sm">
-                                {(item.author.name || "A").charAt(0).toUpperCase()}
+                                {(item.author.name || "A")
+                                  .charAt(0)
+                                  .toUpperCase()}
                               </div>
                             )}
                             <span className="text-sm font-bold text-slate-600 truncate">
@@ -432,18 +482,24 @@ const News = () => {
                                   className="p-2 sm:p-2.5 rounded-xl border-2 border-slate-200 bg-white hover:bg-teal-50 hover:text-teal-600 hover:border-teal-300 transition-all text-slate-400 shadow-sm hover:shadow active:-translate-y-0.5"
                                   title="Edit berita"
                                 >
-                                  <Pencil className="h-4 w-4" strokeWidth={2.5}/>
+                                  <Pencil
+                                    className="h-4 w-4"
+                                    strokeWidth={2.5}
+                                  />
                                 </Link>
                                 <button
                                   onClick={() => handleDelete(item.id)}
                                   className="p-2 sm:p-2.5 rounded-xl border-2 border-slate-200 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 transition-all text-slate-400 shadow-sm hover:shadow active:-translate-y-0.5"
                                   title="Hapus berita"
                                 >
-                                  <Trash2 className="h-4 w-4" strokeWidth={2.5}/>
+                                  <Trash2
+                                    className="h-4 w-4"
+                                    strokeWidth={2.5}
+                                  />
                                 </button>
                               </>
                             )}
-                            
+
                             <button
                               onClick={(e) => handleToggleSave(e, item.id)}
                               className={`p-2 sm:p-2.5 rounded-xl border-2 border-b-4 transition-all ${
@@ -451,17 +507,27 @@ const News = () => {
                                   ? "bg-amber-400 border-amber-600 text-white shadow-inner active:border-b-2 translate-y-0.5"
                                   : "bg-white border-slate-200 text-slate-400 hover:text-amber-500 hover:border-amber-400 active:border-b-2 active:translate-y-0.5 shadow-sm"
                               }`}
-                              title={item.isSaved ? "Hapus dari simpanan" : "Simpan berita"}
+                              title={
+                                item.isSaved
+                                  ? "Hapus dari simpanan"
+                                  : "Simpan berita"
+                              }
                             >
-                              <Bookmark className={`h-4 w-4 ${item.isSaved ? "fill-current" : ""}`} strokeWidth={2.5}/>
+                              <Bookmark
+                                className={`h-4 w-4 ${item.isSaved ? "fill-current" : ""}`}
+                                strokeWidth={2.5}
+                              />
                             </button>
-                            
+
                             <Link
                               href={`/news/${item.slug}`}
                               className="px-4 py-2 sm:py-2.5 rounded-xl bg-teal-50 text-teal-600 font-black border-2 border-teal-200 hover:bg-teal-400 hover:text-white hover:border-teal-500 hover:shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm group/btn active:translate-y-0.5"
                             >
                               <span className="hidden sm:inline">Baca</span>
-                              <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform" strokeWidth={3}/>
+                              <ArrowRight
+                                className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform"
+                                strokeWidth={3}
+                              />
                             </Link>
                           </div>
                         </div>
@@ -475,7 +541,7 @@ const News = () => {
         </div>
       </div>
       <ChatbotButton />
-      
+
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         type="warning"

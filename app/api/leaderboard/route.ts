@@ -41,9 +41,7 @@ export async function GET(req: NextRequest) {
         by: ["userId"],
         where: {
           createdAt: { gte: startDate },
-          ...(role !== "all" && isValidRole(role)
-            ? { user: { role } }
-            : {}),
+          ...(role !== "all" && isValidRole(role) ? { user: { role } } : {}),
         },
         _sum: { xpEarned: true },
         orderBy: { _sum: { xpEarned: "desc" } },
