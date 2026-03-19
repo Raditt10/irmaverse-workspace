@@ -298,9 +298,19 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div
+              className={
+                isAdmin
+                  ? "w-full"
+                  : "grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8"
+              }
+            >
               {/* --- LEFT COLUMN (Profile Info & Activity) --- */}
-              <div className="lg:col-span-2 space-y-6 lg:space-y-8">
+              <div
+                className={
+                  isAdmin ? "space-y-6 lg:space-y-8" : "lg:col-span-2 space-y-6 lg:space-y-8"
+                }
+              >
                 {/* 1. Profile Form Card */}
                 <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[4px_4px_0_0_#cbd5e1] p-6 lg:p-8">
                   <ProfileInformationForm
@@ -490,8 +500,9 @@ const Profile = () => {
               </div>
 
               {/* --- RIGHT COLUMN (Stats) --- */}
-              <div className="space-y-6 lg:space-y-8">
-                {/* Stats Card - Hanya untuk User dan Instruktur */}
+              {!isAdmin && (
+                <div className="space-y-6 lg:space-y-8">
+                  {/* Stats Card - Hanya untuk User dan Instruktur */}
                 {(isUser || isInstruktur) && (
                   <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[4px_4px_0_0_#cbd5e1] p-6 lg:p-8">
                     <div className="flex items-center gap-3 mb-6">
@@ -787,9 +798,8 @@ const Profile = () => {
                     </Link>
                   </div>
                 )}
-
-
               </div>
+              )}
             </div>
           </div>
         </div>

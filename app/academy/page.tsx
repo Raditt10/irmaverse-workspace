@@ -113,7 +113,7 @@ export default function InstructorAcademy() {
               </div>
               <div className="flex flex-col gap-1">
                 <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats ? stats.activeCourses : "0"}</div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Kajian Aktif</div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Kajian Ongoing</div>
               </div>
             </div>
 
@@ -356,7 +356,7 @@ export default function InstructorAcademy() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {recentActivities.map((activity) => {
+                    {recentActivities.slice(0, 3).map((activity) => {
                       // Activity Type mapping
                       const config: Record<string, { icon: any, bgColor: string, iconColor: string, borderColor: string }> = {
                         material: { icon: BookOpen, bgColor: 'bg-emerald-50', iconColor: 'text-emerald-600', borderColor: 'border-emerald-100' },

@@ -395,7 +395,7 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <span className="font-black text-2xl block drop-shadow-md">Administrator</span>
-                    <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest bg-emerald-600/30 px-2 py-0.5 rounded-md">IRMA Central Control</span>
+                    <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest bg-emerald-600/30 px-2 py-0.5 rounded-md">IRMA Administrator</span>
                   </div>
                 </div>
 
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
                       <p className="text-xs text-slate-400 mt-1">Aktivitas instruktur terbaru akan tercatat di sini</p>
                     </div>
                   ) : (
-                    stats.instructorActivities.map((act: any) => (
+                    stats.instructorActivities.slice(0, 4).map((act: any) => (
                       <div key={act.id} className="flex items-center gap-4 p-4 rounded-4xl bg-emerald-50/50 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 bg-white border-emerald-100 text-emerald-500 shadow-sm group-hover:scale-110 transition-transform`}>
                             {act.type === 'material' && <BookOpen className="h-5 w-5" />}
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                       <p className="text-xs text-slate-400 mt-1">Aktivitas anggota terbaru akan tercatat di sini</p>
                     </div>
                   ) : (
-                    stats.userActivities.map((act: any) => (
+                    stats.userActivities.slice(0, 4).map((act: any) => (
                       <div key={act.id} className="flex items-center gap-4 p-4 rounded-4xl bg-emerald-50/50 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 bg-white border-emerald-100 text-emerald-500 shadow-sm group-hover:scale-110 transition-transform`}>
                             {act.type === 'quiz_completed' && <Zap className="h-5 w-5" />}
