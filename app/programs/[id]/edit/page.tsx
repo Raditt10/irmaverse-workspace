@@ -253,30 +253,38 @@ const EditProgram = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t-2 border-slate-50">
                       <div className="space-y-2">
-                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-emerald-500" /> Durasi
+                        <label className="block text-sm font-bold text-slate-600 ml-1">
+                          Durasi
                         </label>
-                        <Input
-                          type="text"
-                          name="duration"
-                          value={formData.duration}
-                          onChange={handleInputChange}
-                          placeholder="e.g. 12 Sesi / 3 Bulan"
-                        />
+                        <div className="relative flex items-center group">
+                          <Clock className="absolute left-4 lg:left-5 h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors pointer-events-none" />
+                          <Input
+                            type="text"
+                            name="duration"
+                            value={formData.duration}
+                            onChange={handleInputChange}
+                            placeholder="e.g. 12 Sesi / 3 Bulan"
+                            className="pl-12 lg:pl-14"
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                          <Layers className="h-4 w-4 text-emerald-500" /> Total Kajian <span className="text-red-500">*</span>
+                        <label className="block text-sm font-bold text-slate-600 ml-1">
+                          Total Kajian <span className="text-red-500">*</span>
                         </label>
-                        <Input
-                          type="number"
-                          name="totalKajian"
-                          min="1"
-                          required
-                          value={formData.totalKajian}
-                          onChange={handleInputChange}
-                          placeholder="Berapa banyak pertemuan/kajian?"
-                        />
+                        <div className="relative flex items-center group">
+                          <Layers className="absolute left-4 lg:left-5 h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors pointer-events-none" />
+                          <Input
+                            type="number"
+                            name="totalKajian"
+                            min="1"
+                            required
+                            value={formData.totalKajian}
+                            onChange={handleInputChange}
+                            placeholder="Berapa banyak pertemuan/kajian?"
+                            className="pl-12 lg:pl-14"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
