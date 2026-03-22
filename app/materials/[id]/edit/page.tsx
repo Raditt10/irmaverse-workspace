@@ -180,7 +180,7 @@ const EditMaterial = () => {
             category: material.category || "Program Wajib",
             grade: material.grade || "Semua",
             thumbnailUrl: material.thumbnailUrl || "",
-            programId: material.programId || material.parentId || "",
+            programId: material.program?.id || material.programId || material.parentId || "",
             kajianOrder: material.kajianOrder?.toString() || "",
             materialType: material.materialType || "editor",
             materialContent: (material.content || "").replace(/<[^>]*>/g, ""),
@@ -529,36 +529,36 @@ const EditMaterial = () => {
                           </p>
                         </div>
 
-                        {/* Card Next Level */}
+                        {/* Card Susulan */}
                         <div
                           onClick={() =>
                             setFormData({
                               ...formData,
-                              category: "Program Next Level",
+                              category: "Program Susulan",
                             })
                           }
                           className={`cursor-pointer rounded-2xl border-2 p-4 transition-all ${
-                            formData.category === "Program Next Level"
+                            formData.category === "Program Susulan"
                               ? "bg-indigo-50 border-indigo-500 shadow-[0_4px_0_0_#6366f1]"
                               : "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 relative top-1"
                           }`}
                         >
                           <div className="flex items-center gap-3 mb-2">
                             <div
-                              className={`p-2 rounded-xl border ${formData.category === "Program Next Level" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
-                            >
-                              <Rocket className="h-5 w-5" />
-                            </div>
-                            <span
-                              className={`font-black ${formData.category === "Program Next Level" ? "text-indigo-700" : "text-slate-700"}`}
-                            >
-                              Next Level
-                            </span>
+                            className={`p-2 rounded-xl border ${formData.category === "Program Susulan" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
+                          >
+                            <Rocket className="h-5 w-5" />
                           </div>
-                          <p className="text-xs font-semibold text-slate-500 leading-tight">
-                            Materi tingkat lanjut.
-                          </p>
+                          <span
+                            className={`font-black ${formData.category === "Program Susulan" ? "text-indigo-700" : "text-slate-700"}`}
+                          >
+                            Susulan
+                          </span>
                         </div>
+                        <p className="text-xs font-semibold text-slate-500 leading-tight">
+                          Materi untuk kajian susulan.
+                        </p>
+                      </div>
                       </div>
 
                       {/* --- PROGRAM (KURSUS) DROPDOWN --- */}
@@ -663,80 +663,18 @@ const EditMaterial = () => {
                               <span className="text-red-500 ml-1 font-bold">*</span>
                             </label>
                             <div className="relative">
-                              {/* Trigger Button */}
-                              <button
-                                type="button"
-                                onClick={() => setIsKajianDropdownOpen(!isKajianDropdownOpen)}
-                                className={`w-full flex items-center justify-between rounded-2xl border-2 bg-white px-5 py-3.5 font-bold transition-all shadow-[0_4px_0_0_#e2e8f0] hover:border-teal-300 focus:outline-none focus:ring-4 focus:ring-teal-100 ${
-                                  isKajianDropdownOpen ? "border-teal-400" : "border-slate-200"
-                                } ${formData.kajianOrder ? "text-slate-700" : "text-slate-400"}`}
-                              >
-                                <span>
+                              <div className="w-full flex items-center justify-between rounded-2xl border-2 border-slate-200 bg-slate-50/80 px-5 py-3.5 font-bold text-slate-500 shadow-inner cursor-not-allowed">
+                                <span className="flex items-center gap-2">
                                   {formData.kajianOrder 
                                     ? `Kajian Ke-${formData.kajianOrder}` 
-                                    : "-- Pilih Urutan Kajian --"}
+                                    : "-- Tidak terikat urutan --"}
                                 </span>
-                                <ChevronDown 
-                                  className={`h-5 w-5 text-slate-400 transition-transform ${isKajianDropdownOpen ? "rotate-180 text-teal-500" : ""}`} 
-                                />
-                              </button>
-
-                              {/* Dropdown Menu */}
-                              {isKajianDropdownOpen && (
-                                <>
-                                  <div 
-                                    className="fixed inset-0 z-40" 
-                                    onClick={() => setIsKajianDropdownOpen(false)} 
-                                  />
-                                  <div className="absolute z-50 w-full mt-2 bg-white border-2 border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 p-1.5">
-                                    {(() => {
-                                      const selectedProgram = availablePrograms.find((p) => p.id === formData.programId);
-                                      if (!selectedProgram || !selectedProgram.totalKajian) return (
-                                        <div className="p-4 text-center text-sm font-bold text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                          Data program tidak ditemukan
-                                        </div>
-                                      );
-                                      
-                                      return (
-                                        <div className="max-h-60 overflow-y-auto pr-1 space-y-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-                                          {Array.from({ length: selectedProgram.totalKajian }, (_, i) => i + 1).map((num) => {
-                                            // Izinkan nomor yang sudah dipilih oleh materi INI SENDIRI, disable nomor lain yang terpakai
-                                            const isUsedByOther = selectedProgram.usedKajianOrders?.includes(num) && num.toString() !== formData.kajianOrder;
-                                            return (
-                                              <button
-                                                key={num}
-                                                type="button"
-                                                disabled={isUsedByOther}
-                                                onClick={() => {
-                                                  setFormData({ ...formData, kajianOrder: num.toString() });
-                                                  setIsKajianDropdownOpen(false);
-                                                }}
-                                                className={`w-full text-left px-4 py-3.5 text-sm font-bold rounded-xl transition-all flex items-center justify-between border ${
-                                                  isUsedByOther 
-                                                    ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed" 
-                                                    : formData.kajianOrder === num.toString()
-                                                      ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
-                                                      : "bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-200 hover:text-teal-600"
-                                                }`}
-                                              >
-                                                <span>Kajian Ke-{num}</span>
-                                                {isUsedByOther && (
-                                                  <span className="text-[10px] bg-slate-200/50 text-slate-500 font-black px-2.5 py-1 rounded-lg border border-slate-200">
-                                                    Sudah Terisi
-                                                  </span>
-                                                )}
-                                                {formData.kajianOrder === num.toString() && !isUsedByOther && (
-                                                  <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
-                                                )}
-                                              </button>
-                                            );
-                                          })}
-                                        </div>
-                                      );
-                                    })()}
-                                  </div>
-                                </>
-                              )}
+                                {formData.kajianOrder && (
+                                  <span className="text-[10px] bg-slate-200/50 text-slate-600 font-black px-2.5 py-1 rounded-lg border border-slate-300 tracking-wide select-none">
+                                    Tidak bisa diedit 
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}

@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     };
 
@@ -111,10 +111,17 @@ export async function GET(req: NextRequest) {
       orderBy: { date: "desc" },
     });
 
-    // Get attendance and total invite counts manually
-    const [attendanceCounts, inviteCounts] = await Promise.all([
+    // Get attendance, total invite counts, and program enrollment status
+    const [attendanceCounts, inviteCounts, programEnrollments] = await Promise.all([
       Promise.all(materials.map(m => prisma.attendance.count({ where: { materialId: m.id } }))),
-      Promise.all(materials.map(m => prisma.materialinvite.count({ where: { materialId: m.id, status: { not: "rejected" } } })))
+      Promise.all(materials.map(m => prisma.materialinvite.count({ where: { materialId: m.id, status: { not: "rejected" } } }))),
+      Promise.all(materials.map(m => 
+        m.programId 
+          ? (prisma as any).program_enrollments.findFirst({ 
+              where: { userId: User.id, programId: m.programId } 
+            })
+          : Promise.resolve(null)
+      ))
     ]);
 
     // normalize ke format frontend
@@ -149,6 +156,7 @@ export async function GET(req: NextRequest) {
         isAttendanceOpen: m.isAttendanceOpen,
         isJoined: isJoined,
         isCompleted: isCompleted,
+        isEnrolledInProgram: !!programEnrollments[index],
         program: (m as any).programs
           ? { id: (m as any).programs.id, title: (m as any).programs.title }
           : null,
@@ -266,10 +274,9 @@ export async function POST(req: NextRequest) {
 
     // Map category from label to enum
     const CATEGORY_MAP: Record<string, any> = {
-      // Changed CourseCategory to any
       "Program Wajib": "Wajib",
       "Program Ekstra": "Extra",
-      "Program Next Level": "NextLevel",
+      "Program Next Level": "Susulan",
       "Program Susulan": "Susulan",
     };
 

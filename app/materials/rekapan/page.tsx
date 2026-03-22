@@ -164,8 +164,7 @@ const RekapanListPage = () => {
   const CATEGORY_STYLE: Record<string, string> = {
     "Program Wajib": "bg-rose-100 text-rose-700 border-rose-200",
     "Program Ekstra": "bg-purple-100 text-purple-700 border-purple-200",
-    "Program Next Level": "bg-amber-100 text-amber-700 border-amber-200",
-    "Program Susulan": "bg-slate-100 text-slate-700 border-slate-200",
+    "Program Susulan": "bg-amber-100 text-amber-700 border-amber-200",
   };
 
   const totalHadir = rekapanList.length;

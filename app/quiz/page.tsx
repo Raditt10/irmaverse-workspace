@@ -21,6 +21,8 @@ import {
   Trash2,
   XCircle,
   HelpCircle,
+  CheckCircle2,
+  Check,
 } from "lucide-react";
 
 interface Quiz {
@@ -78,6 +80,8 @@ const QuizHome = () => {
     }
   }, [authStatus]);
 
+  const [totalQuizXpFromServer, setTotalQuizXpFromServer] = useState(0);
+
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
@@ -86,7 +90,7 @@ const QuizHome = () => {
       const data = await res.json();
 
       let colorIdx = 0;
-      const mapped: Quiz[] = data.map((q: any) => {
+      const mapped: Quiz[] = (data.quizzes || []).map((q: any) => {
         const quiz: Quiz = {
           id: q.id,
           materialId: q.materialId,
@@ -107,6 +111,7 @@ const QuizHome = () => {
       });
 
       setQuizzes(mapped);
+      setTotalQuizXpFromServer(data.totalQuizXp || 0);
     } catch (error) {
       console.error("Error fetching quizzes:", error);
     } finally {
@@ -132,9 +137,25 @@ const QuizHome = () => {
     });
   }, [quizzes, searchQuery, activeFilter]);
 
-  const totalPoints = useMemo(() => {
-    return quizzes.reduce((acc, quiz) => acc + (quiz.score || 0), 0);
-  }, [quizzes]);
+  const quizStats = useMemo(() => {
+    const completed = quizzes.filter((q) => q.status === "completed");
+    const totalEarnedRaw = completed.reduce((acc, q) => acc + (q.score || 0), 0);
+    const totalPossibleRaw = completed.reduce(
+      (acc, q) => acc + (q.totalScore || 0),
+      0,
+    );
+    const accuracy =
+      totalPossibleRaw > 0
+        ? Math.round((totalEarnedRaw / totalPossibleRaw) * 100)
+        : 0;
+
+    return {
+      totalXP: totalQuizXpFromServer,
+      completedCount: completed.length,
+      totalQuizzes: quizzes.length,
+      accuracy,
+    };
+  }, [quizzes, totalQuizXpFromServer]);
 
   const handleQuizClick = (quiz: Quiz, mode?: "review" | "retake") => {
     const baseUrl = quiz.materialId
@@ -241,7 +262,7 @@ const QuizHome = () => {
                       ] as const)
                     : []),
                   { key: "standalone", label: "Mandiri" },
-                  { key: "material", label: "Materi" },
+                  { key: "material", label: "Kajian" },
                 ] as const
               ).map((f: any) => (
                 <button
@@ -259,32 +280,84 @@ const QuizHome = () => {
             </div>
           </div>
 
-          {/* --- BANNER TOTAL POIN --- */}
+          {/* --- PROFESSIONAL XP DASHBOARD BANNER --- */}
           {!isInstructor && (
-            <div className="mb-8 flex flex-col sm:flex-row items-center justify-between bg-white border-2 border-slate-200 rounded-3xl p-4 lg:p-5 shadow-[0_4px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_4px_0_0_#10b981] transition-all duration-300 group cursor-default">
-              <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="w-14 h-14 bg-emerald-50 rounded-full border-2 border-emerald-200 flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300 shrink-0 shadow-sm">
-                  <Zap
-                    className="h-7 w-7 text-emerald-500 drop-shadow-sm"
-                    fill="currentColor"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">
-                    Total Poin Kuis-mu
-                  </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl lg:text-3xl font-black text-slate-800 group-hover:text-emerald-500 transition-colors duration-300">
-                      {totalPoints}
+            <div className="mb-10 relative group">
+              {/* Decorative side shape */}
+              <div className="absolute -inset-0.5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-[2.5rem] opacity-20 blur-sm group-hover:opacity-30 transition-opacity duration-500" />
+              
+              <div className="relative flex flex-col lg:flex-row bg-white border-2 border-slate-200 rounded-[2.5rem] overflow-hidden shadow-[0_8px_0_0_#cbd5e1] group-hover:border-emerald-400 group-hover:shadow-[0_8px_0_0_#10b981] transition-all duration-500">
+                {/* Primary Section: Total XP */}
+                <div className="lg:w-1/3 p-6 lg:p-8 bg-linear-to-br from-emerald-50 via-white to-white border-b-2 lg:border-b-0 lg:border-r-2 border-slate-100 flex items-center gap-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center transform rotate-3 shadow-lg shadow-emerald-200 group-hover:rotate-6 transition-transform duration-500">
+                      <Zap className="h-10 w-10 text-white" fill="currentColor" />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
+                      Total XP dari Kuis
                     </span>
-                    <span className="text-sm font-bold text-emerald-500">XP</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl lg:text-5xl font-black text-slate-800 tracking-tight">
+                        {quizStats.totalXP.toLocaleString()}
+                      </span>
+                      <span className="text-lg font-black text-emerald-500">XP</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t-2 border-slate-100 sm:border-none flex items-center sm:justify-end">
-                <div className="px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 inline-flex items-center gap-2 w-full sm:w-auto justify-center group-hover:bg-teal-50 group-hover:text-teal-600 group-hover:border-teal-200 transition-colors duration-300">
-                  <Sparkles className="h-4 w-4 text-teal-500" />
-                  <span>Terus tingkatkan skormu! 🚀</span>
+
+                {/* Secondary Stats Section */}
+                <div className="flex-1 p-6 lg:p-8 flex flex-col sm:flex-row items-center justify-around gap-8 bg-white/50 backdrop-blur-sm">
+                  {/* Quizzes Completed */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">
+                        Kuis Selesai
+                      </p>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xl font-black text-slate-800">
+                          {quizStats.completedCount}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400">/ {quizStats.totalQuizzes}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Average Accuracy */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100">
+                      <Target className="h-6 w-6 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">
+                        Akurasi Rata-rata
+                      </p>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xl font-black text-slate-800">
+                          {quizStats.accuracy}%
+                        </span>
+                        <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden ml-2">
+                          <div 
+                            className="h-full bg-emerald-500 transition-all duration-1000 ease-out"
+                            style={{ width: `${quizStats.accuracy}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Motivational Text / Badge */}
+                  <div className="hidden xl:flex flex-col items-center gap-2">
+                    <div className="px-5 py-2.5 bg-emerald-50 rounded-2xl border border-emerald-100 text-xs font-black text-emerald-600 flex items-center gap-2 shadow-inner group-hover:scale-105 transition-transform">
+                      <Sparkles className="h-4 w-4" />
+                      Terus Berkembang! 🚀
+                    </div>
+                    <p className="text-[10px] font-bold text-slate-400">Tingkatkan skor untuk lebih banyak XP</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,8 +423,8 @@ const QuizHome = () => {
                     {!isStaffRole && (
                       <div className="absolute bottom-3 right-3 z-10">
                         {quiz.status === "completed" ? (
-                          <div className="w-11 h-11 bg-amber-400 rounded-xl flex items-center justify-center border-2 border-white shadow-[0_3px_0_0_#d97706] group-hover:rotate-6 transition-transform">
-                            <Medal className="h-5 w-5 text-white" fill="currentColor" />
+                          <div className="w-11 h-11 bg-emerald-500 rounded-xl flex items-center justify-center border-2 border-white shadow-[0_3px_0_0_#059669] group-hover:rotate-6 transition-transform">
+                            <Check className="h-6 w-6 text-white" strokeWidth={4} />
                           </div>
                         ) : (
                           <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center border-2 border-slate-100 shadow-[0_3px_0_0_#e2e8f0] group-hover:scale-110 transition-transform">

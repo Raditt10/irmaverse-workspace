@@ -115,59 +115,118 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { instructorId } = body;
+    const userRole = session.user.role;
 
-    if (!instructorId) {
-      return NextResponse.json(
-        { error: "Instructor ID is required" },
-        { status: 400 }
-      );
-    }
+    let targetUserId: string;
+    let targetInstructorId: string;
 
-    // Check if instructor exists and is actually an instructor
-    const instructor = await prisma.users.findFirst({
-      where: {
-        id: instructorId,
-        role: "instruktur",
-      },
-    });
+    if (userRole === "instruktur" || userRole === "admin" || userRole === "super_admin") {
+      // The current user is an instructor (or admin) starting a conversation with a student
+      const { userId } = body;
+      if (!userId) {
+        return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+      }
 
-    if (!instructor) {
-      return NextResponse.json(
-        { error: "Instructor not found" },
-        { status: 404 }
-      );
+      // Check if student exists
+      const student = await prisma.users.findUnique({
+        where: { id: userId },
+      });
+
+      if (!student || student.role !== "user") {
+        return NextResponse.json({ error: "Valid User not found" }, { status: 404 });
+      }
+
+      targetUserId = userId;
+      targetInstructorId = session.user.id;
+    } else {
+      // The current user is a student starting a conversation with an instructor
+      const { instructorId } = body;
+      if (!instructorId) {
+        return NextResponse.json({ error: "Instructor ID is required" }, { status: 400 });
+      }
+
+      // Check if instructor exists and is actually an instructor
+      const instructor = await prisma.users.findFirst({
+        where: {
+          id: instructorId,
+          role: "instruktur",
+        },
+      });
+
+      if (!instructor) {
+        return NextResponse.json({ error: "Instructor not found" }, { status: 404 });
+      }
+
+      targetUserId = session.user.id;
+      targetInstructorId = instructorId;
     }
 
     // Check if conversation already exists
     const existingConversation = await prisma.chat_conversations.findUnique({
       where: {
         userId_instructorId: {
-          userId: session.user.id,
-          instructorId,
+          userId: targetUserId,
+          instructorId: targetInstructorId,
         },
       },
-    });
-
-    if (existingConversation) {
-      return NextResponse.json(existingConversation);
-    }
-
-    // Create new conversation
-    const conversation = await prisma.chat_conversations.create({
-      data: {
-        id: crypto.randomUUID(),
-        userId: session.user.id,
-        instructorId,
-        updatedAt: new Date(),
-      },
       include: {
+        users_chat_conversations_userIdTousers: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
         users_chat_conversations_instructorIdTousers: {
           select: {
             id: true,
             name: true,
             email: true,
             bidangKeahlian: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    if (existingConversation) {
+      return NextResponse.json({
+        id: existingConversation.id,
+        // Depending on who called this, we want to return the OTHER participant as `participant`
+        participant: (userRole === "instruktur" || userRole === "admin" || userRole === "super_admin")
+          ? existingConversation.users_chat_conversations_userIdTousers
+          : existingConversation.users_chat_conversations_instructorIdTousers,
+        lastMessage: null,
+        unreadCount: 0,
+        updatedAt: existingConversation.updatedAt,
+      });
+    }
+
+    // Create new conversation
+    const conversation = await prisma.chat_conversations.create({
+      data: {
+        id: crypto.randomUUID(),
+        userId: targetUserId,
+        instructorId: targetInstructorId,
+        updatedAt: new Date(),
+      },
+      include: {
+        users_chat_conversations_userIdTousers: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        users_chat_conversations_instructorIdTousers: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            bidangKeahlian: true,
+            avatar: true,
           },
         },
       },
@@ -175,7 +234,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: conversation.id,
-      participant: conversation.users_chat_conversations_instructorIdTousers,
+      participant: (userRole === "instruktur" || userRole === "admin" || userRole === "super_admin")
+        ? conversation.users_chat_conversations_userIdTousers
+        : conversation.users_chat_conversations_instructorIdTousers,
       lastMessage: null,
       unreadCount: 0,
       updatedAt: conversation.updatedAt,

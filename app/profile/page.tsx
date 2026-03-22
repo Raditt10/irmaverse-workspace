@@ -87,6 +87,7 @@ interface ProgramEnrollment {
     thumbnailUrl: string | null;
   };
   enrolledAt: string;
+  isCompleted: boolean;
 }
 
 const Profile = () => {
@@ -467,8 +468,8 @@ const Profile = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {activities.map((activity) => (
+                      <div className="space-y-4 max-h-130 overflow-y-auto pr-2 custom-scrollbar">
+                        {activities.slice(0, 7).map((activity) => (
                           <div
                             key={activity.id}
                             className="flex items-center gap-4 p-4 rounded-3xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-200 hover:shadow-sm transition-all duration-300 group"
@@ -689,9 +690,17 @@ const Profile = () => {
                                       })}
                                     </span>
                                   </span>
-                                  <span className="bg-teal-50 px-2 py-1 rounded-lg border border-teal-100 text-[10px] font-black text-teal-600 uppercase tracking-wider flex items-center gap-1">
-                                    <div className="w-1 h-1 bg-teal-500 rounded-full animate-pulse" />
-                                    Aktif
+                                  <span className={`px-2 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider flex items-center gap-1 ${
+                                    enrollment.isCompleted
+                                      ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                                      : "bg-teal-50 border-teal-100 text-teal-600"
+                                  }`}>
+                                    <div className={`w-1 h-1 rounded-full ${
+                                      enrollment.isCompleted 
+                                        ? "bg-emerald-500" 
+                                        : "bg-teal-500 animate-pulse"
+                                    }`} />
+                                    {enrollment.isCompleted ? "Sudah selesai" : "dalam proses"}
                                   </span>
                                 </div>
                               </div>

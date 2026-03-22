@@ -92,7 +92,7 @@ export async function GET(
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     };
 
@@ -121,7 +121,16 @@ export async function GET(
       userInvites.map((inv: any) => [inv.materialId, inv.status]),
     );
 
-    const formattedMaterials = instructorMaterials.map((m, idx) => ({
+    const isPrivileged = user.role === "instruktur" || user.role === "admin" || user.role === "super_admin";
+
+    const visibleMaterials = instructorMaterials.filter(m => {
+      if (isPrivileged) return true;
+      const isEnrolledInCourse = m.courseenrollment?.some((e: any) => e.userId === user.id);
+      const isInvited = inviteMap.has(m.id);
+      return isEnrolledInCourse || isInvited;
+    });
+
+    const formattedMaterials = visibleMaterials.map((m, idx) => ({
       id: m.id,
       title: m.title,
       description: m.description,
@@ -230,8 +239,9 @@ export async function PUT(
       Wajib: "Wajib",
       "Program Ekstra": "Extra",
       Extra: "Extra",
-      "Program Next Level": "NextLevel",
-      NextLevel: "NextLevel",
+      "Program Next Level": "Susulan",
+      "Program Susulan": "Susulan",
+      NextLevel: "Susulan",
       Susulan: "Susulan",
     };
     const GRADE_MAP: Record<string, string> = {

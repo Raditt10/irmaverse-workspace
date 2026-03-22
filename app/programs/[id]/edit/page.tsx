@@ -415,7 +415,7 @@ const EditProgram = () => {
                     <Layers className="h-4 w-4 text-emerald-500" /> Kategori Program
                   </h3>
                   <CategoryFilter
-                    categories={["Program Wajib", "Program Ekstra", "Next Level"]}
+                    categories={["Program Wajib", "Program Ekstra", "Susulan"]}
                     subCategories={[]}
                     selectedCategory={formData.category}
                     selectedSubCategory=""

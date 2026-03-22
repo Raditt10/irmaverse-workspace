@@ -62,6 +62,8 @@ interface Material {
   points?: string[];
   attendedAt?: string;
   hasRekapan?: boolean;
+  isEnrolledInProgram?: boolean;
+  program?: { id: string; title: string } | null;
   inviteDetails?: InviteDetail[];
 }
 
@@ -167,6 +169,8 @@ const MaterialDetail = () => {
         points: data.points || [],
         attendedAt: data.attendedAt || undefined,
         hasRekapan: data.hasRekapan ?? false,
+        isEnrolledInProgram: data.isEnrolledInProgram ?? false,
+        program: data.program || null,
         inviteDetails: data.inviteDetails || [],
       };
 
@@ -206,7 +210,7 @@ const MaterialDetail = () => {
       style = "bg-rose-100 text-rose-700 border-rose-200";
     if (category === "Program Ekstra")
       style = "bg-purple-100 text-purple-700 border-purple-200";
-    if (category === "Program Next Level")
+    if (category === "Program Next Level" || category === "Program Susulan")
       style = "bg-amber-100 text-amber-700 border-amber-200";
 
     return (
@@ -750,9 +754,13 @@ const MaterialDetail = () => {
                           untuk mencatat kehadiranmu.
                         </p>
                         <button
-                          onClick={() =>
-                            router.push(`/materials/${material.id}/absensi`)
-                          }
+                          onClick={() => {
+                            if (material.program?.id && !material.isEnrolledInProgram) {
+                              showToast("mohon maaf, kamu belum terdaftar di program kurikulum kajian ini", "error");
+                              return;
+                            }
+                            router.push(`/materials/${material.id}/absensi`);
+                          }}
                           className="w-full py-4 rounded-2xl bg-white text-teal-600 font-black border-2 border-teal-100 shadow-lg hover:bg-teal-50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10"
                         >
                           <CheckCircle2 className="w-5 h-5" />

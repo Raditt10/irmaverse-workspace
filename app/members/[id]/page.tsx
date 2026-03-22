@@ -255,7 +255,7 @@ const MemberDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* LEFT: Profile Card */}
             <div className="lg:col-span-1">
-              <div className="bg-white border-2 border-slate-200 rounded-[2rem] shadow-[0_6px_0_0_#cbd5e1] overflow-hidden sticky top-24 px-6 pb-6 pt-10">
+              <div className="bg-white border-2 border-slate-200 rounded-4xl shadow-[0_6px_0_0_#cbd5e1] overflow-hidden sticky top-24 px-6 pb-6 pt-10">
                 <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full">
                   <span
                     className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400 animate-pulse" : "bg-slate-300"}`}
@@ -426,7 +426,7 @@ const MemberDetail = () => {
                 ].map((s, i) => (
                   <div
                     key={i}
-                    className={`flex flex-col items-center justify-center p-4 rounded-3xl ${s.bg} border-2 ${s.bdr} transition-all duration-300 ${s.hv} group cursor-default h-full min-h-[140px]`}
+                    className={`flex flex-col items-center justify-center p-4 rounded-3xl ${s.bg} border-2 ${s.bdr} transition-all duration-300 ${s.hv} group cursor-default h-full min-h-35`}
                   >
                     {s.icon && (
                       <div className="w-14 h-14 bg-white/50 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-white/50">
@@ -618,7 +618,7 @@ const MemberDetail = () => {
                     </div>
                   </div>
                   {activities.length === 0 ? (
-                    <div className="text-center py-16 bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200">
+                    <div className="text-center py-16 bg-slate-50 rounded-4xl border-2 border-dashed border-slate-200">
                       <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                         <Activity className="h-10 w-10 text-slate-300" />
                       </div>
@@ -627,8 +627,8 @@ const MemberDetail = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {activities.map((a) => (
+                    <div className="space-y-4 max-h-130 overflow-y-auto pr-2 custom-scrollbar">
+                      {activities.slice(0, 7).map((a) => (
                         <div
                           key={a.id}
                           className="flex items-center gap-5 p-5 rounded-3xl bg-slate-50/50 border border-slate-100 hover:bg-white hover:border-emerald-200 hover:shadow-md transition-all group"

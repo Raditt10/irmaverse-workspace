@@ -38,6 +38,11 @@ interface Program {
   enrollmentCount: number;
   isEnrolled: boolean;
   isCompleted: boolean;
+  progress?: {
+    completed: number;
+    total: number;
+    percentage: number;
+  };
 }
 
 const OurPrograms = () => {
@@ -121,8 +126,8 @@ const OurPrograms = () => {
 
     let matchCategory = true;
     if (selectedCategory !== "Semua Kategori") {
-      if (selectedCategory === "Next Level") {
-        matchCategory = program.category === "Program Next Level";
+      if (selectedCategory === "Susulan") {
+        matchCategory = program.category === "Program Susulan";
       } else {
         matchCategory = program.category === selectedCategory;
       }
@@ -142,7 +147,7 @@ const OurPrograms = () => {
     "Semua Kategori",
     "Program Wajib",
     "Program Ekstra",
-    "Next Level",
+    "Susulan",
   ];
   
   const subCategories = isPrivileged ? [] : ["Semua Status", "Belum Selesai", "Selesai"];
@@ -280,7 +285,7 @@ const OurPrograms = () => {
                             strokeWidth={2.5}
                           />
                           <span className="text-[11px] font-bold text-white">
-                            {program.materialCount} Materi
+                            {program.materialCount} Kajian
                           </span>
                         </div>
                       </div>
@@ -314,25 +319,25 @@ const OurPrograms = () => {
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                   Progress
                                 </span>
-                                {program.isCompleted ? (
+                                {program.isCompleted || program.progress?.percentage === 100 ? (
                                   <span className="text-[10px] font-black text-amber-600">
                                     Selesai 🏆
                                   </span>
                                 ) : (
                                   <span className="text-[10px] font-black text-emerald-600">
-                                    Terdaftar ✓
+                                    Terdaftar ✓ {program.progress?.percentage || 0}%
                                   </span>
                                 )}
                               </div>
                               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all duration-500 ${
-                                    program.isCompleted
+                                    program.isCompleted || program.progress?.percentage === 100
                                       ? "bg-amber-400"
                                       : "bg-emerald-400"
                                   }`}
                                   style={{
-                                    width: program.isCompleted ? "100%" : "30%",
+                                    width: `${program.progress?.percentage || 0}%`,
                                   }}
                                 />
                               </div>
@@ -383,7 +388,7 @@ const OurPrograms = () => {
       <CartoonConfirmDialog
         type="warning"
         title="Hapus Program?"
-        message="Apakah Anda yakin ingin menghapus program ini? Materi di dalamnya tidak akan terhapus."
+        message="Apakah Anda yakin ingin menghapus program ini? Kajian di dalamnya tidak akan terhapus."
         confirmText="Ya, Hapus"
         cancelText="Batal"
         isOpen={showConfirmDelete}

@@ -47,7 +47,7 @@ const CreateMaterial = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [availablePrograms, setAvailablePrograms] = useState<
-    { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[] }[]
+    { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[]; usedKajianDetails?: { order: number; title: string; materialId: string; attendeeEmails?: string[] }[] }[]
   >([]);
   const [fetchingPrograms, setFetchingPrograms] = useState(false);
   const [availableInstructors, setAvailableInstructors] = useState<
@@ -82,7 +82,6 @@ const CreateMaterial = () => {
     materialType: "editor" as "editor" | "link",
     materialContent: "",
     materialLink: "",
-    rekapanContent: "",
     location: "",
     instructorId: "",
   });
@@ -163,7 +162,8 @@ const CreateMaterial = () => {
           id: p.id, 
           title: p.title, 
           totalKajian: p.totalKajian, 
-          usedKajianOrders: p.usedKajianOrders 
+          usedKajianOrders: p.usedKajianOrders,
+          usedKajianDetails: p.usedKajianDetails,
         })),
       );
     } catch (err) {
@@ -304,10 +304,25 @@ const CreateMaterial = () => {
 
     if (
       formData.materialType === "editor" &&
-      !formData.rekapanContent.trim()
+      !formData.materialContent.trim()
     ) {
       showToast("Materi kajian tidak boleh kosong", "error");
       return;
+    }
+
+    // Cek apakah ada anggota yang diundang tapi sudah pernah hadir di kajian ke-N ini
+    const selProgram = availablePrograms.find((p) => p.id === formData.programId);
+    if (selProgram && formData.kajianOrder) {
+      const selectedOrder = parseInt(formData.kajianOrder);
+      const existingDetail = selProgram.usedKajianDetails?.find((d) => d.order === selectedOrder);
+      
+      if (existingDetail && existingDetail.attendeeEmails && existingDetail.attendeeEmails.length > 0) {
+        const overlappingUsers = invitedUsers.filter(email => existingDetail.attendeeEmails?.includes(email));
+        if (overlappingUsers.length > 0) {
+          showToast(`Ada anggota yang sudah mengikuti Kajian Ke-${selectedOrder}, mohon tinjau ulang`, "error");
+          return;
+        }
+      }
     }
 
     setLoading(true);
@@ -334,7 +349,7 @@ const CreateMaterial = () => {
       // Save rekapan if content is provided OR it's a link material
       const finalRekapanContent = formData.materialType === "link"
         ? formData.materialLink.trim()
-        : formData.rekapanContent.trim();
+        : formData.materialContent.trim();
         
       if (finalRekapanContent && result.id) {
         try {
@@ -601,34 +616,34 @@ const CreateMaterial = () => {
                             </p>
                           </div>
 
-                          {/* Card Next Level */}
+                          {/* Card Susulan */}
                           <div
                             onClick={() =>
                               setFormData({
                                 ...formData,
-                                category: "Program Next Level",
+                                category: "Program Susulan",
                               })
                             }
                             className={`cursor-pointer rounded-2xl border-2 p-4 transition-all ${
-                              formData.category === "Program Next Level"
+                              formData.category === "Program Susulan"
                                 ? "bg-indigo-50 border-indigo-500 shadow-[0_4px_0_0_#6366f1]"
                                 : "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 relative top-1"
                             }`}
                           >
                             <div className="flex items-center gap-3 mb-2">
                               <div
-                                className={`p-2 rounded-xl border ${formData.category === "Program Next Level" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
+                                className={`p-2 rounded-xl border ${formData.category === "Program Susulan" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
                               >
                                 <Rocket className="h-5 w-5" />
                               </div>
                               <span
-                                className={`font-black ${formData.category === "Program Next Level" ? "text-indigo-700" : "text-slate-700"}`}
+                                className={`font-black ${formData.category === "Program Susulan" ? "text-indigo-700" : "text-slate-700"}`}
                               >
-                                Next Level
+                                Susulan
                               </span>
                             </div>
                             <p className="text-xs font-semibold text-slate-500 leading-tight">
-                              Materi tingkat lanjut.
+                              Materi untuk kajian susulan.
                             </p>
                           </div>
                         </div>
@@ -776,32 +791,41 @@ const CreateMaterial = () => {
                                           <div className="max-h-60 overflow-y-auto pr-1 space-y-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
                                             {Array.from({ length: selectedProgram.totalKajian }, (_, i) => i + 1).map((num) => {
                                               const isUsed = selectedProgram.usedKajianOrders?.includes(num);
+                                              const existingDetail = selectedProgram.usedKajianDetails?.find((d: any) => d.order === num);
                                               return (
                                                 <button
                                                   key={num}
                                                   type="button"
-                                                  disabled={isUsed}
                                                   onClick={() => {
                                                     setFormData({ ...formData, kajianOrder: num.toString() });
                                                     setIsKajianDropdownOpen(false);
                                                   }}
                                                   className={`w-full text-left px-4 py-3.5 text-sm font-bold rounded-xl transition-all flex items-center justify-between border ${
-                                                    isUsed 
-                                                      ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed" 
-                                                      : formData.kajianOrder === num.toString()
-                                                        ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
+                                                    formData.kajianOrder === num.toString()
+                                                      ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
+                                                      : isUsed
+                                                        ? "bg-amber-50/50 border-amber-100 text-slate-600 hover:bg-amber-50 hover:border-amber-200"
                                                         : "bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-200 hover:text-teal-600"
                                                   }`}
                                                 >
-                                                  <span>Kajian Ke-{num}</span>
-                                                  {isUsed && (
-                                                    <span className="text-[10px] bg-slate-200/50 text-slate-500 font-black px-2.5 py-1 rounded-lg border border-slate-200">
-                                                      Sudah Terisi
-                                                    </span>
-                                                  )}
-                                                  {formData.kajianOrder === num.toString() && !isUsed && (
-                                                    <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
-                                                  )}
+                                                  <div className="flex flex-col gap-0.5">
+                                                    <span>Kajian Ke-{num}</span>
+                                                    {isUsed && existingDetail && (
+                                                      <span className="text-[10px] font-medium text-amber-500 leading-tight">
+                                                        Sebelumnya: {existingDetail.title}
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                  <div className="flex items-center gap-2">
+                                                    {isUsed && (
+                                                      <span className="text-[10px] bg-amber-100 text-amber-600 font-black px-2.5 py-1 rounded-lg border border-amber-200">
+                                                        Sudah Ada
+                                                      </span>
+                                                    )}
+                                                    {formData.kajianOrder === num.toString() && (
+                                                      <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
+                                                    )}
+                                                  </div>
                                                 </button>
                                               );
                                             })}
@@ -870,9 +894,10 @@ const CreateMaterial = () => {
                         {formData.materialType === "editor" ? (
                           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
                             <Textarea
-                              name="rekapanContent"
+                              name="materialContent"
+                              required={formData.materialType === "editor"}
                               rows={8}
-                              value={formData.rekapanContent}
+                              value={formData.materialContent}
                               onChange={handleInputChange}
                               placeholder="Tulis ringkasan materi kajian di sini. Rekapan ini akan bisa dibaca oleh peserta kapan saja sebagai bahan belajar mandiri..."
                               className="text-sm border-2 focus:ring-emerald-200"

@@ -35,7 +35,7 @@ interface RekapanData {
 const CATEGORY_LABEL: Record<string, string> = {
   Wajib: "Program Wajib",
   Extra: "Program Ekstra",
-  NextLevel: "Program Next Level",
+  NextLevel: "Program Susulan",
   Susulan: "Program Susulan",
 };
 

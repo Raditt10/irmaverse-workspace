@@ -30,7 +30,12 @@ export async function GET(req: NextRequest) {
           select: { id: true, name: true, avatar: true },
         },
         material: {
-          select: { id: true, kajianOrder: true, instructorId: true },
+          select: { 
+            id: true, 
+            title: true, 
+            kajianOrder: true, 
+            instructorId: true
+          },
         },
         program_enrollments: {
           select: { id: true, userId: true },
@@ -47,6 +52,41 @@ export async function GET(req: NextRequest) {
       userAttendances.map((a) => a.materialId),
     );
 
+    // Fetch all attendances and invites for materials in these programs to get attendeeEmails
+    const allMaterialIds = programs.flatMap(p => p.material?.map((m: any) => m.id) || []);
+    
+    const allAttendances = await prisma.attendance.findMany({
+      where: { materialId: { in: allMaterialIds } },
+      select: { materialId: true, userId: true },
+    });
+
+    const allInvites = await prisma.materialinvite.findMany({
+      where: { materialId: { in: allMaterialIds } },
+      select: { materialId: true, userId: true },
+    });
+
+    const allParticipantRecords = [...allAttendances, ...allInvites];
+
+    // Fetch user emails for those attendees
+    const attendeeUserIds = Array.from(new Set(allParticipantRecords.map(a => a.userId)));
+    const attendeeUsers = await prisma.users.findMany({
+      where: { id: { in: attendeeUserIds } },
+      select: { id: true, email: true },
+    });
+    const userEmailMap = new Map(attendeeUsers.map(u => [u.id, u.email]));
+
+    // Map materialId to an array of emails
+    const materialAttendeesMap: Record<string, string[]> = {};
+    for (const a of allParticipantRecords) {
+      if (!materialAttendeesMap[a.materialId]) {
+        materialAttendeesMap[a.materialId] = [];
+      }
+      const email = userEmailMap.get(a.userId);
+      if (email && !materialAttendeesMap[a.materialId].includes(email)) {
+        materialAttendeesMap[a.materialId].push(email);
+      }
+    }
+
     const GRADE_LABEL: Record<string, string> = {
       X: "Kelas 10",
       XI: "Kelas 11",
@@ -56,7 +96,7 @@ export async function GET(req: NextRequest) {
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     };
 
@@ -71,18 +111,34 @@ export async function GET(req: NextRequest) {
       );
 
       let isCompleted = false;
+      let attendanceCount = 0;
+      if (filteredMaterials.length > 0) {
+        attendanceCount = filteredMaterials.filter((m: any) => attendedMaterialIds.has(m.id)).length;
+      }
+      
+      const totalKajianTarget = p.totalKajian > 0 ? p.totalKajian : filteredMaterials.length;
+      let progressPercentage = 0;
+
+      if (totalKajianTarget > 0) {
+        progressPercentage = Math.round((attendanceCount / totalKajianTarget) * 100);
+        progressPercentage = Math.min(progressPercentage, 100);
+      }
+
       if (p.totalKajian > 0) {
         // Complete jika sudah ada semua materi sebanyak totalKajian DAN user menghadiri semuanya
         const hasAllMaterials = filteredMaterials.length >= p.totalKajian;
-        const attendedAll =
-          filteredMaterials.length > 0 &&
-          filteredMaterials.every((m: any) => attendedMaterialIds.has(m.id));
-        isCompleted = hasAllMaterials && attendedAll;
+        isCompleted = hasAllMaterials && (attendanceCount >= p.totalKajian);
       } else {
         isCompleted =
           filteredMaterials.length > 0 &&
-          filteredMaterials.every((m: any) => attendedMaterialIds.has(m.id));
+          (attendanceCount >= filteredMaterials.length);
       }
+
+      const progress = {
+        completed: attendanceCount,
+        total: totalKajianTarget,
+        percentage: progressPercentage,
+      };
 
       return {
         id: p.id,
@@ -99,9 +155,18 @@ export async function GET(req: NextRequest) {
         usedKajianOrders: filteredMaterials
           .map((m: any) => m.kajianOrder)
           .filter((order: any) => order !== null && order !== undefined),
+        usedKajianDetails: filteredMaterials
+          .filter((m: any) => m.kajianOrder !== null && m.kajianOrder !== undefined)
+          .map((m: any) => ({
+            order: m.kajianOrder,
+            title: m.title,
+            materialId: m.id,
+            attendeeEmails: materialAttendeesMap[m.id] || [],
+          })),
         enrollmentCount: p.program_enrollments?.length || 0,
         isEnrolled,
         isCompleted,
+        progress,
         createdAt: p.createdAt,
       };
     });
@@ -164,8 +229,9 @@ export async function POST(req: Request) {
       Wajib: "Wajib",
       "Program Ekstra": "Extra",
       Extra: "Extra",
-      "Program Next Level": "NextLevel",
-      NextLevel: "NextLevel",
+      "Program Next Level": "Susulan",
+      "Program Susulan": "Susulan",
+      NextLevel: "Susulan",
       Susulan: "Susulan",
     };
 

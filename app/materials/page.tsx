@@ -13,7 +13,7 @@ import MaterialInstructorActions from "@/components/ui/AbsensiButton";
 import MaterialUserActions from "@/app/materials/_components/ButtonUserAbsenMaterial";
 import Loading from "@/components/ui/Loading"; // Import Loading baru
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
-import { Calendar, Clock, Plus, BookOpen, CheckCheck, User as UserIcon } from "lucide-react";
+import { Calendar, Clock, Plus, BookOpen, CheckCheck, User as UserIcon, ClipboardList } from "lucide-react";
 import AddButton from "@/components/ui/AddButton";
 import DeleteButton from "@/components/ui/DeleteButton";
 import DetailButton from "@/components/ui/DetailButton";
@@ -35,6 +35,8 @@ interface Material {
   attendedAt?: string;
   createdAt?: string;
   isCompleted?: boolean;
+  isEnrolledInProgram?: boolean;
+  program?: { id: string; title: string } | null;
 }
 
 const Materials = () => {
@@ -70,7 +72,7 @@ const Materials = () => {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged = role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
-  const programCategories = ["Semua", "Program Wajib", "Program Ekstra", "Program Next Level"];
+  const programCategories = ["Semua", "Program Wajib", "Program Ekstra", "Program Susulan"];
   const classCategories = ["Semua", "Kelas 10", "Kelas 11", "Kelas 12"];
 
   useEffect(() => {
@@ -232,7 +234,7 @@ const Materials = () => {
             <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex-1">
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  {isPrivileged ? "Kelola Kajian" : "Jadwal Kajianku"}
+                  {isPrivileged ? "Kelola Jadwal Kajian" : "Jadwal Kajianku"}
                 </h1>
                 <p className="text-slate-500 font-medium text-xs lg:text-lg">
                   {isPrivileged
@@ -241,7 +243,7 @@ const Materials = () => {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                 {isPrivileged && (
                   <AddButton
                     label="Buat Kajian"
@@ -548,6 +550,9 @@ const Materials = () => {
                                     attendedAt={material.attendedAt}
                                     materialDate={material.date}
                                     onNoRekapan={() => showToast("Maaf, untuk kajian ini belum tersedia rekapan materinya", "error")}
+                                    programId={material.program?.id}
+                                    isEnrolledInProgram={material.isEnrolledInProgram}
+                                    onShowToast={showToast}
                                   />
                                 </div>
                                 <DetailButton

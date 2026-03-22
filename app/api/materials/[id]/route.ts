@@ -71,6 +71,11 @@ export async function GET(
             },
           },
         },
+        rekapan: {
+          select: {
+            content: true,
+          },
+        },
       },
     });
 
@@ -100,7 +105,7 @@ export async function GET(
     const CATEGORY_LABEL = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     } as const;
 
@@ -112,6 +117,12 @@ export async function GET(
       xi: "Kelas 11",
       xii: "Kelas 12",
     };
+
+    const isEnrolledInProgram = material.programId 
+      ? await (prisma as any).program_enrollments.findFirst({
+          where: { userId: User.id, programId: material.programId }
+        })
+      : null;
 
     const m = material as any; // Cast to any to bypass stale linting issues
     const result = {
@@ -129,13 +140,16 @@ export async function GET(
       startedAt: m.startedAt,
       thumbnailUrl: m.thumbnailUrl,
       location: m.location,
-      content: m.content,
+      content: m.content || (m.rekapan && m.rekapan.length > 0 ? m.rekapan[0].content : null),
       link: m.link,
       materialType: m.materialType,
+      kajianOrder: m.kajianOrder,
       isAttendanceOpen: m.isAttendanceOpen,
+      hasRekapan: !!(m.content || m.link || (m.rekapan && m.rekapan.length > 0)),
       isJoined:
         m.courseenrollment?.length > 0 ||
         (m.materialinvite || []).some((inv: any) => inv.status === "accepted"),
+      isEnrolledInProgram: !!isEnrolledInProgram,
       parent: m.material_material_parentIdTomaterial
         ? {
             id: m.material_material_parentIdTomaterial.id,
@@ -304,7 +318,7 @@ export async function PUT(
     const CATEGORY_MAP: Record<string, string> = {
       "Program Wajib": "Wajib",
       "Program Ekstra": "Extra",
-      "Program Next Level": "NextLevel",
+      "Program Next Level": "Susulan",
       "Program Susulan": "Susulan",
     };
 

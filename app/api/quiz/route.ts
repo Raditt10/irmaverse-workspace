@@ -99,8 +99,21 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // 3. Total XP earned from quizzes (from activity_logs)
+    const quizXpAgg = await prisma.activity_logs.aggregate({
+      where: {
+        userId: session.user.id,
+        type: "quiz_completed",
+      },
+      _sum: {
+        xpEarned: true,
+      },
+    });
+
+    const totalQuizXp = quizXpAgg._sum.xpEarned || 0;
+
     // Format results
-    const result = [
+    const quizzes = [
       ...standaloneQuizzes.map((q) => ({
         id: q.id,
         materialId: null,
@@ -130,7 +143,10 @@ export async function GET(req: NextRequest) {
       })),
     ];
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      quizzes,
+      totalQuizXp,
+    });
   } catch (error) {
     console.error("Get all quizzes error:", error);
     return NextResponse.json(
