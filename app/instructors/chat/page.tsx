@@ -800,7 +800,9 @@ const ChatPage = () => {
                       <div className="relative shrink-0">
                         <Avatar className="h-12 w-12 border-2 border-slate-100">
                           <AvatarImage src={conv.participant.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.participant.name}`} />
-                          <AvatarFallback>{conv.participant.name?.slice(0, 2)}</AvatarFallback>
+                          <AvatarFallback className="bg-teal-500 text-white font-black text-lg">
+                            {conv.participant.name?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         {isParticipantOnline(conv.participant.id) && (
                           <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full shadow-sm animate-pulse" />
@@ -843,18 +845,20 @@ const ChatPage = () => {
                   {/* Active Chat Header */}
                   <div className="flex items-center justify-between px-4 py-3 bg-white border-b-2 border-slate-100 shadow-sm z-20 shrink-0">
                     <div className="flex items-center gap-3">
-                      <BackButton 
-                        onClick={() => {
-                          if (isMobileViewingChat) setIsMobileViewingChat(false);
-                          else router.push('/instructors');
-                        }}
-                        className="p-2 -ml-2 bg-transparent border-none shadow-none hover:bg-slate-100 text-slate-600"
-                        label=""
-                      />
+                       <BackButton 
+                         onClick={() => {
+                           setSelectedConversationId(null);
+                           if (isMobileViewingChat) setIsMobileViewingChat(false);
+                         }}
+                         className="p-1 lg:p-2 bg-white border-2 border-slate-200 shadow-[0_3px_0_0_#cbd5e1] hover:shadow-[0_4px_0_0_#14b8a6] hover:border-teal-400 rounded-full transition-all active:translate-y-0.5 active:shadow-none"
+                         label=""
+                       />
                       <div className="relative">
                         <Avatar className="h-10 w-10 border-2 border-white shadow-sm ring-2 ring-slate-100">
                           <AvatarImage src={selectedConversation.participant.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation.participant.name}`} />
-                          <AvatarFallback>{selectedConversation.participant.name?.slice(0, 2)}</AvatarFallback>
+                          <AvatarFallback className="bg-teal-500 text-white font-black text-lg">
+                            {selectedConversation.participant.name?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         {isParticipantOnline(selectedConversation.participant.id) && (
                           <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full animate-pulse" />
@@ -880,7 +884,7 @@ const ChatPage = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setIsDesktopChatFullscreen((v) => !v)}
-                        className="hidden lg:inline-flex p-2 rounded-full hover:bg-slate-100 text-slate-400"
+                        className="hidden lg:inline-flex p-2 rounded-full hover:bg-slate-50 text-slate-400 border-2 border-slate-100 shadow-sm transition-all"
                         title={isDesktopChatFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
                       >
                         {isDesktopChatFullscreen ? (
@@ -1189,7 +1193,7 @@ const ChatPage = () => {
                         <div className="relative shrink-0">
                           <Avatar className="h-16 w-16 border-[3px] border-white shadow-sm group-hover:border-emerald-100 transition-colors">
                             <AvatarImage src={inst.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${inst.name}`} />
-                            <AvatarFallback className="font-black text-lg">{inst.name.slice(0,2)}</AvatarFallback>
+                            <AvatarFallback className="bg-teal-500 text-white font-black text-lg">{inst.name.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
                           <div className={`absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm`}>
                             <div className={`w-3.5 h-3.5 rounded-full ${onlineUsers.has(inst.id) ? 'bg-emerald-400 animate-pulse' : 'bg-slate-300'}`} />

@@ -18,7 +18,6 @@ import {
   XCircle,
   ChevronDown,
   ChevronRight,
-  ClipboardList,
   Percent,
   Eye,
   UserCheck,
@@ -189,76 +188,77 @@ export default function KajianManagement() {
           </div>
 
           {/* ===== STATS GRID ===== */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10">
-            {/* Total Programs */}
-            <div className="bg-white p-4 sm:p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_6px_0_0_#d1fae5] sm:shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
-              <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <GraduationCap
-                    className="w-6 h-6 md:w-8 md:h-8 text-emerald-500"
-                    strokeWidth={2.5}
-                  />
+          {/* ===== PREMIUM STATS BANNER ===== */}
+          <div className="relative group mb-10">
+            {/* Decorative background glow */}
+            <div className="absolute -inset-1 bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-[3rem] blur-2xl group-hover:opacity-100 transition duration-1000 opacity-0" />
+            
+            <div className="relative flex flex-col lg:flex-row bg-white border-2 border-slate-100 rounded-[3rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:border-emerald-200 transition-all duration-500">
+              
+              {/* Total Programs */}
+              <div className="lg:w-1/3 p-6 lg:p-8 bg-linear-to-br from-emerald-50/50 via-white to-white border-b-2 lg:border-b-0 lg:border-r-2 border-slate-50 flex items-center gap-6 group/stat transition-all">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-emerald-500 rounded-3xl flex items-center justify-center shadow-lg shadow-emerald-200 transition-all duration-500">
+                    <GraduationCap className="h-8 w-8 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">
-                  Program
-                </span>
+                <div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
+                    Program Kurikulum
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl lg:text-5xl font-black text-slate-800 tracking-tight">
+                      {stats.totalPrograms}
+                    </span>
+                    <span className="text-[10px] font-black text-emerald-500 uppercase px-2 py-0.5 bg-emerald-50 rounded-lg border border-emerald-100">
+                      Aktif
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
-                  {stats.totalPrograms}
-                </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">
-                  Total Program Kurikulum
-                </div>
-              </div>
-            </div>
 
-            {/* Total Enrolled */}
-            <div className="bg-white p-4 sm:p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_6px_0_0_#d1fae5] sm:shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
-              <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <Users
-                    className="w-6 h-6 md:w-8 md:h-8 text-emerald-500"
-                    strokeWidth={2.5}
-                  />
+              {/* Total Enrolled */}
+              <div className="lg:w-1/3 p-6 lg:p-8 bg-white border-b-2 lg:border-b-0 lg:border-r-2 border-slate-50 flex items-center gap-6 group/stat transition-all">
+                <div className="w-16 h-16 bg-emerald-600 rounded-3xl flex items-center justify-center shadow-lg shadow-emerald-100 transition-all duration-500">
+                  <Users className="h-8 w-8 text-white" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">
-                  Terdaftar
-                </span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
-                  {stats.uniqueEnrolledUsers}
-                </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide leading-tight">
-                  Total Anggota Terdaftar
-                  <br />
-                  <span className="text-[9px] md:text-xs">di Program Kurikulum</span>
+                <div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
+                    Anggota Terdaftar
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl lg:text-5xl font-black text-slate-800 tracking-tight">
+                      {stats.uniqueEnrolledUsers}
+                    </span>
+                    <span className="text-[10px] font-black text-emerald-600 uppercase px-2 py-0.5 bg-emerald-50 rounded-lg border border-emerald-100">
+                      Peserta
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Total Materials */}
-            <div className="bg-white p-4 sm:p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_6px_0_0_#d1fae5] sm:shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
-              <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <BookOpen
-                    className="w-6 h-6 md:w-8 md:h-8 text-emerald-500"
-                    strokeWidth={2.5}
-                  />
+              {/* Total Materials */}
+              <div className="lg:w-1/3 p-6 lg:p-8 bg-linear-to-bl from-emerald-50/50 via-white to-white flex items-center gap-6 group/stat transition-all">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-teal-500 rounded-3xl flex items-center justify-center shadow-lg shadow-teal-100 transition-all duration-500">
+                    <BookOpen className="h-8 w-8 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">
-                  Kajian
-                </span>
+                <div>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
+                    Total Kajian
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl lg:text-5xl font-black text-slate-800 tracking-tight">
+                      {stats.totalMaterials}
+                    </span>
+                    <span className="text-[10px] font-black text-teal-500 uppercase px-2 py-0.5 bg-teal-50 rounded-lg border border-teal-100">
+                      Materi
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
-                  {stats.totalMaterials}
-                </div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">
-                  Total Kajian
-                </div>
-              </div>
+
             </div>
           </div>
 
@@ -274,15 +274,6 @@ export default function KajianManagement() {
           ) : (
             <>
               <div className="mb-8">
-                <div className="flex items-center gap-3 mb-6 px-2">
-                  <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
-                    <ClipboardList className="w-5 h-5 text-slate-800" />
-                  </div>
-                  <h2 className="text-xl font-black text-slate-800">
-                    Pilih Program Kurikulum
-                  </h2>
-                </div>
-
                 {/* Program Pills */}
                 <div className="flex flex-wrap gap-3">
                   {programs.map((program) => (

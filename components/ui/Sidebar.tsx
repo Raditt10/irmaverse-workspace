@@ -271,7 +271,7 @@ const Sidebar = () => {
             submenu: [
               {
                 icon: Users,
-                label: "List Anggota",
+                label: "Daftar Anggota",
                 path: "/members",
               },
               {

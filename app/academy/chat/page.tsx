@@ -2,8 +2,9 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import DashboardHeader from "@/components/ui/Header";
+import BackButton from "@/components/ui/BackButton";
 import Sidebar from "@/components/ui/Sidebar";
-import SearchInput from "@/components/ui/SearchInput";
+import { Input } from "@/components/ui/InputText";
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import { Textarea } from "@/components/ui/textarea";
 import Toast from "@/components/ui/Toast";
@@ -39,6 +40,9 @@ import {
   Shield,
   Maximize2,
   Minimize2,
+  Search,
+  MessageSquarePlus,
+  Menu,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -47,12 +51,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/DropDown";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+
 interface Conversation {
   id: string;
   participant: {
     id: string;
     name: string;
     email: string;
+    avatar?: string;
   };
   lastMessage?: {
     content: string;
@@ -103,9 +116,12 @@ const InstructorChatDashboard = () => {
   } = useSocket();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [usersList, setUsersList] = useState<User[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalSearchTerm, setModalSearchTerm] = useState("");
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [messageDraft, setMessageDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -119,6 +135,7 @@ const InstructorChatDashboard = () => {
   const [fileCaption, setFileCaption] = useState("");
   const [deletingConversation, setDeletingConversation] = useState(false);
   const [isDesktopChatFullscreen, setIsDesktopChatFullscreen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -174,12 +191,52 @@ const InstructorChatDashboard = () => {
     }
   }, []);
 
+  const fetchUsersList = useCallback(async () => {
+    try {
+      const res = await fetch("/api/users");
+      if (res.ok) {
+        const data = await res.json();
+        setUsersList(data);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }, []);
+
+  const startConversation = useCallback(async (userId: string) => {
+    try {
+      const res = await fetch("/api/chat/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        await fetchConversations();
+        setSelectedConversationId(data.id);
+        setShowNewChatModal(false);
+        if (window.innerWidth < 1024) {
+          setIsMobileViewingChat(true);
+        }
+      } else {
+        console.error("Failed to start conversation:", data);
+        setToast({ show: true, message: data.error || "Gagal memulai percakapan", type: "error" });
+      }
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      setToast({ show: true, message: "Terjadi kesalahan saat memulai percakapan", type: "error" });
+    }
+  }, [fetchConversations]);
+
   // Initial load
   useEffect(() => {
-    if (session?.user?.role === "instruktur") {
+    if (session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin") {
       fetchConversations();
+      fetchUsersList();
     }
-  }, [session, fetchConversations]);
+  }, [session, fetchConversations, fetchUsersList]);
 
   // Join/leave conversation rooms
   useEffect(() => {
@@ -645,32 +702,44 @@ const InstructorChatDashboard = () => {
 
   return (
     <div
-      className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100"
+      className="h-dvh bg-[#FDFBF7] flex flex-col overflow-hidden"
     >
-      <DashboardHeader />
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)]">
-        <Sidebar />
-        <main className="w-full flex-1 px-3 sm:px-4 lg:px-6 py-4 lg:py-5">
-          <div className="h-full flex flex-col">
+      <div className={`${isDesktopChatFullscreen ? "hidden" : "block"} shrink-0`}>
+        <DashboardHeader />
+      </div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className={`${isDesktopChatFullscreen ? "hidden" : (isMobileViewingChat ? 'hidden lg:block' : 'block')} h-full shrink-0`}>
+          <Sidebar />
+        </div>
+        <main className={`w-full flex-1 flex flex-col transition-all duration-300 ${isDesktopChatFullscreen ? 'p-0' : (isMobileViewingChat ? 'p-0' : 'p-4 lg:p-6')} overflow-hidden relative`}>
+          <div className="h-full flex flex-col min-h-0">
             {/* Header */}
-            <div className="mb-3 lg:mb-4 flex items-center justify-between shrink-0">
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">
-                  Chat Anggota
-                </h1>
-                <p className="text-slate-500 font-bold text-xs lg:text-sm mt-0.5 lg:mt-1">
-                  Kelola percakapan dengan peserta didik
-                </p>
+            <div className={`${isDesktopChatFullscreen || isMobileViewingChat ? 'hidden' : 'flex'} mb-4 items-center justify-between shrink-0 px-2 lg:px-0`}>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-mobile-sidebar'))}
+                  className="lg:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                >
+                  <Menu className="h-6 w-6" strokeWidth={2.5} />
+                </button>
+                <div>
+                  <h1 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">
+                    Chat Anggota
+                  </h1>
+                  <p className="text-slate-500 font-bold text-xs lg:text-sm mt-1">
+                    Kelola percakapan dengan peserta didik
+                  </p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {isConnected ? (
-                  <span className="flex items-center gap-2 text-xs font-black text-emerald-600 bg-emerald-100 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full border-2 border-emerald-200">
-                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse border border-white" />
+                  <span className="flex items-center gap-2 text-[10px] lg:text-xs font-black text-emerald-600 bg-emerald-100 px-3 py-1.5 rounded-full border-2 border-emerald-200">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                     Terhubung
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2 text-xs font-black text-slate-500 bg-slate-100 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full border-2 border-slate-200">
-                    <span className="w-2.5 h-2.5 bg-slate-400 rounded-full" />
+                  <span className="flex items-center gap-2 text-[10px] lg:text-xs font-black text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border-2 border-slate-200">
+                    <span className="w-2 h-2 bg-slate-400 rounded-full" />
                     Menghubungkan...
                   </span>
                 )}
@@ -678,29 +747,34 @@ const InstructorChatDashboard = () => {
             </div>
 
             {/* Chat Container */}
-            <div className="rounded-2xl lg:rounded-3xl border-3 lg:border-4 border-slate-200 bg-white shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] overflow-hidden flex flex-1 min-h-0">
+            <div className={`
+              flex flex-1 bg-white overflow-hidden transition-all duration-300
+              ${isDesktopChatFullscreen ? 'rounded-none border-0' : (isMobileViewingChat ? 'fixed inset-0 z-9999 w-screen h-screen rounded-none' : 'lg:rounded-4xl lg:border-4 border-slate-200 lg:shadow-[0_8px_0_0_#cbd5e1]')}
+            `}>
               {/* Sidebar - Conversation List */}
               <div
                 className={`${
-                  isMobileViewingChat ? "hidden" : "flex"
-                } lg:flex flex-col w-full lg:w-64 xl:w-80 border-r-3 lg:border-r-4 border-slate-100 bg-slate-50/30 min-h-0`}
+                  (isMobileViewingChat || isDesktopChatFullscreen) ? "hidden" : "flex"
+                } flex-col w-full lg:w-80 xl:w-96 border-r-0 lg:border-r-4 border-slate-100 bg-slate-50/30 min-h-0 shrink-0`}
               >
-                {/* Search */}
-                <div className="p-3 lg:p-4 border-b-2 border-slate-100 shrink-0">
-                  <SearchInput
-                    placeholder="Cari peserta..."
-                    value={searchTerm}
-                    onChange={setSearchTerm}
-                    className="w-full rounded-xl lg:rounded-2xl border-2"
-                  />
-                  {searchTerm && filteredConversations.length > 0 && (
-                    <div className="mt-3">
-                      <SuccessDataFound
-                        message={`Ditemukan ${filteredConversations.length} chat peserta`}
-                        icon="sparkles"
-                      />
-                    </div>
-                  )}
+                {/* Search & New Chat Button */}
+                <div className="p-4 border-b-2 border-slate-100 space-y-3 bg-white shrink-0">
+                  <div className="relative group">
+                    <Search className="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 h-4 w-4 lg:h-5 lg:w-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                    <Input
+                      placeholder="Cari percakapan..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9 lg:pl-11 bg-slate-50 border-2 border-slate-200 rounded-2xl h-12 focus:border-emerald-400 focus:bg-white transition-all"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowNewChatModal(true)}
+                    className="w-full bg-emerald-400 hover:bg-emerald-500 text-white font-black rounded-2xl h-12 border-b-4 border-emerald-600 active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2"
+                  >
+                    <MessageSquarePlus className="h-5 w-5" strokeWidth={3} />
+                    Chat Baru
+                  </button>
                 </div>
 
                 {/* Conversations List */}
@@ -721,22 +795,24 @@ const InstructorChatDashboard = () => {
                         key={conv.id}
                         onClick={() => {
                           setSelectedConversationId(conv.id);
-                          setIsMobileViewingChat(true);
+                          if (window.innerWidth < 1024) {
+                            setIsMobileViewingChat(true);
+                          }
                         }}
-                        className={`w-full flex items-start gap-3 p-3 lg:p-4 rounded-2xl lg:rounded-3xl transition-all border-2 ${
+                        className={`w-full flex items-start gap-3 p-4 rounded-2xl transition-all border-2 text-left ${
                           selectedConversationId === conv.id
-                            ? "bg-white border-emerald-400 shadow-[0_2px_0_0_#34d399] lg:shadow-[0_4px_0_0_#34d399] -translate-y-1 z-10"
-                            : "bg-white border-transparent hover:border-slate-200 hover:shadow-sm"
+                            ? "bg-white border-emerald-400 shadow-[0_4px_0_0_#34d399] z-10"
+                            : "bg-white border-transparent hover:border-slate-200 shadow-sm"
                         }`}
                       >
                         <div className="relative">
                           <Avatar className="h-12 w-12 border-2 border-slate-100 shadow-sm">
                             <AvatarImage
-                              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.participant.name}`}
+                              src={conv.participant.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.participant.name}`}
                               alt={conv.participant.name || ""}
                             />
-                            <AvatarFallback>
-                              {conv.participant.name?.slice(0, 2).toUpperCase()}
+                            <AvatarFallback className="bg-teal-500 text-white font-black text-lg">
+                              {conv.participant.name?.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           {isParticipantOnline(conv.participant.id) && (
@@ -754,16 +830,11 @@ const InstructorChatDashboard = () => {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 truncate">
-                            {isParticipantOnline(conv.participant.id)
-                              ? "🟢 Online"
-                              : "⚪ Offline"}
-                          </p>
-                          {conv.lastMessage && (
-                            <p className="text-xs text-slate-500 truncate mt-1 font-medium">
-                              {conv.lastMessage.content}
+                          <div className="flex justify-between items-center">
+                            <p className="text-xs text-slate-500 truncate font-medium max-w-[85%]">
+                              {conv.lastMessage ? conv.lastMessage.content : <span className="italic opacity-70">Mulai percakapan...</span>}
                             </p>
-                          )}
+                          </div>
                         </div>
                         {conv.unreadCount > 0 && (
                           <span className="shrink-0 w-6 h-6 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-md">
@@ -779,30 +850,31 @@ const InstructorChatDashboard = () => {
               {/* Chat Area */}
               <div
                 className={`${
-                  isMobileViewingChat ? "flex" : "hidden"
-                } lg:flex flex-col flex-1 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat min-h-0`}
+                  (isMobileViewingChat || isDesktopChatFullscreen) ? "flex" : "hidden lg:flex"
+                } flex-col flex-1 bg-slate-50 relative w-full h-full min-h-0
+                ${(isMobileViewingChat || isDesktopChatFullscreen) ? 'bg-white' : ''}`}
               >
                 {selectedConversation ? (
                   <>
-                    {/* Chat Header */}
-                    <div className="flex items-center justify-between border-b-2 border-slate-100 px-3 lg:px-6 py-3 lg:py-4 bg-white/90 backdrop-blur-md z-20 shrink-0">
+                    {/* Active Chat Header */}
+                    <div className="flex items-center justify-between px-4 py-3 bg-white border-b-2 border-slate-100 shadow-sm z-20 shrink-0">
                       <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => setIsMobileViewingChat(false)}
-                          className="lg:hidden p-2 -ml-2 text-slate-500 hover:text-slate-700"
-                        >
-                          <ArrowLeft className="h-5 w-5" />
-                        </button>
+                        <BackButton 
+                          onClick={() => {
+                            setSelectedConversationId(null);
+                            if (isMobileViewingChat) setIsMobileViewingChat(false);
+                          }}
+                          className="p-1 lg:p-2 bg-white border-2 border-slate-200 shadow-[0_3px_0_0_#cbd5e1] hover:shadow-[0_4px_0_0_#14b8a6] hover:border-teal-400 rounded-full transition-all active:translate-y-0.5 active:shadow-none"
+                          label=""
+                        />
                         <div className="relative">
                           <Avatar className="h-11 w-11 border-2 border-white shadow-md ring-2 ring-slate-100">
                             <AvatarImage
-                              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation.participant.name}`}
+                              src={selectedConversation.participant.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation.participant.name}`}
                               alt={selectedConversation.participant.name || ""}
                             />
-                            <AvatarFallback>
-                              {selectedConversation.participant.name
-                                ?.slice(0, 2)
-                                .toUpperCase()}
+                            <AvatarFallback className="bg-teal-500 text-white font-black text-lg">
+                              {selectedConversation.participant.name?.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           {isParticipantOnline(selectedConversation.participant.id) && (
@@ -834,7 +906,7 @@ const InstructorChatDashboard = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setIsDesktopChatFullscreen((v) => !v)}
-                          className="hidden lg:inline-flex p-2 rounded-full hover:bg-slate-100 text-slate-400"
+                          className="hidden lg:inline-flex p-2 rounded-full hover:bg-slate-50 text-slate-400 border-2 border-slate-100 shadow-sm transition-all"
                           title={isDesktopChatFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
                         >
                           {isDesktopChatFullscreen ? (
@@ -868,7 +940,7 @@ const InstructorChatDashboard = () => {
                     {/* Messages Area */}
                     <div
                       ref={messagesRef}
-                      className="flex-1 overflow-y-auto px-3 lg:px-6 py-4 lg:py-6 space-y-4 lg:space-y-6 min-h-0"
+                      className="flex-1 overflow-y-auto p-4 space-y-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-slate-100/50 min-h-0"
                     >
                       {messagesLoading ? (
                         <div className="flex items-center justify-center h-full">
@@ -935,14 +1007,14 @@ const InstructorChatDashboard = () => {
                                     )}
                                     
                                     <div
-                                      className={`relative px-4 lg:px-5 py-3 lg:py-4 shadow-sm border-2 max-w-[85%] sm:max-w-md ${
+                                      className={`relative px-4 py-3 rounded-2xl shadow-sm border-2 text-sm md:text-base ${
                                         isCurrentUser
                                           ? message.isDeleted
-                                            ? "bg-slate-100 border-slate-300 text-slate-500 italic rounded-2xl lg:rounded-3xl"
-                                            : "bg-linear-to-br from-emerald-400 to-teal-400 border-emerald-600 text-white rounded-3xl lg:rounded-4xl rounded-tr-none shadow-[2px_4px_0_0_#059669]"
+                                            ? "bg-slate-100 border-slate-300 text-slate-500 italic"
+                                            : "bg-emerald-500 border-emerald-600 text-white rounded-tr-none shadow-[2px_3px_0_0_#047857]"
                                           : message.isDeleted
-                                          ? "bg-slate-50 border-slate-200 text-slate-400 italic rounded-2xl lg:rounded-3xl"
-                                          : "bg-white border-slate-200 text-slate-800 rounded-3xl lg:rounded-4xl rounded-tl-none shadow-[2px_4px_0_0_#e2e8f0]"
+                                          ? "bg-slate-50 border-slate-200 text-slate-400 italic"
+                                          : "bg-white border-slate-200 text-slate-800 rounded-tl-none shadow-[2px_3px_0_0_#cbd5e1]"
                                       }`}
                                     >
                                       {editingMessageId === message.id ? (
@@ -1050,7 +1122,7 @@ const InstructorChatDashboard = () => {
                     </div>
 
                     {/* Message Input / Monitor Mode indicator */}
-                    <div className="p-3 lg:p-4 bg-white/80 backdrop-blur-sm relative z-20 shrink-0">
+                    <div className="p-3 lg:p-4 bg-white border-t-2 border-slate-100 z-20 shrink-0">
                       {role === "admin" || role === "super_admin" ? (
                         <div className="flex items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
                           <div className="flex items-center gap-3 text-slate-400">
@@ -1067,10 +1139,10 @@ const InstructorChatDashboard = () => {
                             onChange={handleFileSelect}
                             accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
                           />
-                          <div className="bg-white rounded-2xl lg:rounded-4xl border-2 border-slate-200 shadow-lg p-1.5 lg:p-2 flex items-end gap-2 focus-within:border-emerald-400 focus-within:shadow-[0_0_0_3px_rgba(52,211,153,0.2)] transition-all">
+                          <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-3xl border-2 border-slate-200 focus-within:border-emerald-400 focus-within:shadow-[0_0_0_2px_rgba(52,211,153,0.2)] transition-all">
                             <button
                               type="button"
-                              className="p-2 lg:p-3 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-full transition-all disabled:opacity-50 shrink-0"
+                              className="p-2.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-full transition-all disabled:opacity-50 shrink-0"
                               onClick={() => fileInputRef.current?.click()}
                               disabled={uploadingFile}
                             >
@@ -1079,28 +1151,28 @@ const InstructorChatDashboard = () => {
                                   <Loader2 className="h-5 w-5 animate-spin" />
                                 </div>
                               ) : (
-                                <Paperclip className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
+                                <Paperclip className="h-6 w-6" strokeWidth={2.5} />
                               )}
                             </button>
                             
                             <Textarea
-                              placeholder="Ketik pesan..."
+                              placeholder="Tulis pesan..."
                               value={messageDraft}
                               onChange={(e) => {
                                 setMessageDraft(e.target.value);
                                 handleTyping();
                               }}
                               onKeyDown={handleKeyDown}
-                              className="flex-1 min-h-10 lg:min-h-12 max-h-28 lg:max-h-32 border-0 focus:ring-0 shadow-none resize-none py-2 lg:py-3 text-sm lg:text-base text-slate-700 font-medium placeholder:text-slate-400 bg-transparent"
+                              className="flex-1 bg-transparent border-none shadow-none focus-visible:ring-0 min-h-11 max-h-32 py-2.5 px-2 text-sm md:text-base font-medium text-slate-700 placeholder:text-slate-400 resize-none"
                               rows={1}
                             />
                             
                             <button
                               onClick={handleSendMessage}
-                              disabled={!messageDraft.trim()}
-                              className="p-2 lg:p-3 bg-linear-to-r from-emerald-400 to-teal-400 text-white rounded-full shadow-[0_3px_0_0_#059669] lg:shadow-[0_4px_0_0_#059669] hover:-translate-y-1 hover:shadow-[0_5px_0_0_#059669] lg:hover:shadow-[0_6px_0_0_#059669] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none shrink-0"
+                              disabled={!messageDraft.trim() && !uploadingFile}
+                              className="p-2.5 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_0_0_#047857] active:translate-y-0.5 active:shadow-none transition-all shrink-0"
                             >
-                              <Send className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
+                              <Send className="h-5 w-5" strokeWidth={3} />
                             </button>
                           </div>
                         </>
@@ -1111,9 +1183,9 @@ const InstructorChatDashboard = () => {
                   <div className="flex flex-1 flex-col items-center justify-center p-6 text-center relative">
                     {/* Fullscreen Toggle for Empty State */}
                     <div className="absolute top-4 right-4 hidden lg:block">
-                      <button
-                        onClick={() => setIsDesktopChatFullscreen((v) => !v)}
-                        className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 transition-all shadow-sm bg-white border-2 border-slate-100"
+                        <button
+                          onClick={() => setIsDesktopChatFullscreen((v) => !v)}
+                          className="p-2 rounded-full hover:bg-slate-50 text-slate-400 transition-all shadow-sm bg-white border-2 border-slate-100"
                         title={isDesktopChatFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
                       >
                         {isDesktopChatFullscreen ? (
@@ -1131,8 +1203,15 @@ const InstructorChatDashboard = () => {
                       Pilih Percakapan
                     </h2>
                     <p className="text-slate-500 font-medium max-w-sm">
-                      Pilih percakapan dari daftar di sebelah kiri atau tunggu peserta didik memulai chat
+                      Pilih percakapan dari daftar di sebelah kiri atau mulai chat baru dengan peserta.
                     </p>
+                    <button
+                      onClick={() => setShowNewChatModal(true)}
+                      className="mt-8 bg-emerald-400 hover:bg-emerald-500 text-white font-black rounded-2xl h-12 px-8 border-b-4 border-emerald-600 active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2"
+                    >
+                      <MessageSquarePlus className="h-5 w-5" strokeWidth={3} />
+                      Mulai Chat Baru
+                    </button>
                   </div>
                 )}
               </div>
@@ -1213,6 +1292,91 @@ const InstructorChatDashboard = () => {
                   Batal
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Chat Modal */}
+      {showNewChatModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-md max-h-[85dvh] flex flex-col overflow-hidden border-4 border-emerald-500 shadow-[10px_10px_0_0_#065f46] animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 border-b-4 border-slate-100 bg-emerald-50 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight">Mulai Chat</h3>
+                <p className="text-xs font-bold text-emerald-600 mt-0.5">Pilih anggota/peserta didik</p>
+              </div>
+              <button 
+                onClick={() => { setShowNewChatModal(false); setModalSearchTerm(""); }} 
+                className="p-2.5 hover:bg-white rounded-2xl border-2 border-transparent hover:border-slate-200 transition-all active:scale-95 shadow-sm hover:shadow-orange-100"
+              >
+                <X className="h-6 w-6 text-slate-500" strokeWidth={3} />
+              </button>
+            </div>
+
+            {/* Search Bar within Modal */}
+            <div className="px-6 py-4 bg-white border-b-2 border-slate-50 shrink-0">
+              <div className="relative group">
+                <Input
+                  value={modalSearchTerm}
+                  onChange={(e) => setModalSearchTerm(e.target.value)}
+                  placeholder="Cari nama anggota..."
+                  className="pl-14 py-4 rounded-3xl border-[3px] border-slate-200 focus:border-emerald-400 focus:ring-0 transition-all font-bold placeholder:text-slate-300 shadow-[0_4px_0_0_#34d399] h-14"
+                />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-emerald-500 transition-colors pointer-events-none" strokeWidth={3} />
+              </div>
+            </div>
+
+            {/* User List Area */}
+            <div className="overflow-y-auto p-3 flex-1 custom-scrollbar bg-slate-50/30">
+              {usersList.filter(user => user.name.toLowerCase().includes(modalSearchTerm.toLowerCase())).length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 border-2 border-slate-200">
+                    <Search className="h-10 w-10 text-slate-300" strokeWidth={2} />
+                  </div>
+                  <p className="text-slate-500 font-black text-lg">Tidak ditemukan</p>
+                  <p className="text-sm text-slate-400 font-bold mt-1">Coba cari dengan nama atau kata kunci lain</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2">
+                  {usersList
+                    .filter(user => user.name.toLowerCase().includes(modalSearchTerm.toLowerCase()))
+                    .map(user => (
+                      <button 
+                        key={user.id} 
+                        onClick={() => startConversation(user.id)} 
+                        className="group w-full flex items-center gap-4 p-4 rounded-3xl bg-white border-[3px] border-slate-100 hover:border-emerald-200 shadow-[0_4px_0_0_#34d399] hover:shadow-[0_4px_0_0_#10b981] hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all text-left animate-in slide-in-from-bottom-2 duration-200"
+                      >
+                        <div className="relative shrink-0">
+                          <Avatar className="h-12 w-12 border-[3px] border-white shadow-sm group-hover:border-emerald-100 transition-colors">
+                            <AvatarImage src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
+                            <AvatarFallback className="bg-teal-500 text-white font-black text-lg">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <div className={`absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm`}>
+                            <div className={`w-3 h-3 rounded-full ${onlineUsers.has(user.id) ? 'bg-emerald-400 animate-pulse' : 'bg-slate-300'}`} />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-slate-800 text-base truncate group-hover:text-emerald-600 transition-colors tracking-tight">{user.name}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border-2 ${onlineUsers.has(user.id) ? 'text-emerald-500 bg-emerald-50 border-emerald-100' : 'text-slate-400 bg-slate-50 border-slate-100'}`}>
+                              {onlineUsers.has(user.id) ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 bg-emerald-50 p-2 rounded-xl border-2 border-emerald-100 text-emerald-500">
+                          <MessageSquarePlus className="h-5 w-5" strokeWidth={3} />
+                        </div>
+                      </button>
+                    ))
+                  }
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 bg-slate-50 border-t-2 border-slate-100 flex justify-center shrink-0">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tetap jaga profesionalitas dengan anggota!</p>
             </div>
           </div>
         </div>

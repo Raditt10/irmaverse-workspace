@@ -468,8 +468,8 @@ const Profile = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {activities.map((activity) => (
+                      <div className="space-y-4 max-h-130 overflow-y-auto pr-2 custom-scrollbar">
+                        {activities.slice(0, 7).map((activity) => (
                           <div
                             key={activity.id}
                             className="flex items-center gap-4 p-4 rounded-3xl border-2 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-200 hover:shadow-sm transition-all duration-300 group"

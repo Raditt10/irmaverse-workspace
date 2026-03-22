@@ -22,6 +22,7 @@ import {
   XCircle,
   HelpCircle,
   CheckCircle2,
+  Check,
 } from "lucide-react";
 
 interface Quiz {
@@ -261,7 +262,7 @@ const QuizHome = () => {
                       ] as const)
                     : []),
                   { key: "standalone", label: "Mandiri" },
-                  { key: "material", label: "Materi" },
+                  { key: "material", label: "Kajian" },
                 ] as const
               ).map((f: any) => (
                 <button
@@ -292,13 +293,10 @@ const QuizHome = () => {
                     <div className="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center transform rotate-3 shadow-lg shadow-emerald-200 group-hover:rotate-6 transition-transform duration-500">
                       <Zap className="h-10 w-10 text-white" fill="currentColor" />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-amber-400 rounded-xl border-2 border-white flex items-center justify-center shadow-md animate-bounce-slow">
-                      <Trophy className="h-4 w-4 text-white" fill="currentColor" />
-                    </div>
                   </div>
                   <div>
                     <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">
-                      Total XP Quiz
+                      Total XP dari Kuis
                     </span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl lg:text-5xl font-black text-slate-800 tracking-tight">
@@ -313,8 +311,8 @@ const QuizHome = () => {
                 <div className="flex-1 p-6 lg:p-8 flex flex-col sm:flex-row items-center justify-around gap-8 bg-white/50 backdrop-blur-sm">
                   {/* Quizzes Completed */}
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center border border-blue-100">
-                      <CheckCircle2 className="h-6 w-6 text-blue-500" />
+                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100">
+                      <CheckCircle2 className="h-6 w-6 text-emerald-500" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">
@@ -331,8 +329,8 @@ const QuizHome = () => {
 
                   {/* Average Accuracy */}
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100">
-                      <Target className="h-6 w-6 text-amber-500" />
+                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100">
+                      <Target className="h-6 w-6 text-emerald-500" />
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">
@@ -344,7 +342,7 @@ const QuizHome = () => {
                         </span>
                         <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden ml-2">
                           <div 
-                            className="h-full bg-amber-400 transition-all duration-1000 ease-out"
+                            className="h-full bg-emerald-500 transition-all duration-1000 ease-out"
                             style={{ width: `${quizStats.accuracy}%` }}
                           />
                         </div>
@@ -425,8 +423,8 @@ const QuizHome = () => {
                     {!isStaffRole && (
                       <div className="absolute bottom-3 right-3 z-10">
                         {quiz.status === "completed" ? (
-                          <div className="w-11 h-11 bg-amber-400 rounded-xl flex items-center justify-center border-2 border-white shadow-[0_3px_0_0_#d97706] group-hover:rotate-6 transition-transform">
-                            <Medal className="h-5 w-5 text-white" fill="currentColor" />
+                          <div className="w-11 h-11 bg-emerald-500 rounded-xl flex items-center justify-center border-2 border-white shadow-[0_3px_0_0_#059669] group-hover:rotate-6 transition-transform">
+                            <Check className="h-6 w-6 text-white" strokeWidth={4} />
                           </div>
                         ) : (
                           <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center border-2 border-slate-100 shadow-[0_3px_0_0_#e2e8f0] group-hover:scale-110 transition-transform">
