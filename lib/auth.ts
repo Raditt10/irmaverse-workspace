@@ -23,6 +23,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const user = await prisma.users.findUnique({
           where: { email: credentials.email as string },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            role: true,
+            notelp: true,
+            address: true,
+            bio: true,
+            avatar: true,
+          },
         });
 
         if (!user || !user.password) {
@@ -59,25 +70,78 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        const email = user.email;
-        if (!email) return false;
+      try {
+        if (account?.provider === "google") {
+          const email = user.email;
+          if (!email) return false;
 
-        const existingUser = await prisma.users.findUnique({
-          where: { email },
-          include: { accounts: true },
-        });
+          const existingUser = await prisma.users.findUnique({
+            where: { email },
+            select: {
+              id: true,
+              avatar: true,
+              accounts: {
+                select: {
+                  provider: true,
+                },
+              },
+            },
+          });
 
-        if (existingUser) {
-          // Link Google account if not already linked
-          const hasGoogle = existingUser.accounts.some(
-            (a) => a.provider === "google",
-          );
-          if (!hasGoogle) {
+          if (existingUser) {
+            // Link Google account if not already linked
+            const hasGoogle = existingUser.accounts.some(
+              (a) => a.provider === "google",
+            );
+            if (!hasGoogle) {
+              await prisma.accounts.create({
+                data: {
+                  id: crypto.randomUUID(),
+                  userId: existingUser.id,
+                  type: account.type,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  access_token: account.access_token,
+                  refresh_token: account.refresh_token,
+                  expires_at: account.expires_at,
+                  token_type: account.token_type,
+                  scope: account.scope,
+                  id_token: account.id_token,
+                  session_state: account.session_state as string | undefined,
+                },
+              });
+            }
+
+            // Update avatar from Google if user doesn't have one
+            if (!existingUser.avatar && user.image) {
+              await prisma.users.update({
+                where: { id: existingUser.id },
+                data: {
+                  avatar: user.image,
+                  updatedAt: new Date(),
+                },
+              });
+            }
+
+            return true;
+          } else {
+            // New user from Google
+            const newUser = await prisma.users.create({
+              data: {
+                id: crypto.randomUUID(),
+                email,
+                name: user.name || email.split("@")[0],
+                password: null,
+                avatar: user.image,
+                role: "user",
+                updatedAt: new Date(),
+              },
+            });
+
             await prisma.accounts.create({
               data: {
                 id: crypto.randomUUID(),
-                userId: existingUser.id,
+                userId: newUser.id,
                 type: account.type,
                 provider: account.provider,
                 providerAccountId: account.providerAccountId,
@@ -90,56 +154,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session_state: account.session_state as string | undefined,
               },
             });
+
+            return true;
           }
-
-          // Update avatar from Google if user doesn't have one
-          if (!existingUser.avatar && user.image) {
-            await prisma.users.update({
-              where: { id: existingUser.id },
-              data: { 
-                avatar: user.image,
-                updatedAt: new Date()
-              },
-            });
-          }
-
-          return true;
-        } else {
-          // New user from Google
-          const newUser = await prisma.users.create({
-            data: {
-              id: crypto.randomUUID(),
-              email,
-              name: user.name || email.split("@")[0],
-              password: null,
-              avatar: user.image,
-              role: "user",
-              updatedAt: new Date()
-            },
-          });
-
-          await prisma.accounts.create({
-            data: {
-              id: crypto.randomUUID(),
-              userId: newUser.id,
-              type: account.type,
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-              access_token: account.access_token,
-              refresh_token: account.refresh_token,
-              expires_at: account.expires_at,
-              token_type: account.token_type,
-              scope: account.scope,
-              id_token: account.id_token,
-              session_state: account.session_state as string | undefined,
-            },
-          });
-
-          return true;
         }
-      }
 
-      return true;
+        return true;
+      } catch (error) {
+        console.error("[auth] signIn callback error:", error);
+        return false;
+      }
     },
 
     async jwt({ token, user, account, trigger, session }) {
@@ -147,6 +171,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (account?.provider === "google") {
           const dbUser = await prisma.users.findUnique({
             where: { email: user.email! },
+            select: {
+              id: true,
+              role: true,
+              avatar: true,
+            },
           });
           if (dbUser) {
             token.id = dbUser.id;

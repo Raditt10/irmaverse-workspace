@@ -256,15 +256,16 @@ export default function FriendsPage() {
                   ? "Kamu sudah mengikuti semua pengguna!"
                   : "Mulai ikuti pengguna lain untuk membangun koneksi."}
               </p>
-              {activeTab !== "suggestions" && (activeTab as any) === "NEVER_SHOW_THIS" && (
-                <button
-                  onClick={() => setActiveTab("suggestions")}
-                  className="mt-4 flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  Cari Teman Baru
-                </button>
-              )}
+              {activeTab !== "suggestions" &&
+                (activeTab as any) === "NEVER_SHOW_THIS" && (
+                  <button
+                    onClick={() => setActiveTab("suggestions")}
+                    className="mt-4 flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Cari Teman Baru
+                  </button>
+                )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
@@ -337,24 +338,35 @@ export default function FriendsPage() {
                     >
                       <UserIcon className="h-4 w-4" /> Profil
                     </button>
+                    {activeTab === "friends" &&
+                      session?.user?.id !== user.id && (
+                        <button
+                          onClick={() =>
+                            router.push(`/friends/chat?userId=${user.id}`)
+                          }
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-xl border-2 border-emerald-200 hover:bg-emerald-100 transition-colors text-xs"
+                        >
+                          <MessageCircle className="h-4 w-4" /> Chat
+                        </button>
+                      )}
                     {session?.user?.id !== user.id && ( // Hide if it's ourself (rare but good check)
-                        <FollowButton
-                          targetUserId={user.id}
-                          initialIsFollowing={
-                            activeTab === "friends" ||
-                            activeTab === "following" ||
-                            !!user.iFollowBack
-                          }
-                          initialIsMutual={
-                            activeTab === "friends" ||
-                            (activeTab === "followers" && !!user.iFollowBack)
-                          }
-                          size="sm"
-                          className="flex-1 py-1.5"
-                          onStatusChange={() => {
-                            fetchCounts();
-                          }}
-                        />
+                      <FollowButton
+                        targetUserId={user.id}
+                        initialIsFollowing={
+                          activeTab === "friends" ||
+                          activeTab === "following" ||
+                          !!user.iFollowBack
+                        }
+                        initialIsMutual={
+                          activeTab === "friends" ||
+                          (activeTab === "followers" && !!user.iFollowBack)
+                        }
+                        size="sm"
+                        className="flex-1 py-1.5"
+                        onStatusChange={() => {
+                          fetchCounts();
+                        }}
+                      />
                     )}
                   </div>
                 </div>
