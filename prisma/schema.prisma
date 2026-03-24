@@ -502,6 +502,7 @@ model user_feedback_reports {
   type        user_feedback_reports_type
   title       String
   description String                       @db.Text
+  screenshotUrl String?
   status      user_feedback_reports_status @default(open)
   adminNote   String?                      @db.Text
   createdAt   DateTime                     @default(now())

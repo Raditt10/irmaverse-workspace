@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
         fr.type,
         fr.title,
         fr.description,
+        fr.screenshotUrl,
         fr.status,
         fr.adminNote,
         fr.createdAt,

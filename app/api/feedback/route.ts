@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
         fr.type,
         fr.title,
         fr.description,
+        fr.screenshotUrl,
         fr.status,
         fr.adminNote,
         fr.createdAt,
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { type, title, description } = body;
+    const { type, title, description, screenshotUrl } = body;
 
     if (!type || !FEEDBACK_TYPES.includes(type)) {
       return NextResponse.json(
@@ -113,6 +114,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (
+      screenshotUrl &&
+      (typeof screenshotUrl !== "string" || screenshotUrl.length > 500)
+    ) {
+      return NextResponse.json(
+        { error: "Format screenshot tidak valid" },
+        { status: 400 },
+      );
+    }
+
     await ensureFeedbackReportsTable();
 
     const id = crypto.randomUUID();
@@ -120,15 +131,16 @@ export async function POST(req: NextRequest) {
     await prisma.$executeRawUnsafe(
       `
       INSERT INTO user_feedback_reports
-        (id, userId, type, title, description, status, createdAt, updatedAt)
+        (id, userId, type, title, description, screenshotUrl, status, createdAt, updatedAt)
       VALUES
-        (?, ?, ?, ?, ?, 'open', NOW(3), NOW(3))
+        (?, ?, ?, ?, ?, ?, 'open', NOW(3), NOW(3))
       `,
       id,
       session.user.id,
       type,
       title.trim(),
       description.trim(),
+      screenshotUrl?.trim() || null,
     );
 
     return NextResponse.json(

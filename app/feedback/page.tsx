@@ -15,6 +15,7 @@ import {
   CircleCheck,
   Eye,
   XCircle,
+  ImagePlus,
 } from "lucide-react";
 
 type FeedbackType = "bug" | "feature";
@@ -25,6 +26,7 @@ interface FeedbackItem {
   type: FeedbackType;
   title: string;
   description: string;
+  screenshotUrl?: string | null;
   status: FeedbackStatus;
   adminNote?: string | null;
   createdAt: string;
@@ -69,8 +71,10 @@ export default function FeedbackPage() {
   const [items, setItems] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingScreenshot, setUploadingScreenshot] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
 
   const [form, setForm] = useState({
     type: "bug" as FeedbackType,
@@ -126,21 +130,45 @@ export default function FeedbackPage() {
 
     try {
       setSubmitting(true);
+
+      let screenshotUrl: string | null = null;
+      if (form.type === "bug" && screenshotFile) {
+        setUploadingScreenshot(true);
+        const uploadForm = new FormData();
+        uploadForm.append("file", screenshotFile);
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: uploadForm,
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) {
+          throw new Error(uploadData.error || "Gagal upload screenshot");
+        }
+
+        screenshotUrl = uploadData.url;
+      }
+
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          screenshotUrl,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal mengirim laporan");
 
       setSuccess("Laporan berhasil dikirim. Terima kasih!");
       setForm({ type: "bug", title: "", description: "" });
+      setScreenshotFile(null);
       fetchMyReports();
     } catch (e: any) {
       setError(e.message || "Gagal mengirim laporan");
     } finally {
       setSubmitting(false);
+      setUploadingScreenshot(false);
     }
   }
 
@@ -252,6 +280,53 @@ export default function FeedbackPage() {
                   />
                 </div>
 
+                {form.type === "bug" && (
+                  <div>
+                    <label className="block text-sm font-black text-slate-700 mb-1">
+                      Screenshot (opsional)
+                    </label>
+                    <label className="w-full rounded-xl border-2 border-dashed border-slate-300 px-4 py-5 text-sm font-bold text-slate-500 hover:border-teal-400 hover:text-teal-600 transition-all cursor-pointer flex items-center gap-2 justify-center">
+                      <ImagePlus className="h-4 w-4" />
+                      {screenshotFile
+                        ? `Terpilih: ${screenshotFile.name}`
+                        : "Pilih gambar screenshot"}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        className="hidden"
+                        onChange={(e) =>
+                          setScreenshotFile(e.target.files?.[0] || null)
+                        }
+                      />
+                    </label>
+                    {screenshotFile && (
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setScreenshotFile(null)}
+                          className="flex-1 px-3 py-2 rounded-lg border-2 border-rose-300 bg-rose-50 text-rose-700 font-bold text-xs hover:bg-rose-100 transition-all"
+                        >
+                          Hapus
+                        </button>
+                        <label className="flex-1 px-3 py-2 rounded-lg border-2 border-teal-300 bg-teal-50 text-teal-700 font-bold text-xs hover:bg-teal-100 transition-all cursor-pointer flex items-center justify-center">
+                          Ganti
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp,image/gif"
+                            className="hidden"
+                            onChange={(e) =>
+                              setScreenshotFile(e.target.files?.[0] || null)
+                            }
+                          />
+                        </label>
+                      </div>
+                    )}
+                    <p className="mt-1 text-xs font-bold text-slate-400">
+                      Format: JPG/PNG/GIF/WebP, max 5MB.
+                    </p>
+                  </div>
+                )}
+
                 {error && (
                   <div className="rounded-xl border-2 border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
                     {error}
@@ -269,7 +344,11 @@ export default function FeedbackPage() {
                   className="w-full md:w-auto px-5 py-3 rounded-xl bg-teal-500 text-white font-black border-2 border-teal-600 shadow-[0_4px_0_0_#0f766e] hover:translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Send className="h-4 w-4" />
-                  {submitting ? "Mengirim..." : "Kirim Laporan"}
+                  {submitting
+                    ? uploadingScreenshot
+                      ? "Upload screenshot..."
+                      : "Mengirim..."
+                    : "Kirim Laporan"}
                 </button>
               </form>
             </div>
@@ -352,6 +431,21 @@ export default function FeedbackPage() {
                       <p className="text-slate-600 font-medium mt-1 whitespace-pre-line">
                         {item.description}
                       </p>
+
+                      {item.screenshotUrl && (
+                        <a
+                          href={item.screenshotUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 block"
+                        >
+                          <img
+                            src={item.screenshotUrl}
+                            alt="Screenshot laporan"
+                            className="max-h-64 w-auto rounded-xl border-2 border-slate-200 hover:border-teal-300 transition-all"
+                          />
+                        </a>
+                      )}
 
                       {item.adminNote && (
                         <div className="mt-3 rounded-xl border-2 border-teal-100 bg-teal-50 p-3">

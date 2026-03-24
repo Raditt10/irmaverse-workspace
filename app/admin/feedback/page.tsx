@@ -20,6 +20,7 @@ interface FeedbackReport {
   type: FeedbackType;
   title: string;
   description: string;
+  screenshotUrl?: string | null;
   status: FeedbackStatus;
   adminNote?: string | null;
   createdAt: string;
@@ -265,6 +266,21 @@ export default function AdminFeedbackPage() {
                   <p className="mt-1 text-slate-600 font-medium whitespace-pre-line">
                     {report.description}
                   </p>
+
+                  {report.screenshotUrl && (
+                    <a
+                      href={report.screenshotUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-3 block"
+                    >
+                      <img
+                        src={report.screenshotUrl}
+                        alt="Screenshot laporan"
+                        className="max-h-64 w-auto rounded-xl border-2 border-slate-200 hover:border-teal-300 transition-all"
+                      />
+                    </a>
+                  )}
 
                   <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-3 items-start">
                     <select

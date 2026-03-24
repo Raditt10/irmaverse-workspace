@@ -8,6 +8,7 @@ export async function ensureFeedbackReportsTable() {
       type ENUM('bug','feature') NOT NULL,
       title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
+      screenshotUrl VARCHAR(500) NULL,
       status ENUM('open','in_review','done','rejected') NOT NULL DEFAULT 'open',
       adminNote TEXT NULL,
       createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -21,6 +22,11 @@ export async function ensureFeedbackReportsTable() {
         FOREIGN KEY (userId) REFERENCES users(id)
         ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE user_feedback_reports
+    ADD COLUMN IF NOT EXISTS screenshotUrl VARCHAR(500) NULL;
   `);
 }
 
