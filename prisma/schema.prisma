@@ -492,7 +492,26 @@ model users {
   quiz_attempts                                                 quiz_attempts[]
   saved_news                                                    saved_news[]
   schedules                                                     schedules[]
+  user_feedback_reports                                         user_feedback_reports[]
   user_badges                                                   user_badges[]
+}
+
+model user_feedback_reports {
+  id          String                       @id
+  userId      String
+  type        user_feedback_reports_type
+  title       String
+  description String                       @db.Text
+  status      user_feedback_reports_status @default(open)
+  adminNote   String?                      @db.Text
+  createdAt   DateTime                     @default(now())
+  updatedAt   DateTime
+  users       users                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([type])
+  @@index([userId])
 }
 
 enum activity_logs_type {
@@ -599,4 +618,16 @@ enum users_role {
   admin
   super_admin
   instruktur
+}
+
+enum user_feedback_reports_type {
+  bug
+  feature
+}
+
+enum user_feedback_reports_status {
+  open
+  in_review
+  done
+  rejected
 }

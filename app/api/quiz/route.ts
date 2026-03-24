@@ -17,14 +17,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const isPrivileged = user.role === "instruktur" || user.role === "admin" || user.role === "super_admin";
+    const isPrivileged =
+      user.role === "instruktur" ||
+      user.role === "admin" ||
+      user.role === "super_admin";
 
     // Build a set of INACTIVE quiz IDs to exclude (non-privileged users only)
     let inactiveQuizIdSet: Set<string> = new Set();
     if (!isPrivileged) {
       try {
-        const inactiveRows: any[] = await prisma.$queryRaw`SELECT id FROM material_quizzes WHERE isActive = 0`;
-        inactiveQuizIdSet = new Set(inactiveRows.map(q => String(q.id)));
+        const inactiveRows: any[] =
+          await prisma.$queryRaw`SELECT id FROM material_quizzes WHERE isActive = 0`;
+        inactiveQuizIdSet = new Set(inactiveRows.map((q) => String(q.id)));
       } catch (e) {
         // If column doesn't exist yet, show all quizzes (safe fallback)
         console.warn("isActive column query failed, showing all quizzes:", e);
@@ -50,7 +54,7 @@ export async function GET(req: NextRequest) {
     // Filter inactive quizzes for regular users
     const standaloneQuizzes = isPrivileged
       ? allStandaloneQuizzes
-      : allStandaloneQuizzes.filter(q => !inactiveQuizIdSet.has(q.id));
+      : allStandaloneQuizzes.filter((q) => !inactiveQuizIdSet.has(q.id));
 
     // 2. Material-bound quizzes
     let materialQuizzes: any[] = [];
@@ -95,22 +99,35 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "desc" },
         });
         // Filter inactive quizzes
-        materialQuizzes = allMaterialQuizzes.filter(q => !inactiveQuizIdSet.has(q.id));
+        materialQuizzes = allMaterialQuizzes.filter(
+          (q) => !inactiveQuizIdSet.has(q.id),
+        );
       }
     }
 
-    // 3. Total XP earned from quizzes (from activity_logs)
-    const quizXpAgg = await prisma.activity_logs.aggregate({
+    const visibleQuizIds = new Set<string>([
+      ...standaloneQuizzes.map((q) => q.id),
+      ...materialQuizzes.map((q: any) => q.id),
+    ]);
+
+    // 3. Total XP earned from quizzes shown on this page only
+    const quizLogs = await prisma.activity_logs.findMany({
       where: {
         userId: session.user.id,
         type: "quiz_completed",
       },
-      _sum: {
+      select: {
         xpEarned: true,
+        metadata: true,
       },
     });
 
-    const totalQuizXp = quizXpAgg._sum.xpEarned || 0;
+    const totalQuizXp = quizLogs.reduce((sum, log: any) => {
+      const quizId = log?.metadata?.quizId as string | undefined;
+      if (!quizId) return sum;
+      if (!visibleQuizIds.has(quizId)) return sum;
+      return sum + (log.xpEarned || 0);
+    }, 0);
 
     // Format results
     const quizzes = [
@@ -167,7 +184,12 @@ export async function POST(req: NextRequest) {
     const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
+    if (
+      !user ||
+      (user.role !== "instruktur" &&
+        user.role !== "admin" &&
+        user.role !== "super_admin")
+    ) {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa membuat quiz" },
         { status: 403 },
