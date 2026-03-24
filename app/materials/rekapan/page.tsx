@@ -10,6 +10,8 @@ import Loading from "@/components/ui/Loading";
 import EmptyState from "@/components/ui/EmptyState";
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import DetailButton from "@/components/ui/DetailButton";
+import DeleteButton from "@/components/ui/DeleteButton";
+import { toast } from "sonner";
 import {
   BookOpen,
   FileText,
@@ -155,6 +157,27 @@ const RekapanListPage = () => {
     }
   };
 
+  const handleDeleteRekapan = async (materialId: string) => {
+    try {
+      const res = await fetch(`/api/materials/${materialId}/rekapan`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal menghapus rekapan");
+      }
+
+      toast.success("Rekapan berhasil dihapus");
+      // Refresh data
+      fetchRekapan();
+      fetchInstructorMaterials();
+    } catch (error: any) {
+      console.error("Delete error:", error);
+      toast.error(error.message || "Terjadi kesalahan saat menghapus");
+    }
+  };
+
   const filteredRekapan = rekapanList.filter(
     (item) =>
       item.materialTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -285,7 +308,7 @@ const RekapanListPage = () => {
                               Anda (Instruktur)
                             </div>
                             <div className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></div>
-                            <div className="w-[6px] h-[6px] rounded-full bg-slate-300 hidden sm:block"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 hidden sm:block"></div>
                             <div className="flex items-center gap-1.5">
                               <Clock className="h-4 w-4 text-slate-400" />-
                             </div>
@@ -300,17 +323,25 @@ const RekapanListPage = () => {
                             }
                             iconOnly
                           />
+                          {(material.content || material.link) && (
+                            <DeleteButton
+                              onClick={() => handleDeleteRekapan(material.id)}
+                              variant="icon-only"
+                              className="h-13 w-13 rounded-xl"
+                              confirmMessage={`Apakah Anda yakin ingin menghapus rekapan untuk "${material.title}"?`}
+                            />
+                          )}
                           <button
                             onClick={() =>
                               router.push(
                                 `/materials/${material.id}/rekapan/edit`,
                               )
                             }
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 h-[52px] rounded-xl bg-white text-emerald-600 font-bold border-2 border-emerald-200 border-b-4 hover:bg-emerald-50 hover:border-emerald-400 hover:text-emerald-700 active:border-b-2 active:translate-y-0.5 transition-all text-sm"
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 h-13 rounded-xl bg-white text-emerald-600 font-bold border-2 border-emerald-200 border-b-4 hover:bg-emerald-50 hover:border-emerald-400 hover:text-emerald-700 active:border-b-2 active:translate-y-0.5 transition-all text-sm"
                           >
                             {material.content || material.link
                               ? "Edit Rekapan"
-                              : "Tambah Rekapan"}
+                              : "Tambahkan Rekapan Materi"}
                           </button>
                         </div>
                       </div>
@@ -323,7 +354,7 @@ const RekapanListPage = () => {
               <>
                 {/* --- STATISTIK CARDS --- */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                    <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
+                    <div className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
                       <div className="p-4 bg-emerald-100 rounded-2xl border border-emerald-200">
                         <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                       </div>
@@ -340,7 +371,7 @@ const RekapanListPage = () => {
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
+                    <div className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
                       <div className="p-4 bg-red-100 rounded-2xl border border-red-200">
                         <XCircle className="h-8 w-8 text-red-600" />
                     </div>

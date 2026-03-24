@@ -389,7 +389,8 @@ model quiz_questions {
 model rekapan {
   id         String    @id
   materialId String?   @unique
-  content    String    @db.LongText
+  content    String?   @db.LongText
+  link       String?   @db.Text
   createdAt  DateTime  @default(now())
   updatedAt  DateTime
   material   material? @relation(fields: [materialId], references: [id])
