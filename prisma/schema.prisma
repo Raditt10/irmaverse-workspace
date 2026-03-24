@@ -118,6 +118,42 @@ model chat_messages {
   @@index([senderId])
 }
 
+model user_chat_conversations {
+  id              String                @id
+  user1Id         String
+  user2Id         String
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime
+  users_user1     users                 @relation("user_chat_conversations_user1", fields: [user1Id], references: [id], onDelete: Cascade)
+  users_user2     users                 @relation("user_chat_conversations_user2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages        user_chat_messages[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model user_chat_messages {
+  id              String                    @id
+  conversationId  String
+  senderId        String
+  content         String                    @db.Text
+  isRead          Boolean                   @default(false)
+  readAt          DateTime?
+  attachmentUrl   String?
+  attachmentType  String?
+  isEdited        Boolean                   @default(false)
+  editedAt        DateTime?
+  isDeleted       Boolean                   @default(false)
+  deletedAt       DateTime?
+  createdAt       DateTime                  @default(now())
+  conversation    user_chat_conversations   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender          users                     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
 model competitions {
   id              String                @id
   title           String
@@ -493,7 +529,30 @@ model users {
   quiz_attempts                                                 quiz_attempts[]
   saved_news                                                    saved_news[]
   schedules                                                     schedules[]
+  user_feedback_reports                                         user_feedback_reports[]
   user_badges                                                   user_badges[]
+  user_chat_conversations_user1                                 user_chat_conversations[] @relation("user_chat_conversations_user1")
+  user_chat_conversations_user2                                 user_chat_conversations[] @relation("user_chat_conversations_user2")
+  user_chat_messages                                            user_chat_messages[]
+}
+
+model user_feedback_reports {
+  id          String                       @id
+  userId      String
+  type        user_feedback_reports_type
+  title       String
+  description String                       @db.Text
+  screenshotUrl String?
+  status      user_feedback_reports_status @default(open)
+  adminNote   String?                      @db.Text
+  createdAt   DateTime                     @default(now())
+  updatedAt   DateTime
+  users       users                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([type])
+  @@index([userId])
 }
 
 enum activity_logs_type {
@@ -600,4 +659,16 @@ enum users_role {
   admin
   super_admin
   instruktur
+}
+
+enum user_feedback_reports_type {
+  bug
+  feature
+}
+
+enum user_feedback_reports_status {
+  open
+  in_review
+  done
+  rejected
 }

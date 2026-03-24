@@ -283,47 +283,52 @@ const Sidebar = () => {
           },
         ]
       : isAdmin
-      ? [
-          {
-            icon: Contact,
-            label: "Instruktur",
-            path: "/instructors",
-          },
-          {
-            icon: Users,
-            label: "Daftar Anggota",
-            path: "/members",
-          },
-        ]
-      : [
-          {
-            icon: Contact,
-            label: "Instruktur",
-            id: "menu-instruktur",
-            submenu: [
-              {
-                icon: Contact,
-                label: "Daftar Instruktur",
-                path: "/instructors",
-              },
-              {
-                icon: MessageCircle,
-                label: "Chat Instruktur",
-                path: "/instructors/chat",
-              },
-            ],
-          },
-          {
-            icon: Users,
-            label: "Daftar Anggota",
-            path: "/members",
-          },
-        ]),
+        ? [
+            {
+              icon: Contact,
+              label: "Instruktur",
+              path: "/instructors",
+            },
+            {
+              icon: Users,
+              label: "Daftar Anggota",
+              path: "/members",
+            },
+          ]
+        : [
+            {
+              icon: Contact,
+              label: "Instruktur",
+              id: "menu-instruktur",
+              submenu: [
+                {
+                  icon: Contact,
+                  label: "Daftar Instruktur",
+                  path: "/instructors",
+                },
+                {
+                  icon: MessageCircle,
+                  label: "Chat Instruktur",
+                  path: "/instructors/chat",
+                },
+              ],
+            },
+            {
+              icon: Users,
+              label: "Daftar Anggota",
+              path: "/members",
+            },
+          ]),
     // ----------------------------------------------------
     {
       icon: Newspaper,
       label: isInstruktur || isAdmin ? "Kelola Berita" : "Berita IRMA",
       path: "/news",
+    },
+    {
+      icon: ClipboardList,
+      label: "Lapor Bug / Request",
+      path: "/feedback",
     },
     ...(isAdmin
       ? [
@@ -351,6 +356,11 @@ const Sidebar = () => {
                     },
                   ]
                 : []),
+              {
+                icon: ClipboardList,
+                label: "Laporan User",
+                path: "/admin/feedback",
+              },
             ],
           },
         ]
