@@ -74,6 +74,7 @@ export async function GET(
       id: rekapan.id,
       materialId: rekapan.materialId,
       content: rekapan.content,
+      link: rekapan.link,
       createdAt: rekapan.createdAt,
       updatedAt: rekapan.updatedAt,
       material: {
@@ -131,26 +132,28 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { content } = body;
+    const { content, link } = body;
 
-    if (!content || !content.trim()) {
+    if ((!content || !content.trim()) && (!link || !link.trim())) {
       return NextResponse.json(
-        { error: "Konten rekapan tidak boleh kosong" },
+        { error: "Konten atau link rekapan tidak boleh kosong" },
         { status: 400 },
       );
     }
 
     // Upsert: create if not exists, update if exists
-    const rekapan = await prisma.rekapan.upsert({
+    const rekapan = await (prisma.rekapan as any).upsert({
       where: { materialId },
       create: {
         id: `rek-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
         materialId,
-        content: content.trim(),
+        content: content?.trim() || null,
+        link: link?.trim() || null,
         updatedAt: new Date(),
       },
       update: {
-        content: content.trim(),
+        content: content?.trim() || null,
+        link: link?.trim() || null,
         updatedAt: new Date(),
       },
     });
@@ -176,6 +179,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id: materialId } = await params;
+
     const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
@@ -183,10 +188,23 @@ export async function DELETE(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { id: materialId } = await params;
+    // 1. Try deleting from rekapan table (ignore if not found)
+    try {
+      await prisma.rekapan.delete({
+        where: { materialId },
+      });
+    } catch (e) {
+      // Record might not exist in the rekapan table, that's okay
+      console.log("No rekapan table record found for material", materialId);
+    }
 
-    await prisma.rekapan.delete({
-      where: { materialId },
+    // 2. Also clear content and link in material table if they exist
+    await prisma.material.update({
+      where: { id: materialId },
+      data: {
+        content: null,
+        link: null,
+      },
     });
 
     return NextResponse.json({ success: true, message: "Rekapan dihapus" });

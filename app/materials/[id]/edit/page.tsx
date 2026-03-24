@@ -356,10 +356,13 @@ const EditMaterial = () => {
         
       if (finalRekapanContent && materialId) {
         try {
+          const rekapanPayload = formData.materialType === "link"
+            ? { content: null, link: formData.materialLink.trim() }
+            : { content: formData.materialContent.split("\n").filter((l: string) => l.trim()).map((l: string) => `<p>${l}</p>`).join("\n"), link: null };
           await fetch(`/api/materials/${materialId}/rekapan`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: finalRekapanContent }),
+            body: JSON.stringify(rekapanPayload),
           });
         } catch (rekapanErr) {
           console.error("Error syncing rekapan on edit:", rekapanErr);
