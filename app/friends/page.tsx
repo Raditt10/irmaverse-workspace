@@ -19,6 +19,7 @@ import {
   Handshake,
   Sparkles,
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Tab = "friends" | "followers" | "following" | "suggestions";
@@ -173,16 +174,14 @@ export default function FriendsPage() {
 
         <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
           {/* ─── HEADER ─── */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-            <div className="text-center md:text-left">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-800 leading-tight">
-                Teman Belajar
-              </h1>
-              <p className="text-sm sm:text-base text-slate-500 font-medium mt-1 max-w-lg mx-auto md:mx-0">
-                Temukan dan berinteraksi dengan teman sesama pejuang ilmu.
-              </p>
-            </div>
-          </div>
+          <PageBanner
+            title="Teman Belajar"
+            description="Temukan dan berinteraksi dengan teman sesama pejuang ilmu."
+            icon={Handshake}
+            tag="Koneksi"
+            tagIcon={Handshake}
+            className="mb-8"
+          />
 
           {/* ─── TABS ─── */}
           <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">

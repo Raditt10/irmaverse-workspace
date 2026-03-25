@@ -21,6 +21,7 @@ import {
   Plus
 } from "lucide-react";
 import AddButton from "@/components/ui/AddButton";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Schedule {
   id: string;
@@ -167,18 +168,14 @@ const Schedule = () => {
         <div className="flex-1 px-6 lg:px-8 py-12 lg:ml-0">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  Kegiatan IRMA
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  Daftar kegiatan IRMA yang akan datang dan sedang berlangsung
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {(session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin") && (
+            <PageBanner
+              title="Kegiatan IRMA"
+              description="Daftar kegiatan IRMA yang akan datang dan sedang berlangsung"
+              icon={Calendar}
+              tag="Jadwal"
+              tagIcon={Calendar}
+              action={
+                (session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin") ? (
                   <AddButton
                     label="Buat Kegiatan"
                     onClick={() => router.push("/schedule/create")}
@@ -186,9 +183,9 @@ const Schedule = () => {
                     color="emerald"
                     hideIcon={false}
                   />
-                )}
-              </div>
-            </div>
+                ) : undefined
+              }
+            />
 
             {/* Filter & Search Bar */}
             {!loading && schedules.length > 0 && (

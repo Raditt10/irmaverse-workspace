@@ -86,21 +86,10 @@ export async function GET(
       );
     }
 
+    // Non-privileged users can view all materials, but isJoined controls
+    // whether the attendance section is shown in the UI.
     const isPrivileged = User.role === "instruktur" || User.role === "admin" || User.role === "super_admin";
 
-    // Access control: non-privileged users must be enrolled (courseenrollment)
-    // OR have an accepted invitation to view this material.
-    // Admins can see all.
-    if (User.role !== "admin" && User.role !== "super_admin") {
-      const isCreator = material.instructorId === User.id;
-      const hasEnrollment = (material as any).courseenrollment?.length > 0;
-      const hasAcceptedInvite = ((material as any).materialinvite || []).some(
-        (inv: any) => inv.status === "accepted",
-      );
-      if (!isCreator && !hasEnrollment && !hasAcceptedInvite) {
-        return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
-      }
-    }
 
     const CATEGORY_LABEL = {
       Wajib: "Program Wajib",

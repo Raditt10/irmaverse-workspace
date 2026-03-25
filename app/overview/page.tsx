@@ -412,7 +412,7 @@ const Dashboard = () => {
     { title: "Jadwal", icon: Calendar, link: "/materials" },
     { title: "Materi", icon: BookOpen, link: "/archivesch" },
     { title: "Kuis", icon: Trophy, link: "/quiz" },
-    { title: "Diskusi", icon: MessageCircle, link: "/chat-rooms" },
+    { title: "Diskusi", icon: MessageCircle, link: "/friends/chat" },
     { title: "Peringkat", icon: TrendingUp, link: "/leaderboard" },
   ];
 

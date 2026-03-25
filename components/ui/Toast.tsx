@@ -90,7 +90,7 @@ const Toast: React.FC<ToastProps> = ({ show, message, type, onClose, duration = 
   const animationClass = isExiting ? "toast-exit" : "toast-enter";
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-6 pointer-events-none">
+    <div className="fixed top-0 left-0 right-0 z-[110] flex justify-center pt-6 pointer-events-none">
       <div
         className={`pointer-events-auto rounded-xl px-5 py-3 flex items-center gap-3 min-w-65 max-w-[90vw] text-white bg-linear-to-r ${getGradient()} ${animationClass}`}
         style={{ boxShadow: getBoxShadow() }}

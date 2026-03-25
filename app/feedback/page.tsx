@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import Loading from "@/components/ui/Loading";
+import Toast from "@/components/ui/Toast";
 import {
   Bug,
   Lightbulb,
@@ -179,6 +180,23 @@ export default function FeedbackPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
       <DashboardHeader />
+      
+      <Toast
+        show={!!success}
+        message={success}
+        type="success"
+        onClose={() => setSuccess("")}
+        duration={5000}
+      />
+      
+      <Toast
+        show={!!error}
+        message={error}
+        type="error"
+        onClose={() => setError("")}
+        duration={5000}
+      />
+
       <div className="flex">
         <Sidebar />
 
@@ -327,29 +345,22 @@ export default function FeedbackPage() {
                   </div>
                 )}
 
-                {error && (
-                  <div className="rounded-xl border-2 border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
-                    {error}
-                  </div>
-                )}
-                {success && (
-                  <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
-                    {success}
-                  </div>
-                )}
+                {/* Inline alerts are moved to Toast component */}
 
-                <button
-                  type="submit"
-                  disabled={submitting || role !== "user"}
-                  className="w-full md:w-auto px-5 py-3 rounded-xl bg-teal-500 text-white font-black border-2 border-teal-600 shadow-[0_4px_0_0_#0f766e] hover:translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <Send className="h-4 w-4" />
-                  {submitting
-                    ? uploadingScreenshot
-                      ? "Upload screenshot..."
-                      : "Mengirim..."
-                    : "Kirim Laporan"}
-                </button>
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="submit"
+                    disabled={submitting || role !== "user"}
+                    className="w-full md:w-auto px-5 py-3 rounded-xl bg-teal-500 text-white font-black border-2 border-teal-600 shadow-[0_4px_0_0_#0f766e] hover:translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    <Send className="h-4 w-4" />
+                    {submitting
+                      ? uploadingScreenshot
+                        ? "Upload screenshot..."
+                        : "Mengirim..."
+                      : "Kirim Laporan"}
+                  </button>
+                </div>
               </form>
             </div>
 
@@ -366,7 +377,7 @@ export default function FeedbackPage() {
                 </div>
                 <div className="rounded-xl border-2 border-amber-100 bg-amber-50 p-3">
                   <p className="text-xs font-black text-amber-500 uppercase">
-                    Open
+                    Menunggu Ditinjau
                   </p>
                   <p className="text-2xl font-black text-amber-700">
                     {summary.open}
@@ -374,7 +385,7 @@ export default function FeedbackPage() {
                 </div>
                 <div className="rounded-xl border-2 border-sky-100 bg-sky-50 p-3">
                   <p className="text-xs font-black text-sky-500 uppercase">
-                    Review
+                    Dalam Proses
                   </p>
                   <p className="text-2xl font-black text-sky-700">
                     {summary.review}
@@ -382,7 +393,7 @@ export default function FeedbackPage() {
                 </div>
                 <div className="rounded-xl border-2 border-emerald-100 bg-emerald-50 p-3">
                   <p className="text-xs font-black text-emerald-500 uppercase">
-                    Done
+                    Sudah Ditangani
                   </p>
                   <p className="text-2xl font-black text-emerald-700">
                     {summary.done}
@@ -402,7 +413,7 @@ export default function FeedbackPage() {
                 Belum ada laporan yang kamu kirim.
               </p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[500px] md:max-h-[600px] overflow-y-auto pr-2 feedback-scrollbar">
                 {items.map((item) => {
                   const statusMeta = STATUS_META[item.status];
                   const StatusIcon = statusMeta.icon;
@@ -465,6 +476,23 @@ export default function FeedbackPage() {
           </section>
         </main>
       </div>
+
+      <style jsx global>{`
+        .feedback-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .feedback-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 8px;
+        }
+        .feedback-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 8px;
+        }
+        .feedback-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+      `}</style>
     </div>
   );
 }

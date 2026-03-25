@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import CategoryFilter from "@/components/ui/CategoryFilter";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Instructor {
   id: string;
@@ -164,33 +165,32 @@ const Instructors = () => {
           <div className="max-w-7xl mx-auto">
             
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2">
-                  {showFavoritesOnly ? "Instruktur Favorit" : "Daftar Instruktur"}
-                </h1>
-                <p className="text-slate-500 font-medium text-sm lg:text-lg">
-                  {showFavoritesOnly 
-                    ? "Instruktur favorit yang telah kamu pilih" 
-                    : "Para instruktur terbaik kami yang siap membimbing kamu!"}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={`hidden md:flex px-4 lg:px-6 py-3 rounded-2xl border-2 border-b-4 font-bold items-center gap-2 transition-all ${
-                  showFavoritesOnly
-                    ? 'bg-emerald-400 border-emerald-500 text-white shadow-lg hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5'
-                    : 'bg-white border-slate-200 text-slate-600 shadow-[0_4px_0_0_#e2e8f0] hover:border-emerald-300 hover:text-emerald-500 active:border-b-2 active:translate-y-0.5'
-                }`}
-              >
-                <Heart className={`h-5 w-5 ${
-                  showFavoritesOnly ? 'fill-white' : 'group-hover:fill-emerald-500'
-                }`} strokeWidth={2.5} />
-                <span className="hidden sm:inline text-sm lg:text-base">
-                  {showFavoritesOnly ? "Semua Instruktur" : "Favorit"}
-                </span>
-              </button>
-            </div>
+            <PageBanner
+              title={showFavoritesOnly ? "Instruktur Favorit" : "Daftar Instruktur"}
+              description={showFavoritesOnly 
+                ? "Instruktur favorit yang telah kamu pilih" 
+                : "Para instruktur terbaik kami yang siap membimbing kamu!"}
+              icon={UserCircle2}
+              tag="Instruktur"
+              tagIcon={UserCircle2}
+              action={
+                <button
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className={`hidden md:flex px-4 lg:px-6 py-3 rounded-2xl border-2 border-b-4 font-bold items-center gap-2 transition-all ${
+                    showFavoritesOnly
+                      ? 'bg-emerald-400 border-emerald-500 text-white shadow-lg hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5'
+                      : 'bg-white border-slate-200 text-slate-600 shadow-[0_4px_0_0_#e2e8f0] hover:border-emerald-300 hover:text-emerald-500 active:border-b-2 active:translate-y-0.5'
+                  }`}
+                >
+                  <Heart className={`h-5 w-5 ${
+                    showFavoritesOnly ? 'fill-white' : 'group-hover:fill-emerald-500'
+                  }`} strokeWidth={2.5} />
+                  <span className="hidden sm:inline text-sm lg:text-base">
+                    {showFavoritesOnly ? "Semua Instruktur" : "Favorit"}
+                  </span>
+                </button>
+              }
+            />
 
             {/* Filter & Search Section */}
             <div className="mb-8 flex flex-col gap-4">

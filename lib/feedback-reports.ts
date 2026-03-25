@@ -24,10 +24,19 @@ export async function ensureFeedbackReportsTable() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `);
 
-  await prisma.$executeRawUnsafe(`
-    ALTER TABLE user_feedback_reports
-    ADD COLUMN IF NOT EXISTS screenshotUrl VARCHAR(500) NULL;
-  `);
+  try {
+    // MySQL < 8.0.16 does not support ADD COLUMN IF NOT EXISTS
+    // So we just try to add it and catch the error if it already exists.
+    await prisma.$executeRawUnsafe(`
+      ALTER TABLE user_feedback_reports
+      ADD COLUMN screenshotUrl VARCHAR(500) NULL;
+    `);
+  } catch (e: any) {
+    // Ignore error if column already exists (MySQL Error 1060: Duplicate column name)
+    if (e.message && !e.message.includes("Duplicate column name")) {
+      console.error("Migration warning:", e);
+    }
+  }
 }
 
 export const FEEDBACK_TYPES = ["bug", "feature"] as const;

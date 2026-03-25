@@ -319,16 +319,10 @@ const Sidebar = () => {
               path: "/members",
             },
           ]),
-    // ----------------------------------------------------
     {
       icon: Newspaper,
       label: isInstruktur || isAdmin ? "Kelola Berita" : "Berita IRMA",
       path: "/news",
-    },
-    {
-      icon: ClipboardList,
-      label: "Lapor Bug / Request",
-      path: "/feedback",
     },
     ...(isAdmin
       ? [

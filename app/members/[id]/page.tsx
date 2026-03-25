@@ -143,7 +143,7 @@ const MemberDetail = () => {
     }
   };
 
-  const handleStartChat = () => router.push(`/chat-rooms?userId=${userId}`);
+  const handleStartChat = () => router.push(`/friends/chat?userId=${userId}`);
   const isOnline = (ls: string) => Date.now() - new Date(ls).getTime() < 300000;
 
   const formatLastSeen = (ls: string) => {

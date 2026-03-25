@@ -44,10 +44,14 @@ interface Material {
   thumbnailUrl: string | null;
   category: string;
   grade: string;
+  isTuntas: boolean;
+  totalInvited: number;
+  totalAttended: number;
 }
 
 interface InstructorStats {
   kajianCount: number;
+  completedKajianCount: number;
   totalParticipants: number;
   averageRating: number;
 }
@@ -242,7 +246,7 @@ const InstructorDetail = () => {
                   
                   <div className="mt-8">
                      <button 
-                        onClick={() => router.push(`/chat-rooms?userId=${instructor.id}`)}
+                        onClick={() => router.push(`/instructors/chat?instructorId=${instructor.id}`)}
                         className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 border-b-4 border-emerald-700 hover:border-b-2 active:border-b-0 transition-all shadow-lg text-sm uppercase tracking-wide"
                      >
                         <MessageCircle className="h-5 w-5" />
@@ -260,8 +264,8 @@ const InstructorDetail = () => {
                 {[
                   {
                     icon: <BookOpen className="h-7 w-7 text-emerald-500" />,
-                    val: stats?.kajianCount || 0,
-                    lbl: "TOTAL KAJIAN",
+                    val: stats?.completedKajianCount || 0,
+                    lbl: "KAJIAN YANG DIISI OLEH INSTRUKTUR",
                     bg: "bg-emerald-50",
                     bdr: "border-emerald-100",
                     hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#10b981]",
@@ -319,57 +323,77 @@ const InstructorDetail = () => {
                       Belum ada kajian yang dibuat
                     </p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {materials.map((m) => (
-                      <div
-                        key={m.id}
-                        onClick={() => router.push(`/materials/${m.id}`)}
-                        className="flex items-center gap-5 p-5 rounded-3xl bg-slate-50/50 border-2 border-slate-100 hover:bg-white hover:border-emerald-200 hover:shadow-lg transition-all group cursor-pointer"
-                      >
-                        <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border-2 border-white shadow-md group-hover:scale-105 transition-transform bg-slate-200">
-                           {m.thumbnailUrl ? (
-                              <img 
-                                src={m.thumbnailUrl} 
-                                alt={m.title} 
-                                className="w-full h-full object-cover"
-                              />
-                           ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-emerald-50">
-                                 <BookOpen className="h-8 w-8 text-emerald-200" />
+                ) : (() => {
+                  const tuntasMaterials = materials
+                    .filter((m) => m.isTuntas)
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                  const shown = tuntasMaterials.slice(0, 3);
+
+                  if (tuntasMaterials.length === 0) return (
+                    <div className="text-center py-12 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                      <p className="text-slate-400 font-bold text-sm">Belum ada kajian yang tuntas</p>
+                    </div>
+                  );
+
+                  return (
+                    <>
+                      <div className="overflow-y-auto max-h-[420px] space-y-4 pr-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+                        {shown.map((m) => (
+                          <div
+                            key={m.id}
+                            onClick={() => router.push(`/materials/${m.id}`)}
+                            className="flex items-center gap-5 p-5 rounded-3xl bg-slate-50/50 border-2 border-slate-100 hover:bg-white hover:border-emerald-200 hover:shadow-lg transition-all group cursor-pointer"
+                          >
+                            <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border-2 border-white shadow-md group-hover:scale-105 transition-transform bg-slate-200">
+                               {m.thumbnailUrl ? (
+                                  <img 
+                                    src={m.thumbnailUrl} 
+                                    alt={m.title} 
+                                    className="w-full h-full object-cover"
+                                  />
+                               ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-emerald-50">
+                                     <BookOpen className="h-8 w-8 text-emerald-200" />
+                                  </div>
+                               )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1.5 text-[9px] font-black uppercase tracking-widest">
+                                 <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full border border-emerald-200">
+                                    {m.category}
+                                 </span>
+                                 <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full border border-slate-200">
+                                    Kelas {m.grade}
+                                 </span>
                               </div>
-                           )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1.5 text-[9px] font-black uppercase tracking-widest">
-                             <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full border border-emerald-200">
-                                {m.category}
-                             </span>
-                             <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full border border-slate-200">
-                                Kelas {m.grade}
-                             </span>
+                              <h4 className="font-black text-slate-700 text-lg truncate mb-1 group-hover:text-emerald-600 transition-colors">
+                                {m.title}
+                              </h4>
+                              <div className="flex items-center gap-3 text-slate-400">
+                                 <div className="flex items-center gap-1">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    <span className="text-[11px] font-bold uppercase tracking-tight">
+                                       {formatDate(m.date)}
+                                    </span>
+                                 </div>
+                              </div>
+                            </div>
+                            <div className="hidden sm:flex flex-col items-end gap-2">
+                               <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                  <ArrowLeft className="h-5 w-5 rotate-180" />
+                               </div>
+                            </div>
                           </div>
-                          <h4 className="font-black text-slate-700 text-lg truncate mb-1 group-hover:text-emerald-600 transition-colors">
-                            {m.title}
-                          </h4>
-                          <div className="flex items-center gap-3 text-slate-400">
-                             <div className="flex items-center gap-1">
-                                <Clock className="h-3.5 w-3.5" />
-                                <span className="text-[11px] font-bold uppercase tracking-tight">
-                                   {formatDate(m.date)}
-                                </span>
-                             </div>
-                          </div>
-                        </div>
-                        <div className="hidden sm:flex flex-col items-end gap-2">
-                           <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                              <ArrowLeft className="h-5 w-5 rotate-180" />
-                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
+                      {tuntasMaterials.length > 3 && (
+                        <p className="text-center text-xs font-black text-slate-400 uppercase tracking-widest mt-4">
+                          Menampilkan 3 dari {tuntasMaterials.length} kajian tuntas terbaru
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>

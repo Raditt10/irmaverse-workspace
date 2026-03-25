@@ -13,6 +13,7 @@ import MaterialInstructorActions from "@/components/ui/AbsensiButton";
 import MaterialUserActions from "@/app/materials/_components/ButtonUserAbsenMaterial";
 import Loading from "@/components/ui/Loading"; // Import Loading baru
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
+import PageBanner from "@/components/ui/PageBanner";
 import { Calendar, Clock, Plus, BookOpen, CheckCheck, User as UserIcon, ClipboardList } from "lucide-react";
 import AddButton from "@/components/ui/AddButton";
 import DeleteButton from "@/components/ui/DeleteButton";
@@ -231,20 +232,14 @@ const Materials = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  {isPrivileged ? "Kelola Jadwal Kajian" : "Jadwal Kajianku"}
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  {isPrivileged
-                    ? "Atur jadwal dan materi kajian untuk anggota"
-                    : "Ikuti kajian seru bareng teman-teman!"}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                {isPrivileged && (
+            <PageBanner
+              title={isPrivileged ? "Kelola Jadwal Kajian" : "Jadwal Kajianku"}
+              description={isPrivileged ? "Atur jadwal dan materi kajian untuk anggota" : "Ikuti kajian seru bareng teman-teman!"}
+              icon={BookOpen}
+              tag="Kajian"
+              tagIcon={BookOpen}
+              action={
+                isPrivileged ? (
                   <AddButton
                     label="Buat Kajian"
                     onClick={() => router.push("/materials/create")}
@@ -252,9 +247,9 @@ const Materials = () => {
                     color="emerald"
                     hideIcon={false}
                   />
-                )}
-              </div>
-            </div>
+                ) : undefined
+              }
+            />
 
             {/* --- LATEST MATERIAL CARD --- */}
             {isPrivileged && firstTodayMaterial && (

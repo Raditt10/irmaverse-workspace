@@ -55,15 +55,37 @@ const TYPE_CONFIG: Record<string, { label: string; icon: React.ElementType; colo
 interface SearchBarProps {
   limitTypes?: SearchResult["type"][];
   placeholder?: string;
+  isCollapsible?: boolean;
+  isExpanded?: boolean;
+  onToggle?: (expanded: boolean) => void;
+  className?: string;
 }
 
-export default function SearchBar({ limitTypes, placeholder }: SearchBarProps) {
+export default function SearchBar({ 
+  limitTypes, 
+  placeholder, 
+  isCollapsible = false,
+  isExpanded: controlledIsExpanded,
+  onToggle,
+  className = ""
+}: SearchBarProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const isExpanded = controlledIsExpanded ?? internalIsExpanded;
+
+  const toggleExpand = (val: boolean) => {
+    if (onToggle) {
+      onToggle(val);
+    } else {
+      setInternalIsExpanded(val);
+    }
+  };
 
   const performSearch = useCallback(
     debounce(async (searchQuery: string) => {
@@ -109,6 +131,9 @@ export default function SearchBar({ limitTypes, placeholder }: SearchBarProps) {
     setQuery("");
     setResults([]);
     setIsOpen(false);
+    if (isCollapsible && query === "") {
+      toggleExpand(false);
+    }
   };
 
   const handleResultClick = (result: SearchResult) => {
@@ -190,32 +215,55 @@ export default function SearchBar({ limitTypes, placeholder }: SearchBarProps) {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full">
-      <div className="relative group">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:border-emerald-600 transition-all duration-300">
-          <Search 
-            className="h-4 w-4 text-emerald-500 group-focus-within:text-white transition-colors duration-300" 
-            strokeWidth={2.5} 
+    <div ref={searchRef} className={`relative ${className}`}>
+      {!isExpanded && isCollapsible ? (
+        <button
+          onClick={() => toggleExpand(true)}
+          className="h-11 w-11 rounded-xl bg-white border-2 border-slate-200 shadow-[3px_3px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[3px_3px_0_0_#34d399] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center group outline-none"
+          aria-label="Buka pencarian"
+        >
+          <Search className="h-5 w-5 text-slate-500 group-hover:text-emerald-600 transition-colors" strokeWidth={2.5} />
+        </button>
+      ) : (
+        <div className={`relative group animate-in fade-in slide-in-from-right-4 duration-300 w-full`}>
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:border-emerald-600 transition-all duration-300">
+            <Search 
+              className="h-4 w-4 text-emerald-500 group-focus-within:text-white transition-colors duration-300" 
+              strokeWidth={2.5} 
+            />
+          </div>
+          
+          <input
+            type="text"
+            value={query}
+            autoFocus={isCollapsible}
+            onChange={handleInputChange}
+            placeholder={placeholder || (limitTypes?.includes("news") ? "Cari berita & kegiatan..." : "Cari di IRMA Verse...")}
+            className="w-full pl-15 pr-12 py-3.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:bg-white focus:shadow-[0_4px_12px_rgba(52,211,153,0.15)] transition-all font-bold text-sm"
           />
+          
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {query && (
+              <button
+                onClick={handleClear}
+                className="h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all"
+                aria-label="Hapus pencarian"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={3} />
+              </button>
+            )}
+            {isCollapsible && (
+              <button
+                onClick={() => toggleExpand(false)}
+                className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-all"
+                aria-label="Tutup pencarian"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={3} />
+              </button>
+            )}
+          </div>
         </div>
-        
-        <input
-          type="text"
-          value={query}
-          onChange={handleInputChange}
-          placeholder={placeholder || (limitTypes?.includes("news") ? "Cari berita & kegiatan..." : "Cari di IRMA Verse...")}
-          className="w-full pl-15 pr-12 py-3.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:bg-white focus:shadow-[0_4px_12px_rgba(52,211,153,0.15)] transition-all font-bold text-sm"
-        />
-        
-        {query && (
-          <button
-            onClick={handleClear}
-            className="absolute right-4 top-1/2 -translate-y-1/2 h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all"
-          >
-            <X className="h-3.5 w-3.5" strokeWidth={3} />
-          </button>
-        )}
-      </div>
+      )}
 
       {isOpen && query.length >= 2 && (
         <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-3xl border-2 border-slate-200 shadow-[0_8px_0_0_#e2e8f0] z-50 max-h-125 overflow-hidden animate-in fade-in zoom-in-95 duration-200">

@@ -6,6 +6,7 @@ import DashboardHeader from "@/components/ui/Header";
 import ChatbotButton from "@/components/ui/Chatbot";
 import LeaderboardClient from "@/components/ui/LeaderboardClient";
 import type { LeaderboardUser } from "@/components/ui/LeaderboardClient";
+import PageBanner from "@/components/ui/PageBanner";
 import { Trophy } from "lucide-react";
 
 const LeaderboardPage = async () => {
@@ -83,16 +84,13 @@ const LeaderboardPage = async () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto pb-32 md:pb-8">
-          <div className="text-center mb-8 md:mb-12 space-y-2">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <h1 className="text-3xl md:text-5xl font-black text-slate-800 tracking-tight">
-                Peringkat XP
-              </h1>
-            </div>
-            <p className="text-slate-500 font-bold text-sm md:text-lg">
-              Pantau pencapaian 10 EXP terbaik disini
-            </p>
-          </div>
+          <PageBanner
+            title="Peringkat XP"
+            description="Pantau pencapaian 10 EXP terbaik disini"
+            icon={Trophy}
+            tag="Leaderboard"
+            tagIcon={Trophy}
+          />
           <LeaderboardClient 
             users={users} 
             currentUserId={session.user.id} 

@@ -144,7 +144,7 @@ export default function UserPublicProfile() {
     }
   };
 
-  const handleStartChat = () => router.push(`/chat-rooms?userId=${userId}`);
+  const handleStartChat = () => router.push(`/friends/chat?userId=${userId}`);
   const isOnline = (ls: string) => Date.now() - new Date(ls).getTime() < 300000;
 
   const formatLastSeen = (ls: string) => {
@@ -251,7 +251,6 @@ export default function UserPublicProfile() {
           <div className="mb-6">
             <BackButton />
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* LEFT: Profile Card */}
             <div className="lg:col-span-1">

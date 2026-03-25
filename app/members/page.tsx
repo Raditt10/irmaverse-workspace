@@ -18,8 +18,10 @@ import {
   Search, 
   Zap,
   Lock,
-  UserCheck
+  UserCheck,
+  Users
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Member {
   id: string;
@@ -114,16 +116,13 @@ const Members = () => {
           <div className="max-w-7xl mx-auto">
             
             {/* Header Section */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2">
-                  Daftar Anggota IRMA
-                </h1>
-                <p className="text-slate-500 font-medium text-sm lg:text-lg">
-                  Temukan teman dan lihat siapa saja anggota aktif IRMA.
-                </p>
-              </div>
-            </div>
+            <PageBanner
+              title="Daftar Anggota IRMA"
+              description="Temukan teman dan lihat siapa saja anggota aktif IRMA Verse"
+              icon={Users}
+              tag="Keanggotaan"
+              tagIcon={Users}
+            />
 
             {/* Search & Suggestions */}
             <div className="space-y-6 mb-8 lg:mb-10">

@@ -11,6 +11,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import DetailButton from "@/components/ui/DetailButton";
 import DeleteButton from "@/components/ui/DeleteButton";
+import PageBanner from "@/components/ui/PageBanner";
 import { toast } from "sonner";
 import {
   BookOpen,
@@ -24,6 +25,7 @@ import {
   TrendingUp,
   XCircle,
   Clock,
+  ClipboardList,
 } from "lucide-react";
 
 interface RekapanItem {
@@ -224,17 +226,13 @@ const RekapanListPage = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-6xl mx-auto">
             {/* --- HEADER SECTION --- */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-3">
-                  {isInstructor ? "Kelola Rekapan Materi" : "Rekapan Kajian"}
-                </h1>
-                <p className="text-slate-500 font-medium text-sm lg:text-lg">
-                  Pantau riwayat kehadiran dan materi kajian yang telah kamu
-                  ikuti.
-                </p>
-              </div>
-            </div>
+            <PageBanner
+              title={isInstructor ? "Kelola Rekapan Materi" : "Rekapan Kajian"}
+              description="Pantau riwayat kehadiran dan materi kajian yang telah kamu ikuti."
+              icon={ClipboardList}
+              tag="Rekapan"
+              tagIcon={ClipboardList}
+            />
 
             {isInstructor ? (
               /* --- INSTRUCTOR VIEW --- */

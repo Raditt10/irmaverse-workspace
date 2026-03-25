@@ -24,6 +24,7 @@ import {
   BarChart3,
   GraduationCap,
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Program {
   id: string;
@@ -161,39 +162,32 @@ const OurPrograms = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  {isPrivileged ? "Kelola Program" : "Program Kurikulum"}
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  {isPrivileged
-                    ? "Buat dan kelola program kurikulum untuk anggota"
-                    : "Ikuti program untuk meningkatkan pengetahuan keagamaan"}
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {isPrivileged && (
-                  <div className="flex flex-wrap gap-3 text-xs font-bold">
-                    <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 shadow-sm">
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      <span>{programs.length} Program</span>
+            <PageBanner
+              title={isPrivileged ? "Kelola Program" : "Program Kurikulum"}
+              description={isPrivileged ? "Buat dan kelola program kurikulum untuk anggota" : "Ikuti program untuk meningkatkan pengetahuan keagamaan"}
+              icon={GraduationCap}
+              tag="Program"
+              tagIcon={GraduationCap}
+              action={
+                isPrivileged ? (
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap gap-3 text-xs font-bold">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-white/20 text-white rounded-lg border border-white/30 shadow-sm backdrop-blur-sm">
+                        <GraduationCap className="h-3.5 w-3.5 text-white" />
+                        <span>{programs.length} Program</span>
+                      </div>
                     </div>
+                    <AddButton
+                      label="Buat Program"
+                      onClick={() => router.push("/programs/create")}
+                      icon={<Plus className="h-5 w-5" />}
+                      color="emerald"
+                      hideIcon={false}
+                    />
                   </div>
-                )}
-
-                {isPrivileged && (
-                  <AddButton
-                    label="Buat Program"
-                    onClick={() => router.push("/programs/create")}
-                    icon={<Plus className="h-5 w-5" />}
-                    color="emerald"
-                    hideIcon={false}
-                  />
-                )}
-              </div>
-            </div>
+                ) : undefined
+              }
+            />
 
             {!loading && programs.length > 0 && (
               <div className="mb-8 flex flex-col gap-4">

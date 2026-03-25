@@ -32,8 +32,8 @@ export async function GET(
       );
     }
 
-    // 2. Ambil list kajian (materi) yang dibuat instruktur
-    const materials = await prisma.material.findMany({
+    // 2. Ambil list kajian beserta invite per kajian
+    const materials = await (prisma as any).material.findMany({
       where: { instructorId },
       orderBy: { date: "desc" },
       select: {
@@ -44,12 +44,52 @@ export async function GET(
         thumbnailUrl: true,
         category: true,
         grade: true,
+        materialinvite: {
+          select: {
+            userId: true,
+          },
+        },
       },
     });
 
-    // 3. Hitung stats: Total Peserta (attendance) & Avg Rating
-    const materialIds = materials.map((m) => m.id);
-    
+    // 3. Ambil attendance secara terpisah karena tidak ada relasi formal di schema
+    const materialIds = materials.map((m: any) => m.id);
+    const allAttendance = await prisma.attendance.findMany({
+      where: {
+        materialId: { in: materialIds },
+      },
+      select: {
+        userId: true,
+        materialId: true,
+        status: true,
+      },
+    });
+
+    // Determine "tuntas" per kajian: semua yang diundang sudah mengisi absensi
+    const materialsWithStatus = materials.map((m: any) => {
+      const invitedUserIds: string[] = m.materialinvite.map((i: any) => i.userId);
+      const mAttendance = allAttendance.filter((a: any) => a.materialId === m.id);
+      const attendedUserIds: string[] = mAttendance.map((a: any) => a.userId);
+      
+      const totalInvited = invitedUserIds.length;
+      const totalAttended = invitedUserIds.filter((uid) =>
+        attendedUserIds.includes(uid)
+      ).length;
+      const isTuntas = totalInvited > 0 && totalAttended === totalInvited;
+      return {
+        id: m.id,
+        title: m.title,
+        description: m.description,
+        date: m.date.toISOString(),
+        thumbnailUrl: m.thumbnailUrl,
+        category: m.category,
+        grade: m.grade,
+        isTuntas,
+        totalInvited,
+        totalAttended,
+      };
+    });
+
     // Count unique users who attended this instructor's materials
     const totalParticipants = await prisma.attendance.count({
       where: {
@@ -67,18 +107,18 @@ export async function GET(
       _avg: { rating: true },
     });
 
+    const completedKajianCount = materialsWithStatus.filter((m: any) => m.isTuntas).length;
+
     return NextResponse.json({
       instructor: {
         ...instructor,
         createdAt: instructor.createdAt.toISOString(),
         lastSeen: instructor.lastSeen.toISOString(),
       },
-      materials: materials.map(m => ({
-        ...m,
-        date: m.date.toISOString(),
-      })),
+      materials: materialsWithStatus,
       stats: {
         kajianCount: materials.length,
+        completedKajianCount,
         totalParticipants,
         averageRating: Math.round((ratingStats._avg.rating || 0) * 10) / 10,
       }

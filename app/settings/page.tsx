@@ -23,6 +23,7 @@ import {
   ArrowRight,
   Info,
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 
 /* ─── Types ─── */
 interface SecurityInfo {
@@ -342,16 +343,14 @@ export default function SettingsPage() {
         </div>
         <main className="flex-1 px-4 sm:px-6 lg:px-10 py-8 max-w-5xl mx-auto w-full">
           {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
-                Pengaturan
-              </h1>
-              <p className="text-sm text-slate-500 font-medium">
-                Kelola preferensi dan keamanan akunmu
-              </p>
-            </div>
-          </div>
+          <PageBanner
+            title="Pengaturan"
+            description="Kelola preferensi dan keamanan akunmu"
+            icon={Settings}
+            tag="Akun"
+            tagIcon={Settings}
+            className="mb-8"
+          />
 
           {/* Tabs */}
           <div className="flex gap-2 mb-8 p-1.5 bg-white border-2 border-slate-200 rounded-2xl shadow-[0_4px_0_0_#cbd5e1] w-fit">

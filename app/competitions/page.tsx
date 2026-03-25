@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import DetailButton from "@/components/ui/DetailButton";
 import Toast from "@/components/ui/Toast";
 import AddButton from "@/components/ui/AddButton";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface CompetitionItem {
   id: string;
@@ -117,18 +118,14 @@ const Competitions = () => {
           <div className="max-w-7xl mx-auto">
             
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  Info Perlombaan
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  Tunjukkan bakatmu di ajang bergengsi ini!
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {(session?.user?.role === "instruktur" || isPrivileged) && (
+            <PageBanner
+              title="Info Perlombaan"
+              description="Tunjukkan bakatmu di ajang bergengsi ini!"
+              icon={Trophy}
+              tag="Perlombaan"
+              tagIcon={Trophy}
+              action={
+                (session?.user?.role === "instruktur" || isPrivileged) ? (
                   <AddButton
                     label="Tambah Lomba"
                     onClick={() => router.push("/competitions/create")}
@@ -136,9 +133,9 @@ const Competitions = () => {
                     color="emerald"
                     hideIcon={false}
                   />
-                )}
-              </div>
-            </div>
+                ) : undefined
+              }
+            />
 
             {/* Search Bar */}
             <div className="mb-8">

@@ -13,6 +13,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import Loading from "@/components/ui/Loading";
 import Toast from "@/components/ui/Toast";
+import PageBanner from "@/components/ui/PageBanner";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSocket } from "@/lib/socket";
@@ -141,6 +142,7 @@ const GlobalForumPage = () => {
       }
     } catch (err) {
       console.error("Error fetching forum messages:", err);
+      setToast({ show: true, message: "Gagal memuat pesan forum", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -191,6 +193,7 @@ const GlobalForumPage = () => {
       }
     } catch (err) {
       console.error("Error loading older messages:", err);
+      setToast({ show: true, message: "Gagal memuat pesan lama", type: "error" });
     } finally {
       setIsLoadingMore(false);
     }
@@ -373,31 +376,14 @@ const GlobalForumPage = () => {
           className={`w-full flex-1 flex flex-col ${isDesktopChatFullscreen ? "p-0" : "p-0 lg:p-6"} overflow-hidden relative transition-all`}
         >
           {/* Page title (desktop only) */}
-          <div
-            className={`${isDesktopChatFullscreen ? "hidden" : "hidden lg:flex"} mb-4 items-center justify-between shrink-0`}
-          >
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">
-                Forum Diskusi
-              </h1>
-              <p className="text-slate-500 font-bold text-sm mt-1">
-                Grup Ngobrol Santai &amp; Belajar Bersama
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {isConnected ? (
-                <span className="flex items-center gap-2 text-xs font-black text-teal-600 bg-teal-100 px-3 py-1.5 rounded-full border-2 border-teal-200 shadow-sm">
-                  <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse" />
-                  Terhubung
-                </span>
-              ) : (
-                <span className="flex items-center gap-2 text-xs font-black text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border-2 border-slate-200 shadow-sm">
-                  <span className="w-2 h-2 bg-slate-400 rounded-full" />
-                  Menghubungkan…
-                </span>
-              )}
-            </div>
-          </div>
+          <PageBanner
+            title="Forum Diskusi"
+            description="Grup Ngobrol Santai & Belajar Bersama dengan kawan kawan di IRMA Verse"
+            icon={MessageSquare}
+            tag="Forum"
+            tagIcon={MessageSquare}
+            className={isDesktopChatFullscreen ? "hidden" : "hidden lg:flex mb-4 shrink-0"}
+          />
 
           {/* Chat container */}
           <div

@@ -47,6 +47,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/DropDown";
+import PageBanner from "@/components/ui/PageBanner";
 
 // ... (INTERFACES tetap sama) ...
 interface Instructor {
@@ -166,6 +167,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      setToast({ show: true, message: "Gagal memuat daftar percakapan", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -180,6 +182,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching instructors:", error);
+      setToast({ show: true, message: "Gagal memuat daftar instruktur", type: "error" });
     }
   }, []);
 
@@ -192,6 +195,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching favorites:", error);
+      setToast({ show: true, message: "Gagal memuat instruktur favorit", type: "error" });
     }
   }, []);
 
@@ -232,6 +236,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
+      setToast({ show: true, message: "Gagal memuat pesan", type: "error" });
     } finally {
       setMessagesLoading(false);
     }
@@ -710,41 +715,19 @@ const ChatPage = () => {
 
         <main className={`w-full flex-1 flex flex-col transition-all duration-300 ${isDesktopChatFullscreen ? 'p-0' : (isMobileViewingChat ? 'p-0' : 'p-4 lg:p-6')} overflow-hidden relative`}>
           
-          {/* Page Title (Only visible on Desktop/Tablet or when List View on Mobile) */}
-          <div className={`${isDesktopChatFullscreen || isMobileViewingChat ? 'hidden' : 'flex'} mb-4 items-center justify-between shrink-0 px-2 lg:px-0`}>
-            <div className="flex items-center gap-3">
-              {/* PERBAIKAN: Tombol Hamburger untuk Mobile */}
-              <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('open-mobile-sidebar'))}
-                className="lg:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-              >
-                <Menu className="h-6 w-6" strokeWidth={2.5} />
-              </button>
-              
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">Chat Instruktur</h1>
-                <p className="text-slate-500 font-bold text-xs lg:text-sm mt-1">Konsultasi langsung dengan ahlinya</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-                {isConnected ? (
-                  <span className="flex items-center gap-2 text-[10px] lg:text-xs font-black text-emerald-600 bg-emerald-100 px-3 py-1.5 rounded-full border-2 border-emerald-200">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    Online
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2 text-[10px] lg:text-xs font-black text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border-2 border-slate-200">
-                    <span className="w-2 h-2 bg-slate-400 rounded-full" />
-                    Connecting...
-                  </span>
-                )}
-            </div>
-          </div>
+          {/* Page Title */}
+          <PageBanner
+            title="Chat Instruktur"
+            description="Konsultasi langsung dengan ahlinya"
+            icon={MessageCircle}
+            tag="Konsultasi"
+            tagIcon={MessageCircle}
+            className={`${isDesktopChatFullscreen || isMobileViewingChat ? 'hidden' : 'mb-3! lg:mb-5! p-4! lg:p-6! shrink-0'}`}
+          />
 
           <div className={`
             flex flex-1 bg-white overflow-hidden transition-all duration-300
-            ${isDesktopChatFullscreen ? 'rounded-none border-0' : (isMobileViewingChat ? 'fixed inset-0 z-9999 w-screen h-screen rounded-none' : 'lg:rounded-4xl lg:border-4 border-slate-200 lg:shadow-[0_8px_0_0_#cbd5e1]')}
+            ${isDesktopChatFullscreen ? 'rounded-none border-0' : (isMobileViewingChat ? 'fixed inset-0 z-[70] w-screen h-screen rounded-none' : 'lg:rounded-4xl lg:border-4 border-slate-200 lg:shadow-[0_8px_0_0_#cbd5e1]')}
           `}>
             
             {/* --- LIST CONVERSATIONS (SIDEBAR CHAT) --- */}
@@ -845,11 +828,13 @@ const ChatPage = () => {
                   {/* Active Chat Header */}
                   <div className="flex items-center justify-between px-4 py-3 bg-white border-b-2 border-slate-100 shadow-sm z-20 shrink-0">
                     <div className="flex items-center gap-3">
-                       <BackButton 
-                         onClick={() => {
-                           setSelectedConversationId(null);
-                           if (isMobileViewingChat) setIsMobileViewingChat(false);
-                         }}
+                        <BackButton 
+                          onClick={() => {
+                            setSelectedConversationId(null);
+                            if (isMobileViewingChat) setIsMobileViewingChat(false);
+                            // Clear query params so it doesn't re-trigger the auto-select effect
+                            router.replace("/instructors/chat", { scroll: false });
+                          }}
                          className="p-1 lg:p-2 bg-white border-2 border-slate-200 shadow-[0_3px_0_0_#cbd5e1] hover:shadow-[0_4px_0_0_#14b8a6] hover:border-teal-400 rounded-full transition-all active:translate-y-0.5 active:shadow-none"
                          label=""
                        />

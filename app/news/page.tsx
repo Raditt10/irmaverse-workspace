@@ -19,7 +19,9 @@ import {
   Search,
   HelpCircle,
   Sparkles,
+  Newspaper
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
@@ -306,18 +308,14 @@ const News = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  Berita IRMA
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  Berita terkini seputar kegiatan dan perkembangan IRMA Verse
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {isPrivileged && (
+            <PageBanner
+              title="Berita IRMA"
+              description="Berita terkini seputar kegiatan dan perkembangan IRMA Verse"
+              icon={Newspaper}
+              tag="Berita"
+              tagIcon={Newspaper}
+              action={
+                isPrivileged ? (
                   <AddButton
                     label="Buat Berita"
                     onClick={() => router.push("/news/create")}
@@ -325,9 +323,9 @@ const News = () => {
                     color="emerald"
                     hideIcon={false}
                   />
-                )}
-              </div>
-            </div>
+                ) : undefined
+              }
+            />
 
             {/* Search & Filter */}
             <div className="mb-6 lg:mb-8 flex flex-col gap-4">
