@@ -213,7 +213,7 @@ export default function FriendsPage() {
           </div>
 
           {/* ─── SEARCH ─── */}
-          <div className="bg-white border-2 border-slate-200 rounded-4xl p-4 lg:p-6 mb-8 shadow-[0_6px_0_0_#cbd5e1]">
+          <div className="bg-white border-2 border-slate-200 rounded-4xl p-4 lg:p-6 mb-8 shadow-[0_6px_0_0_#cbd5e1] max-w-md">
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
               <input

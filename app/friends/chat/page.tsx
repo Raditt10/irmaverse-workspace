@@ -717,7 +717,7 @@ const ChatPage = () => {
           
           {/* Page Title */}
           <PageBanner
-            title="Chat Personal"
+            title="Chat Temanku"
             description="Kirim pesan langsung ke temanmu"
             icon={MessageCircle}
             tag="Pesan"

@@ -173,34 +173,36 @@ const Instructors = () => {
               icon={UserCircle2}
               tag="Instruktur"
               tagIcon={UserCircle2}
-              action={
+            />
+
+            {/* Filter & Search Section */}
+            <div className="mb-8 flex flex-col gap-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="w-full max-w-md">
+                  <SearchInput
+                    placeholder="Cari nama instruktur atau keahlian..."
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    className="w-full transition-shadow duration-300"
+                  />
+                </div>
+
+                {/* Desktop Favorite Toggle (Aligned with Search) */}
                 <button
                   onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                  className={`hidden md:flex px-4 lg:px-6 py-3 rounded-2xl border-2 border-b-4 font-bold items-center gap-2 transition-all ${
+                  className={`hidden md:flex px-6 py-3 rounded-2xl border-2 border-b-4 font-black items-center gap-2 transition-all shadow-lg ${
                     showFavoritesOnly
-                      ? 'bg-emerald-400 border-emerald-500 text-white shadow-lg hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5'
-                      : 'bg-white border-slate-200 text-slate-600 shadow-[0_4px_0_0_#e2e8f0] hover:border-emerald-300 hover:text-emerald-500 active:border-b-2 active:translate-y-0.5'
+                      ? 'bg-emerald-400 border-emerald-500 text-white hover:bg-emerald-500 active:border-b-2 active:translate-y-0.5'
+                      : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-300 hover:text-emerald-500 active:border-b-2 active:translate-y-0.5 shadow-[0_4px_0_0_#e2e8f0]'
                   }`}
                 >
                   <Heart className={`h-5 w-5 ${
                     showFavoritesOnly ? 'fill-white' : 'group-hover:fill-emerald-500'
                   }`} strokeWidth={2.5} />
-                  <span className="hidden sm:inline text-sm lg:text-base">
-                    {showFavoritesOnly ? "Semua Instruktur" : "Favorit"}
+                  <span className="text-sm lg:text-base">
+                    {showFavoritesOnly ? "Lihat Semua" : "Filter Favorit"}
                   </span>
                 </button>
-              }
-            />
-
-            {/* Filter & Search Section */}
-            <div className="mb-8 flex flex-col gap-4">
-              <div className="w-full">
-                <SearchInput
-                  placeholder="Cari nama instruktur atau keahlian..."
-                  value={searchTerm}
-                  onChange={setSearchTerm}
-                  className="w-full transition-shadow duration-300"
-                />
               </div>
 
               {/* Porsi Kategori dan Tombol Favorit */}

@@ -237,7 +237,7 @@ export default function DashboardHeader() {
           </div>
 
           {/* --- CENTER: SEARCH BAR (Desktop) --- */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-4">
+          <div className="hidden md:flex flex-1 max-w-md mx-4">
             <div className="w-full">
               <SearchBar placeholder="Cari apa saja di IRMA VERSE..." />
             </div>
