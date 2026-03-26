@@ -102,10 +102,6 @@ export async function POST(
     const { conversationId } = await params;
     const userRole = session.user.role;
 
-    if (userRole === "admin" || userRole === "super_admin") {
-      return NextResponse.json({ error: "Monitoring mode: Admins cannot send messages" }, { status: 403 });
-    }
-
     const body = await request.json();
     const { content, attachmentUrl, attachmentType } = body;
 

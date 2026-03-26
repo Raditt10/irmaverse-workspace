@@ -229,7 +229,7 @@ const ChatPage = () => {
   const fetchMessages = useCallback(async (conversationId: string) => {
     setMessagesLoading(true);
     try {
-      const res = await fetch(`/api/chat/conversations/${conversationId}/messages`);
+      const res = await fetch(`/api/chat/users/conversations/${conversationId}/messages`);
       if (res.ok) {
         const data = await res.json();
         setMessages(data.messages);
@@ -289,28 +289,36 @@ const ChatPage = () => {
 
     const handleNewMessage = (data: any) => {
       if (data.conversationId === selectedConversationId) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: data.messageId,
-            senderId: data.senderId,
-            content: data.content,
-            createdAt: data.createdAt,
-            isRead: false,
-            isEdited: false,
-            isDeleted: false,
-            attachmentUrl: data.attachmentUrl,
-            attachmentType: data.attachmentType,
-            sender: {
-              id: data.senderId,
-              name: data.senderName,
-            },
-          },
-        ]);
-
-        if (data.senderId !== session?.user?.id) {
-          playNotificationSound();
+        // Skip messages sent by the current user (already added via optimistic update)
+        if (data.senderId === session?.user?.id) {
+          fetchConversations();
+          return;
         }
+
+        setMessages((prev) => {
+          // Prevent duplicates by checking if the message already exists
+          if (prev.some((msg) => msg.id === data.messageId)) return prev;
+          return [
+            ...prev,
+            {
+              id: data.messageId,
+              senderId: data.senderId,
+              content: data.content,
+              createdAt: data.createdAt,
+              isRead: false,
+              isEdited: false,
+              isDeleted: false,
+              attachmentUrl: data.attachmentUrl,
+              attachmentType: data.attachmentType,
+              sender: {
+                id: data.senderId,
+                name: data.senderName,
+              },
+            },
+          ];
+        });
+
+        playNotificationSound();
       }
       fetchConversations();
     };
@@ -474,7 +482,7 @@ const ChatPage = () => {
       if (!uploadRes.ok) throw new Error("Upload failed");
       const { url } = await uploadRes.json();
       const res = await fetch(
-        `/api/chat/conversations/${selectedConversationId}/messages`,
+        `/api/chat/users/conversations/${selectedConversationId}/messages`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -524,7 +532,7 @@ const ChatPage = () => {
   const handleEditMessage = async (messageId: string) => {
     if (!editingContent.trim()) return;
     try {
-      const res = await fetch(`/api/chat/messages/${messageId}`, {
+      const res = await fetch(`/api/chat/users/conversations/${selectedConversationId}/messages/${messageId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: editingContent.trim() }),
@@ -561,7 +569,7 @@ const ChatPage = () => {
     if (!isConfirmed) return;
 
     try {
-      const res = await fetch(`/api/chat/messages/${messageId}`, {
+      const res = await fetch(`/api/chat/users/conversations/${selectedConversationId}/messages/${messageId}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -596,7 +604,7 @@ const ChatPage = () => {
 
     setDeletingConversation(true);
     try {
-      const res = await fetch(`/api/chat/conversations/${selectedConversationId}`, {
+      const res = await fetch(`/api/chat/users/conversations/${selectedConversationId}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -625,20 +633,51 @@ const ChatPage = () => {
   const handleSendMessage = async () => {
     const content = messageDraft.trim();
     if (!content || !selectedConversation || !session?.user) return;
+    
+    // Simpan draft untuk recovery jika gagal
+    const originalDraft = messageDraft;
+    
     if (selectedConversationId) {
       stopTyping(selectedConversationId);
     }
+
+    // Optimistic Update: Tambahkan pesan ke UI segera
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage: ChatMessage = {
+      id: tempId,
+      senderId: session.user.id,
+      content,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      isEdited: false,
+      isDeleted: false,
+      sender: {
+        id: session.user.id,
+        name: session.user.name || "Anda",
+      },
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setMessageDraft("");
+    
     try {
       const res = await fetch(
-        `/api/chat/conversations/${selectedConversationId}/messages`,
+        `/api/chat/users/conversations/${selectedConversationId}/messages`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content }),
         }
       );
+      
       if (res.ok) {
         const newMessage = await res.json();
+        
+        // Ganti pesan optimis dengan pesan asli dari server
+        setMessages((prev) => 
+          prev.map((msg) => msg.id === tempId ? newMessage : msg)
+        );
+
         socket?.emit("message:send", {
           conversationId: selectedConversationId,
           senderId: session.user.id,
@@ -647,12 +686,21 @@ const ChatPage = () => {
           messageId: newMessage.id,
           senderName: session.user.name,
           createdAt: newMessage.createdAt,
+          attachmentUrl: newMessage.attachmentUrl,
+          attachmentType: newMessage.attachmentType,
         });
-        setMessageDraft("");
+        
         fetchConversations();
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Gagal mengirim pesan");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
+      setToast({ show: true, message: error.message || "Gagal mengirim pesan. Silakan coba lagi.", type: 'error' });
+      // Rollback optimistic update
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
+      setMessageDraft(originalDraft);
     }
   };
 

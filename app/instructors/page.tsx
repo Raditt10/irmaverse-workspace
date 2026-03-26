@@ -14,7 +14,7 @@ import {
   SearchX, 
   RefreshCcw, 
   Heart,
-  UserCircle2
+  Contact
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -170,9 +170,9 @@ const Instructors = () => {
               description={showFavoritesOnly 
                 ? "Instruktur favorit yang telah kamu pilih" 
                 : "Para instruktur terbaik kami yang siap membimbing kamu!"}
-              icon={UserCircle2}
+              icon={Contact}
               tag="Instruktur"
-              tagIcon={UserCircle2}
+              tagIcon={Contact}
             />
 
             {/* Filter & Search Section */}
@@ -370,13 +370,13 @@ const Instructors = () => {
                                     </Link>
                                   )}
                                   
-                                  <Link 
-                                    href={`/instructors/${instructor.id}`}
-                                    className="w-full py-2 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-600 font-bold border-2 border-slate-200 border-b-4 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center gap-1.5 md:gap-2 text-[10px] md:text-base"
-                                  >
-                                    <UserCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={2.5} />
-                                    Lihat Profile
-                                  </Link>
+                                    <Link 
+                                      href={`/instructors/${instructor.id}`}
+                                      className="w-full py-2 md:py-3.5 rounded-xl md:rounded-2xl bg-white text-slate-600 font-bold border-2 border-slate-200 border-b-4 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center gap-1.5 md:gap-2 text-[10px] md:text-base"
+                                    >
+                                      <Contact className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={2.5} />
+                                      Lihat Profile
+                                    </Link>
                                 </>
                               ) : (
                                 <button className="w-full py-2 md:py-3.5 rounded-xl md:rounded-2xl bg-teal-400 text-white font-black border-2 border-teal-600 border-b-4 hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 text-[10px] md:text-base">
