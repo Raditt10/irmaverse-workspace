@@ -8,6 +8,7 @@ import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import SearchInput from "@/components/ui/SearchInput";
 import EmptyState from "@/components/ui/EmptyState";
+import PageBanner from "@/components/ui/PageBanner";
 import {
   Users,
   BookOpen,
@@ -173,19 +174,14 @@ export default function KajianManagement() {
         <Sidebar />
 
         <main className="flex-1 min-w-0 w-full overflow-x-hidden p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
-          {/* ===== HEADER ===== */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div>
-              <h1 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight mb-1">
-                Perkembangan Kajian
-              </h1>
-              <p className="text-slate-500 mt-1 font-bold text-base md:text-lg ml-1">
-                Pantau kehadiran dan kelola anggota terdaftar di program kurikulum
-              </p>
-            </div>
-
-
-          </div>
+            {/* ===== HEADER ===== */}
+            <PageBanner
+              title="Perkembangan Kajian"
+              description="Pantau kehadiran dan kelola anggota terdaftar di program kurikulum"
+              icon={BarChart3}
+              tag="Progress"
+              tagIcon={BarChart3}
+            />
 
           {/* ===== STATS GRID ===== */}
           {/* ===== PREMIUM STATS BANNER ===== */}
@@ -718,7 +714,7 @@ export default function KajianManagement() {
                                       </span>
                                     </div>
 
-                                    <div className="max-h-[420px] overflow-y-auto pr-1 scrollbar-thin" style={{ scrollbarWidth: 'thin', scrollbarColor: '#d1d5db transparent' }}>
+                                    <div className="max-h-105 overflow-y-auto pr-1 scrollbar-thin" style={{ scrollbarWidth: 'thin', scrollbarColor: '#d1d5db transparent' }}>
                                       <div className="space-y-3">
                                         {user.materialProgress.map((mp, idx) => {
                                           const materialInfo = selectedProgram?.materials.find(m => m.id === mp.materialId);

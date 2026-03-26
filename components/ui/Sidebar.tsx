@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
+  BarChart3,
   LayoutGrid,
   BookOpen,
   Calendar,
@@ -190,7 +191,7 @@ const Sidebar = () => {
                 path: "/materials",
               },
               {
-                icon: ClipboardList,
+                icon: BarChart3,
                 label: "Perkembangan Kajian",
                 path: "/materials/progress",
               },
