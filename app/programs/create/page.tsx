@@ -188,7 +188,6 @@ const CreateProgram = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Contoh: Tahfizh Akhir Pekan (Juz 30)"
@@ -233,7 +232,6 @@ const CreateProgram = () => {
                             type="number"
                             name="totalKajian"
                             min="1"
-                            required
                             value={formData.totalKajian}
                             onChange={handleInputChange}
                             placeholder="Berapa banyak pertemuan/kajian?"

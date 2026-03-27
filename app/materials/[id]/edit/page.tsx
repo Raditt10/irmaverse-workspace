@@ -298,6 +298,11 @@ const EditMaterial = () => {
       showToast("Deskripsi kajian tidak boleh kosong", "error");
       return;
     }
+
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kajian wajib diunggah", "error");
+      return;
+    }
     if (!formData.date) {
       showToast("Tanggal kajian harus dipilih", "error");
       return;
@@ -443,7 +448,6 @@ const EditMaterial = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Contoh: Tadabbur Alam & Quran"
@@ -456,7 +460,6 @@ const EditMaterial = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={3}
                         value={formData.description}
                         onChange={handleInputChange}
@@ -737,7 +740,6 @@ const EditMaterial = () => {
                           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
                             <Textarea
                               name="materialContent"
-                              required={formData.materialType === "editor"}
                               rows={8}
                               value={formData.materialContent}
                               onChange={(e) =>
@@ -762,7 +764,6 @@ const EditMaterial = () => {
                               <Input
                                 type="url"
                                 name="materialLink"
-                                required={formData.materialType === "link"}
                                 value={formData.materialLink}
                                 onChange={(e) =>
                                   setFormData({
@@ -856,7 +857,6 @@ const EditMaterial = () => {
                         value={formData.location}
                         onChange={handleInputChange}
                         placeholder="Contoh: Masjid Irma atau Link Zoom..."
-                        required
                         className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
                       />
                     </div>

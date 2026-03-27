@@ -292,6 +292,11 @@ const CreateMaterial = () => {
       return;
     }
 
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kajian wajib diunggah", "error");
+      return;
+    }
+
     if (invitedUsers.length === 0) {
       showToast("Minimal 1 anggota harus diundang ke dalam kajian", "error");
       return;
@@ -525,7 +530,6 @@ const CreateMaterial = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Contoh: Tadabbur Alam & Quran"
@@ -538,7 +542,6 @@ const CreateMaterial = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={5}
                         value={formData.description}
                         onChange={handleInputChange}
@@ -895,7 +898,6 @@ const CreateMaterial = () => {
                           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
                             <Textarea
                               name="materialContent"
-                              required={formData.materialType === "editor"}
                               rows={8}
                               value={formData.materialContent}
                               onChange={handleInputChange}
@@ -994,7 +996,6 @@ const CreateMaterial = () => {
                         value={formData.location}
                         onChange={handleInputChange}
                         placeholder="Contoh: Masjid Irma atau Link Zoom..."
-                        required
                         className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
                       />
                     </div>

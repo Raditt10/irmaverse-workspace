@@ -141,8 +141,17 @@ const EditProgram = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.title || !formData.description) {
-      showToast("Harap isi semua field yang diperlukan", "error");
+    if (!formData.title.trim()) {
+      showToast("Nama Program wajib diisi", "error");
+      return;
+    }
+    if (!formData.description.trim()) {
+      showToast("Deskripsi Program wajib diisi", "error");
+      return;
+    }
+
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail Program wajib diunggah", "error");
       return;
     }
 
@@ -233,7 +242,6 @@ const EditProgram = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Nama program..."
@@ -274,16 +282,15 @@ const EditProgram = () => {
                         </label>
                         <div className="relative flex items-center group">
                           <Layers className="absolute left-4 lg:left-5 h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors pointer-events-none" />
-                          <Input
-                            type="number"
-                            name="totalKajian"
-                            min="1"
-                            required
-                            value={formData.totalKajian}
-                            onChange={handleInputChange}
-                            placeholder="Berapa banyak pertemuan/kajian?"
-                            className="pl-12 lg:pl-14"
-                          />
+                           <Input
+                             type="number"
+                             name="totalKajian"
+                             min="1"
+                             value={formData.totalKajian}
+                             onChange={handleInputChange}
+                             placeholder="Berapa banyak pertemuan/kajian?"
+                             className="pl-12 lg:pl-14"
+                           />
                         </div>
                       </div>
                     </div>

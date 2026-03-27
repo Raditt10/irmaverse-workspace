@@ -354,7 +354,7 @@ const Materials = () => {
                       <Calendar className="h-4 w-4" />
                       Hari Ini
                     </button>
-                    {isPrivileged && (
+                    {isPrivileged && role !== "instruktur" && role !== "instructor" && (
                       <button
                         onClick={() => setActiveFilter("mine")}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs lg:text-sm font-black transition-all ${
@@ -364,7 +364,7 @@ const Materials = () => {
                         }`}
                       >
                         <UserIcon className="h-4 w-4" />
-                        Saya
+                        Kajian Saya
                       </button>
                     )}
                   </div>

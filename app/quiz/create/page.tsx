@@ -273,7 +273,6 @@ export default function CreateStandaloneQuizPage() {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="Contoh: Quiz Pengetahuan Umum Islam"
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -324,7 +323,6 @@ export default function CreateStandaloneQuizPage() {
                         onChange={(e) => updateQuestion(qIdx, e.target.value)}
                         placeholder="Tulis pertanyaan di sini..."
                         rows={2}
-                        required
                       />
                     </div>
 

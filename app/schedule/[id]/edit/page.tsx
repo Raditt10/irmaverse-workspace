@@ -181,6 +181,7 @@ const EditSchedule = () => {
     if (!formData.time) { showToast("Jam event harus dipilih", "error"); return; }
     if (!formData.location.trim()) { showToast("Lokasi event tidak boleh kosong", "error"); return; }
     if (!formData.pemateri.trim()) { showToast("Narahubung tidak boleh kosong", "error"); return; }
+    if (!formData.thumbnailUrl) { showToast("Tumbnail event wajib diunggah", "error"); return; }
 
     setSubmitting(true);
     try {
@@ -263,7 +264,6 @@ const EditSchedule = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="Contoh: Seminar Akhlak Pemuda"
@@ -276,7 +276,6 @@ const EditSchedule = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={3}
                         value={formData.description}
                         onChange={handleChange}
@@ -345,7 +344,6 @@ const EditSchedule = () => {
                         <Input
                           type="text"
                           name="location"
-                          required
                           value={formData.location}
                           onChange={handleChange}
                           placeholder="Contoh: Aula Utama"
@@ -365,7 +363,6 @@ const EditSchedule = () => {
                         <Input
                           type="text"
                           name="pemateri"
-                          required
                           value={formData.pemateri}
                           onChange={handleChange}
                           placeholder="Contoh: Ustadz Ahmad Zaki"
@@ -440,7 +437,6 @@ const EditSchedule = () => {
                       disabled={uploading}
                       className="hidden"
                       id="upload-thumb"
-                      required={!formData.thumbnailUrl}
                     />
                     {formData.thumbnailUrl ? (
                       <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-teal-400 transition-all shadow-sm">

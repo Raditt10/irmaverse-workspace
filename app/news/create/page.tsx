@@ -114,6 +114,18 @@ export default function CreateNewsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.title.trim()) {
+      showToast("Judul berita wajib diisi", "error");
+      return;
+    }
+    if (!formData.content.trim()) {
+      showToast("Konten berita wajib diisi", "error");
+      return;
+    }
+    if (!formData.image) {
+      showToast("Tumbnail berita wajib diunggah", "error");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -196,7 +208,6 @@ export default function CreateNewsPage() {
                         onChange={handleChange}
                         placeholder="Masukkan judul berita..."
                         className="w-full rounded-2xl border-2 border-slate-200 bg-white px-4 sm:px-5 py-3.5 sm:py-4 text-sm sm:text-base font-medium shadow-sm transition-all focus:outline-none focus:border-teal-400 focus:shadow-[0_4px_0_0_#34d399]"
-                        required
                       />
                     </div>
 
@@ -280,14 +291,12 @@ export default function CreateNewsPage() {
                       onChange={handleImageUpload}
                       disabled={uploadingImage}
                       className="hidden"
-                      required={!formData.image}
                     />
                     {formData.image ? (
                       <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-teal-400 transition-all shadow-sm">
                         <img
                           src={formData.image}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
+                          className="w-full rounded-2xll object-cover"
                         />
                         <button
                           type="button"

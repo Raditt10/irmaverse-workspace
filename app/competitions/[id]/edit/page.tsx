@@ -191,6 +191,11 @@ const EditCompetition = () => {
       return;
     }
 
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kompetisi wajib diunggah", "error");
+      return;
+    }
+
     setLoading(true);
     try {
       // Create a combined date object from date and time
@@ -278,7 +283,6 @@ const EditCompetition = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="Contoh: Lomba Tahfidz Tingkat Nasional"
@@ -308,7 +312,6 @@ const EditCompetition = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={4}
                         value={formData.description}
                         onChange={handleChange}
@@ -359,7 +362,6 @@ const EditCompetition = () => {
                         <Input
                           type="text"
                           name="location"
-                          required
                           value={formData.location}
                           onChange={handleChange}
                           placeholder="Contoh: Aula Utama IRMA"

@@ -386,7 +386,6 @@ export default function EditQuizPage() {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="Judul quiz..."
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -439,7 +438,6 @@ export default function EditQuizPage() {
                         onChange={(e) => updateQuestion(qIdx, e.target.value)}
                         placeholder="Tulis pertanyaan di sini..."
                         rows={2}
-                        required
                       />
                     </div>
 

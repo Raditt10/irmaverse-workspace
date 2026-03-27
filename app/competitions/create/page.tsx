@@ -172,6 +172,10 @@ const CreateCompetition = () => {
       showToast("Hadiah utama/Juara 1 belum diisi!", "error");
       return;
     }
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kompetisi wajib diunggah", "error");
+      return;
+    }
     // -------------------------
 
     setLoading(true);
@@ -281,7 +285,6 @@ const CreateCompetition = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="Contoh: Lomba Tahfidz Tingkat Nasional"
@@ -311,7 +314,6 @@ const CreateCompetition = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={4}
                         value={formData.description}
                         onChange={handleChange}
@@ -332,7 +334,6 @@ const CreateCompetition = () => {
                         <Input
                           type="text"
                           name="location"
-                          required
                           value={formData.location}
                           onChange={handleChange}
                           placeholder="Contoh: Aula Utama IRMA / Online"
