@@ -24,12 +24,12 @@ export async function GET(request: NextRequest) {
       // ── Load older messages (pagination) ──────────────────────────────────
       const beforeDate = new Date(before);
 
-      const messages = await prisma.forumMessage.findMany({
+      const messages = await prisma.forum_messages.findMany({
         where: { createdAt: { lt: beforeDate } },
         orderBy: { createdAt: "desc" },
         take: PAGE_SIZE + 1, // +1 to detect whether there are more
         include: {
-          sender: {
+          users: {
             select: { id: true, name: true, avatar: true, role: true },
           },
         },
@@ -44,11 +44,11 @@ export async function GET(request: NextRequest) {
       });
     } else {
       // ── Initial load: last 100 messages ───────────────────────────────────
-      const messages = await prisma.forumMessage.findMany({
+      const messages = await prisma.forum_messages.findMany({
         orderBy: { createdAt: "desc" },
         take: INITIAL_LOAD + 1,
         include: {
-          sender: {
+          users: {
             select: { id: true, name: true, avatar: true, role: true },
           },
         },
@@ -101,10 +101,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const message = await prisma.forumMessage.create({
-      data: { content, senderId: session.user.id },
+    const message = await prisma.forum_messages.create({
+      data: { id: crypto.randomUUID(), content, senderId: session.user.id },
       include: {
-        sender: {
+        users: {
           select: { id: true, name: true, avatar: true, role: true },
         },
       },
@@ -126,7 +126,7 @@ function mapMessage(msg: {
   content: string;
   senderId: string;
   createdAt: Date;
-  sender: {
+  users: {
     id: string;
     name: string | null;
     avatar: string | null;
@@ -139,10 +139,10 @@ function mapMessage(msg: {
     senderId: msg.senderId,
     createdAt: msg.createdAt.toISOString(),
     sender: {
-      id: msg.sender.id,
-      name: msg.sender.name ?? "Anonim",
-      avatar: msg.sender.avatar ?? null,
-      role: msg.sender.role,
+      id: msg.users.id,
+      name: msg.users.name ?? "Anonim",
+      avatar: msg.users.avatar ?? null,
+      role: msg.users.role,
     },
   };
 }

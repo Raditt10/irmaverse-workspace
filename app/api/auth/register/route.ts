@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Cek apakah user sudah ada
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email },
     });
 
@@ -29,12 +29,14 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Buat user baru
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
+        id: crypto.randomUUID(),
         email,
         name,
         password: hashedPassword,
         role: "user",
+        updatedAt: new Date(),
       },
     });
 

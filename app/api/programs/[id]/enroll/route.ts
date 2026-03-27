@@ -19,7 +19,7 @@ export async function POST(
 
     const { id } = await params;
 
-    const program = await prisma.program.findUnique({ where: { id } });
+    const program = await prisma.programs.findUnique({ where: { id } });
     if (!program) {
       return NextResponse.json(
         { error: "Program tidak ditemukan" },
@@ -28,7 +28,7 @@ export async function POST(
     }
 
     // Check if already enrolled
-    const existing = await prisma.program_enrollment.findUnique({
+    const existing = await prisma.program_enrollments.findUnique({
       where: { programId_userId: { programId: id, userId: session.user.id } },
     });
 
@@ -39,8 +39,9 @@ export async function POST(
       );
     }
 
-    await prisma.program_enrollment.create({
+    await prisma.program_enrollments.create({
       data: {
+        id: crypto.randomUUID(),
         programId: id,
         userId: session.user.id,
       },

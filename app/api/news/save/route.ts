@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Toggle save status
-    const existingSave = await prisma.savedNews.findUnique({
+    const existingSave = await prisma.saved_news.findUnique({
       where: {
         userId_newsId: {
           userId: user.id,
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     if (existingSave) {
       // Unsave
-      await prisma.savedNews.delete({
+      await prisma.saved_news.delete({
         where: {
           id: existingSave.id,
         },
@@ -54,8 +54,9 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Save
-      await prisma.savedNews.create({
+      await prisma.saved_news.create({
         data: {
+          id: crypto.randomUUID(),
           userId: user.id,
           newsId,
         },
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ isSaved: false });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "News ID is required" }, { status: 400 });
     }
 
-    const existingSave = await prisma.savedNews.findUnique({
+    const existingSave = await prisma.saved_news.findUnique({
       where: {
         userId_newsId: {
           userId: user.id,

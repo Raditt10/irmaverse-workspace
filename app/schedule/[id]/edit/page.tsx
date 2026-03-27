@@ -89,7 +89,7 @@ const EditSchedule = () => {
         status === "authenticated" &&
         session?.user?.id !== data.instructorId &&
         session?.user?.role !== "admin" &&
-        session?.user?.role !== "instruktur"
+        session?.user?.role !== "super_admin"
       ) {
         showToast("Anda tidak memiliki akses untuk mengedit event ini", "error");
         setTimeout(() => router.push("/schedule"), 2000);
@@ -120,11 +120,13 @@ const EditSchedule = () => {
     }
   };
 
-  // Redirect jika bukan instruktur atau admin
+  // Redirect jika bukan instruktur, admin, atau super_admin
+  const role = session?.user?.role;
+  const isPrivileged = role === "instruktur" || role === "admin" || role === "super_admin";
+
   if (
     status === "authenticated" &&
-    session?.user?.role !== "instruktur" &&
-    session?.user?.role !== "admin"
+    !isPrivileged
   ) {
     router.push("/schedule");
     return null;
@@ -179,6 +181,7 @@ const EditSchedule = () => {
     if (!formData.time) { showToast("Jam event harus dipilih", "error"); return; }
     if (!formData.location.trim()) { showToast("Lokasi event tidak boleh kosong", "error"); return; }
     if (!formData.pemateri.trim()) { showToast("Narahubung tidak boleh kosong", "error"); return; }
+    if (!formData.thumbnailUrl) { showToast("Tumbnail event wajib diunggah", "error"); return; }
 
     setSubmitting(true);
     try {
@@ -228,7 +231,7 @@ const EditSchedule = () => {
                 onClick={() => router.back()}
                 className="self-start inline-flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#cbd5e1] active:translate-y-0.5 active:shadow-none transition-all text-sm lg:text-base"
               >
-                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
+                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5 text-emerald-500" strokeWidth={3} />
                 Kembali
               </button>
               <div>
@@ -261,7 +264,6 @@ const EditSchedule = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="Contoh: Seminar Akhlak Pemuda"
@@ -274,7 +276,6 @@ const EditSchedule = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={3}
                         value={formData.description}
                         onChange={handleChange}
@@ -333,31 +334,41 @@ const EditSchedule = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                        <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Lokasi <span className="text-red-500">*</span>
                       </label>
-                      <Input
-                        type="text"
-                        name="location"
-                        required
-                        value={formData.location}
-                        onChange={handleChange}
-                        placeholder="Contoh: Aula Utama"
-                      />
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <MapPin className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <Input
+                          type="text"
+                          name="location"
+                          value={formData.location}
+                          onChange={handleChange}
+                          placeholder="Contoh: Aula Utama"
+                          className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                         <Headset className="h-4 w-4" /> Narahubung <span className="text-red-500">*</span>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                         Narahubung <span className="text-red-500">*</span>
                       </label>
-                      <Input
-                        type="text"
-                        name="pemateri"
-                        required
-                        value={formData.pemateri}
-                        onChange={handleChange}
-                        placeholder="Contoh: Ustadz Ahmad Zaki"
-                      />
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Headset className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <Input
+                          type="text"
+                          name="pemateri"
+                          value={formData.pemateri}
+                          onChange={handleChange}
+                          placeholder="Contoh: Ustadz Ahmad Zaki"
+                          className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -370,29 +381,41 @@ const EditSchedule = () => {
                   <div className="space-y-4 lg:space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Phone className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Nomor Telepon (WA)
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Nomor Telepon (WA)
                         </label>
-                        <Input
-                          type="tel"
-                          name="contactNumber"
-                          value={formData.contactNumber}
-                          onChange={handleChange}
-                          placeholder="Contoh: 08123456789"
-                        />
+                        <div className="relative group">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Phone className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                          </div>
+                          <Input
+                            type="tel"
+                            name="contactNumber"
+                            value={formData.contactNumber}
+                            onChange={handleChange}
+                            placeholder="Contoh: 08123456789"
+                            className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Mail className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Email
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Email
                         </label>
-                        <Input
-                          type="email"
-                          name="contactEmail"
-                          value={formData.contactEmail}
-                          onChange={handleChange}
-                          placeholder="email@example.com"
-                        />
+                        <div className="relative group">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Mail className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                          </div>
+                          <Input
+                            type="email"
+                            name="contactEmail"
+                            value={formData.contactEmail}
+                            onChange={handleChange}
+                            placeholder="email@example.com"
+                            className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -414,7 +437,6 @@ const EditSchedule = () => {
                       disabled={uploading}
                       className="hidden"
                       id="upload-thumb"
-                      required={!formData.thumbnailUrl}
                     />
                     {formData.thumbnailUrl ? (
                       <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-teal-400 transition-all shadow-sm">
@@ -448,7 +470,7 @@ const EditSchedule = () => {
                           </svg>
                         ) : (
                           <>
-                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-teal-500 transition-colors" />
+                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-emerald-500 mb-2 group-hover:text-emerald-600 transition-colors" />
                             <span className="text-xs lg:text-sm font-bold text-slate-400 group-hover:text-teal-500 transition-colors">
                               Klik untuk Upload Thumbnail
                             </span>

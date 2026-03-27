@@ -8,7 +8,7 @@ interface DetailButtonProps {
   onDelete?: () => void;
   label?: string;
   className?: string;
-  role?: "instruktur" | "admin" | "member" | null;
+  role?: "instruktur" | "admin" | "super_admin" | "member" | null;
   iconOnly?: boolean;
   showConfirm?: boolean;
   confirmTitle?: string;
@@ -27,7 +27,7 @@ export default function DetailButton({
   confirmTitle,
   confirmMessage,
 }: DetailButtonProps) {
-  const isInstructor = role === "instruktur" || role === "admin";
+  const isInstructor = role === "instruktur" || role === "admin" || role === "super_admin";
 
   // Base class untuk tombol utama (Detail)
   const mainButtonClass = `

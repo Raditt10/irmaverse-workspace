@@ -16,9 +16,10 @@ import {
   Zap,
   User as UserIcon,
   UserCheck,
-  Heart,
+  Handshake,
   Sparkles,
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Tab = "friends" | "followers" | "following" | "suggestions";
@@ -141,7 +142,7 @@ export default function FriendsPage() {
     {
       key: "friends",
       label: "Teman",
-      icon: <Heart className="h-4 w-4" />,
+      icon: <Handshake className="h-4 w-4" />,
       count: counts.friends,
     },
     {
@@ -169,22 +170,18 @@ export default function FriendsPage() {
       <DashboardHeader />
 
       <div className="flex flex-1">
-        <div className="hidden lg:block h-[calc(100vh-80px)] sticky top-20">
-          <Sidebar />
-        </div>
+        <Sidebar />
 
         <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
           {/* ─── HEADER ─── */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-            <div>
-              <h1 className="text-3xl lg:text-4xl font-black text-slate-800 leading-tight">
-                Teman Belajar
-              </h1>
-              <p className="text-slate-500 font-medium mt-1">
-                Temukan dan berinteraksi dengan teman sesama pejuang ilmu.
-              </p>
-            </div>
-          </div>
+          <PageBanner
+            title="Teman Belajar"
+            description="Temukan dan berinteraksi dengan teman sesama pejuang ilmu."
+            icon={Handshake}
+            tag="Bestie"
+            tagIcon={Handshake}
+            className="mb-8"
+          />
 
           {/* ─── TABS ─── */}
           <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
@@ -192,7 +189,7 @@ export default function FriendsPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm border-2 transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-bold text-xs sm:text-sm border-2 transition-all whitespace-nowrap ${
                   activeTab === tab.key
                     ? "bg-emerald-500 text-white border-emerald-600 shadow-lg shadow-emerald-100"
                     : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300 hover:text-emerald-600"
@@ -216,7 +213,7 @@ export default function FriendsPage() {
           </div>
 
           {/* ─── SEARCH ─── */}
-          <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-4 lg:p-6 mb-8 shadow-[0_6px_0_0_#cbd5e1]">
+          <div className="bg-white border-2 border-slate-200 rounded-4xl p-4 lg:p-6 mb-8 shadow-[0_6px_0_0_#cbd5e1] max-w-md">
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
@@ -244,36 +241,37 @@ export default function FriendsPage() {
                 {activeTab === "suggestions" ? (
                   <Sparkles className="h-10 w-10 text-slate-300" />
                 ) : (
-                  <Users className="h-10 w-10 text-slate-300" />
+                  <Handshake className="h-10 w-10 text-slate-300" />
                 )}
               </div>
-              <h3 className="text-xl font-black text-slate-700">
+              <h3 className="text-lg sm:text-xl font-black text-slate-700 text-center px-4">
                 {activeTab === "friends" && "Belum ada teman"}
                 {activeTab === "followers" && "Belum ada pengikut"}
                 {activeTab === "following" && "Belum mengikuti siapapun"}
                 {activeTab === "suggestions" && "Tidak ada saran saat ini"}
               </h3>
-              <p className="text-slate-400 font-medium mt-1">
+              <p className="text-slate-400 font-medium mt-1 text-center px-6 text-xs sm:text-sm">
                 {activeTab === "suggestions"
                   ? "Kamu sudah mengikuti semua pengguna!"
                   : "Mulai ikuti pengguna lain untuk membangun koneksi."}
               </p>
-              {activeTab !== "suggestions" && (
-                <button
-                  onClick={() => setActiveTab("suggestions")}
-                  className="mt-4 flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  Cari Teman Baru
-                </button>
-              )}
+              {activeTab !== "suggestions" &&
+                (activeTab as any) === "NEVER_SHOW_THIS" && (
+                  <button
+                    onClick={() => setActiveTab("suggestions")}
+                    className="mt-4 flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Cari Teman Baru
+                  </button>
+                )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
               {users.map((user) => (
                 <div
                   key={user.id}
-                  className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_6px_0_0_#34d399] transition-all duration-300 group relative overflow-hidden"
+                  className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-8 shadow-[0_8px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_8px_0_0_#34d399] hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col"
                 >
                   {/* Status Indicator */}
                   <div className="absolute top-6 right-6 flex items-center gap-1.5">
@@ -290,8 +288,8 @@ export default function FriendsPage() {
                   </div>
 
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="relative">
-                      <Avatar className="h-16 w-16 border-4 border-slate-50 shadow-sm">
+                    <div className="relative group-hover:scale-105 transition-transform duration-500">
+                      <Avatar className="h-20 w-20 md:h-24 md:w-24 border-4 border-slate-50 shadow-md">
                         <AvatarImage
                           src={
                             user.avatar ||
@@ -299,25 +297,25 @@ export default function FriendsPage() {
                           }
                           alt={user.name || "User"}
                         />
-                        <AvatarFallback className="bg-emerald-500 text-white font-black text-xl">
+                        <AvatarFallback className="bg-emerald-500 text-white font-black text-2xl">
                           {(user.name || "U").substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-black text-slate-800 truncate group-hover:text-emerald-600 transition-colors">
+                      <h3 className="text-xl md:text-2xl font-black text-slate-800 truncate group-hover:text-emerald-600 transition-colors leading-tight">
                         {user.name || "Pengguna"}
                       </h3>
-                      <p className="text-xs font-bold text-slate-400 truncate mb-2">
+                      <p className="text-sm font-bold text-slate-400 truncate mb-3">
                         {user.email}
                       </p>
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded-lg border border-amber-100 text-[10px] font-black uppercase">
-                          <Zap className="h-3 w-3" fill="currentColor" />
+                        <div className="flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-xl border-2 border-amber-100 text-xs font-black uppercase">
+                          <Zap className="h-3.5 w-3.5" fill="currentColor" />
                           Lvl {user.level}
                         </div>
-                        <span className="text-[10px] font-black text-slate-300 uppercase">
+                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">
                           {user.points.toLocaleString()} XP
                         </span>
                       </div>
@@ -326,69 +324,51 @@ export default function FriendsPage() {
 
                   {/* Bio preview */}
                   {user.bio && (
-                    <p className="text-xs text-slate-500 font-medium mb-4 line-clamp-2 leading-relaxed">
-                      {user.bio}
+                    <p className="text-sm text-slate-500 font-bold mb-6 line-clamp-3 leading-relaxed italic border-l-4 border-emerald-100 pl-4 py-1">
+                      "{user.bio}"
                     </p>
                   )}
 
                   {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {activeTab === "suggestions" ? (
-                      <>
-                        <FollowButton
-                          targetUserId={user.id}
-                          initialIsFollowing={false}
-                          size="sm"
-                          className="w-full"
-                          onStatusChange={(following) => {
-                            if (following) {
-                              setUsers((prev) =>
-                                prev.filter((u) => u.id !== user.id),
-                              );
-                              fetchCounts();
-                            }
-                          }}
-                        />
-                        <button
-                          onClick={() => router.push(`/u/${user.id}`)}
-                          className="flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
-                        >
-                          <UserIcon className="h-4 w-4" /> Profil
-                        </button>
-                      </>
-                    ) : activeTab === "followers" && !user.iFollowBack ? (
-                      <>
-                        <FollowButton
-                          targetUserId={user.id}
-                          initialIsFollowing={false}
-                          size="sm"
-                          className="w-full"
-                          onStatusChange={() => fetchCounts()}
-                        />
-                        <button
-                          onClick={() => router.push(`/u/${user.id}`)}
-                          className="flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
-                        >
-                          <UserIcon className="h-4 w-4" /> Profil
-                        </button>
-                      </>
-                    ) : (
-                      <>
+                  <div className="flex flex-col sm:flex-row items-center gap-3 mt-auto">
+                    <button
+                      onClick={() => router.push(`/u/${user.id}`)}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-white text-slate-600 font-black rounded-2xl border-2 border-slate-200 border-b-4 hover:bg-slate-50 hover:border-slate-300 active:border-b-2 active:translate-y-0.5 transition-all text-sm"
+                    >
+                      <UserIcon className="h-5 w-5" /> Profil
+                    </button>
+                    {activeTab === "friends" &&
+                      session?.user?.id !== user.id && (
                         <button
                           onClick={() =>
-                            router.push(`/chat-rooms?userId=${user.id}`)
+                            router.push(`/friends/chat?userId=${user.id}`)
                           }
-                          className="flex items-center justify-center gap-2 py-2 bg-emerald-50 text-emerald-600 font-black rounded-xl border-2 border-emerald-100 hover:bg-emerald-100 transition-colors text-xs"
+                          className="w-full flex items-center justify-center gap-2 py-3.5 bg-teal-400 text-white font-black rounded-2xl border-2 border-teal-600 border-b-4 hover:bg-teal-500 hover:shadow-lg active:border-b-2 active:translate-y-0.5 transition-all text-sm shadow-sm"
                         >
-                          <MessageCircle className="h-4 w-4" /> Chat
+                          <MessageCircle className="h-5 w-5" /> Chat
                         </button>
-                        <button
-                          onClick={() => router.push(`/u/${user.id}`)}
-                          className="flex items-center justify-center gap-2 py-2 bg-slate-50 text-slate-600 font-black rounded-xl border-2 border-slate-100 hover:bg-slate-100 transition-colors text-xs"
-                        >
-                          <UserIcon className="h-4 w-4" /> Profil
-                        </button>
-                      </>
+                      )}
+                  </div>
+                  
+                  <div className="mt-4">
+                    {session?.user?.id !== user.id && ( // Hide if it's ourself (rare but good check)
+                      <FollowButton
+                        targetUserId={user.id}
+                        initialIsFollowing={
+                          activeTab === "friends" ||
+                          activeTab === "following" ||
+                          !!user.iFollowBack
+                        }
+                        initialIsMutual={
+                          activeTab === "friends" ||
+                          (activeTab === "followers" && !!user.iFollowBack)
+                        }
+                        size="lg"
+                        className="w-full"
+                        onStatusChange={() => {
+                          fetchCounts();
+                        }}
+                      />
                     )}
                   </div>
                 </div>

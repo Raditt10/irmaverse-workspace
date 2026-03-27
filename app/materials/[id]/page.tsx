@@ -62,6 +62,8 @@ interface Material {
   points?: string[];
   attendedAt?: string;
   hasRekapan?: boolean;
+  isEnrolledInProgram?: boolean;
+  program?: { id: string; title: string } | null;
   inviteDetails?: InviteDetail[];
 }
 
@@ -98,7 +100,7 @@ const MaterialDetail = () => {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
-    role === "instruktur" || role === "admin" || role === "instructor";
+    role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
@@ -167,6 +169,8 @@ const MaterialDetail = () => {
         points: data.points || [],
         attendedAt: data.attendedAt || undefined,
         hasRekapan: data.hasRekapan ?? false,
+        isEnrolledInProgram: data.isEnrolledInProgram ?? false,
+        program: data.program || null,
         inviteDetails: data.inviteDetails || [],
       };
 
@@ -206,7 +210,7 @@ const MaterialDetail = () => {
       style = "bg-rose-100 text-rose-700 border-rose-200";
     if (category === "Program Ekstra")
       style = "bg-purple-100 text-purple-700 border-purple-200";
-    if (category === "Program Next Level")
+    if (category === "Program Next Level" || category === "Program Susulan")
       style = "bg-amber-100 text-amber-700 border-amber-200";
 
     return (
@@ -446,7 +450,8 @@ const MaterialDetail = () => {
                   )}
                 </div>
 
-                {/* Rekapan & Quiz Section */}
+                {/* Rekapan & Quiz Section — visible only to invited/privileged */}
+                {(material.isJoined || isPrivileged) && (
                 <div className="bg-white p-6 lg:p-8 rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1]">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="p-2.5 bg-emerald-100 rounded-2xl border-2 border-emerald-200">
@@ -571,6 +576,7 @@ const MaterialDetail = () => {
                     </button>
                   )}
                 </div>
+                )}
               </div>
 
               {/* RIGHT COLUMN (Instructor & CTA) */}
@@ -723,6 +729,7 @@ const MaterialDetail = () => {
 
                 {/* CTA / Action Box */}
                 {!isPrivileged && (
+                  material.isJoined ? (
                   <div className="bg-linear-to-br from-teal-400 to-cyan-400 rounded-4xl p-6 lg:p-8 text-white border-2 border-teal-600 shadow-[0_6px_0_0_#0f766e] text-center relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
 
@@ -750,9 +757,13 @@ const MaterialDetail = () => {
                           untuk mencatat kehadiranmu.
                         </p>
                         <button
-                          onClick={() =>
-                            router.push(`/materials/${material.id}/absensi`)
-                          }
+                          onClick={() => {
+                            if (material.program?.id && !material.isEnrolledInProgram) {
+                              showToast("mohon maaf, kamu belum terdaftar di program kurikulum kajian ini", "error");
+                              return;
+                            }
+                            router.push(`/materials/${material.id}/absensi`);
+                          }}
                           className="w-full py-4 rounded-2xl bg-white text-teal-600 font-black border-2 border-teal-100 shadow-lg hover:bg-teal-50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10"
                         >
                           <CheckCircle2 className="w-5 h-5" />
@@ -761,6 +772,17 @@ const MaterialDetail = () => {
                       </>
                     )}
                   </div>
+                  ) : (
+                  <div className="bg-white rounded-4xl p-6 lg:p-8 border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] text-center">
+                    <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-slate-200">
+                      <Info className="h-7 w-7 text-slate-400" />
+                    </div>
+                    <h3 className="text-lg font-black text-slate-700 mb-2">Akses Dibatasi</h3>
+                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                      Mohon maaf, Kamu tidak terdaftar sebagai peserta kajian ini.
+                    </p>
+                  </div>
+                  )
                 )}
               </div>
             </div>

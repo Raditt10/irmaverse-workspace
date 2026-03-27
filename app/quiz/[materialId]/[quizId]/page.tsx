@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   X,
@@ -18,6 +18,7 @@ import {
   ChevronUp,
   Eye,
   BookOpen,
+  Zap,
 } from "lucide-react";
 import Loading from "@/components/ui/Loading";
 import DashboardHeader from "@/components/ui/Header";
@@ -72,6 +73,7 @@ interface QuizData {
     score: number;
     totalScore: number;
     completedAt: string;
+    answers?: any;
   }[];
 }
 
@@ -91,6 +93,7 @@ interface FinalResult {
   totalScore: number;
   percentage: number;
   results: ReviewResult[];
+  xpAwarded?: boolean;
   cooldownMinutes: number;
   retryAt: string;
 }
@@ -98,8 +101,10 @@ interface FinalResult {
 export default function QuizSessionPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const materialId = params.materialId as string;
   const quizId = params.quizId as string;
+  const isReviewMode = searchParams.get("review") === "true";
 
   const { status: authStatus } = useSession({
     required: true,
@@ -120,6 +125,11 @@ export default function QuizSessionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResult | null>(null);
+  const { data: session } = useSession();
+  const isStaffRole =
+    session?.user?.role === "admin" ||
+    session?.user?.role === "super_admin" ||
+    session?.user?.role === "instruktur";
 
   // Review state
   const [showReview, setShowReview] = useState(false);
@@ -135,20 +145,29 @@ export default function QuizSessionPage() {
     }
   }, [authStatus, quizId]);
 
-  // Cooldown timer
   useEffect(() => {
-    if (cooldownRemaining <= 0) return;
-    const timer = setInterval(() => {
-      setCooldownRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [cooldownRemaining]);
+    if (quizData && isReviewMode && quizData.attempts.length > 0) {
+      const latest = quizData.attempts[0];
+      if (latest.answers) {
+        const results = Array.isArray(latest.answers)
+          ? latest.answers
+          : JSON.parse(latest.answers as any);
+
+        setFinalResult({
+          score: latest.score,
+          totalScore: latest.totalScore,
+          percentage: Math.round((latest.score / latest.totalScore) * 100),
+          results: results,
+          xpAwarded: false, // Review doesn't award XP
+          cooldownMinutes: 0,
+          retryAt: new Date().toISOString(),
+        });
+        setIsFinished(true);
+      }
+    }
+  }, [quizData, isReviewMode]);
+
+  // Cooldown timer
 
   const fetchQuiz = async () => {
     try {
@@ -372,6 +391,20 @@ export default function QuizSessionPage() {
               </p>
             </div>
 
+            {/* XP Badge */}
+            <div className="mb-6">
+              {finalResult?.xpAwarded ? (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-black border-2 border-emerald-200 animate-bounce">
+                  <Zap className="h-4 w-4 fill-current" />
+                  XP Berhasil Didapatkan!
+                </div>
+              ) : (
+                <p className="text-xs font-bold text-slate-400 italic">
+                  *XP sudah pernah didapatkan sebelumnya
+                </p>
+              )}
+            </div>
+
             {/* Cooldown timer */}
             {cooldownRemaining > 0 && (
               <div className="bg-emerald-50 rounded-2xl p-4 border-2 border-emerald-200 mb-6 flex items-center justify-center gap-3">
@@ -470,7 +503,7 @@ export default function QuizSessionPage() {
                           const isCorrectOpt = opt.isCorrect;
                           let optClass =
                             "bg-slate-50 border-slate-200 text-slate-600";
-                          let icon = null;
+                          let icon: React.ReactNode = null;
 
                           if (isCorrectOpt && isSelected) {
                             optClass =
@@ -548,13 +581,24 @@ export default function QuizSessionPage() {
         message="Pastikan semua jawaban sudah benar. Kamu tidak bisa mengubahnya setelah ini."
         confirmText="Ya, Selesai"
         cancelText="Belum"
-        type="info"
+        type="warning"
         onConfirm={() => {
           setShowSubmitConfirm(false);
           handleFinishQuiz();
         }}
         onCancel={() => setShowSubmitConfirm(false)}
       />
+
+      {/* Admin/Staff Preview Banner */}
+      {isStaffRole && (
+        <div className="bg-amber-100 border-b border-amber-200 px-4 py-2 text-center text-amber-800 text-sm font-bold flex items-center justify-center gap-2">
+          <Eye className="h-4 w-4" />
+          <span>
+            Mode Preview - Anda dapat melihat pertanyaan namun tidak dapat
+            menyimpan progress
+          </span>
+        </div>
+      )}
 
       {/* Top Bar */}
       <div className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b-2 border-slate-200 px-4 py-3">
@@ -600,7 +644,7 @@ export default function QuizSessionPage() {
                 <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
               </div>
             )}
-            
+
             <div className="p-6 lg:p-8 text-center">
               <p className="text-xs font-black text-emerald-500 uppercase tracking-wider mb-2 flex items-center justify-center gap-1.5">
                 <BookOpen className="h-3.5 w-3.5" /> {quizData.materialTitle}
@@ -688,7 +732,13 @@ export default function QuizSessionPage() {
               </button>
             ) : (
               <button
-                onClick={() => setShowSubmitConfirm(true)}
+                onClick={() => {
+                  if (isStaffRole) {
+                    router.push("/quiz");
+                  } else {
+                    setShowSubmitConfirm(true);
+                  }
+                }}
                 disabled={submitting}
                 className="px-10 py-4 rounded-2xl font-black text-lg bg-emerald-500 text-white border-b-4 border-emerald-700 shadow-[0_4px_0_0_#059669] hover:bg-emerald-600 active:border-b-0 active:translate-y-1 transition-all min-w-50"
               >
@@ -696,7 +746,8 @@ export default function QuizSessionPage() {
                   "Mengirim..."
                 ) : (
                   <>
-                    Selesaikan Quiz <Trophy className="inline h-5 w-5 ml-1" />
+                    {isStaffRole ? "Selesai Preview" : "Selesaikan Quiz"}{" "}
+                    <Trophy className="inline h-5 w-5 ml-1" />
                   </>
                 )}
               </button>

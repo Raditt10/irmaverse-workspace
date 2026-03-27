@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user from database
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
       select: { id: true },
     });
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Update user avatar in database
     const avatarUrl = `/uploads/avatars/${fileName}`;
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: { id: user.id },
       data: { avatar: avatarUrl },
       select: {

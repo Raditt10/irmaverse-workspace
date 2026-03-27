@@ -15,6 +15,7 @@ interface CartoonConfirmDialogProps {
   onCancel?: () => void;
   isOpen?: boolean;
   onClose?: () => void;
+  showCancel?: boolean;
 }
 
 const CartoonConfirmDialog = ({
@@ -27,6 +28,7 @@ const CartoonConfirmDialog = ({
   onCancel,
   isOpen: externalIsOpen,
   onClose,
+  showCancel = true,
 }: CartoonConfirmDialogProps) => {
   const [internalIsOpen, setInternalIsOpen] = useState(externalIsOpen !== false);
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
@@ -91,56 +93,60 @@ const CartoonConfirmDialog = ({
       {/* Backdrop - Full screen blur */}
       <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" />
       
-      {/* Dialog - Centered on screen */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity">
         <div
           className={`
-            ${style.bg} ${style.border}
-            rounded-2xl border-4 p-6 shadow-2xl
+            ${style.bg} border-slate-200
+            rounded-2xl border-2 p-6 shadow-[0_8px_0_0_rgba(0,0,0,0.1)]
             relative overflow-hidden
-            animate-in scale-in-95 zoom-in-50
+            animate-in fade-in zoom-in duration-200
             max-w-sm w-full
           `}
         >
-          {/* Top accent bar */}
-          <div className={`absolute top-0 left-0 right-0 h-3 ${style.accentColor}`}></div>
-
-          <div className="pt-2">
-            {/* Icon */}
-            <div className={`${style.iconColor} mb-3`}>
-              <Icon size={40} strokeWidth={2.5} />
+          <div className="relative">
+            {/* Icon Group */}
+            <div className={`w-12 h-12 rounded-xl border-2 ${style.bg} ${style.border} flex items-center justify-center ${style.iconColor} mb-6 shadow-sm`}>
+              <Icon size={24} strokeWidth={2.5} />
             </div>
 
-            {/* Title & Message */}
-            <h2 className="text-lg font-bold mb-2">{title}</h2>
-            <p className="text-sm opacity-90 mb-6">{message}</p>
+            {/* Content */}
+            <div className="space-y-1 mb-8">
+              <h2 className="text-xl font-bold text-slate-900 leading-tight">{title}</h2>
+              <p className="text-slate-500 font-bold text-xs leading-relaxed">{message}</p>
+            </div>
 
-            {/* Buttons */}
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleCancel}
-                disabled={isLoading}
-                className="
-                  px-5 py-2 rounded-lg font-bold text-sm
-                  bg-gray-200 hover:bg-gray-300
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors
-                  border-2 border-gray-300
-                  shadow-md hover:shadow-lg
-                "
-              >
-                {cancelText}
-              </button>
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              {showCancel && (
+                <button
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                  className="
+                    flex-1 h-12 rounded-xl font-bold text-sm
+                    bg-white text-slate-600
+                    disabled:opacity-50
+                    transition-all
+                    border-2 border-slate-200
+                    shadow-[0_4px_0_0_#e2e8f0]
+                    hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_#e2e8f0]
+                    active:translate-y-0.5 active:shadow-none
+                  "
+                >
+                  {cancelText}
+                </button>
+              )}
               <button
                 onClick={handleConfirm}
                 disabled={isLoading}
                 className={`
-                  px-5 py-2 rounded-lg font-bold text-sm text-white
+                  flex-1 h-12 rounded-xl font-bold text-sm text-white
                   ${style.buttonColor}
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors
-                  border-2 border-transparent
-                  shadow-md hover:shadow-lg
+                  disabled:opacity-50
+                  transition-all
+                  border-2 border-black/10
+                  shadow-[0_4px_0_0_rgba(0,0,0,0.1)]
+                  hover:-translate-y-0.5 hover:shadow-[0_5px_0_0_rgba(0,0,0,0.1)]
+                  active:translate-y-0.5 active:shadow-none
                 `}
               >
                 {isLoading ? "Memproses..." : confirmText}

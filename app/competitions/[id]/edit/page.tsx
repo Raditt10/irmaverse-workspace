@@ -126,8 +126,13 @@ const EditCompetition = () => {
     }
   };
 
-  if (status === "authenticated" && session?.user?.role !== "instruktur" && session?.user?.role !== "admin") {
-    router.push("/competitions");
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role !== "instruktur" && session?.user?.role !== "admin" && session?.user?.role !== "super_admin") {
+      router.push("/competitions");
+    }
+  }, [status, session, router]);
+
+  if (status === "authenticated" && session?.user?.role !== "instruktur" && session?.user?.role !== "admin" && session?.user?.role !== "super_admin") {
     return null;
   }
 
@@ -186,6 +191,11 @@ const EditCompetition = () => {
       return;
     }
 
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kompetisi wajib diunggah", "error");
+      return;
+    }
+
     setLoading(true);
     try {
       // Create a combined date object from date and time
@@ -240,7 +250,7 @@ const EditCompetition = () => {
                 onClick={() => router.push(`/competitions/`)}
                 className="self-start inline-flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#cbd5e1] active:translate-y-0.5 active:shadow-none transition-all text-sm lg:text-base"
               >
-                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
+                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5 text-emerald-500" strokeWidth={3} />
                 Kembali
               </button>
               <div>
@@ -273,7 +283,6 @@ const EditCompetition = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="Contoh: Lomba Tahfidz Tingkat Nasional"
@@ -303,7 +312,6 @@ const EditCompetition = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={4}
                         value={formData.description}
                         onChange={handleChange}
@@ -344,17 +352,22 @@ const EditCompetition = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                        <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
+                      <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Lokasi <span className="text-red-500">*</span>
                       </label>
-                      <Input
-                        type="text"
-                        name="location"
-                        required
-                        value={formData.location}
-                        onChange={handleChange}
-                        placeholder="Contoh: Aula Utama IRMA"
-                      />
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <MapPin className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <Input
+                          type="text"
+                          name="location"
+                          value={formData.location}
+                          onChange={handleChange}
+                          placeholder="Contoh: Aula Utama IRMA"
+                          className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -404,7 +417,7 @@ const EditCompetition = () => {
                     {/* Criteria Column */}
                     <div className="space-y-4 lg:space-y-6">
                       <h2 className="text-lg lg:text-xl font-black text-slate-700 mb-6 lg:mb-8 flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-rose-100 text-rose-600">
+                        <div className="p-2 rounded-xl bg-emerald-100 text-emerald-600">
                           <ListChecks className="h-5 w-5 lg:h-6 lg:w-6" />
                         </div>
                         Kriteria Penilaian
@@ -598,43 +611,61 @@ const EditCompetition = () => {
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                        <Headset className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Narahubung
+                      <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Narahubung
                       </label>
-                      <Input
-                        type="text"
-                        name="contactPerson"
-                        value={formData.contactPerson}
-                        onChange={handleChange}
-                        placeholder="Contoh: Ahmad Fauzi"
-                      />
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Headset className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <Input
+                          type="text"
+                          name="contactPerson"
+                          value={formData.contactPerson}
+                          onChange={handleChange}
+                          placeholder="Contoh: Ahmad Fauzi"
+                          className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Phone className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Nomor Telepon
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Nomor Telepon
                         </label>
-                        <Input
-                          type="tel"
-                          name="contactNumber"
-                          value={formData.contactNumber}
-                          onChange={handleChange}
-                          placeholder="Contoh: 08123456789"
-                        />
+                        <div className="relative group">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Phone className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                          </div>
+                          <Input
+                            type="tel"
+                            name="contactNumber"
+                            value={formData.contactNumber}
+                            onChange={handleChange}
+                            placeholder="Contoh: 08123456789"
+                            className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Mail className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Email
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Email
                         </label>
-                        <Input
-                          type="email"
-                          name="contactEmail"
-                          value={formData.contactEmail}
-                          onChange={handleChange}
-                          placeholder="email@example.com"
-                        />
+                        <div className="relative group">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Mail className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                          </div>
+                          <Input
+                            type="email"
+                            name="contactEmail"
+                            value={formData.contactEmail}
+                            onChange={handleChange}
+                            placeholder="email@example.com"
+                            className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -677,7 +708,7 @@ const EditCompetition = () => {
                           <Sparkles className="w-6 h-6 lg:w-8 lg:h-8 text-teal-400 animate-spin" />
                         ) : (
                           <>
-                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-teal-500" />
+                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-emerald-500 mb-2 group-hover:text-emerald-600" />
                             <span className="text-xs lg:text-sm font-bold text-slate-400">Klik untuk Upload</span>
                           </>
                         )}

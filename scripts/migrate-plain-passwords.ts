@@ -8,13 +8,13 @@ async function migratePlainPasswords() {
   console.log("Memulai migrasi password...");
   
   // Ambil semua user
-  const users = await prisma.user.findMany();
+  const users = await prisma.users.findMany();
   
   for (const user of users) {
     // Cek jika password ada dan belum di-hash
     if (user.password && !user.password.startsWith("$2b$")) {
       const hashed = await bcrypt.hash(user.password, 10);
-      await prisma.user.update({
+      await prisma.users.update({
         where: { id: user.id },
         data: { password: hashed },
       });

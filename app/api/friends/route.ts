@@ -26,13 +26,13 @@ export async function GET(req: Request) {
 
     if (tab === "followers") {
       // Orang yang mengikuti saya
-      const followers = await prisma.friendship.findMany({
+      const followers = await prisma.friendships.findMany({
         where: {
           followingId: userId,
-          ...(search ? { follower: { name: { contains: search } } } : {}),
+          ...(search ? { users_friendships_followerIdTousers: { name: { contains: search } } } : {}),
         },
         include: {
-          follower: {
+          users_friendships_followerIdTousers: {
             select: {
               id: true,
               name: true,
@@ -50,7 +50,7 @@ export async function GET(req: Request) {
       });
 
       // Cek apakah saya juga follow mereka balik
-      const myFollowing = await prisma.friendship.findMany({
+      const myFollowing = await prisma.friendships.findMany({
         where: {
           followerId: userId,
           followingId: { in: followers.map((f) => f.followerId) },
@@ -63,7 +63,7 @@ export async function GET(req: Request) {
 
       return NextResponse.json(
         followers.map((f) => ({
-          ...f.follower,
+          ...f.users_friendships_followerIdTousers,
           friendshipId: f.id,
           friendshipStatus: f.status,
           iFollowBack: followingMap.has(f.followerId),
@@ -73,13 +73,13 @@ export async function GET(req: Request) {
 
     if (tab === "following") {
       // Orang yang saya ikuti
-      const following = await prisma.friendship.findMany({
+      const following = await prisma.friendships.findMany({
         where: {
           followerId: userId,
-          ...(search ? { following: { name: { contains: search } } } : {}),
+          ...(search ? { users_friendships_followingIdTousers: { name: { contains: search } } } : {}),
         },
         include: {
-          following: {
+          users_friendships_followingIdTousers: {
             select: {
               id: true,
               name: true,
@@ -98,7 +98,7 @@ export async function GET(req: Request) {
 
       return NextResponse.json(
         following.map((f) => ({
-          ...f.following,
+          ...f.users_friendships_followingIdTousers,
           friendshipId: f.id,
           friendshipStatus: f.status,
         })),
@@ -107,13 +107,13 @@ export async function GET(req: Request) {
 
     if (tab === "suggestions") {
       // Users yang belum saya follow
-      const myFollowingIds = await prisma.friendship.findMany({
+      const myFollowingIds = await prisma.friendships.findMany({
         where: { followerId: userId },
         select: { followingId: true },
       });
       const excludeIds = [userId, ...myFollowingIds.map((f) => f.followingId)];
 
-      const suggestions = await prisma.user.findMany({
+      const suggestions = await prisma.users.findMany({
         where: {
           id: { notIn: excludeIds },
           role: "user", // Hanya tampilkan user biasa sebagai saran
@@ -138,20 +138,20 @@ export async function GET(req: Request) {
     }
 
     // Default: tab === "friends" → mutual follows (both accepted)
-    const myFollowing = await prisma.friendship.findMany({
+    const myFollowing = await prisma.friendships.findMany({
       where: { followerId: userId, status: "accepted" },
       select: { followingId: true },
     });
     const followingIds = myFollowing.map((f) => f.followingId);
 
-    const mutualFriends = await prisma.friendship.findMany({
+    const mutualFriends = await prisma.friendships.findMany({
       where: {
         followerId: { in: followingIds },
         followingId: userId,
         status: "accepted",
       },
       include: {
-        follower: {
+        users_friendships_followerIdTousers: {
           select: {
             id: true,
             name: true,
@@ -168,7 +168,7 @@ export async function GET(req: Request) {
     });
 
     const friends = mutualFriends
-      .map((f) => f.follower)
+      .map((f) => f.users_friendships_followerIdTousers)
       .filter((f) =>
         search ? f.name?.toLowerCase().includes(search.toLowerCase()) : true,
       );

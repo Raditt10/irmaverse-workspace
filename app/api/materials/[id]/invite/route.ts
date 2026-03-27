@@ -20,7 +20,7 @@ export async function POST(
       );
     }
 
-    const User = await prisma.user.findUnique({
+    const User = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
 
@@ -31,7 +31,7 @@ export async function POST(
       );
     }
 
-    if (User.role !== "instruktur" && User.role !== "admin") {
+    if (User.role !== "instruktur" && User.role !== "admin" && User.role !== "super_admin") {
       return NextResponse.json(
         { error: "Hanya instruktur yang bisa mengundang peserta!" },
         { status: 403 },
@@ -135,7 +135,7 @@ export async function GET(
       );
     }
 
-    const User = await prisma.user.findUnique({
+    const User = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
 
@@ -146,7 +146,7 @@ export async function GET(
       );
     }
 
-    if (User.role !== "instruktur" && User.role !== "admin") {
+    if (User.role !== "instruktur" && User.role !== "admin" && User.role !== "super_admin") {
       return NextResponse.json(
         {
           error: "Hanya instruktur dan admin yang bisa mengakses halaman ini!",
@@ -157,7 +157,7 @@ export async function GET(
     const query = req.nextUrl.searchParams.get("q") || "";
     const { id: materialId } = await params;
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       where: {
         OR: [{ name: { contains: query } }, { email: { contains: query } }],
         NOT: {

@@ -24,6 +24,7 @@ import {
   BarChart3,
   GraduationCap,
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Program {
   id: string;
@@ -38,6 +39,11 @@ interface Program {
   enrollmentCount: number;
   isEnrolled: boolean;
   isCompleted: boolean;
+  progress?: {
+    completed: number;
+    total: number;
+    percentage: number;
+  };
 }
 
 const OurPrograms = () => {
@@ -59,7 +65,7 @@ const OurPrograms = () => {
   const { data: session } = useSession({ required: false });
 
   const isPrivileged =
-    session?.user?.role === "instruktur" || session?.user?.role === "admin";
+    session?.user?.role === "instruktur" || session?.user?.role === "admin" || session?.user?.role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
@@ -121,8 +127,8 @@ const OurPrograms = () => {
 
     let matchCategory = true;
     if (selectedCategory !== "Semua Kategori") {
-      if (selectedCategory === "Next Level") {
-        matchCategory = program.category === "Program Next Level";
+      if (selectedCategory === "Susulan") {
+        matchCategory = program.category === "Program Susulan";
       } else {
         matchCategory = program.category === selectedCategory;
       }
@@ -142,7 +148,7 @@ const OurPrograms = () => {
     "Semua Kategori",
     "Program Wajib",
     "Program Ekstra",
-    "Next Level",
+    "Susulan",
   ];
   
   const subCategories = isPrivileged ? [] : ["Semua Status", "Belum Selesai", "Selesai"];
@@ -156,39 +162,29 @@ const OurPrograms = () => {
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  {isPrivileged ? "Kelola Program" : "Program Kurikulum"}
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  {isPrivileged
-                    ? "Buat dan kelola program kurikulum untuk anggota"
-                    : "Ikuti program untuk meningkatkan pengetahuan keagamaan"}
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {isPrivileged && (
-                  <div className="flex flex-wrap gap-3 text-xs font-bold">
-                    <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 shadow-sm">
-                      <GraduationCap className="h-3.5 w-3.5" />
+            <PageBanner
+              title={isPrivileged ? "Kelola Program" : "Program Kurikulum"}
+              description={isPrivileged ? "Buat dan kelola program kurikulum untuk anggota" : "Ikuti program untuk meningkatkan pengetahuan keagamaan"}
+              icon={GraduationCap}
+              tag="Program"
+              tagIcon={GraduationCap}
+              action={
+                isPrivileged && (
+                  <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+                    <div className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-white/20 text-white font-black text-sm border-2 border-white/30 backdrop-blur-sm w-full max-w-[180px] md:w-auto justify-center mx-auto md:mx-0">
+                      <GraduationCap className="h-5 w-5" />
                       <span>{programs.length} Program</span>
                     </div>
+                    <button
+                      onClick={() => router.push("/programs/create")}
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-teal-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                    >
+                      <Plus className="h-5 w-5" strokeWidth={3} /> Buat Program Baru
+                    </button>
                   </div>
-                )}
-
-                {isPrivileged && (
-                  <AddButton
-                    label="Buat Program"
-                    onClick={() => router.push("/programs/create")}
-                    icon={<Plus className="h-5 w-5" />}
-                    color="emerald"
-                    hideIcon={false}
-                  />
-                )}
-              </div>
-            </div>
+                )
+              }
+            />
 
             {!loading && programs.length > 0 && (
               <div className="mb-8 flex flex-col gap-4">
@@ -280,7 +276,7 @@ const OurPrograms = () => {
                             strokeWidth={2.5}
                           />
                           <span className="text-[11px] font-bold text-white">
-                            {program.materialCount} Materi
+                            {program.materialCount} Kajian
                           </span>
                         </div>
                       </div>
@@ -314,25 +310,25 @@ const OurPrograms = () => {
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
                                   Progress
                                 </span>
-                                {program.isCompleted ? (
+                                {program.isCompleted || program.progress?.percentage === 100 ? (
                                   <span className="text-[10px] font-black text-amber-600">
                                     Selesai 🏆
                                   </span>
                                 ) : (
                                   <span className="text-[10px] font-black text-emerald-600">
-                                    Terdaftar ✓
+                                    Terdaftar ✓ {program.progress?.percentage || 0}%
                                   </span>
                                 )}
                               </div>
                               <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <div
                                   className={`h-full rounded-full transition-all duration-500 ${
-                                    program.isCompleted
+                                    program.isCompleted || program.progress?.percentage === 100
                                       ? "bg-amber-400"
                                       : "bg-emerald-400"
                                   }`}
                                   style={{
-                                    width: program.isCompleted ? "100%" : "30%",
+                                    width: `${program.progress?.percentage || 0}%`,
                                   }}
                                 />
                               </div>
@@ -383,7 +379,7 @@ const OurPrograms = () => {
       <CartoonConfirmDialog
         type="warning"
         title="Hapus Program?"
-        message="Apakah Anda yakin ingin menghapus program ini? Materi di dalamnya tidak akan terhapus."
+        message="Apakah Anda yakin ingin menghapus program ini? Kajian di dalamnya tidak akan terhapus."
         confirmText="Ya, Hapus"
         cancelText="Batal"
         isOpen={showConfirmDelete}

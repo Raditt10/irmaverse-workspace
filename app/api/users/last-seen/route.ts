@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.user.updateMany({
+    await prisma.users.updateMany({
       where: { id: session.user.id },
       data: { lastSeen: new Date() },
     });
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       select: { lastSeen: true },
     });

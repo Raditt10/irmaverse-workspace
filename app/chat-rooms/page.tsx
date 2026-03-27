@@ -13,6 +13,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import Loading from "@/components/ui/Loading";
 import Toast from "@/components/ui/Toast";
+import PageBanner from "@/components/ui/PageBanner";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSocket } from "@/lib/socket";
@@ -29,6 +30,9 @@ import {
   Globe2,
   ChevronDown,
   Loader2,
+  Shield,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -61,6 +65,8 @@ const GlobalForumPage = () => {
       router.push("/auth");
     },
   });
+  
+  const role = session?.user?.role?.toLowerCase();
 
   const { socket, isConnected, onlineUsers } = useSocket();
 
@@ -136,6 +142,7 @@ const GlobalForumPage = () => {
       }
     } catch (err) {
       console.error("Error fetching forum messages:", err);
+      setToast({ show: true, message: "Gagal memuat pesan forum", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -186,6 +193,7 @@ const GlobalForumPage = () => {
       }
     } catch (err) {
       console.error("Error loading older messages:", err);
+      setToast({ show: true, message: "Gagal memuat pesan lama", type: "error" });
     } finally {
       setIsLoadingMore(false);
     }
@@ -368,31 +376,14 @@ const GlobalForumPage = () => {
           className={`w-full flex-1 flex flex-col ${isDesktopChatFullscreen ? "p-0" : "p-0 lg:p-6"} overflow-hidden relative transition-all`}
         >
           {/* Page title (desktop only) */}
-          <div
-            className={`${isDesktopChatFullscreen ? "hidden" : "hidden lg:flex"} mb-4 items-center justify-between shrink-0`}
-          >
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">
-                Forum Diskusi
-              </h1>
-              <p className="text-slate-500 font-bold text-sm mt-1">
-                Grup Ngobrol Santai &amp; Belajar Bersama
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {isConnected ? (
-                <span className="flex items-center gap-2 text-xs font-black text-teal-600 bg-teal-100 px-3 py-1.5 rounded-full border-2 border-teal-200 shadow-sm">
-                  <span className="w-2 h-2 bg-teal-500 rounded-full animate-pulse" />
-                  Terhubung
-                </span>
-              ) : (
-                <span className="flex items-center gap-2 text-xs font-black text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border-2 border-slate-200 shadow-sm">
-                  <span className="w-2 h-2 bg-slate-400 rounded-full" />
-                  Menghubungkan…
-                </span>
-              )}
-            </div>
-          </div>
+          <PageBanner
+            title="Forum Diskusi"
+            description="Grup Ngobrol Santai & Belajar Bersama dengan kawan kawan di IRMA Verse"
+            icon={MessageSquare}
+            tag="Forum"
+            tagIcon={MessageSquare}
+            className={isDesktopChatFullscreen ? "hidden" : "hidden lg:flex mb-4 shrink-0"}
+          />
 
           {/* Chat container */}
           <div
@@ -455,35 +446,9 @@ const GlobalForumPage = () => {
                   }
                 >
                   {isDesktopChatFullscreen ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 17v2a2 2 0 002 2h2a2 2 0 002-2v-2m0-10V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v2m10 10h-2a2 2 0 00-2 2v-2a2 2 0 002-2h2m-10 0H5a2 2 0 00-2 2v2a2 2 0 002 2h2"
-                      />
-                    </svg>
+                    <Minimize2 className="h-5 w-5" strokeWidth={2.5} />
                   ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 4h6M4 4v6m0-6l6 6m10 10h-6m6 0v-6m0 6l-6-6"
-                      />
-                    </svg>
+                    <Maximize2 className="h-5 w-5" strokeWidth={2.5} />
                   )}
                 </button>
               </div>
@@ -579,9 +544,9 @@ const GlobalForumPage = () => {
                                     Instruktur
                                   </span>
                                 )}
-                                {message.sender.role === "admin" && (
+                                {(message.sender.role === "admin" || message.sender.role === "super_admin") && (
                                   <span className="bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wide border border-violet-200">
-                                    Admin
+                                    {message.sender.role === "super_admin" ? "Super Admin" : "Admin"}
                                   </span>
                                 )}
                               </span>
@@ -598,7 +563,7 @@ const GlobalForumPage = () => {
                                 }
                               `}
                             >
-                              <p className="whitespace-pre-wrap leading-relaxed break-words">
+                              <p className="whitespace-pre-wrap leading-relaxed wrap-break-word">
                                 {message.content}
                               </p>
                             </div>
@@ -657,30 +622,39 @@ const GlobalForumPage = () => {
               </div>
             )}
 
-            {/* ── Input area ────────────────────────────────────────────── */}
+            {/* ── Input area / Monitor Mode indicator ────────────────────────────── */}
             <div className="p-3 lg:p-4 bg-white border-t-2 border-slate-100 z-20 shrink-0">
-              <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-3xl border-2 border-slate-200 focus-within:border-teal-400 focus-within:shadow-[0_0_0_2px_rgba(45,212,191,0.2)] transition-all">
-                <Textarea
-                  value={messageDraft}
-                  onChange={(e) => handleDraftChange(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Kirim pesan ke forum…"
-                  className="flex-1 bg-transparent border-none shadow-none focus-visible:ring-0 min-h-11 max-h-32 py-2.5 px-3 text-sm md:text-base font-medium text-slate-700 placeholder:text-slate-400 resize-none"
-                  rows={1}
-                  disabled={isSending}
-                />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!messageDraft.trim() || isSending}
-                  className="p-2.5 bg-teal-500 text-white rounded-full hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none transition-all shrink-0"
-                >
-                  {isSending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} />
-                  ) : (
-                    <Send className="h-5 w-5" strokeWidth={3} />
-                  )}
-                </button>
-              </div>
+              {role === "admin" || role === "super_admin" ? (
+                <div className="flex items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <Shield className="h-5 w-5" />
+                    <p className="text-sm font-bold uppercase tracking-widest">Mode Pemantauan: {role === "super_admin" ? "Super Admin" : "Admin"} tidak dapat mengirim pesan</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-3xl border-2 border-slate-200 focus-within:border-teal-400 focus-within:shadow-[0_0_0_2px_rgba(45,212,191,0.2)] transition-all">
+                  <Textarea
+                    value={messageDraft}
+                    onChange={(e) => handleDraftChange(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Kirim pesan ke forum…"
+                    className="flex-1 bg-transparent border-none shadow-none focus-visible:ring-0 min-h-11 max-h-32 py-2.5 px-3 text-sm md:text-base font-medium text-slate-700 placeholder:text-slate-400 resize-none"
+                    rows={1}
+                    disabled={isSending}
+                  />
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!messageDraft.trim() || isSending}
+                    className="p-2.5 bg-teal-500 text-white rounded-full hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_3px_0_0_#0f766e] active:translate-y-0.5 active:shadow-none transition-all shrink-0"
+                  >
+                    {isSending ? (
+                      <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} />
+                    ) : (
+                      <Send className="h-5 w-5" strokeWidth={3} />
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </main>

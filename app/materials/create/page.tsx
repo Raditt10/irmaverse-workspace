@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import BackButton from "@/components/ui/BackButton";
@@ -35,6 +36,7 @@ import {
   CheckSquare,
   Square,
   Layers,
+  MapPin,
 } from "lucide-react";
 import Loading from "@/components/ui/Loading";
 
@@ -45,11 +47,20 @@ const CreateMaterial = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [availablePrograms, setAvailablePrograms] = useState<
-    { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[] }[]
+    { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[]; usedKajianDetails?: { order: number; title: string; materialId: string; attendeeEmails?: string[] }[] }[]
   >([]);
   const [fetchingPrograms, setFetchingPrograms] = useState(false);
+  const [availableInstructors, setAvailableInstructors] = useState<
+    { id: string; name: string; avatar?: string; email: string }[]
+  >([]);
+  const [fetchingInstructors, setFetchingInstructors] = useState(false);
   const [isProgramDropdownOpen, setIsProgramDropdownOpen] = useState(false);
   const [isKajianDropdownOpen, setIsKajianDropdownOpen] = useState(false);
+  const [isInstructorDropdownOpen, setIsInstructorDropdownOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const userRole = session?.user?.role?.toLowerCase();
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
 
   // Toast State
   const [toast, setToast] = useState<{
@@ -71,8 +82,8 @@ const CreateMaterial = () => {
     materialType: "editor" as "editor" | "link",
     materialContent: "",
     materialLink: "",
-    rekapanContent: "",
     location: "",
+    instructorId: "",
   });
 
   const [inviteInput, setInviteInput] = useState("");
@@ -110,9 +121,26 @@ const CreateMaterial = () => {
         console.error(err);
       }
     }
+
+    async function fetchInstructors() {
+      if (!isAdmin) return;
+      try {
+        setFetchingInstructors(true);
+        const res = await fetch("/api/admin/instructors");
+        if (!res.ok) throw new Error("Gagal mengambil data instruktur");
+        const data = await res.json();
+        setAvailableInstructors(data);
+      } catch (err) {
+        console.error("Error fetching instructors:", err);
+      } finally {
+        setFetchingInstructors(false);
+      }
+    }
+
     fetchUsers();
     fetchPrograms();
-  }, []);
+    fetchInstructors();
+  }, [isAdmin]);
 
   const fetchPrograms = async () => {
     try {
@@ -134,7 +162,8 @@ const CreateMaterial = () => {
           id: p.id, 
           title: p.title, 
           totalKajian: p.totalKajian, 
-          usedKajianOrders: p.usedKajianOrders 
+          usedKajianOrders: p.usedKajianOrders,
+          usedKajianDetails: p.usedKajianDetails,
         })),
       );
     } catch (err) {
@@ -183,15 +212,15 @@ const CreateMaterial = () => {
 
         if (!res.ok) {
           const error = await res.json();
-          showToast(error.error || "Gagal mengunggah gambar", "error");
+          showToast(error.error || "Gagal mengunggah Tumbnail", "error");
           return;
         }
 
         const data = await res.json();
         setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
-        showToast("Gambar berhasil diunggah", "success");
+        showToast("Tumbnail berhasil diunggah", "success");
       } catch (error: any) {
-        showToast("Terjadi kesalahan saat mengunggah gambar", "error");
+        showToast("Terjadi kesalahan saat mengunggah Tumbnail", "error");
       } finally {
         setUploading(false);
       }
@@ -258,6 +287,16 @@ const CreateMaterial = () => {
       showToast("Jam kajian harus dipilih", "error");
       return;
     }
+    if (isAdmin && !formData.instructorId) {
+      showToast("Silakan pilih instruktur kajian", "error");
+      return;
+    }
+
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kajian wajib diunggah", "error");
+      return;
+    }
+
     if (invitedUsers.length === 0) {
       showToast("Minimal 1 anggota harus diundang ke dalam kajian", "error");
       return;
@@ -270,10 +309,25 @@ const CreateMaterial = () => {
 
     if (
       formData.materialType === "editor" &&
-      !formData.rekapanContent.trim()
+      !formData.materialContent.trim()
     ) {
       showToast("Materi kajian tidak boleh kosong", "error");
       return;
+    }
+
+    // Cek apakah ada anggota yang diundang tapi sudah pernah hadir di kajian ke-N ini
+    const selProgram = availablePrograms.find((p) => p.id === formData.programId);
+    if (selProgram && formData.kajianOrder) {
+      const selectedOrder = parseInt(formData.kajianOrder);
+      const existingDetail = selProgram.usedKajianDetails?.find((d) => d.order === selectedOrder);
+      
+      if (existingDetail && existingDetail.attendeeEmails && existingDetail.attendeeEmails.length > 0) {
+        const overlappingUsers = invitedUsers.filter(email => existingDetail.attendeeEmails?.includes(email));
+        if (overlappingUsers.length > 0) {
+          showToast(`Ada anggota yang sudah mengikuti Kajian Ke-${selectedOrder}, mohon tinjau ulang`, "error");
+          return;
+        }
+      }
     }
 
     setLoading(true);
@@ -300,7 +354,7 @@ const CreateMaterial = () => {
       // Save rekapan if content is provided OR it's a link material
       const finalRekapanContent = formData.materialType === "link"
         ? formData.materialLink.trim()
-        : formData.rekapanContent.trim();
+        : formData.materialContent.trim();
         
       if (finalRekapanContent && result.id) {
         try {
@@ -372,6 +426,103 @@ const CreateMaterial = () => {
                   </h2>
 
                   <div className="space-y-4 lg:space-y-6">
+                    {/* --- INSTRUCTOR SELECTOR (Admin only) --- */}
+                    {isAdmin && (
+                      <div className="space-y-2">
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
+                          <Plus className="h-4 w-4 text-emerald-500" />{" "}
+                          Instruktur Kajian <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setIsInstructorDropdownOpen(!isInstructorDropdownOpen)
+                            }
+                            className={`
+                              w-full flex items-center justify-between rounded-2xl border-2 bg-white px-5 py-3.5 
+                              font-bold text-slate-700 transition-all cursor-pointer
+                              ${
+                                isInstructorDropdownOpen
+                                  ? "border-teal-400 shadow-[0_4px_0_0_#34d399]"
+                                  : "border-slate-200 shadow-[0_4px_0_0_#e2e8f0] hover:border-teal-300"
+                              }
+                            `}
+                          >
+                            <div className="flex items-center gap-3 truncate">
+                              {formData.instructorId ? (
+                                <>
+                                  <div className="w-6 h-6 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                                    <img 
+                                      src={availableInstructors.find(i => i.id === formData.instructorId)?.avatar || "/img/icons/default-avatar.png"} 
+                                      alt="avatar"
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => (e.currentTarget.src = "/img/icons/default-avatar.png")}
+                                    />
+                                  </div>
+                                  <span className="truncate">
+                                    {availableInstructors.find(i => i.id === formData.instructorId)?.name}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-slate-400 italic font-medium">— Pilih Instruktur —</span>
+                              )}
+                            </div>
+                            <ChevronDown
+                              className={`h-5 w-5 text-slate-400 transition-transform ${isInstructorDropdownOpen ? "rotate-180" : ""}`}
+                            />
+                          </button>
+
+                          {isInstructorDropdownOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-2 z-20 bg-white border-2 border-slate-200 rounded-2xl shadow-[0_8px_0_0_#cbd5e1] overflow-hidden max-h-60 overflow-y-auto">
+                              <div className="p-1.5 space-y-1">
+                                {fetchingInstructors ? (
+                                  <div className="px-4 py-3 text-sm text-slate-500 font-bold italic">
+                                    Memuat instruktur...
+                                  </div>
+                                ) : availableInstructors.length === 0 ? (
+                                  <div className="px-4 py-3 text-sm text-slate-500 font-bold italic">
+                                    Tidak ada instruktur tersedia
+                                  </div>
+                                ) : (
+                                  availableInstructors.map((inst) => (
+                                    <button
+                                      key={inst.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setFormData({
+                                          ...formData,
+                                          instructorId: inst.id,
+                                        });
+                                        setIsInstructorDropdownOpen(false);
+                                      }}
+                                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                                        formData.instructorId === inst.id
+                                          ? "bg-teal-50 text-teal-700"
+                                          : "text-slate-600 hover:bg-slate-50"
+                                      }`}
+                                    >
+                                      <div className="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                                        <img 
+                                          src={inst.avatar || "/img/icons/default-avatar.png"} 
+                                          alt={inst.name}
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => (e.currentTarget.src = "/img/icons/default-avatar.png")}
+                                        />
+                                      </div>
+                                      <div className="flex flex-col items-start leading-tight truncate">
+                                        <span className="truncate">{inst.name}</span>
+                                        <span className="text-[10px] text-slate-400 font-medium truncate">{inst.email}</span>
+                                      </div>
+                                    </button>
+                                  ))
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
                         Judul Kajian <span className="text-red-500">*</span>
@@ -379,7 +530,6 @@ const CreateMaterial = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Contoh: Tadabbur Alam & Quran"
@@ -392,7 +542,6 @@ const CreateMaterial = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={5}
                         value={formData.description}
                         onChange={handleInputChange}
@@ -470,34 +619,34 @@ const CreateMaterial = () => {
                             </p>
                           </div>
 
-                          {/* Card Next Level */}
+                          {/* Card Susulan */}
                           <div
                             onClick={() =>
                               setFormData({
                                 ...formData,
-                                category: "Program Next Level",
+                                category: "Program Susulan",
                               })
                             }
                             className={`cursor-pointer rounded-2xl border-2 p-4 transition-all ${
-                              formData.category === "Program Next Level"
+                              formData.category === "Program Susulan"
                                 ? "bg-indigo-50 border-indigo-500 shadow-[0_4px_0_0_#6366f1]"
                                 : "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 relative top-1"
                             }`}
                           >
                             <div className="flex items-center gap-3 mb-2">
                               <div
-                                className={`p-2 rounded-xl border ${formData.category === "Program Next Level" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
+                                className={`p-2 rounded-xl border ${formData.category === "Program Susulan" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
                               >
                                 <Rocket className="h-5 w-5" />
                               </div>
                               <span
-                                className={`font-black ${formData.category === "Program Next Level" ? "text-indigo-700" : "text-slate-700"}`}
+                                className={`font-black ${formData.category === "Program Susulan" ? "text-indigo-700" : "text-slate-700"}`}
                               >
-                                Next Level
+                                Susulan
                               </span>
                             </div>
                             <p className="text-xs font-semibold text-slate-500 leading-tight">
-                              Materi tingkat lanjut.
+                              Materi untuk kajian susulan.
                             </p>
                           </div>
                         </div>
@@ -645,32 +794,41 @@ const CreateMaterial = () => {
                                           <div className="max-h-60 overflow-y-auto pr-1 space-y-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
                                             {Array.from({ length: selectedProgram.totalKajian }, (_, i) => i + 1).map((num) => {
                                               const isUsed = selectedProgram.usedKajianOrders?.includes(num);
+                                              const existingDetail = selectedProgram.usedKajianDetails?.find((d: any) => d.order === num);
                                               return (
                                                 <button
                                                   key={num}
                                                   type="button"
-                                                  disabled={isUsed}
                                                   onClick={() => {
                                                     setFormData({ ...formData, kajianOrder: num.toString() });
                                                     setIsKajianDropdownOpen(false);
                                                   }}
                                                   className={`w-full text-left px-4 py-3.5 text-sm font-bold rounded-xl transition-all flex items-center justify-between border ${
-                                                    isUsed 
-                                                      ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed" 
-                                                      : formData.kajianOrder === num.toString()
-                                                        ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
+                                                    formData.kajianOrder === num.toString()
+                                                      ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
+                                                      : isUsed
+                                                        ? "bg-amber-50/50 border-amber-100 text-slate-600 hover:bg-amber-50 hover:border-amber-200"
                                                         : "bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-200 hover:text-teal-600"
                                                   }`}
                                                 >
-                                                  <span>Kajian Ke-{num}</span>
-                                                  {isUsed && (
-                                                    <span className="text-[10px] bg-slate-200/50 text-slate-500 font-black px-2.5 py-1 rounded-lg border border-slate-200">
-                                                      Sudah Terisi
-                                                    </span>
-                                                  )}
-                                                  {formData.kajianOrder === num.toString() && !isUsed && (
-                                                    <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
-                                                  )}
+                                                  <div className="flex flex-col gap-0.5">
+                                                    <span>Kajian Ke-{num}</span>
+                                                    {isUsed && existingDetail && (
+                                                      <span className="text-[10px] font-medium text-amber-500 leading-tight">
+                                                        Sebelumnya: {existingDetail.title}
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                  <div className="flex items-center gap-2">
+                                                    {isUsed && (
+                                                      <span className="text-[10px] bg-amber-100 text-amber-600 font-black px-2.5 py-1 rounded-lg border border-amber-200">
+                                                        Sudah Ada
+                                                      </span>
+                                                    )}
+                                                    {formData.kajianOrder === num.toString() && (
+                                                      <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
+                                                    )}
+                                                  </div>
                                                 </button>
                                               );
                                             })}
@@ -739,9 +897,9 @@ const CreateMaterial = () => {
                         {formData.materialType === "editor" ? (
                           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
                             <Textarea
-                              name="rekapanContent"
+                              name="materialContent"
                               rows={8}
-                              value={formData.rekapanContent}
+                              value={formData.materialContent}
                               onChange={handleInputChange}
                               placeholder="Tulis ringkasan materi kajian di sini. Rekapan ini akan bisa dibaca oleh peserta kapan saja sebagai bahan belajar mandiri..."
                               className="text-sm border-2 focus:ring-emerald-200"
@@ -790,26 +948,16 @@ const CreateMaterial = () => {
                           <Target className="h-4 w-4 text-emerald-500" />{" "}
                           Tingkat Kelas / Sasaran
                         </h3>
-                        <div className="flex flex-wrap gap-2 lg:gap-3">
-                          {["Semua", "Kelas 10", "Kelas 11", "Kelas 12"].map(
-                            (grade) => (
-                              <button
-                                key={grade}
-                                type="button"
-                                onClick={() =>
-                                  setFormData({ ...formData, grade })
-                                }
-                                className={`px-4 py-2 rounded-full font-bold transition-all border-2 text-sm ${
-                                  formData.grade === grade
-                                    ? "bg-teal-500 text-white border-teal-600 shadow-[0_4px_0_0_#0d9488]"
-                                    : "bg-white text-slate-600 border-slate-200 hover:border-teal-300 hover:bg-slate-50 hover:-translate-y-px shadow-sm"
-                                }`}
-                              >
-                                {grade}
-                              </button>
-                            ),
-                          )}
-                        </div>
+                        <CategoryFilter
+                          categories={["Semua", "Kelas 10", "Kelas 11", "Kelas 12"]}
+                          subCategories={[]}
+                          selectedCategory={formData.grade}
+                          selectedSubCategory=""
+                          onCategoryChange={(grade) =>
+                            setFormData({ ...formData, grade })
+                          }
+                          onSubCategoryChange={() => {}}
+                        />
                       </div>
                     </div>
                   </div>
@@ -838,14 +986,19 @@ const CreateMaterial = () => {
                     <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
                       Lokasi / Platform <span className="text-red-500">*</span>
                     </label>
-                    <Input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder="Contoh: Masjid Irma atau Link Zoom..."
-                      required
-                    />
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <MapPin className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                      </div>
+                      <Input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleInputChange}
+                        placeholder="Contoh: Masjid Irma atau Link Zoom..."
+                        className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

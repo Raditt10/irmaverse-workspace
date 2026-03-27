@@ -13,18 +13,18 @@ export async function GET() {
     const userId = session.user.id;
 
     const [followersCount, followingCount] = await Promise.all([
-      prisma.friendship.count({ where: { followingId: userId } }),
-      prisma.friendship.count({ where: { followerId: userId } }),
+      prisma.friendships.count({ where: { followingId: userId } }),
+      prisma.friendships.count({ where: { followerId: userId } }),
     ]);
 
     // Hitung mutual friends (accepted di kedua sisi)
-    const myFollowing = await prisma.friendship.findMany({
+    const myFollowing = await prisma.friendships.findMany({
       where: { followerId: userId, status: "accepted" },
       select: { followingId: true },
     });
     const followingIds = myFollowing.map((f) => f.followingId);
 
-    const mutualCount = await prisma.friendship.count({
+    const mutualCount = await prisma.friendships.count({
       where: {
         followerId: { in: followingIds },
         followingId: userId,

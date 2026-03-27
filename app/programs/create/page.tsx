@@ -90,14 +90,14 @@ const CreateProgram = () => {
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         if (!res.ok) {
           const error = await res.json();
-          showToast(error.error || "Gagal mengunggah gambar", "error");
+          showToast(error.error || "Gagal mengunggah Tumbnail", "error");
           return;
         }
         const data = await res.json();
         setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
-        showToast("Banner Program berhasil diunggah", "success");
+        showToast("Tumbnail Program berhasil diunggah", "success");
       } catch {
-        showToast("Terjadi kesalahan saat mengunggah gambar", "error");
+        showToast("Terjadi kesalahan saat mengunggah Tumbnail", "error");
       } finally {
         setUploading(false);
       }
@@ -115,7 +115,7 @@ const CreateProgram = () => {
       return;
     }
     if (!formData.thumbnailUrl) {
-      showToast("Banner Program wajib diunggah", "error");
+      showToast("Tumbnail Program wajib diunggah", "error");
       return;
     }
 
@@ -188,7 +188,6 @@ const CreateProgram = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Contoh: Tahfizh Akhir Pekan (Juz 30)"
@@ -208,30 +207,37 @@ const CreateProgram = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t-2 border-slate-50">
                       <div className="space-y-2">
-                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-emerald-500" /> Durasi
+                        <label className="block text-sm font-bold text-slate-600 ml-1">
+                          Durasi
                         </label>
-                        <Input
-                          type="text"
-                          name="duration"
-                          value={formData.duration}
-                          onChange={handleInputChange}
-                          placeholder="e.g. 12 Sesi / 3 Bulan"
-                        />
+                        <div className="relative flex items-center group">
+                          <Clock className="absolute left-4 lg:left-5 h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors pointer-events-none" />
+                          <Input
+                            type="text"
+                            name="duration"
+                            value={formData.duration}
+                            onChange={handleInputChange}
+                            placeholder="e.g. 12 Sesi / 3 Bulan"
+                            className="pl-12 lg:pl-14"
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="block text-sm font-bold text-slate-600 ml-1 flex items-center gap-2">
-                          <Layers className="h-4 w-4 text-emerald-500" /> Total Kajian <span className="text-red-500">*</span>
+                        <label className="block text-sm font-bold text-slate-600 ml-1">
+                          Total Kajian <span className="text-red-500">*</span>
                         </label>
-                        <Input
-                          type="number"
-                          name="totalKajian"
-                          min="1"
-                          required
-                          value={formData.totalKajian}
-                          onChange={handleInputChange}
-                          placeholder="Berapa banyak pertemuan/kajian?"
-                        />
+                        <div className="relative flex items-center group">
+                          <Layers className="absolute left-4 lg:left-5 h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors pointer-events-none" />
+                          <Input
+                            type="number"
+                            name="totalKajian"
+                            min="1"
+                            value={formData.totalKajian}
+                            onChange={handleInputChange}
+                            placeholder="Berapa banyak pertemuan/kajian?"
+                            className="pl-12 lg:pl-14"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -362,7 +368,7 @@ const CreateProgram = () => {
                     <Layers className="h-4 w-4 text-emerald-500" /> Kategori Program
                   </h3>
                   <CategoryFilter
-                    categories={["Program Wajib", "Program Ekstra", "Next Level"]}
+                    categories={["Program Wajib", "Program Ekstra", "Susulan"]}
                     subCategories={[]}
                     selectedCategory={formData.category}
                     selectedSubCategory=""
@@ -376,24 +382,16 @@ const CreateProgram = () => {
                   <h3 className="text-sm font-bold text-slate-700 mb-4 ml-1 flex items-center gap-2">
                     <Target className="h-4 w-4 text-emerald-500" /> Target Kelas
                   </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {["Semua", "Kelas 10", "Kelas 11", "Kelas 12"].map(
-                      (grade) => (
-                        <button
-                          key={grade}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, grade })}
-                          className={`px-6 py-2.5 rounded-full font-black text-sm transition-all border-2 ${
-                            formData.grade === grade
-                              ? "bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_0_#059669]"
-                              : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300"
-                          }`}
-                        >
-                          {grade}
-                        </button>
-                      ),
-                    )}
-                  </div>
+                  <CategoryFilter
+                    categories={["Semua", "Kelas 10", "Kelas 11", "Kelas 12"]}
+                    subCategories={[]}
+                    selectedCategory={formData.grade}
+                    selectedSubCategory=""
+                    onCategoryChange={(grade) =>
+                      setFormData({ ...formData, grade })
+                    }
+                    onSubCategoryChange={() => {}}
+                  />
                 </div>
               </div>
 
@@ -402,7 +400,7 @@ const CreateProgram = () => {
                 {/* Thumbnail Card */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Banner Program
+                    TUmbnail Program
                   </label>
                   <div className="relative group cursor-pointer">
                     <input

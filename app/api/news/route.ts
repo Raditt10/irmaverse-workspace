@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 import { unlink } from "fs/promises";
 import { join } from "path";
 
@@ -42,14 +43,14 @@ export async function GET(request: NextRequest) {
     let savedNewsIds: Set<string> = new Set();
     
     if (session?.user?.email) {
-      const user = await prisma.user.findUnique({
+      const user = await prisma.users.findUnique({
         where: { email: session.user.email },
         select: { id: true }
       });
       if (user) {
         userId = user.id;
         // Fetch saved news separately to avoid Prisma inclusion error if client is out of sync
-        const saved = await (prisma as any).savedNews.findMany({
+        const saved = await prisma.saved_news.findMany({
           where: { userId: user.id },
           select: { newsId: true }
         });
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
       const news = await prisma.news.findUnique({
         where: { slug },
         include: {
-          author: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -77,8 +78,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
+      const { users, ...newsData } = news;
       const result = {
-        ...news,
+        ...newsData,
+        author: users,
         isSaved: savedNewsIds.has(news.id),
       };
 
@@ -90,7 +93,7 @@ export async function GET(request: NextRequest) {
       const news = await prisma.news.findUnique({
         where: { id },
         include: {
-          author: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -105,8 +108,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "News not found" }, { status: 404 });
       }
 
+      const { users, ...newsData } = news;
       const result = {
-        ...news,
+        ...newsData,
+        author: users,
         isSaved: savedNewsIds.has(news.id),
       };
 
@@ -122,7 +127,7 @@ export async function GET(request: NextRequest) {
     const allNews = await prisma.news.findMany({
       where,
       include: {
-        author: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -136,11 +141,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Map to include isSaved and sort
-    const mappedNews = allNews.map((n: any) => ({
-      ...n,
-      isSaved: savedNewsIds.has(n.id),
-    }));
+    // Map to include isSaved, rename users to author, and sort
+    const mappedNews = allNews.map((n: any) => {
+      const { users, ...newsData } = n;
+      return {
+        ...newsData,
+        author: users,
+        isSaved: savedNewsIds.has(n.id),
+      };
+    });
 
     if (userId) {
       // Sort: saved first, then by createdAt desc
@@ -174,11 +183,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is admin or instructor
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email! },
     });
 
-    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur" || user?.role === "super_admin";
 
     if (!user || !isPrivileged) {
       return NextResponse.json(
@@ -221,9 +230,11 @@ export async function POST(request: NextRequest) {
         content,
         image: image || null,
         authorId: user.id,
+        updatedAt: new Date(),
+        id: crypto.randomUUID(),
       },
       include: {
-        author: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -234,7 +245,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(news, { status: 201 });
+    // Log Activity
+    const userRole = user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: user.id,
+        type: "admin_news_managed" as any,
+        title: "Membuat Berita",
+        description: `Admin membuat berita baru: ${news.title}`,
+        metadata: { newsId: news.id }
+      });
+    }
+
+    const { users, ...newsData } = news;
+    const result = {
+      ...newsData,
+      author: users,
+    };
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
     console.error("Error creating news:", error);
     return NextResponse.json(
@@ -256,11 +285,11 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email! },
     });
 
-    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur" || user?.role === "super_admin";
 
     if (!user || !isPrivileged) {
       return NextResponse.json(
@@ -304,7 +333,7 @@ export async function PUT(request: NextRequest) {
         ...(image !== undefined && { image }),
       },
       include: {
-        author: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -314,6 +343,18 @@ export async function PUT(request: NextRequest) {
         },
       },
     });
+
+    // Log Activity
+    const userRole = user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: user.id,
+        type: "admin_news_managed" as any,
+        title: "Memperbarui Berita",
+        description: `Admin memperbarui berita: ${updatedNews.title}`,
+        metadata: { newsId: updatedNews.id }
+      });
+    }
 
     // Delete old image if it was replaced with a new one
     if (oldImage && oldImage.startsWith("/uploads/")) {
@@ -326,7 +367,13 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(updatedNews);
+    const { users, ...newsData } = updatedNews;
+    const result = {
+      ...newsData,
+      author: users,
+    };
+
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error("Error updating news:", error);
     return NextResponse.json(
@@ -348,11 +395,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email! },
     });
 
-    const isPrivileged = user?.role === "admin" || user?.role === "instruktur";
+    const isPrivileged = user?.role === "admin" || user?.role === "instruktur" || user?.role === "super_admin";
 
     if (!user || !isPrivileged) {
       return NextResponse.json(
@@ -387,6 +434,18 @@ export async function DELETE(request: NextRequest) {
     await prisma.news.delete({
       where: { id },
     });
+
+    // Log Activity
+    const userRole = user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: user.id,
+        type: "admin_news_managed" as any,
+        title: "Menghapus Berita",
+        description: `Admin menghapus berita: ${existingNews.title}`,
+        metadata: { newsId: id }
+      });
+    }
 
     // Delete the image file if it's an uploaded file (starts with /uploads/)
     if (existingNews.image && existingNews.image.startsWith("/uploads/")) {

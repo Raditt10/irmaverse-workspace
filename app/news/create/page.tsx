@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import CustomDropdown from "@/components/ui/CustomDropdown";
 import Toast from "@/components/ui/Toast";
+import { useConfirm } from "@/lib/confirm-provider";
 
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
@@ -21,6 +22,7 @@ export default function CreateNewsPage() {
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const { alert: customAlert } = useConfirm();
   const [toastData, setToastData] = useState({
     show: false,
     message: "",
@@ -35,10 +37,15 @@ export default function CreateNewsPage() {
   };
 
   const role = session?.user?.role?.toLowerCase();
-  const isPrivileged = role === "admin" || role === "instruktur";
+  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
+
+  useEffect(() => {
+    if (status === "authenticated" && !isPrivileged) {
+      router.push("/news");
+    }
+  }, [status, isPrivileged, router]);
 
   if (status === "authenticated" && !isPrivileged) {
-    router.push("/news");
     return null;
   }
   const [user, setUser] = useState<any>({
@@ -83,7 +90,11 @@ export default function CreateNewsPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(`Error: ${error.error}`);
+        customAlert({
+          title: "Gagal Upload",
+          message: error.error || "Gagal mengupload gambar.",
+          confirmText: "Oke"
+        });
         return;
       }
 
@@ -92,10 +103,10 @@ export default function CreateNewsPage() {
         ...prev,
         image: data.url,
       }));
-      showToast("Gambar berhasil diupload!", "success");
+      showToast("Tumbnail berhasil diupload!", "success");
     } catch (error) {
       console.error("Error uploading image:", error);
-      showToast("Gagal mengupload gambar. Silakan coba lagi.", "error");
+      showToast("Gagal mengupload tumbnail. Silakan coba lagi.", "error");
     } finally {
       setUploadingImage(false);
     }
@@ -103,6 +114,18 @@ export default function CreateNewsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.title.trim()) {
+      showToast("Judul berita wajib diisi", "error");
+      return;
+    }
+    if (!formData.content.trim()) {
+      showToast("Konten berita wajib diisi", "error");
+      return;
+    }
+    if (!formData.image) {
+      showToast("Tumbnail berita wajib diunggah", "error");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -120,7 +143,7 @@ export default function CreateNewsPage() {
         return;
       }
 
-      showToast("Berita berhasil dibuat!", "success");
+      showToast("Berita berhasil dibuat! Mengalihkan...", "success");
       
       // Tunggu toast selesai sebelum redirect
       setTimeout(() => {
@@ -185,7 +208,6 @@ export default function CreateNewsPage() {
                         onChange={handleChange}
                         placeholder="Masukkan judul berita..."
                         className="w-full rounded-2xl border-2 border-slate-200 bg-white px-4 sm:px-5 py-3.5 sm:py-4 text-sm sm:text-base font-medium shadow-sm transition-all focus:outline-none focus:border-teal-400 focus:shadow-[0_4px_0_0_#34d399]"
-                        required
                       />
                     </div>
 
@@ -259,7 +281,7 @@ export default function CreateNewsPage() {
                 {/* Upload Image */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Gambar Berita <span className="text-red-500">*</span>
+                    Tumbnail Berita<span className="text-red-500">*</span>
                   </label>
                   <div className="relative group cursor-pointer">
                     <input
@@ -269,14 +291,12 @@ export default function CreateNewsPage() {
                       onChange={handleImageUpload}
                       disabled={uploadingImage}
                       className="hidden"
-                      required={!formData.image}
                     />
                     {formData.image ? (
                       <div className="relative w-full h-40 lg:h-48 rounded-2xl lg:rounded-3xl overflow-hidden border-2 border-slate-200 group-hover:border-teal-400 transition-all shadow-sm">
                         <img
                           src={formData.image}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
+                          className="w-full rounded-2xll object-cover"
                         />
                         <button
                           type="button"

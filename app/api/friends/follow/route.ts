@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     // Guard: Hanya role "user"
     if ((session.user as any).role !== "user") {
       return NextResponse.json(
-        { error: "Hanya pengguna biasa yang dapat follow" },
+        { error: "Hanya pengguna biasa yang dapat mengikuti pengguna lain" },
         { status: 403 },
       );
     }
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     }
 
     // Cek apakah target user ada
-    const targetUser = await prisma.user.findUnique({
+    const targetUser = await prisma.users.findUnique({
       where: { id: targetUserId },
       select: { id: true, name: true },
     });
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     // Cek apakah sudah follow
-    const existing = await prisma.friendship.findUnique({
+    const existing = await prisma.friendships.findUnique({
       where: {
         followerId_followingId: {
           followerId: userId,
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     }
 
     // Cek apakah target user sudah follow kita → jika iya, langsung accepted (mutual)
-    const reverseFollow = await prisma.friendship.findUnique({
+    const reverseFollow = await prisma.friendships.findUnique({
       where: {
         followerId_followingId: {
           followerId: targetUserId,
@@ -79,32 +79,36 @@ export async function POST(req: Request) {
     const status = reverseFollow ? "accepted" : "pending";
 
     // Buat friendship baru
-    const friendship = await prisma.friendship.create({
+    const friendship = await prisma.friendships.create({
       data: {
+        id: crypto.randomUUID(),
         followerId: userId,
         followingId: targetUserId,
         status,
+        updatedAt: new Date(),
       },
     });
 
     // Jika mutual, update kedua sisi jadi accepted
     if (reverseFollow && reverseFollow.status === "pending") {
-      await prisma.friendship.update({
+      await prisma.friendships.update({
         where: { id: reverseFollow.id },
-        data: { status: "accepted" },
+        data: { status: "accepted", updatedAt: new Date() },
       });
     }
 
     // Kirim notifikasi ke target user
     try {
-      await prisma.notification.create({
+      await prisma.notifications.create({
         data: {
+          id: crypto.randomUUID(),
           userId: targetUserId,
           senderId: userId,
           type: "basic",
           title: "Pengikut Baru",
           message: `${session.user.name || "Seseorang"} mulai mengikuti kamu!`,
           actionUrl: `/u/${userId}`,
+          updatedAt: new Date(),
         },
       });
     } catch (e) {

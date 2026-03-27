@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
 import ChatbotButton from "@/components/ui/Chatbot";
@@ -36,6 +37,7 @@ import {
   Link,
   FileText,
   Layers,
+  MapPin,
 } from "lucide-react";
 import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,6 +46,7 @@ const EditMaterial = () => {
   const router = useRouter();
   const params = useParams();
   const materialId = params.id as string;
+  const { data: session } = useSession();
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +73,8 @@ const EditMaterial = () => {
     materialLink: "",
     location: "",
   });
+
+  const [instructorName, setInstructorName] = useState<string | null>(null);
 
   const [availablePrograms, setAvailablePrograms] = useState<
     { id: string; title: string; totalKajian?: number; usedKajianOrders?: number[] }[]
@@ -175,13 +180,15 @@ const EditMaterial = () => {
             category: material.category || "Program Wajib",
             grade: material.grade || "Semua",
             thumbnailUrl: material.thumbnailUrl || "",
-            programId: material.programId || material.parentId || "",
+            programId: material.program?.id || material.programId || material.parentId || "",
             kajianOrder: material.kajianOrder?.toString() || "",
             materialType: material.materialType || "editor",
             materialContent: (material.content || "").replace(/<[^>]*>/g, ""),
             materialLink: material.link || "",
             location: material.location || "",
           });
+
+          setInstructorName(material.instructor || null);
 
           // Load existing invite details with status
           if (material.inviteDetails && Array.isArray(material.inviteDetails)) {
@@ -233,15 +240,15 @@ const EditMaterial = () => {
 
         if (!res.ok) {
           const error = await res.json();
-          showToast(error.message || "Gagal mengunggah gambar", "error");
+          showToast(error.message || "Gagal mengunggah Tumbnail", "error");
           return;
         }
 
         const data = await res.json();
         setFormData((prev) => ({ ...prev, thumbnailUrl: data.url }));
-        showToast("Gambar berhasil diunggah", "success");
+        showToast("Tumbnail berhasil diunggah", "success");
       } catch (error) {
-        showToast("Gagal mengunggah gambar", "error");
+        showToast("Gagal mengunggah Tumbnail", "error");
       } finally {
         setUploading(false);
       }
@@ -289,6 +296,11 @@ const EditMaterial = () => {
     }
     if (!formData.description.trim()) {
       showToast("Deskripsi kajian tidak boleh kosong", "error");
+      return;
+    }
+
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kajian wajib diunggah", "error");
       return;
     }
     if (!formData.date) {
@@ -340,6 +352,29 @@ const EditMaterial = () => {
         throw new Error(errorMessage);
       }
 
+      const updatedMaterial = await res.json();
+
+      // Sync to separate rekapan table for long-term consistency
+      const finalRekapanContent = formData.materialType === "link"
+        ? formData.materialLink.trim()
+        : formData.materialContent.trim();
+        
+      if (finalRekapanContent && materialId) {
+        try {
+          const rekapanPayload = formData.materialType === "link"
+            ? { content: null, link: formData.materialLink.trim() }
+            : { content: formData.materialContent.split("\n").filter((l: string) => l.trim()).map((l: string) => `<p>${l}</p>`).join("\n"), link: null };
+          await fetch(`/api/materials/${materialId}/rekapan`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(rekapanPayload),
+          });
+        } catch (rekapanErr) {
+          console.error("Error syncing rekapan on edit:", rekapanErr);
+          // Non-blocking
+        }
+      }
+
       showToast("Kajian berhasil diperbarui. Mengalihkan...", "success");
       setTimeout(() => router.push(`/materials/${materialId}`), 1500);
     } catch (error: any) {
@@ -379,7 +414,9 @@ const EditMaterial = () => {
               </button>
               <div>
                 <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2 flex items-center gap-2 lg:gap-3">
-                  Edit Jadwal Kajianmu
+                  {(session?.user?.role === "admin" || session?.user?.role === "super_admin") && instructorName
+                    ? `Edit jadwal kajian ${instructorName}`
+                    : "Edit Jadwal Kajianmu"}
                 </h1>
                 <p className="text-slate-500 font-medium text-sm lg:text-lg">
                   Update detail kajian yang sudah dibuat.
@@ -411,7 +448,6 @@ const EditMaterial = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleInputChange}
                         placeholder="Contoh: Tadabbur Alam & Quran"
@@ -424,7 +460,6 @@ const EditMaterial = () => {
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={3}
                         value={formData.description}
                         onChange={handleInputChange}
@@ -500,36 +535,36 @@ const EditMaterial = () => {
                           </p>
                         </div>
 
-                        {/* Card Next Level */}
+                        {/* Card Susulan */}
                         <div
                           onClick={() =>
                             setFormData({
                               ...formData,
-                              category: "Program Next Level",
+                              category: "Program Susulan",
                             })
                           }
                           className={`cursor-pointer rounded-2xl border-2 p-4 transition-all ${
-                            formData.category === "Program Next Level"
+                            formData.category === "Program Susulan"
                               ? "bg-indigo-50 border-indigo-500 shadow-[0_4px_0_0_#6366f1]"
                               : "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50 relative top-1"
                           }`}
                         >
                           <div className="flex items-center gap-3 mb-2">
                             <div
-                              className={`p-2 rounded-xl border ${formData.category === "Program Next Level" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
-                            >
-                              <Rocket className="h-5 w-5" />
-                            </div>
-                            <span
-                              className={`font-black ${formData.category === "Program Next Level" ? "text-indigo-700" : "text-slate-700"}`}
-                            >
-                              Next Level
-                            </span>
+                            className={`p-2 rounded-xl border ${formData.category === "Program Susulan" ? "bg-indigo-500 border-indigo-600 text-white" : "bg-slate-100 border-slate-200 text-slate-500"}`}
+                          >
+                            <Rocket className="h-5 w-5" />
                           </div>
-                          <p className="text-xs font-semibold text-slate-500 leading-tight">
-                            Materi tingkat lanjut.
-                          </p>
+                          <span
+                            className={`font-black ${formData.category === "Program Susulan" ? "text-indigo-700" : "text-slate-700"}`}
+                          >
+                            Susulan
+                          </span>
                         </div>
+                        <p className="text-xs font-semibold text-slate-500 leading-tight">
+                          Materi untuk kajian susulan.
+                        </p>
+                      </div>
                       </div>
 
                       {/* --- PROGRAM (KURSUS) DROPDOWN --- */}
@@ -634,80 +669,18 @@ const EditMaterial = () => {
                               <span className="text-red-500 ml-1 font-bold">*</span>
                             </label>
                             <div className="relative">
-                              {/* Trigger Button */}
-                              <button
-                                type="button"
-                                onClick={() => setIsKajianDropdownOpen(!isKajianDropdownOpen)}
-                                className={`w-full flex items-center justify-between rounded-2xl border-2 bg-white px-5 py-3.5 font-bold transition-all shadow-[0_4px_0_0_#e2e8f0] hover:border-teal-300 focus:outline-none focus:ring-4 focus:ring-teal-100 ${
-                                  isKajianDropdownOpen ? "border-teal-400" : "border-slate-200"
-                                } ${formData.kajianOrder ? "text-slate-700" : "text-slate-400"}`}
-                              >
-                                <span>
+                              <div className="w-full flex items-center justify-between rounded-2xl border-2 border-slate-200 bg-slate-50/80 px-5 py-3.5 font-bold text-slate-500 shadow-inner cursor-not-allowed">
+                                <span className="flex items-center gap-2">
                                   {formData.kajianOrder 
                                     ? `Kajian Ke-${formData.kajianOrder}` 
-                                    : "-- Pilih Urutan Kajian --"}
+                                    : "-- Tidak terikat urutan --"}
                                 </span>
-                                <ChevronDown 
-                                  className={`h-5 w-5 text-slate-400 transition-transform ${isKajianDropdownOpen ? "rotate-180 text-teal-500" : ""}`} 
-                                />
-                              </button>
-
-                              {/* Dropdown Menu */}
-                              {isKajianDropdownOpen && (
-                                <>
-                                  <div 
-                                    className="fixed inset-0 z-40" 
-                                    onClick={() => setIsKajianDropdownOpen(false)} 
-                                  />
-                                  <div className="absolute z-50 w-full mt-2 bg-white border-2 border-slate-100 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 p-1.5">
-                                    {(() => {
-                                      const selectedProgram = availablePrograms.find((p) => p.id === formData.programId);
-                                      if (!selectedProgram || !selectedProgram.totalKajian) return (
-                                        <div className="p-4 text-center text-sm font-bold text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                                          Data program tidak ditemukan
-                                        </div>
-                                      );
-                                      
-                                      return (
-                                        <div className="max-h-60 overflow-y-auto pr-1 space-y-1 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-                                          {Array.from({ length: selectedProgram.totalKajian }, (_, i) => i + 1).map((num) => {
-                                            // Izinkan nomor yang sudah dipilih oleh materi INI SENDIRI, disable nomor lain yang terpakai
-                                            const isUsedByOther = selectedProgram.usedKajianOrders?.includes(num) && num.toString() !== formData.kajianOrder;
-                                            return (
-                                              <button
-                                                key={num}
-                                                type="button"
-                                                disabled={isUsedByOther}
-                                                onClick={() => {
-                                                  setFormData({ ...formData, kajianOrder: num.toString() });
-                                                  setIsKajianDropdownOpen(false);
-                                                }}
-                                                className={`w-full text-left px-4 py-3.5 text-sm font-bold rounded-xl transition-all flex items-center justify-between border ${
-                                                  isUsedByOther 
-                                                    ? "bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed" 
-                                                    : formData.kajianOrder === num.toString()
-                                                      ? "bg-teal-50 border-teal-200 text-teal-700 shadow-sm"
-                                                      : "bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-200 hover:text-teal-600"
-                                                }`}
-                                              >
-                                                <span>Kajian Ke-{num}</span>
-                                                {isUsedByOther && (
-                                                  <span className="text-[10px] bg-slate-200/50 text-slate-500 font-black px-2.5 py-1 rounded-lg border border-slate-200">
-                                                    Sudah Terisi
-                                                  </span>
-                                                )}
-                                                {formData.kajianOrder === num.toString() && !isUsedByOther && (
-                                                  <div className="h-2 w-2 bg-teal-500 rounded-full shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
-                                                )}
-                                              </button>
-                                            );
-                                          })}
-                                        </div>
-                                      );
-                                    })()}
-                                  </div>
-                                </>
-                              )}
+                                {formData.kajianOrder && (
+                                  <span className="text-[10px] bg-slate-200/50 text-slate-600 font-black px-2.5 py-1 rounded-lg border border-slate-300 tracking-wide select-none">
+                                    Tidak bisa diedit 
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -767,7 +740,6 @@ const EditMaterial = () => {
                           <div className="animate-in fade-in slide-in-from-top-1 duration-200">
                             <Textarea
                               name="materialContent"
-                              required={formData.materialType === "editor"}
                               rows={8}
                               value={formData.materialContent}
                               onChange={(e) =>
@@ -792,7 +764,6 @@ const EditMaterial = () => {
                               <Input
                                 type="url"
                                 name="materialLink"
-                                required={formData.materialType === "link"}
                                 value={formData.materialLink}
                                 onChange={(e) =>
                                   setFormData({
@@ -876,14 +847,19 @@ const EditMaterial = () => {
                     <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
                       Lokasi / Platform <span className="text-red-500">*</span>
                     </label>
-                    <Input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder="Contoh: Masjid Irma atau Link Zoom..."
-                      required
-                    />
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <MapPin className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                      </div>
+                      <Input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleInputChange}
+                        placeholder="Contoh: Masjid Irma atau Link Zoom..."
+                        className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

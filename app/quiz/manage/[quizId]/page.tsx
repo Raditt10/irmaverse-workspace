@@ -80,7 +80,7 @@ export default function EditQuizPage() {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
-    role === "instruktur" || role === "admin" || role === "instructor";
+    role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
@@ -386,7 +386,6 @@ export default function EditQuizPage() {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="Judul quiz..."
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -439,7 +438,6 @@ export default function EditQuizPage() {
                         onChange={(e) => updateQuestion(qIdx, e.target.value)}
                         placeholder="Tulis pertanyaan di sini..."
                         rows={2}
-                        required
                       />
                     </div>
 

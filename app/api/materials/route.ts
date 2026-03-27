@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check if user exists (using email for higher reliability with session)
-    const User = await prisma.user.findUnique({
+    const User = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
     // If user is not instructor/admin, only show materials where they are enrolled or invited
     // Normalizing role check to include both 'instruktur' and 'instructor'
-    const isPrivileged = User.role === "instruktur" || User.role === "admin";
+    const isPrivileged = User.role === "instruktur" || User.role === "admin" || User.role === "super_admin";
 
     if (User.role === "instruktur") {
       where.OR = [
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
         { courseenrollment: { some: { userId: User.id } } },
         { materialinvite: { some: { userId: User.id, status: "accepted" } } },
       ];
-    } else if (User.role !== "admin") {
+    } else if (User.role !== "admin" && User.role !== "super_admin") {
       where.OR = [
         {
           courseenrollment: {
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     };
 
@@ -104,17 +104,24 @@ export async function GET(req: NextRequest) {
           where: { userId: User.id },
           select: { status: true },
         },
-        program: {
+        programs: {
           select: { id: true, title: true },
         },
       },
       orderBy: { date: "desc" },
     });
 
-    // Get attendance and total invite counts manually
-    const [attendanceCounts, inviteCounts] = await Promise.all([
+    // Get attendance, total invite counts, and program enrollment status
+    const [attendanceCounts, inviteCounts, programEnrollments] = await Promise.all([
       Promise.all(materials.map(m => prisma.attendance.count({ where: { materialId: m.id } }))),
-      Promise.all(materials.map(m => prisma.materialinvite.count({ where: { materialId: m.id } })))
+      Promise.all(materials.map(m => prisma.materialinvite.count({ where: { materialId: m.id, status: { not: "rejected" } } }))),
+      Promise.all(materials.map(m => 
+        m.programId 
+          ? (prisma as any).program_enrollments.findFirst({ 
+              where: { userId: User.id, programId: m.programId } 
+            })
+          : Promise.resolve(null)
+      ))
     ]);
 
     // normalize ke format frontend
@@ -149,8 +156,9 @@ export async function GET(req: NextRequest) {
         isAttendanceOpen: m.isAttendanceOpen,
         isJoined: isJoined,
         isCompleted: isCompleted,
-        program: m.program
-          ? { id: m.program.id, title: m.program.title }
+        isEnrolledInProgram: !!programEnrollments[index],
+        program: (m as any).programs
+          ? { id: (m as any).programs.id, title: (m as any).programs.title }
           : null,
       };
     });
@@ -188,7 +196,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user is instructor or admin
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin") {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa membuat kajian" },
         { status: 403 },
@@ -211,7 +219,12 @@ export async function POST(req: NextRequest) {
       materialContent,
       materialLink,
       location,
+      instructorId: providedInstructorId,
     } = body;
+
+    // Determine target instructor ID
+    const isAdmin = session.user.role === "admin" || session.user.role === "super_admin";
+    const targetInstructorId = (isAdmin && providedInstructorId) ? providedInstructorId : session.user.id;
 
     // Detailed validation
     if (!title || !title.toString().trim()) {
@@ -261,10 +274,9 @@ export async function POST(req: NextRequest) {
 
     // Map category from label to enum
     const CATEGORY_MAP: Record<string, any> = {
-      // Changed CourseCategory to any
       "Program Wajib": "Wajib",
       "Program Ekstra": "Extra",
-      "Program Next Level": "NextLevel",
+      "Program Next Level": "Susulan",
       "Program Susulan": "Susulan",
     };
 
@@ -283,7 +295,7 @@ export async function POST(req: NextRequest) {
     // Temporary workaround: manually provide ID since prisma generate is blocked by file lock
     const material = await prisma.material.create({
       data: {
-        id: `cl${Math.random().toString(36).substring(2, 11)}`,
+        id: crypto.randomUUID(),
         title,
         description,
         date: new Date(date),
@@ -291,7 +303,7 @@ export async function POST(req: NextRequest) {
         category: mappedCategory as any,
         grade: mappedGrade as any,
         thumbnailUrl: thumbnailUrl || null,
-        instructorId: session.user.id,
+        instructorId: targetInstructorId,
         programId: programId || null,
         kajianOrder: kajianOrder ? parseInt(kajianOrder, 10) : null,
         materialType: materialType || null,
@@ -307,7 +319,7 @@ export async function POST(req: NextRequest) {
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
 
-    const invitedUsersDb = await prisma.user.findMany({
+    const invitedUsersDb = await prisma.users.findMany({
       where: { email: { in: invites } },
       select: { id: true, email: true },
     });
@@ -316,7 +328,7 @@ export async function POST(req: NextRequest) {
       const inviteData = invitedUsersDb.map((u) => ({
         id: `cl${Math.random().toString(36).substring(2, 11)}`,
         materialId: material.id,
-        instructorId: session.user.id,
+        instructorId: targetInstructorId,
         userId: u.id,
         token: generateToken(),
         status: "pending" as any,
@@ -326,8 +338,8 @@ export async function POST(req: NextRequest) {
       await prisma.materialinvite.createMany({ data: inviteData });
 
       // Fetch instructor name for notification message
-      const instructor = await prisma.user.findUnique({
-        where: { id: session.user.id },
+      const instructor = await prisma.users.findUnique({
+        where: { id: targetInstructorId },
         select: { name: true },
       });
 
@@ -343,7 +355,7 @@ export async function POST(req: NextRequest) {
           resourceId: material.id,
           actionUrl: `/materials/${material.id}`,
           inviteToken: inv.token,
-          senderId: session.user.id,
+          senderId: targetInstructorId,
         })),
       );
 

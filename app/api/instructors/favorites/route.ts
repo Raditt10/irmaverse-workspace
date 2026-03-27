@@ -9,7 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const favorites = await prisma.favoriteInstructor.findMany({
+  const favorites = await prisma.favorite_instructors.findMany({
     where: { userId: session.user.id },
     select: { instructorId: true },
   });
@@ -32,20 +32,34 @@ export async function POST(req: NextRequest) {
 
   const userId = session.user.id;
 
-  const existing = await prisma.favoriteInstructor.findUnique({
-    where: { userId_instructorId: { userId, instructorId } },
+  const existing = await prisma.favorite_instructors.findUnique({
+    where: {
+      userId_instructorId: {
+        userId,
+        instructorId,
+      },
+    },
   });
 
   if (existing) {
     // Sudah ada → hapus (unfavorite)
-    await prisma.favoriteInstructor.delete({
-      where: { userId_instructorId: { userId, instructorId } },
+    await prisma.favorite_instructors.delete({
+      where: {
+        userId_instructorId: {
+          userId,
+          instructorId,
+        },
+      },
     });
     return NextResponse.json({ action: "removed", instructorId });
   } else {
     // Belum ada → tambah (favorite)
-    await prisma.favoriteInstructor.create({
-      data: { userId, instructorId },
+    await prisma.favorite_instructors.create({
+      data: { 
+        id: crypto.randomUUID(),
+        userId, 
+        instructorId 
+      },
     });
     return NextResponse.json({ action: "added", instructorId });
   }

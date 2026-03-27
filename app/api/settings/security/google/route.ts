@@ -10,7 +10,7 @@ export async function DELETE() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
       select: {
         password: true,
@@ -46,7 +46,7 @@ export async function DELETE() {
       );
     }
 
-    await prisma.account.deleteMany({
+    await prisma.accounts.deleteMany({
       where: {
         userId: session.user.id,
         provider: "google",

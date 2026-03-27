@@ -20,70 +20,79 @@ import {
   Flame,
   GraduationCap,
   MessageCircle,
+  MessageSquare,
   Star,
   Target,
   TrendingUp,
   Trophy,
   Users,
   Zap,
+  Sprout,
+  Book,
+  Search,
+  Sparkles,
+  Inbox,
+  Brain,
+  Lock,
+  HelpCircle,
 } from "lucide-react";
 
 const LEVEL_MILESTONES = [
   {
     level: 1,
     title: "Pemula",
-    emoji: "🌱",
-    color: "bg-slate-100 text-slate-600 border-slate-300",
+    icon: Sprout,
+    color: "bg-emerald-50 text-emerald-600 border-emerald-200",
   },
   {
     level: 3,
     title: "Pelajar",
-    emoji: "📖",
-    color: "bg-blue-100 text-blue-700 border-blue-300",
+    icon: Book,
+    color: "bg-emerald-100 text-emerald-700 border-emerald-300",
   },
   {
     level: 6,
     title: "Pencari Ilmu",
-    emoji: "🔍",
-    color: "bg-indigo-100 text-indigo-700 border-indigo-300",
+    icon: Search,
+    color: "bg-teal-50 text-teal-600 border-teal-200",
   },
   {
     level: 11,
     title: "Penuntut Ilmu",
-    emoji: "⚡",
-    color: "bg-purple-100 text-purple-700 border-purple-300",
+    icon: Zap,
+    color: "bg-teal-100 text-teal-700 border-teal-300",
   },
   {
     level: 16,
     title: "Ahli Ilmu",
-    emoji: "🌟",
-    color: "bg-amber-100 text-amber-700 border-amber-300",
+    icon: Star,
+    color: "bg-cyan-50 text-cyan-600 border-cyan-200",
   },
   {
     level: 21,
     title: "Mujtahid",
-    emoji: "🔥",
-    color: "bg-orange-100 text-orange-700 border-orange-300",
+    icon: Flame,
+    color: "bg-cyan-100 text-cyan-700 border-cyan-300",
   },
   {
     level: 31,
     title: "Ulama Muda",
-    emoji: "🏆",
-    color: "bg-rose-100 text-rose-700 border-rose-300",
+    icon: Trophy,
+    color: "bg-emerald-100 text-emerald-700 border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]",
   },
   {
     level: 51,
     title: "Masya Allah",
-    emoji: "✨",
-    color: "bg-emerald-100 text-emerald-700 border-emerald-300",
+    icon: Sparkles,
+    color: "bg-teal-100 text-teal-700 border-teal-300 shadow-[0_0_15px_rgba(20,184,166,0.2)]",
   },
 ];
 
 const XP_GUIDE = [
-  { icon: "🧠", label: "Selesaikan Quiz", xp: 50, bonus: "+25 jika skor ≥80%" },
-  { icon: "📚", label: "Ikut Program", xp: 40 },
-  { icon: "✅", label: "Absensi", xp: 25 },
-  { icon: "🏅", label: "Dapat Badge", xp: 100 },
+  { icon: HelpCircle, label: "Selesaikan Quiz", xp: 50, bonus: "+25 jika skor ≥80%" },
+  { icon: GraduationCap, label: "Ikut Program", xp: 40 },
+  { icon: CheckCircle2, label: "Absensi", xp: 25 },
+  { icon: Award, label: "Dapat Badge", xp: 100 },
 ];
 
 function getActivityConfig(type: string): {
@@ -92,54 +101,54 @@ function getActivityConfig(type: string): {
 } {
   const map: Record<string, { bg: string; icon: React.ReactNode }> = {
     quiz_completed: {
-      bg: "bg-indigo-50",
-      icon: <BarChart3 className="h-4 w-4 text-indigo-600" />,
+      bg: "bg-emerald-50",
+      icon: <HelpCircle className="h-4 w-4 text-emerald-600" />,
     },
     badge_earned: {
-      bg: "bg-amber-50",
-      icon: <Award className="h-4 w-4 text-amber-600" />,
+      bg: "bg-emerald-50",
+      icon: <Award className="h-4 w-4 text-emerald-600" />,
     },
     forum_post: {
       bg: "bg-emerald-50",
-      icon: <MessageCircle className="h-4 w-4 text-emerald-600" />,
+      icon: <MessageSquare className="h-4 w-4 text-emerald-600" />,
     },
     material_read: {
-      bg: "bg-blue-50",
-      icon: <BookOpen className="h-4 w-4 text-blue-600" />,
+      bg: "bg-emerald-50",
+      icon: <BookOpen className="h-4 w-4 text-emerald-600" />,
     },
     level_up: {
-      bg: "bg-rose-50",
-      icon: <Trophy className="h-4 w-4 text-rose-600" />,
+      bg: "bg-emerald-50",
+      icon: <Trophy className="h-4 w-4 text-emerald-600" />,
     },
     course_enrolled: {
-      bg: "bg-purple-50",
-      icon: <GraduationCap className="h-4 w-4 text-purple-600" />,
+      bg: "bg-emerald-50",
+      icon: <GraduationCap className="h-4 w-4 text-emerald-600" />,
     },
     program_enrolled: {
-      bg: "bg-teal-50",
-      icon: <FileText className="h-4 w-4 text-teal-600" />,
+      bg: "bg-emerald-50",
+      icon: <GraduationCap className="h-4 w-4 text-emerald-600" />,
     },
     friend_added: {
-      bg: "bg-pink-50",
-      icon: <Users className="h-4 w-4 text-pink-600" />,
+      bg: "bg-emerald-50",
+      icon: <Users className="h-4 w-4 text-emerald-600" />,
     },
     attendance_marked: {
-      bg: "bg-green-50",
-      icon: <CheckCircle2 className="h-4 w-4 text-green-600" />,
+      bg: "bg-emerald-50",
+      icon: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
     },
     streak_maintained: {
-      bg: "bg-orange-50",
-      icon: <Flame className="h-4 w-4 text-orange-600" />,
+      bg: "bg-emerald-50",
+      icon: <Flame className="h-4 w-4 text-emerald-600" />,
     },
     profile_completed: {
-      bg: "bg-yellow-50",
-      icon: <Star className="h-4 w-4 text-yellow-600" />,
+      bg: "bg-emerald-50",
+      icon: <Star className="h-4 w-4 text-emerald-600" />,
     },
   };
   return (
     map[type] ?? {
-      bg: "bg-blue-50",
-      icon: <Activity className="h-4 w-4 text-blue-600" />,
+      bg: "bg-emerald-50",
+      icon: <Activity className="h-4 w-4 text-emerald-600" />,
     }
   );
 }
@@ -182,7 +191,7 @@ export default async function LevelPage() {
   // Hanya role "user" yang bisa mengakses halaman Level & XP
   if ((session.user as any).role !== "user") redirect("/overview");
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.users.findUnique({
     where: { id: session.user.id },
     select: {
       name: true,
@@ -198,7 +207,7 @@ export default async function LevelPage() {
   // Sync level if drift
   const calculatedLevel = getLevelFromXp(user.points);
   if (calculatedLevel !== user.level) {
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: session.user.id },
       data: { level: calculatedLevel },
     });
@@ -209,18 +218,18 @@ export default async function LevelPage() {
   const levelTitle = getLevelTitle(user.level);
 
   const [activities, earnedBadges, allBadges, rank] = await Promise.all([
-    prisma.activityLog.findMany({
+    prisma.activity_logs.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
       take: 50,
     }),
-    prisma.userBadge.findMany({
+    prisma.user_badges.findMany({
       where: { userId: session.user.id },
-      include: { badge: true },
+      include: { badges: true },
       orderBy: { earnedAt: "desc" },
     }),
-    prisma.badge.findMany(),
-    prisma.user.count({
+    prisma.badges.findMany(),
+    prisma.users.count({
       where: { points: { gt: user.points } },
     }),
   ]);
@@ -269,7 +278,7 @@ export default async function LevelPage() {
   }
 
   // ── Next badge to earn ────────────────────────────────────────────────
-  const earnedCodes = new Set(earnedBadges.map((ub) => ub.badge.code));
+  const earnedCodes = new Set(earnedBadges.map((ub) => ub.badges.code));
   const unearnedBadges = allBadges.filter((b) => !earnedCodes.has(b.code));
 
   const currentMilestone =
@@ -291,9 +300,7 @@ export default async function LevelPage() {
               {/* Level badge */}
               <div className="flex-shrink-0 mx-auto sm:mx-0">
                 <div className="w-28 h-28 md:w-36 md:h-36 rounded-[2rem] bg-white/20 backdrop-blur-sm border-4 border-white/40 flex flex-col items-center justify-center shadow-2xl">
-                  <span className="text-4xl md:text-5xl">
-                    {currentMilestone.emoji}
-                  </span>
+                  <currentMilestone.icon className="h-10 w-10 md:h-14 md:w-14 mb-1 text-white stroke-[2.5]" />
                   <span className="text-[9px] font-black mt-0.5 opacity-80 tracking-[0.2em] uppercase">
                     LEVEL
                   </span>
@@ -349,47 +356,51 @@ export default async function LevelPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               {
-                emoji: "⭐",
+                icon: Zap,
                 label: "Total XP",
                 value: user.points.toLocaleString(),
-                from: "from-amber-50",
-                to: "to-yellow-50",
-                border: "border-amber-200",
-                shadow: "shadow-[0_4px_0_0_#fde68a]",
+                from: "from-emerald-50",
+                to: "to-emerald-100",
+                border: "border-emerald-200",
+                shadow: "shadow-[0_4px_0_0_#10b981]",
+                iconColor: "text-emerald-500",
               },
               {
-                emoji: "🔥",
+                icon: Flame,
                 label: "Streak Hari",
                 value: String(user.streak),
-                from: "from-orange-50",
-                to: "to-red-50",
-                border: "border-orange-200",
-                shadow: "shadow-[0_4px_0_0_#fed7aa]",
+                from: "from-emerald-50",
+                to: "to-emerald-100",
+                border: "border-emerald-200",
+                shadow: "shadow-[0_4px_0_0_#10b981]",
+                iconColor: "text-emerald-500",
               },
               {
-                emoji: "🏆",
+                icon: Award,
                 label: "Badge",
                 value: String(user.badges),
-                from: "from-purple-50",
-                to: "to-pink-50",
-                border: "border-purple-200",
-                shadow: "shadow-[0_4px_0_0_#e9d5ff]",
+                from: "from-emerald-50",
+                to: "to-emerald-100",
+                border: "border-emerald-200",
+                shadow: "shadow-[0_4px_0_0_#10b981]",
+                iconColor: "text-emerald-500",
               },
               {
-                emoji: "🧠",
+                icon: HelpCircle,
                 label: "Quiz Selesai",
                 value: String(user.quizzes),
-                from: "from-blue-50",
-                to: "to-indigo-50",
-                border: "border-blue-200",
-                shadow: "shadow-[0_4px_0_0_#bfdbfe]",
+                from: "from-emerald-50",
+                to: "to-emerald-100",
+                border: "border-emerald-200",
+                shadow: "shadow-[0_4px_0_0_#10b981]",
+                iconColor: "text-emerald-500",
               },
             ].map((s) => (
               <div
                 key={s.label}
-                className={`bg-gradient-to-br ${s.from} ${s.to} border-2 ${s.border} rounded-2xl p-4 ${s.shadow} text-center`}
+                className={`bg-gradient-to-br ${s.from} ${s.to} border-2 ${s.border} rounded-2xl p-4 ${s.shadow} text-center flex flex-col items-center justify-center`}
               >
-                <div className="text-2xl mb-1">{s.emoji}</div>
+                <s.icon className={`h-8 w-8 mb-2 ${s.iconColor}`} />
                 <div className="text-2xl md:text-3xl font-black text-slate-800">
                   {s.value}
                 </div>
@@ -403,8 +414,8 @@ export default async function LevelPage() {
           {/* ── DAILY XP CHART ────────────────────────────────────────────── */}
           <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
+              <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                <TrendingUp className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
                 <h2 className="text-lg font-black text-slate-800">
@@ -475,7 +486,9 @@ export default async function LevelPage() {
 
                 {activities.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-5xl mb-3">📭</p>
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-50 border-2 border-slate-100 mb-3 text-slate-300">
+                      <Inbox className="h-8 w-8" />
+                    </div>
                     <p className="font-bold text-slate-500">
                       Belum ada aktivitas
                     </p>
@@ -536,8 +549,8 @@ export default async function LevelPage() {
               {/* Level Roadmap */}
               <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center border border-amber-100">
-                    <Trophy className="h-5 w-5 text-amber-600" />
+                  <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                    <Trophy className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
                     <h2 className="text-lg font-black text-slate-800">
@@ -567,13 +580,13 @@ export default async function LevelPage() {
                         }`}
                       >
                         <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border-2 ${
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2 ${
                             isReached
                               ? m.color
                               : "bg-slate-100 text-slate-400 border-slate-200"
                           }`}
                         >
-                          {isReached ? m.emoji : "🔒"}
+                          {isReached ? <m.icon className="h-5 w-5 stroke-[2.5]" /> : <Lock className="h-5 w-5 stroke-[2.5]" />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -608,10 +621,10 @@ export default async function LevelPage() {
             <div className="space-y-6">
               {/* Next Badge Preview */}
               {unearnedBadges.length > 0 && (
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-[2rem] p-5 shadow-[0_6px_0_0_#c7d2fe]">
+                <div className="bg-white border-2 border-emerald-200 rounded-[2rem] p-5 shadow-[0_6px_0_0_#10b981]">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-indigo-100">
-                      <Target className="h-5 w-5 text-indigo-600" />
+                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                      <Target className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div>
                       <h2 className="text-base font-black text-slate-800">
@@ -639,9 +652,9 @@ export default async function LevelPage() {
                             {b.requirement}
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-100 flex-shrink-0">
-                          <Zap className="h-2.5 w-2.5 text-indigo-500" />
-                          <span className="text-[10px] font-black text-indigo-600">
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0">
+                          <Zap className="h-2.5 w-2.5 text-emerald-500" />
+                          <span className="text-[10px] font-black text-emerald-600">
                             +{b.xpReward}
                           </span>
                         </div>
@@ -654,8 +667,8 @@ export default async function LevelPage() {
               {/* Earned Badges */}
               <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-5 shadow-[0_6px_0_0_#cbd5e1]">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center border border-purple-100">
-                    <Award className="h-5 w-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                    <Award className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
                     <h2 className="text-base font-black text-slate-800">
@@ -668,7 +681,9 @@ export default async function LevelPage() {
                 </div>
                 {earnedBadges.length === 0 ? (
                   <div className="text-center py-6">
-                    <p className="text-3xl mb-2">🎖️</p>
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border-2 border-slate-100 mb-2 text-slate-300">
+                      <Award className="h-6 w-6" />
+                    </div>
                     <p className="text-sm font-bold text-slate-400">
                       Belum ada badge
                     </p>
@@ -681,12 +696,12 @@ export default async function LevelPage() {
                     {earnedBadges.map((ub) => (
                       <div
                         key={ub.id}
-                        title={ub.badge.description}
+                        title={ub.badges.description}
                         className="flex flex-col items-center gap-1 p-2 rounded-xl bg-amber-50 border border-amber-100 text-center"
                       >
-                        <span className="text-2xl">{ub.badge.icon}</span>
+                        <span className="text-2xl">{ub.badges.icon}</span>
                         <span className="text-[10px] font-black text-slate-600 leading-tight line-clamp-2">
-                          {ub.badge.name}
+                          {ub.badges.name}
                         </span>
                       </div>
                     ))}
@@ -715,10 +730,10 @@ export default async function LevelPage() {
                       key={g.label}
                       className="flex items-center justify-between py-2.5"
                     >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-base flex-shrink-0">
-                          {g.icon}
-                        </span>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center border border-emerald-100 flex-shrink-0">
+                          <g.icon className="h-4 w-4 text-emerald-600 stroke-[2.5]" />
+                        </div>
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-700 truncate">
                             {g.label}

@@ -10,7 +10,7 @@ export async function PATCH(
     const session = await auth();
     const { id: materialId } = await params;
 
-    if (!session?.user || (session.user.role !== "instruktur" && session.user.role !== "admin")) {
+    if (!session?.user || (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin")) {
       console.log("Toggle API: Unauthorized access attempt", { role: session?.user?.role });
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

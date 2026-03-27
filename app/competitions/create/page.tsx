@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
@@ -53,8 +53,16 @@ const CreateCompetition = () => {
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
 
-  if (status === "authenticated" && session?.user?.role !== "instruktur") {
-    router.push("/competitions");
+  const role = session?.user?.role?.toLowerCase();
+  const isPrivileged = role === "admin" || role === "instruktur" || role === "super_admin";
+
+  useEffect(() => {
+    if (status === "authenticated" && !isPrivileged) {
+      router.push("/competitions");
+    }
+  }, [status, isPrivileged, router]);
+
+  if (status === "authenticated" && !isPrivileged) {
     return null;
   }
 
@@ -122,9 +130,9 @@ const CreateCompetition = () => {
         ...prev,
         thumbnailUrl: data.url,
       }));
-      showToast("Gambar berhasil diunggah", "success");
+      showToast("Tumbnail berhasil diunggah", "success");
     } catch (error: any) {
-      showToast("Gagal mengunggah gambar", "error");
+      showToast("Gagal mengunggah Tumbnail", "error");
     } finally {
       setUploadingImage(false);
     }
@@ -162,6 +170,10 @@ const CreateCompetition = () => {
     // Validasi Hadiah: Harus ada isinya di salah satu tempat
     if (!finalPrize) {
       showToast("Hadiah utama/Juara 1 belum diisi!", "error");
+      return;
+    }
+    if (!formData.thumbnailUrl) {
+      showToast("Tumbnail kompetisi wajib diunggah", "error");
       return;
     }
     // -------------------------
@@ -218,7 +230,7 @@ const CreateCompetition = () => {
 
       const data = await response.json();
       showToast("Perlombaan berhasil dibuat. Mengalihkan...", "success");
-      setTimeout(() => router.push(`/competitions/${data.id}`), 2000);
+      setTimeout(() => router.push("/competitions"), 2000);
     } catch (error: any) {
       console.error("Error creating competition:", error);
       showToast(error.message || "Terjadi kesalahan saat membuat perlombaan", "error");
@@ -240,7 +252,7 @@ const CreateCompetition = () => {
                 onClick={() => router.back()}
                 className="self-start inline-flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 rounded-xl bg-white border-2 border-slate-200 text-slate-500 font-bold hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#cbd5e1] active:translate-y-0.5 active:shadow-none transition-all text-sm lg:text-base"
               >
-                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={3} />
+                <ArrowLeft className="h-4 w-4 lg:h-5 lg:w-5 text-emerald-500" strokeWidth={3} />
                 Kembali
               </button>
               <div>
@@ -273,7 +285,6 @@ const CreateCompetition = () => {
                       <Input
                         type="text"
                         name="title"
-                        required
                         value={formData.title}
                         onChange={handleChange}
                         placeholder="Contoh: Lomba Tahfidz Tingkat Nasional"
@@ -299,11 +310,10 @@ const CreateCompetition = () => {
 
                     <div className="space-y-2">
                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
-                        Deskripsi Singkat <span className="text-red-500">*</span>
+                        Deskripsi Perlombaan <span className="text-red-500">*</span>
                       </label>
                       <Textarea
                         name="description"
-                        required
                         rows={4}
                         value={formData.description}
                         onChange={handleChange}
@@ -314,17 +324,22 @@ const CreateCompetition = () => {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="flex text-xs lg:text-sm font-bold text-slate-600 ml-1 items-center gap-1">
-                         <MapPin className="h-4 w-4" /> Lokasi <span className="text-red-500">*</span>
+                       <label className="block text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                         Lokasi <span className="text-red-500">*</span>
                        </label>
-                       <Input
-                         type="text"
-                         name="location"
-                         required
-                         value={formData.location}
-                         onChange={handleChange}
-                         placeholder="Contoh: Aula Utama IRMA / Online"
-                       />
+                       <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <MapPin className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <Input
+                          type="text"
+                          name="location"
+                          value={formData.location}
+                          onChange={handleChange}
+                          placeholder="Contoh: Aula Utama IRMA / Online"
+                          className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                        />
+                      </div>
                     </div>
 
                     {/* HAPUS INPUT HADIAH DISINI AGAR TIDAK BINGUNG */}
@@ -580,43 +595,61 @@ const CreateCompetition = () => {
                   </h2>
                   <div className="space-y-4 lg:space-y-6">
                     <div className="space-y-2">
-                      <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                        <Headset className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Narahubung
+                      <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                        Narahubung
                       </label>
-                      <Input
-                        type="text"
-                        name="contactPerson"
-                        value={formData.contactPerson}
-                        onChange={handleChange}
-                        placeholder="Contoh: Ahmad Fauzi"
-                      />
+                      <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Headset className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                        </div>
+                        <Input
+                          type="text"
+                          name="contactPerson"
+                          value={formData.contactPerson}
+                          onChange={handleChange}
+                          placeholder="Contoh: Ahmad Fauzi"
+                          className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Phone className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Nomor Telepon
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Nomor Telepon
                         </label>
-                        <Input
-                          type="tel"
-                          name="contactNumber"
-                          value={formData.contactNumber}
-                          onChange={handleChange}
-                          placeholder="Contoh: 08123456789"
-                        />
+                        <div className="relative group">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Phone className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                          </div>
+                          <Input
+                            type="tel"
+                            name="contactNumber"
+                            value={formData.contactNumber}
+                            onChange={handleChange}
+                            placeholder="Contoh: 08123456789"
+                            className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1 flex items-center gap-1.5 justify-start">
-                          <Mail className="w-4 h-4 text-slate-800" strokeWidth={2.5}/> Email
+                        <label className="text-xs lg:text-sm font-bold text-slate-600 ml-1">
+                          Email
                         </label>
-                        <Input
-                          type="email"
-                          name="contactEmail"
-                          value={formData.contactEmail}
-                          onChange={handleChange}
-                          placeholder="email@example.com"
-                        />
+                        <div className="relative group">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Mail className="h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors" />
+                          </div>
+                          <Input
+                            type="email"
+                            name="contactEmail"
+                            value={formData.contactEmail}
+                            onChange={handleChange}
+                            placeholder="email@example.com"
+                            className="pl-12 lg:pl-12 border-2 border-slate-200 focus:border-emerald-400 focus:ring-emerald-100"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -659,7 +692,7 @@ const CreateCompetition = () => {
                           <Sparkles className="w-6 h-6 lg:w-8 lg:h-8 text-teal-400 animate-spin" />
                         ) : (
                           <>
-                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-slate-400 mb-2 group-hover:text-teal-500" />
+                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-emerald-500 mb-2 group-hover:text-emerald-600" />
                             <span className="text-xs lg:text-sm font-bold text-slate-400">Klik untuk Upload</span>
                           </>
                         )}

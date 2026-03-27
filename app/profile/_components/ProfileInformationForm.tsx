@@ -13,6 +13,7 @@ import {
   Camera,
   Check,
   AlertCircle,
+  Shield,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ImageCropDialog from "./ImageCropDialog";
@@ -346,7 +347,7 @@ const ProfileInformationForm = ({ stats, level, rank, levelTitle }: any) => {
 
           {/* Badge Container: Center di mobile, Start di desktop */}
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-            {session?.user?.role === "user" ? (
+            {session?.user?.role === "user" && (
               <>
                 <span className="px-3 py-1 rounded-full bg-linear-to-r from-emerald-400 to-cyan-500 text-white text-xs font-bold shadow-sm">
                   Level {level}
@@ -358,9 +359,23 @@ const ProfileInformationForm = ({ stats, level, rank, levelTitle }: any) => {
                   Peringkat #{rank || "-"}
                 </span>
               </>
-            ) : (
+            )}
+            
+            {session?.user?.role === "instruktur" && (
               <span className="px-3 py-1 rounded-full bg-linear-to-r from-emerald-400 to-teal-500 text-white text-xs font-bold shadow-sm">
                 Instruktur
+              </span>
+            )}
+
+            {session?.user?.role === "admin" && (
+              <span className="px-3 py-1 rounded-full bg-linear-to-r from-emerald-400 to-teal-500 text-white text-xs font-bold shadow-sm">
+                Admin
+              </span>
+            )}
+
+            {session?.user?.role === "super_admin" && (
+              <span className="px-3 py-1 rounded-full bg-linear-to-r from-emerald-400 to-teal-500 text-white text-xs font-bold shadow-sm flex items-center gap-1">
+                <Shield className="h-3 w-3" /> Super Admin
               </span>
             )}
           </div>

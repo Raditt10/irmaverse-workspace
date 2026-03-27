@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop();
     if (!id) return NextResponse.json({ error: "No id provided" }, { status: 400 });
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id },
       select: {
         id: true,

@@ -10,34 +10,44 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // For admins, show all quizzes. For instruktur, show only their own.
     const whereClause =
-      user.role === "admin"
+      user.role === "admin" || user.role === "super_admin"
         ? {}
         : {
             OR: [
               { creatorId: session.user.id },
+              { materialId: null },
               { material: { instructorId: session.user.id } },
             ],
           };
 
-    const quizzes = await prisma.material_quiz.findMany({
+    const quizzes = await prisma.material_quizzes.findMany({
       where: whereClause,
       include: {
         material: { select: { id: true, title: true } },
-        creator: { select: { id: true, name: true } },
-        questions: { select: { id: true } },
-        attempts: { select: { id: true } },
+        users: { select: { id: true, name: true } },
+        quiz_questions: { select: { id: true } },
+        quiz_attempts: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },
     });
+
+    // Fetch isActive status separately via raw query to bypass out-of-sync Prisma Client
+    let statusMap = new Map();
+    if (quizzes.length > 0) {
+      const activeStatus: any[] = await prisma.$queryRawUnsafe(
+        `SELECT id, isActive FROM material_quizzes WHERE id IN (${quizzes.map(q => `'${q.id}'`).join(',')})`
+      );
+      statusMap = new Map(activeStatus.map(s => [s.id, s.isActive === 1 || s.isActive === true]));
+    }
 
     const result = quizzes.map((q) => ({
       id: q.id,
@@ -45,11 +55,12 @@ export async function GET(req: NextRequest) {
       description: q.description,
       materialId: q.materialId,
       materialTitle: q.material?.title ?? null,
-      creatorName: q.creator?.name ?? null,
-      questionCount: q.questions.length,
-      attemptCount: q.attempts.length,
+      creatorName: q.users?.name ?? null,
+      questionCount: q.quiz_questions.length,
+      attemptCount: q.quiz_attempts.length,
       createdAt: q.createdAt,
       isStandalone: q.materialId === null,
+      isActive: statusMap.get(q.id) ?? true,
     }));
 
     return NextResponse.json(result);

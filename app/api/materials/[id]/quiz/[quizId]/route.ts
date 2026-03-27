@@ -15,17 +15,17 @@ export async function GET(
 
     const { quizId } = await params;
 
-    const quiz = await prisma.material_quiz.findUnique({
+    const quiz = await prisma.material_quizzes.findUnique({
       where: { id: quizId },
       include: {
         material: {
           select: { id: true, title: true, instructorId: true, thumbnailUrl: true },
         },
-        questions: {
-          include: { options: true },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
-        attempts: {
+        quiz_attempts: {
           where: { userId: session.user.id },
           orderBy: { completedAt: "desc" },
           select: {
@@ -33,6 +33,7 @@ export async function GET(
             score: true,
             totalScore: true,
             completedAt: true,
+            answers: true,
           },
         },
       },
@@ -46,21 +47,21 @@ export async function GET(
     }
 
     // Check if user is instructor/admin; if not, hide isCorrect in options
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    const isPrivileged = user?.role === "instruktur" || user?.role === "admin";
+    const isPrivileged = user?.role === "instruktur" || user?.role === "admin" || user?.role === "super_admin";
 
-    const questions = quiz.questions.map((q) => ({
+    const questions = quiz.quiz_questions.map((q) => ({
       id: q.id,
       question: q.question,
       order: q.order,
-      options: q.options.map((o) => ({
+      options: q.quiz_options.map((o) => ({
         id: o.id,
         text: o.text,
         // Only show correct answer to instructors (for editing),
         // or after user has made an attempt
-        ...(isPrivileged || quiz.attempts.length > 0
+        ...(isPrivileged || quiz.quiz_attempts.length > 0
           ? { isCorrect: o.isCorrect }
           : {}),
       })),
@@ -73,9 +74,9 @@ export async function GET(
       materialThumbnail: quiz.material?.thumbnailUrl ?? null,
       title: quiz.title,
       description: quiz.description,
-      questionCount: quiz.questions.length,
+      questionCount: quiz.quiz_questions.length,
       questions,
-      attempts: quiz.attempts,
+      attempts: quiz.quiz_attempts,
       createdAt: quiz.createdAt,
     });
   } catch (error) {
@@ -98,10 +99,10 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -117,22 +118,24 @@ export async function PUT(
     }
 
     // Delete old questions (cascade deletes options too)
-    await prisma.quiz_question.deleteMany({
+    await prisma.quiz_questions.deleteMany({
       where: { quizId },
     });
 
     // Update quiz and recreate questions
-    const quiz = await prisma.material_quiz.update({
+    const quiz = await (prisma as any).material_quizzes.update({
       where: { id: quizId },
       data: {
         title: title.trim(),
         description: description?.trim() || null,
-        questions: {
+        quiz_questions: {
           create: (questions || []).map((q: any, idx: number) => ({
+            id: crypto.randomUUID(),
             question: q.question.trim(),
             order: idx,
-            options: {
+            quiz_options: {
               create: (q.options || []).map((o: any) => ({
+                id: crypto.randomUUID(),
                 text: o.text.trim(),
                 isCorrect: o.isCorrect === true,
               })),
@@ -141,8 +144,8 @@ export async function PUT(
         },
       },
       include: {
-        questions: {
-          include: { options: true },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
       },
@@ -169,16 +172,16 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { quizId } = await params;
 
-    await prisma.material_quiz.delete({
+    await prisma.material_quizzes.delete({
       where: { id: quizId },
     });
 

@@ -5,8 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import FollowButton from "@/components/ui/FollowButton";
+import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
+import BackButton from "@/components/ui/BackButton";
+import FollowButton from "@/components/ui/FollowButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ArrowLeft,
@@ -31,6 +33,7 @@ import {
   FileText,
   Lock,
   HelpCircle,
+  UserCheck
 } from "lucide-react";
 
 interface UserProfile {
@@ -141,7 +144,7 @@ export default function UserPublicProfile() {
     }
   };
 
-  const handleStartChat = () => router.push(`/chat-rooms?userId=${userId}`);
+  const handleStartChat = () => router.push(`/friends/chat?userId=${userId}`);
   const isOnline = (ls: string) => Date.now() - new Date(ls).getTime() < 300000;
 
   const formatLastSeen = (ls: string) => {
@@ -229,10 +232,13 @@ export default function UserPublicProfile() {
 
   const online = isOnline(profile.lastSeen);
 
-  // Konten privat hanya terlihat jika pertemanan mutual (saling mengikuti) atau profil sendiri
+  // Konten privat hanya terlihat jika pertemanan mutual (saling mengikuti), profil sendiri, atau jika login sebagai admin/instruktur
+  const userRole = (session?.user as any)?.role;
   const canViewPrivate =
     friendshipStatus?.isOwnProfile === true ||
-    friendshipStatus?.isMutual === true;
+    friendshipStatus?.isMutual === true ||
+    userRole === "admin" ||
+    userRole === "instruktur";
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col font-sans">
@@ -242,29 +248,23 @@ export default function UserPublicProfile() {
           <Sidebar />
         </div>
         <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 mb-6 transition-colors font-bold text-sm"
-          >
-            <ArrowLeft className="h-4 w-4" /> Kembali
-          </button>
-
+          <div className="mb-6">
+            <BackButton />
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* LEFT: Profile Card */}
             <div className="lg:col-span-1">
-              <div className="bg-white border-2 border-slate-200 rounded-[2rem] shadow-[0_6px_0_0_#cbd5e1] overflow-hidden sticky top-24">
-                <div className="h-28 bg-gradient-to-br from-emerald-400 via-teal-400 to-cyan-500 relative">
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <span
-                      className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400 animate-pulse" : "bg-slate-300"}`}
-                    />
-                    <span className="text-[10px] font-black text-white uppercase tracking-tight">
-                      {formatLastSeen(profile.lastSeen)}
-                    </span>
-                  </div>
+              <div className="bg-white border-2 border-slate-200 rounded-[2rem] shadow-[0_6px_0_0_#cbd5e1] overflow-hidden sticky top-24 px-6 pb-6 pt-10">
+                <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full">
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400 animate-pulse" : "bg-slate-300"}`}
+                  />
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+                    {formatLastSeen(profile.lastSeen)}
+                  </span>
                 </div>
-                <div className="px-6 pb-6 -mt-14">
-                  <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="flex justify-center mb-6">
                     <Avatar className="h-28 w-28 border-4 border-white shadow-xl">
                       <AvatarImage
                         src={
@@ -293,14 +293,14 @@ export default function UserPublicProfile() {
                       {profile.role}
                     </div>
                     {xpProgress && (
-                      <div className="mt-2">
-                        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black shadow-sm">
+                      <div className="mt-2 flex justify-center">
+                        <span className="bg-red-500 text-white px-4 py-1 rounded-full text-[10px] font-black shadow-[0_4px_0_0_#b91c1c] border-2 border-white flex items-center justify-center uppercase tracking-wider w-fit">
                           {xpProgress.levelTitle}
                         </span>
                       </div>
                     )}
                     {profile.bidangKeahlian && (
-                      <p className="text-xs text-slate-400 font-medium mt-2">
+                      <p className="text-xs text-slate-400 font-medium mt-3">
                         {profile.bidangKeahlian}
                       </p>
                     )}
@@ -311,21 +311,21 @@ export default function UserPublicProfile() {
                     </p>
                   )}
                   {stats && (
-                    <div className="flex items-center justify-center gap-6 mb-5">
+                    <div className="flex items-center justify-center gap-8 mb-6 border-y border-slate-50 py-4">
                       <div className="text-center">
-                        <div className="text-xl font-black text-slate-800">
+                        <div className="text-2xl font-black text-slate-800 leading-none">
                           {stats.followersCount}
                         </div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">
                           Pengikut
                         </div>
                       </div>
-                      <div className="w-px h-8 bg-slate-200" />
+                      <div className="w-px h-10 bg-slate-100" />
                       <div className="text-center">
-                        <div className="text-xl font-black text-slate-800">
+                        <div className="text-2xl font-black text-slate-800 leading-none">
                           {stats.followingCount}
                         </div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">
                           Mengikuti
                         </div>
                       </div>
@@ -337,13 +337,16 @@ export default function UserPublicProfile() {
                         targetUserId={profile.id}
                         initialIsFollowing={friendshipStatus.isFollowing}
                         initialIsMutual={friendshipStatus.isMutual}
-                        className="w-full"
-                        size="md"
+                        className="w-full py-3"
+                        onStatusChange={() => {
+                          fetchFriendshipStatus();
+                          fetchProfile();
+                        }}
                       />
                       {friendshipStatus.isMutual && (
                         <button
                           onClick={handleStartChat}
-                          className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-50 text-emerald-600 font-bold rounded-xl border-2 border-emerald-100 hover:bg-emerald-100 transition-colors text-sm"
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-50 text-emerald-600 font-bold rounded-2xl border-2 border-emerald-100 hover:bg-emerald-100 transition-colors text-sm shadow-sm"
                         >
                           <MessageCircle className="h-4 w-4" /> Kirim Pesan
                         </button>
@@ -353,31 +356,34 @@ export default function UserPublicProfile() {
                   {friendshipStatus?.isOwnProfile && (
                     <button
                       onClick={() => router.push("/profile")}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 text-slate-600 font-bold rounded-xl border-2 border-slate-200 hover:bg-slate-100 transition-colors text-sm"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 text-slate-600 font-bold rounded-2xl border-2 border-slate-200 hover:bg-slate-100 transition-colors text-sm shadow-sm"
                     >
                       Edit Profil
                     </button>
                   )}
-                  <div className="mt-5 space-y-3">
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center gap-4 text-sm bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
                         <Mail className="h-4 w-4 text-emerald-600" />
                       </div>
-                      <span className="text-slate-600 font-medium truncate text-xs">
-                        {profile.email}
-                      </span>
+                      <div className="flex flex-col min-w-0">
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Email</span>
+                         <span className="text-slate-600 font-bold truncate text-xs">{profile.email}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                    <div className="flex items-center gap-4 text-sm bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
                         <Calendar className="h-4 w-4 text-emerald-600" />
                       </div>
-                      <span className="text-slate-600 font-medium text-xs">
-                        Bergabung{" "}
-                        {new Date(profile.createdAt).toLocaleDateString(
-                          "id-ID",
-                          { year: "numeric", month: "long", day: "numeric" },
-                        )}
-                      </span>
+                      <div className="flex flex-col">
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Terdaftar</span>
+                         <span className="text-slate-600 font-bold text-xs">
+                          {new Date(profile.createdAt).toLocaleDateString(
+                            "id-ID",
+                            { year: "numeric", month: "long", day: "numeric" },
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -387,46 +393,59 @@ export default function UserPublicProfile() {
             {/* RIGHT: Stats & Activity */}
             <div className="lg:col-span-2 space-y-6">
               {/* Stat Cards */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   {
-                    icon: <Zap className="h-6 w-6 text-emerald-500" />,
+                    icon: null,
                     val: profile.level,
-                    lbl: "Level",
+                    lbl: "LEVEL",
                     bg: "bg-emerald-50",
                     bdr: "border-emerald-100",
-                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#34d399]",
+                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#10b981]",
                   },
                   {
-                    icon: <Flame className="h-6 w-6 text-emerald-500" />,
+                    icon: (
+                      <Zap
+                        className="h-7 w-7 text-emerald-500"
+                        fill="currentColor"
+                      />
+                    ),
+                    val: canViewPrivate ? profile.points.toLocaleString() : "—",
+                    lbl: "TOTAL XP",
+                    bg: "bg-emerald-50",
+                    bdr: "border-emerald-100",
+                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#10b981]",
+                  },
+                  {
+                    icon: <Flame className="h-7 w-7 text-emerald-500" />,
                     val: profile.streak,
-                    lbl: "Streak",
+                    lbl: "STREAK",
                     bg: "bg-emerald-50",
                     bdr: "border-emerald-100",
-                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#34d399]",
+                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#10b981]",
                   },
                   {
-                    icon: <Award className="h-6 w-6 text-emerald-500" />,
+                    icon: <Award className="h-7 w-7 text-emerald-500" />,
                     val: profile.badges,
-                    lbl: "Badge",
+                    lbl: "BADGE",
                     bg: "bg-emerald-50",
                     bdr: "border-emerald-100",
-                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#34d399]",
+                    hv: "hover:border-emerald-300 hover:shadow-[0_4px_0_0_#10b981]",
                   },
                 ].map((s, i) => (
                   <div
                     key={i}
-                    className={`bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-[0_4px_0_0_#cbd5e1] text-center ${s.hv} transition-all`}
+                    className={`flex flex-col items-center justify-center p-4 rounded-3xl ${s.bg} border-2 ${s.bdr} transition-all duration-300 ${s.hv} group cursor-default h-full min-h-[140px]`}
                   >
-                    <div
-                      className={`w-12 h-12 ${s.bg} rounded-xl flex items-center justify-center mx-auto mb-3 border ${s.bdr}`}
-                    >
-                      {s.icon}
-                    </div>
-                    <div className="text-2xl font-black text-slate-800">
+                    {s.icon && (
+                      <div className="w-14 h-14 bg-white/50 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-white/50">
+                        {s.icon}
+                      </div>
+                    )}
+                    <div className="text-3xl font-black text-slate-800 group-hover:text-slate-900 leading-none mb-1">
                       {s.val}
                     </div>
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                       {s.lbl}
                     </div>
                   </div>
@@ -435,77 +454,80 @@ export default function UserPublicProfile() {
 
               {/* XP Progress — hanya untuk pertemanan mutual atau profil sendiri */}
               {canViewPrivate && xpProgress && (
-                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Zap
-                        className="h-5 w-5 text-emerald-500"
-                        fill="currentColor"
-                      />
-                      <span className="font-black text-slate-800">
-                        Level {xpProgress.currentLevel}
-                      </span>
-                      <span className="text-xs font-bold text-slate-400">
-                        • {xpProgress.levelTitle}
-                      </span>
+                <div className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-8 shadow-[0_8px_0_0_#cbd5e1]">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
+                        <Zap className="h-6 w-6 text-emerald-500" fill="currentColor" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-black text-xl text-slate-800 leading-none">Level {xpProgress.currentLevel}</span>
+                        <span className="text-xs font-bold text-slate-400">{xpProgress.levelTitle}</span>
+                      </div>
                     </div>
-                    <span className="text-sm font-black text-emerald-600">
-                      {profile.points.toLocaleString()} XP
-                    </span>
+                    <div className="text-right">
+                       <span className="text-xl font-black text-amber-500 block leading-none">{profile.points.toLocaleString()} XP</span>
+                       <span className="text-[10px] font-black text-slate-300 uppercase">Total Pengalaman</span>
+                    </div>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-3 border border-slate-200 overflow-hidden">
+                  <div className="w-full bg-slate-100 rounded-full h-4 border-2 border-slate-200 overflow-hidden p-0.5">
                     <div
-                      className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 h-3 rounded-full transition-all duration-700"
+                      className="bg-yellow-400 rounded-full shadow-[0_2px_0_0_#ca8a04] h-full transition-all duration-1000 ease-out relative"
                       style={{ width: `${xpProgress.progressPercent}%` }}
-                    />
+                    >
+                      <div className="absolute top-0 right-2 w-2 h-full bg-white/40 rounded-full skew-x-[-20deg]" />
+                      <div className="absolute top-0 right-5 w-1 h-full bg-white/30 rounded-full skew-x-[-20deg]" />
+                    </div>
                   </div>
-                  <div className="flex justify-between mt-1.5 text-[10px] font-bold text-slate-400">
-                    <span>Lv {xpProgress.currentLevel}</span>
-                    <span>
-                      {xpProgress.progressXp} /{" "}
-                      {xpProgress.nextLevelXp - xpProgress.currentLevelXp} XP
+                  <div className="flex justify-between mt-2.5 text-[11px] font-black tracking-tight text-slate-400">
+                    <span className="bg-slate-50 px-3 py-1 rounded-full">Lv {xpProgress.currentLevel}</span>
+                    <span className="flex items-center gap-1 font-bold">
+                       <span className="text-amber-500">{xpProgress.progressXp}</span> / <span className="text-slate-500">{xpProgress.nextLevelXp - xpProgress.currentLevelXp} XP</span>
                     </span>
-                    <span>Lv {xpProgress.currentLevel + 1}</span>
+                    <span className="bg-slate-50 px-3 py-1 rounded-full">Lv {xpProgress.currentLevel + 1}</span>
                   </div>
                 </div>
               )}
 
               {/* Badges */}
               {earnedBadges.length > 0 && (
-                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
-                      <Award className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-black text-slate-800">
-                        Badge Diperoleh
-                      </h2>
-                      <p className="text-xs text-slate-500 font-medium">
-                        {earnedBadges.length} badge dikumpulkan
-                      </p>
+                <div className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-8 shadow-[0_8px_0_0_#cbd5e1]">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center border-2 border-emerald-100">
+                        <Shield className="h-8 w-8 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-black text-slate-800 leading-none mb-1">
+                          Badge Diperoleh
+                        </h2>
+                        <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest">
+                          {earnedBadges.length} Badge telah terkumpul
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
                     {earnedBadges.map((b) => (
                       <div
                         key={b.id}
-                        className="relative bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-4 text-center shadow-sm"
+                        className="group relative bg-slate-50/50 border-2 border-slate-200 rounded-3xl p-5 text-center transition-all hover:bg-white hover:border-emerald-300 hover:shadow-lg hover:-translate-y-1"
                       >
-                        <div className="text-3xl mb-2">{b.icon}</div>
-                        <p className="text-xs font-black text-slate-700 leading-tight">
+                        <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">{b.icon}</div>
+                        <h4 className="text-sm font-black text-slate-800 leading-tight mb-1">
                           {b.name}
-                        </p>
-                        <p className="text-[10px] font-medium text-slate-400 mt-1 line-clamp-2">
+                        </h4>
+                        <p className="text-[10px] font-bold text-slate-400 mb-3 line-clamp-2">
                           {b.description}
                         </p>
-                        <p className="text-[9px] font-bold text-amber-500 mt-1.5">
+                        <div className="inline-block px-3 py-1 bg-white border border-slate-100 rounded-full text-[9px] font-black text-emerald-600 shadow-sm">
                           {new Date(b.earnedAt).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "short",
+                            year: "numeric"
                           })}
-                        </p>
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white shadow-sm scale-0 group-hover:scale-100 transition-transform">
                           <CheckCircle2 className="h-3.5 w-3.5 text-white" />
                         </div>
                       </div>
@@ -516,61 +538,70 @@ export default function UserPublicProfile() {
 
               {/* Learning Stats — hanya untuk pertemanan mutual atau profil sendiri */}
               {canViewPrivate && stats && (
-                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
-                      <TrendingUp className="h-6 w-6 text-emerald-600" />
+                <div className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-8 shadow-[0_8px_0_0_#cbd5e1] relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-8 scale-150 opacity-[0.03] rotate-12 pointer-events-none">
+                      <TrendingUp className="w-32 h-32 text-emerald-600" />
+                   </div>
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center border-2 border-emerald-100">
+                      <TrendingUp className="h-8 w-8 text-emerald-600" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-black text-slate-800">
+                      <h2 className="text-2xl font-black text-slate-800 leading-none mb-1">
                         Statistik Pembelajaran
                       </h2>
-                      <p className="text-xs text-slate-500 font-medium">
-                        Rekap aktivitas belajar
+                      <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest">
+                        Ringkasan Pencapaian Utama
                       </p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <HelpCircle className="h-5 w-5 text-emerald-600" />
-                        <span className="text-xs font-bold text-emerald-600 uppercase">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-slate-50 rounded-3xl p-6 border-2 border-slate-100 hover:border-emerald-200 transition-colors group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <HelpCircle className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
                           Quiz
                         </span>
                       </div>
-                      <div className="text-2xl font-black text-slate-800">
+                      <div className="text-4xl font-black text-slate-800 mb-1 leading-none">
                         {stats.quizAttemptCount}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-medium">
-                        Quiz dikerjakan
+                      <div className="text-[11px] text-slate-500 font-bold">
+                        Quiz telah diselesaikan
                       </div>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Target className="h-5 w-5 text-emerald-600" />
-                        <span className="text-xs font-bold text-emerald-600 uppercase">
-                          Skor
+                    <div className="bg-slate-50 rounded-3xl p-6 border-2 border-slate-100 hover:border-emerald-200 transition-colors group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <Target className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                          Rata-Rata
                         </span>
                       </div>
-                      <div className="text-2xl font-black text-slate-800">
+                      <div className="text-4xl font-black text-slate-800 mb-1 leading-none">
                         {stats.averageQuizScore}%
                       </div>
-                      <div className="text-[10px] text-slate-500 font-medium">
-                        Rata-rata skor
+                      <div className="text-[11px] text-slate-500 font-bold">
+                        Skor quiz rata-rata
                       </div>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 border border-emerald-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <GraduationCap className="h-5 w-5 text-emerald-600" />
-                        <span className="text-xs font-bold text-emerald-600 uppercase">
-                          Program
+                    <div className="bg-slate-50 rounded-3xl p-6 border-2 border-slate-100 hover:border-emerald-200 transition-colors group">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <GraduationCap className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                          Materi
                         </span>
                       </div>
-                      <div className="text-2xl font-black text-slate-800">
+                      <div className="text-4xl font-black text-slate-800 mb-1 leading-none">
                         {stats.totalEnrollments}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-medium">
-                        Materi diikuti
+                      <div className="text-[11px] text-slate-500 font-bold">
+                        Modul yang sedang diikuti
                       </div>
                     </div>
                   </div>
@@ -579,65 +610,69 @@ export default function UserPublicProfile() {
 
               {/* Recent Activity — hanya untuk pertemanan mutual atau profil sendiri */}
               {canViewPrivate && (
-                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
-                      <Activity className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-black text-slate-800">
-                        Aktivitas Terkini
-                      </h2>
-                      <p className="text-xs text-slate-500 font-medium">
-                        Kegiatan terbaru pengguna ini
-                      </p>
+                <div className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-8 shadow-[0_8px_0_0_#cbd5e1]">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center border-2 border-emerald-100">
+                        <Activity className="h-8 w-8 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-black text-slate-800 leading-none mb-1">
+                          Aktivitas Terkini
+                        </h2>
+                        <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest">
+                           Jejak belajar terbaru
+                        </p>
+                      </div>
                     </div>
                   </div>
                   {activities.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Activity className="h-8 w-8 text-slate-300" />
+                    <div className="text-center py-16 bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200">
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <Activity className="h-10 w-10 text-slate-300" />
                       </div>
-                      <p className="text-slate-400 font-bold text-sm">
-                        Belum ada aktivitas terbaru
+                      <p className="text-slate-400 font-black text-sm uppercase tracking-wide">
+                        Belum ada aktivitas
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {activities.map((a) => (
                         <div
                           key={a.id}
-                          className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors group"
+                          className="flex items-center gap-5 p-5 rounded-3xl bg-slate-50/50 border border-slate-100 hover:bg-white hover:border-emerald-200 hover:shadow-md transition-all group"
                         >
                           <div
-                            className={`w-10 h-10 ${getBg(a.type)} rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform`}
+                            className={`w-12 h-12 ${getBg(a.type)} rounded-2xl flex items-center justify-center shrink-0 border border-emerald-100 group-hover:scale-105 transition-transform`}
                           >
                             {getIcon(a.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-slate-700 text-sm truncate">
+                            <h4 className="font-black text-slate-700 text-sm truncate mb-0.5">
                               {a.title}
                             </h4>
-                            <p className="text-[11px] text-slate-400 font-medium">
+                            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-tight">
                               {formatDate(a.date)}
                             </p>
                           </div>
-                          {a.xpEarned !== undefined && a.xpEarned > 0 && (
-                            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100">
-                              <Zap className="h-3.5 w-3.5 text-emerald-500" />
-                              <span className="text-xs font-black text-emerald-600">
-                                +{a.xpEarned}
-                              </span>
-                            </div>
-                          )}
-                          {a.score !== undefined && (
-                            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 border border-amber-100">
-                              <Star className="h-3.5 w-3.5 text-amber-500" />
-                              <span className="text-xs font-black text-amber-600">
-                                {a.score}/{a.totalScore}
-                              </span>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {a.xpEarned !== undefined && a.xpEarned > 0 && (
+                              <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 shadow-sm">
+                                <Zap className="h-4 w-4 text-emerald-500" fill="currentColor" />
+                                <span className="text-xs font-black text-emerald-600">
+                                  +{a.xpEarned} XP
+                                </span>
+                              </div>
+                            )}
+                            {a.score !== undefined && (
+                              <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 shadow-sm">
+                                <Star className="h-4 w-4 text-emerald-500" fill="currentColor" />
+                                <span className="text-xs font-black text-emerald-600">
+                                  {a.score}/{a.totalScore}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -647,63 +682,57 @@ export default function UserPublicProfile() {
 
               {/* Locked Card — tampil saat belum berteman */}
               {!canViewPrivate && (
-                <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-10 shadow-[0_6px_0_0_#cbd5e1] text-center">
-                  <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-5 border-2 border-slate-200">
-                    <Lock className="h-10 w-10 text-slate-400" />
+                <div className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-12 shadow-[0_10px_0_0_#cbd5e1] text-center relative overflow-hidden group">
+                   <div className="absolute inset-0 bg-linear-to-b from-slate-50/0 via-slate-50/50 to-slate-100/80 backdrop-blur-[1px] pointer-events-none" />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 border-4 border-slate-100 shadow-xl group-hover:rotate-12 transition-transform duration-500">
+                      <Lock className="h-12 w-12 text-slate-300" />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-800 mb-4">
+                      Profil Ini Dikunci
+                    </h3>
+                    <p className="text-sm text-slate-500 font-bold leading-relaxed mb-8 max-w-sm mx-auto uppercase tracking-wide">
+                      Bertemanlah dengan {" "}
+                      <span className="text-emerald-600">
+                        {profile.name?.split(" ")[0]}
+                      </span> {" "}
+                      untuk mendapatkan akses penuh ke total XP, statistik belajar, and aktivitas harian mereka.
+                    </p>
+                    {!session?.user ? (
+                      <button
+                        onClick={() => router.push("/auth")}
+                        className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 border-b-4 border-emerald-700 hover:border-b-2 transition-all shadow-lg text-sm"
+                      >
+                        <Users className="h-5 w-5" />
+                        MULAI BERTEMAN SEKARANG
+                      </button>
+                    ) : (
+                      <div className="flex flex-col items-center gap-4">
+                        {friendshipStatus?.isFollowedBy && !friendshipStatus.isMutual && (
+                          <div className="text-emerald-600 font-black text-xs uppercase animate-bounce">
+                            ✨ {profile.name?.split(" ")[0]} Menunggu Kamu Follow Back!
+                          </div>
+                        )}
+                        <FollowButton
+                          targetUserId={profile.id}
+                          initialIsFollowing={friendshipStatus?.isFollowing ?? false}
+                          initialIsMutual={friendshipStatus?.isMutual ?? false}
+                          size="lg"
+                          onStatusChange={() => {
+                            fetchFriendshipStatus();
+                            fetchProfile();
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
-                  <h3 className="text-xl font-black text-slate-700 mb-3">
-                    Konten Pribadi
-                  </h3>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6 max-w-xs mx-auto">
-                    Berteman dengan{" "}
-                    <span className="font-black text-slate-700">
-                      {profile.name?.split(" ")[0]}
-                    </span>{" "}
-                    untuk melihat XP, statistik pembelajaran, dan aktivitas
-                    belajar mereka
-                  </p>
-                  {!session?.user ? (
-                    <button
-                      onClick={() => router.push("/auth")}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 border-b-4 border-emerald-700 hover:border-b-2 transition-all text-sm"
-                    >
-                      <Users className="h-4 w-4" />
-                      Login untuk Berteman
-                    </button>
-                  ) : friendshipStatus?.isFollowing &&
-                    !friendshipStatus?.isMutual ? (
-                    <div className="inline-flex items-center gap-2 px-5 py-3 bg-amber-50 border-2 border-amber-200 rounded-2xl text-amber-700 font-bold text-sm">
-                      <Star className="h-4 w-4" />
-                      Menunggu {profile.name?.split(" ")[0]} mengikutimu kembali
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-3">
-                      {friendshipStatus?.isFollowedBy && (
-                        <p className="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
-                          ✨ {profile.name?.split(" ")[0]} sudah mengikutimu!
-                        </p>
-                      )}
-                      <FollowButton
-                        targetUserId={profile.id}
-                        initialIsFollowing={
-                          friendshipStatus?.isFollowing || false
-                        }
-                        initialIsMutual={false}
-                        size="md"
-                      />
-                      {!friendshipStatus?.isFollowing && (
-                        <p className="text-xs text-slate-400 font-medium mt-1">
-                          Ikuti dan tunggu mereka membalas untuk berteman
-                        </p>
-                      )}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
           </div>
         </main>
       </div>
+      <ChatbotButton />
     </div>
   );
 }

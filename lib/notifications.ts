@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import type { NotificationType } from "@prisma/client";
+import type { notifications_type } from "@prisma/client";
 
 /**
  * Server-side helper to create a notification and return it for WebSocket emission.
@@ -18,7 +18,7 @@ export async function createNotification({
   senderId,
 }: {
   userId: string;
-  type?: NotificationType;
+  type?: notifications_type;
   title: string;
   message: string;
   icon?: string;
@@ -28,8 +28,9 @@ export async function createNotification({
   inviteToken?: string;
   senderId?: string;
 }) {
-  const notification = await prisma.notification.create({
+  const notification = await prisma.notifications.create({
     data: {
+      id: crypto.randomUUID(),
       userId,
       type,
       title,
@@ -40,9 +41,10 @@ export async function createNotification({
       actionUrl,
       inviteToken,
       senderId,
+      updatedAt: new Date(),
     },
     include: {
-      sender: {
+      users_notifications_senderIdTousers: {
         select: {
           id: true,
           name: true,
@@ -63,7 +65,7 @@ export async function createNotification({
 export async function createBulkNotifications(
   notifications: {
     userId: string;
-    type?: NotificationType;
+    type?: notifications_type;
     title: string;
     message: string;
     icon?: string;

@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   const email = "iniakuraditt@gmail.com"
-  const users = await prisma.user.findMany({
+  const users = await prisma.users.findMany({
     where: { email }
   })
   
@@ -12,7 +12,7 @@ async function main() {
   
   if (users.length > 0) {
     const userId = users[0].id
-    const notifications = await prisma.notification.findMany({
+    const notifications = await prisma.notifications.findMany({
       where: { userId }
     })
     console.log("Notifications for user:", notifications.map(n => ({ id: n.id, type: n.type, status: n.status, inviteToken: n.inviteToken })))

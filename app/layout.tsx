@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Comic_Neue } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import { SocketProvider } from "@/lib/socket";
 import { NotificationProvider } from "@/lib/notification-provider";
+import { ConfirmProvider } from "@/lib/confirm-provider";
 import PageTransitionProvider from "@/components/ui/PageTransitionProvider";
 import { Suspense } from "react";
 
@@ -41,12 +42,14 @@ export default function RootLayout({
       >
         <SessionProvider>
           <SocketProvider>
-            <NotificationProvider>
-              <Suspense fallback={null}>
-                <PageTransitionProvider />
-              </Suspense>
-              {children}
-            </NotificationProvider>
+            <ConfirmProvider>
+              <NotificationProvider>
+                <Suspense fallback={null}>
+                  <PageTransitionProvider />
+                </Suspense>
+                {children}
+              </NotificationProvider>
+            </ConfirmProvider>
           </SocketProvider>
         </SessionProvider>
       </body>

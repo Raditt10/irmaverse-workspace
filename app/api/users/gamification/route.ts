@@ -77,7 +77,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
       select: {
         points: true,
@@ -97,7 +97,7 @@ export async function GET() {
     // Sync level jika ada ketidakcocokan
     const calculatedLevel = getLevelFromXp(user.points);
     if (calculatedLevel !== user.level) {
-      await prisma.user.update({
+      await prisma.users.update({
         where: { id: session.user.id },
         data: { level: calculatedLevel },
       });
@@ -108,7 +108,7 @@ export async function GET() {
     const levelTitle = getLevelTitle(user.level);
 
     // Hitung rank (peringkat berdasarkan poin)
-    const rank = await prisma.user.count({
+    const rank = await prisma.users.count({
       where: { points: { gt: user.points }, role: "user" },
     });
 
@@ -116,12 +116,12 @@ export async function GET() {
     const streak = await calculateStreak(session.user.id);
 
     // Ambil program enrollments yang sudah selesai
-    const completedPrograms = await prisma.program_enrollment.count({
+    const completedPrograms = await prisma.program_enrollments.count({
       where: { userId: session.user.id },
     });
 
     // Total quiz attempts
-    const quizAttempts = await prisma.quiz_attempt.count({
+    const quizAttempts = await prisma.quiz_attempts.count({
       where: { userId: session.user.id },
     });
 

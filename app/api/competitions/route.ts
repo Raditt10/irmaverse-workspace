@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET() {
   try {
-    const competitions = await prisma.competition.findMany({
+    const competitions = await prisma.competitions.findMany({
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -34,10 +35,10 @@ export async function GET() {
           prize: comp.prize || "TBA",
           category: comp.category,
           image: comp.thumbnailUrl || "https://images.unsplash.com/photo-1526080652727-5b77f74df6c5?auto=format&fit=crop&w=1000&q=80",
-          instructor: comp.instructor ? {
-            id: comp.instructor.id,
-            name: comp.instructor.name || "Instructor",
-            avatar: comp.instructor.avatar,
+          instructor: comp.users ? {
+            id: comp.users.id,
+            name: comp.users.name || "Instructor",
+            avatar: comp.users.avatar,
           } : null,
         };
       } catch (e) {
@@ -71,6 +72,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userRole = session.user.role?.toLowerCase();
+    const isPrivileged = userRole === "admin" || userRole === "instruktur" || userRole === "super_admin";
+
+    if (!isPrivileged) {
+      return NextResponse.json(
+        { error: "Forbidden - Insufficient permissions" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     console.log("Request body:", body);
     
@@ -100,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     console.log("Creating competition with data:", { title, date, prize, category, instructorId });
 
-    const competition = await prisma.competition.create({
+    const competition = await prisma.competitions.create({
       data: {
         title,
         description: description || null,
@@ -118,9 +129,11 @@ export async function POST(request: NextRequest) {
         requirements: requirements || null,
         judgingCriteria: judgingCriteria || null,
         instructorId,
+        updatedAt: new Date(),
+        id: crypto.randomUUID(),
       },
       include: {
-        instructor: {
+        users: {
           select: {
             id: true,
             name: true,
@@ -131,6 +144,18 @@ export async function POST(request: NextRequest) {
     });
 
     console.log("Competition created:", competition.id);
+
+    // Log Activity
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_competition_managed" as any,
+        title: "Membuat Lomba Baru",
+        description: `Admin membuat lomba baru: ${competition.title}`,
+        metadata: { competitionId: competition.id }
+      });
+    }
+
     return NextResponse.json(competition, { status: 201 });
   } catch (error: any) {
     console.error("Error creating competition:", error);
@@ -154,6 +179,16 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const userRole = session.user.role?.toLowerCase();
+    const isPrivileged = userRole === "admin" || userRole === "instruktur" || userRole === "super_admin";
+
+    if (!isPrivileged) {
+      return NextResponse.json(
+        { error: "Forbidden - Insufficient permissions" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { 
       id, title, description, date, location, prize, category, thumbnailUrl, 
@@ -168,7 +203,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const competition = await prisma.competition.findUnique({
+    const competition = await prisma.competitions.findUnique({
       where: { id },
     });
 
@@ -177,7 +212,7 @@ export async function PUT(request: NextRequest) {
     }
 
 
-    const updatedCompetition = await prisma.competition.update({
+    const updatedCompetition = await prisma.competitions.update({
       where: { id },
       data: {
         title,
@@ -197,6 +232,17 @@ export async function PUT(request: NextRequest) {
         maxParticipants,
       },
     });
+
+    // Log Activity
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_competition_managed" as any,
+        title: "Memperbarui Lomba",
+        description: `Admin memperbarui lomba: ${updatedCompetition.title}`,
+        metadata: { competitionId: updatedCompetition.id }
+      });
+    }
 
     return NextResponse.json(updatedCompetition, { status: 200 });
   } catch (error: any) {

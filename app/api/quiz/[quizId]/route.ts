@@ -15,17 +15,23 @@ export async function GET(
 
     const { quizId } = await params;
 
-    const quiz = await prisma.material_quiz.findUnique({
+    const user = await prisma.users.findUnique({
+      where: { id: session.user.id },
+    });
+    const isStaffRole = user?.role === "instruktur" || user?.role === "admin" || user?.role === "super_admin";
+
+    // If staff, fetch all attempts. Otherwise, only own attempts.
+    const quiz = await prisma.material_quizzes.findUnique({
       where: { id: quizId },
       include: {
         material: { select: { id: true, title: true, instructorId: true, thumbnailUrl: true } },
-        creator: { select: { id: true, name: true, avatar: true } },
-        questions: {
-          include: { options: true },
+        users: { select: { id: true, name: true, avatar: true } },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
-        attempts: {
-          where: { userId: session.user.id },
+        quiz_attempts: {
+          where: isStaffRole ? undefined : { userId: session.user.id },
           orderBy: { completedAt: "desc" },
           select: {
             id: true,
@@ -33,6 +39,7 @@ export async function GET(
             totalScore: true,
             completedAt: true,
             answers: true,
+            users: { select: { id: true, name: true, avatar: true } },
           },
         },
       },
@@ -45,35 +52,35 @@ export async function GET(
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    });
-    const isPrivileged = user?.role === "instruktur" || user?.role === "admin";
-
-    const questions = quiz.questions.map((q) => ({
+    const questions = quiz.quiz_questions.map((q) => ({
       id: q.id,
       question: q.question,
       order: q.order,
-      options: q.options.map((o) => ({
+      options: q.quiz_options.map((o) => ({
         id: o.id,
         text: o.text,
-        ...(isPrivileged || quiz.attempts.length > 0
+        ...(isStaffRole || quiz.quiz_attempts.some(a => a.users.id === session.user.id)
           ? { isCorrect: o.isCorrect }
           : {}),
       })),
     }));
+
+    // Fetch isActive separately via raw query to bypass out-of-sync Prisma Client
+    const rawStatus: any[] = await prisma.$queryRaw`SELECT isActive FROM material_quizzes WHERE id = ${quizId}`;
+    const quizStatus = rawStatus.length > 0 ? (rawStatus[0].isActive === 1 || rawStatus[0].isActive === true) : true;
 
     return NextResponse.json({
       id: quiz.id,
       materialId: quiz.materialId || null,
       materialTitle: quiz.material?.title || null,
       materialThumbnail: quiz.material?.thumbnailUrl || null,
-      creatorName: quiz.creator?.name || null,
+      creatorName: quiz.users?.name || null,
       title: quiz.title,
       description: quiz.description,
-      questionCount: quiz.questions.length,
+      questionCount: quiz.quiz_questions.length,
       questions,
-      attempts: quiz.attempts,
+      attempts: quiz.quiz_attempts,
+      isActive: quizStatus,
       createdAt: quiz.createdAt,
     });
   } catch (error) {
@@ -96,10 +103,10 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -115,19 +122,19 @@ export async function PUT(
     }
 
     // Delete old questions (cascade deletes options)
-    await prisma.quiz_question.deleteMany({ where: { quizId } });
+    await prisma.quiz_questions.deleteMany({ where: { quizId } });
 
     // Update quiz and recreate questions
-    const quiz = await prisma.material_quiz.update({
+    const quiz = await (prisma as any).material_quizzes.update({
       where: { id: quizId },
       data: {
         title: title.trim(),
         description: description?.trim() || null,
-        questions: {
+        quiz_questions: {
           create: (questions || []).map((q: any, idx: number) => ({
             question: q.question.trim(),
             order: idx,
-            options: {
+            quiz_options: {
               create: (q.options || []).map((o: any) => ({
                 text: o.text.trim(),
                 isCorrect: o.isCorrect === true,
@@ -137,7 +144,7 @@ export async function PUT(
         },
       },
       include: {
-        questions: { include: { options: true }, orderBy: { order: "asc" } },
+        quiz_questions: { include: { quiz_options: true }, orderBy: { order: "asc" } },
       },
     });
 
@@ -162,16 +169,16 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { quizId } = await params;
 
-    await prisma.material_quiz.delete({ where: { id: quizId } });
+    await prisma.material_quizzes.delete({ where: { id: quizId } });
 
     return NextResponse.json({
       success: true,
@@ -181,6 +188,44 @@ export async function DELETE(
     console.error("Delete quiz error:", error);
     return NextResponse.json(
       { error: "Gagal menghapus quiz" },
+      { status: 500 },
+    );
+  }
+}
+// PATCH - toggle quiz activation status
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> },
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const user = await prisma.users.findUnique({
+      where: { id: session.user.id },
+    });
+    if (!user || (user.role !== "instruktur" && user.role !== "admin" && user.role !== "super_admin")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { quizId } = await params;
+    const body = await req.json();
+    const { isActive } = body;
+
+    if (typeof isActive !== "boolean") {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+
+    // Use raw query to bypass out-of-sync Prisma Client
+    await prisma.$executeRaw`UPDATE material_quizzes SET isActive = ${isActive ? 1 : 0} WHERE id = ${quizId}`;
+
+    return NextResponse.json({ success: true, isActive });
+  } catch (error: any) {
+    console.error("Toggle quiz status error:", error);
+    return NextResponse.json(
+      { error: "Gagal memperbarui status quiz", details: error.message },
       { status: 500 },
     );
   }

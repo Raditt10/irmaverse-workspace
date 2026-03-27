@@ -8,11 +8,10 @@ import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
 import Loading from "@/components/ui/Loading";
 import Toast from "@/components/ui/Toast";
-// Import komponen Confirm Dialog yang baru
-import CartoonConfirmDialog from "@/components/ui/ConfirmDialog"; 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSocket } from "@/lib/socket";
+import { useConfirm } from "@/lib/confirm-provider";
 import {
   formatRelativeTime,
   formatMessageDate,
@@ -36,10 +35,19 @@ import {
   Heart,
   Check,
   CheckCheck,
-  File,
+  File as FileIcon,
   Loader2,
-  Menu, // Import icon Menu
+  Menu,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/DropDown";
+import PageBanner from "@/components/ui/PageBanner";
 
 // ... (INTERFACES tetap sama) ...
 interface Instructor {
@@ -135,10 +143,12 @@ const ChatPage = () => {
   const [showFilePreview, setShowFilePreview] = useState(false);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [fileCaption, setFileCaption] = useState("");
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletingConversation, setDeletingConversation] = useState(false);
   const [isDesktopChatFullscreen, setIsDesktopChatFullscreen] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [modalSearchTerm, setModalSearchTerm] = useState("");
+  const [favoriteInstructorIds, setFavoriteInstructorIds] = useState<string[]>([]);
+  
+  const { confirm, alert: customAlert } = useConfirm();
   
   const messagesRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -157,6 +167,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      setToast({ show: true, message: "Gagal memuat daftar percakapan", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -171,6 +182,20 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching instructors:", error);
+      setToast({ show: true, message: "Gagal memuat daftar instruktur", type: "error" });
+    }
+  }, []);
+
+  const fetchFavorites = useCallback(async () => {
+    try {
+      const res = await fetch("/api/instructors/favorites");
+      if (res.ok) {
+        const data = await res.json();
+        setFavoriteInstructorIds(data.favoriteIds || []);
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      setToast({ show: true, message: "Gagal memuat instruktur favorit", type: "error" });
     }
   }, []);
 
@@ -181,17 +206,23 @@ const ChatPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ instructorId }),
       });
+      
+      const data = await res.json();
+      
       if (res.ok) {
-        const conv = await res.json();
         await fetchConversations();
-        setSelectedConversationId(conv.id);
+        setSelectedConversationId(data.id);
         setShowNewChatModal(false);
         if (window.innerWidth < 1024) {
           setIsMobileViewingChat(true);
         }
+      } else {
+        console.error("Failed to start conversation:", data);
+        setToast({ show: true, message: data.error || "Gagal memulai percakapan", type: "error" });
       }
     } catch (error) {
       console.error("Error starting conversation:", error);
+      setToast({ show: true, message: "Terjadi kesalahan saat memulai percakapan", type: "error" });
     }
   }, [fetchConversations]);
 
@@ -205,6 +236,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
+      setToast({ show: true, message: "Gagal memuat pesan", type: "error" });
     } finally {
       setMessagesLoading(false);
     }
@@ -213,7 +245,8 @@ const ChatPage = () => {
   useEffect(() => {
     fetchConversations();
     fetchInstructors();
-  }, [fetchConversations, fetchInstructors]);
+    fetchFavorites();
+  }, [fetchConversations, fetchInstructors, fetchFavorites]);
 
   useEffect(() => {
     if (loading) return; // tunggu sampai fetchConversations selesai
@@ -416,7 +449,7 @@ const ChatPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert("File terlalu besar! Maksimal 10MB");
+      setToast({ show: true, message: "Ukuran file maksimal adalah 10MB.", type: 'error' });
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -472,7 +505,7 @@ const ChatPage = () => {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert("Gagal mengupload file");
+      setToast({ show: true, message: "Gagal mengunggah file. Silakan coba lagi.", type: 'error' });
     } finally {
       setUploadingFile(false);
     }
@@ -508,16 +541,25 @@ const ChatPage = () => {
         setEditingContent("");
       } else {
         const error = await res.json();
-        alert(error.error || "Gagal mengedit pesan");
+        setToast({ show: true, message: error.error || "Gagal mengedit pesan.", type: 'error' });
       }
     } catch (error) {
       console.error("Error editing message:", error);
-      alert("Gagal mengedit pesan");
+      setToast({ show: true, message: "Gagal mengedit pesan.", type: 'error' });
     }
   };
 
   const handleDeleteMessage = async (messageId: string) => {
-    if (!confirm("Hapus pesan ini?")) return;
+    const isConfirmed = await confirm({
+      type: "warning",
+      title: "Hapus Pesan",
+      message: "Apakah Anda yakin ingin menghapus pesan ini?",
+      confirmText: "Hapus",
+      cancelText: "Batal",
+    });
+
+    if (!isConfirmed) return;
+
     try {
       const res = await fetch(`/api/chat/messages/${messageId}`, {
         method: "DELETE",
@@ -531,16 +573,27 @@ const ChatPage = () => {
         });
       } else {
         const error = await res.json();
-        alert(error.error || "Gagal menghapus pesan");
+        setToast({ show: true, message: error.error || "Gagal menghapus pesan.", type: 'error' });
       }
     } catch (error) {
       console.error("Error deleting message:", error);
-      alert("Gagal menghapus pesan");
+      setToast({ show: true, message: "Terjadi kesalahan saat menghapus pesan.", type: 'error' });
     }
   };
 
   const handleDeleteConversation = async () => {
     if (!selectedConversationId) return;
+
+    const isConfirmed = await confirm({
+      type: "warning",
+      title: "Hapus Percakapan",
+      message: "Apakah kamu yakin ingin menghapus semua pesan dalam percakapan ini? Tindakan ini tidak dapat dibatalkan.",
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+    });
+
+    if (!isConfirmed) return;
+
     setDeletingConversation(true);
     try {
       const res = await fetch(`/api/chat/conversations/${selectedConversationId}`, {
@@ -552,7 +605,6 @@ const ChatPage = () => {
         );
         setSelectedConversationId(null);
         setMessages([]);
-        setShowDeleteConfirm(false); // Close dialog
         setIsMobileViewingChat(false);
         socket?.emit("conversation:delete", {
           conversationId: selectedConversationId,
@@ -560,11 +612,11 @@ const ChatPage = () => {
         setToast({ show: true, message: 'Percakapan berhasil dihapus', type: 'success' });
       } else {
         const error = await res.json();
-        alert(error.error || "Gagal menghapus percakapan");
+        setToast({ show: true, message: error.error || "Gagal menghapus percakapan.", type: 'error' });
       }
     } catch (error) {
       console.error("Error deleting conversation:", error);
-      alert("Gagal menghapus percakapan");
+      setToast({ show: true, message: "Terjadi kesalahan saat menghapus percakapan.", type: 'error' });
     } finally {
       setDeletingConversation(false);
     }
@@ -604,6 +656,29 @@ const ChatPage = () => {
     }
   };
 
+  const handleToggleFavorite = async (instructorId: string) => {
+    try {
+      const res = await fetch("/api/instructors/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ instructorId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.action === "added") {
+          setFavoriteInstructorIds((prev) => [...prev, instructorId]);
+          setToast({ show: true, message: 'Berhasil ditambahkan ke Favorit!', type: 'success' });
+        } else {
+          setFavoriteInstructorIds((prev) => prev.filter(id => id !== instructorId));
+          setToast({ show: true, message: 'Berhasil dihapus dari Favorit!', type: 'success' });
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      setToast({ show: true, message: 'Gagal mengubah status favorit.', type: 'error' });
+    }
+  };
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -628,55 +703,31 @@ const ChatPage = () => {
     <div className="h-dvh bg-[#FDFBF7] flex flex-col overflow-hidden">
       
       {/* Hide header & sidebar on mobile when viewing chat to maximize space */}
-      <div className={`${isMobileViewingChat || isDesktopChatFullscreen ? 'hidden lg:block' : 'block'}`}>
+      <div className={`${isDesktopChatFullscreen ? "hidden" : "block"} shrink-0`}>
         <DashboardHeader />
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Hide main sidebar on mobile or fullscreen desktop when viewing chat */}
-        {/* PERBAIKAN: Ubah hidden lg:block menjadi block. Sidebar component sendiri yang handle responsiveness */}
-        <div className={`${isMobileViewingChat || isDesktopChatFullscreen ? 'hidden lg:block' : 'block'} h-full shrink-0`}>
+        <div className={`${isDesktopChatFullscreen ? "hidden" : (isMobileViewingChat ? 'hidden lg:block' : 'block')} h-full shrink-0`}>
           <Sidebar />
         </div>
 
-        <main className={`w-full flex-1 flex flex-col ${(isMobileViewingChat || isDesktopChatFullscreen) ? 'p-0' : 'p-4 lg:p-6'} overflow-hidden`}>
+        <main className={`w-full flex-1 flex flex-col transition-all duration-300 ${isDesktopChatFullscreen ? 'p-0' : (isMobileViewingChat ? 'p-0' : 'p-4 lg:p-6')} overflow-hidden relative`}>
           
-          {/* Page Title (Only visible on Desktop/Tablet or when List View on Mobile) */}
-          <div className={`${isMobileViewingChat || isDesktopChatFullscreen ? 'hidden' : 'flex'} mb-4 items-center justify-between shrink-0 px-2 lg:px-0`}>
-            <div className="flex items-center gap-3">
-              {/* PERBAIKAN: Tombol Hamburger untuk Mobile */}
-              <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('open-mobile-sidebar'))}
-                className="lg:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-              >
-                <Menu className="h-6 w-6" strokeWidth={2.5} />
-              </button>
-              
-              <div>
-                <h1 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">Chat Instruktur</h1>
-                <p className="text-slate-500 font-bold text-xs lg:text-sm mt-1">Konsultasi langsung dengan ahlinya</p>
-              </div>
-            </div>
+          {/* Page Title */}
+          <PageBanner
+            title="Chat Instruktur"
+            description="Konsultasi langsung dengan ahlinya"
+            icon={MessageCircle}
+            tag="Konsultasi"
+            tagIcon={MessageCircle}
+            className={`${isDesktopChatFullscreen || isMobileViewingChat ? 'hidden' : 'mb-3! lg:mb-5! p-4! lg:p-6! shrink-0'}`}
+          />
 
-            <div className="flex items-center gap-2">
-                {isConnected ? (
-                  <span className="flex items-center gap-2 text-[10px] lg:text-xs font-black text-emerald-600 bg-emerald-100 px-3 py-1.5 rounded-full border-2 border-emerald-200">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    Online
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2 text-[10px] lg:text-xs font-black text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border-2 border-slate-200">
-                    <span className="w-2 h-2 bg-slate-400 rounded-full" />
-                    Connecting...
-                  </span>
-                )}
-            </div>
-          </div>
-
-          {/* CHAT CONTAINER FRAME */}
           <div className={`
-            flex flex-1 bg-white overflow-hidden shadow-sm
-            ${(isMobileViewingChat || isDesktopChatFullscreen) ? 'fixed inset-0 z-9999 w-screen h-screen rounded-none' : 'rounded-4xl border-4 border-slate-200 shadow-[0_8px_0_0_#cbd5e1]'}
+            flex flex-1 bg-white overflow-hidden transition-all duration-300
+            ${isDesktopChatFullscreen ? 'rounded-none border-0' : (isMobileViewingChat ? 'fixed inset-0 z-[70] w-screen h-screen rounded-none' : 'lg:rounded-4xl lg:border-4 border-slate-200 lg:shadow-[0_8px_0_0_#cbd5e1]')}
           `}>
             
             {/* --- LIST CONVERSATIONS (SIDEBAR CHAT) --- */}
@@ -732,7 +783,9 @@ const ChatPage = () => {
                       <div className="relative shrink-0">
                         <Avatar className="h-12 w-12 border-2 border-slate-100">
                           <AvatarImage src={conv.participant.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.participant.name}`} />
-                          <AvatarFallback>{conv.participant.name?.slice(0, 2)}</AvatarFallback>
+                          <AvatarFallback className="bg-teal-500 text-white font-black text-lg">
+                            {conv.participant.name?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         {isParticipantOnline(conv.participant.id) && (
                           <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full shadow-sm animate-pulse" />
@@ -775,18 +828,22 @@ const ChatPage = () => {
                   {/* Active Chat Header */}
                   <div className="flex items-center justify-between px-4 py-3 bg-white border-b-2 border-slate-100 shadow-sm z-20 shrink-0">
                     <div className="flex items-center gap-3">
-                      <BackButton 
-                        onClick={() => {
-                          if (isMobileViewingChat) setIsMobileViewingChat(false);
-                          else router.push('/instructors');
-                        }}
-                        className="p-2 -ml-2 bg-transparent border-none shadow-none hover:bg-slate-100 text-slate-600"
-                        label=""
-                      />
+                        <BackButton 
+                          onClick={() => {
+                            setSelectedConversationId(null);
+                            if (isMobileViewingChat) setIsMobileViewingChat(false);
+                            // Clear query params so it doesn't re-trigger the auto-select effect
+                            router.replace("/instructors/chat", { scroll: false });
+                          }}
+                         className="p-1 lg:p-2 bg-white border-2 border-slate-200 shadow-[0_3px_0_0_#cbd5e1] hover:shadow-[0_4px_0_0_#14b8a6] hover:border-teal-400 rounded-full transition-all active:translate-y-0.5 active:shadow-none"
+                         label=""
+                       />
                       <div className="relative">
                         <Avatar className="h-10 w-10 border-2 border-white shadow-sm ring-2 ring-slate-100">
                           <AvatarImage src={selectedConversation.participant.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation.participant.name}`} />
-                          <AvatarFallback>{selectedConversation.participant.name?.slice(0, 2)}</AvatarFallback>
+                          <AvatarFallback className="bg-teal-500 text-white font-black text-lg">
+                            {selectedConversation.participant.name?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         {isParticipantOnline(selectedConversation.participant.id) && (
                           <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full animate-pulse" />
@@ -812,44 +869,53 @@ const ChatPage = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setIsDesktopChatFullscreen((v) => !v)}
-                        className="hidden lg:inline-flex p-2 rounded-full hover:bg-slate-100 text-slate-400"
+                        className="hidden lg:inline-flex p-2 rounded-full hover:bg-slate-50 text-slate-400 border-2 border-slate-100 shadow-sm transition-all"
                         title={isDesktopChatFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
                       >
                         {isDesktopChatFullscreen ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v2a2 2 0 002 2h2a2 2 0 002-2v-2m0-10V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v2m10 10h-2a2 2 0 00-2 2v-2a2 2 0 002-2h2m-10 0H5a2 2 0 00-2 2v2a2 2 0 002 2h2" /></svg>
+                          <Minimize2 className="h-6 w-6" strokeWidth={2.5} />
                         ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h6M4 4v6m0-6l6 6m10 10h-6m6 0v-6m0 6l-6-6" /></svg>
+                          <Maximize2 className="h-6 w-6" strokeWidth={2.5} />
                         )}
                       </button>
                       <div className="relative">
-                        <button
-                          onClick={() => setShowMenu((v) => !v)}
-                          className="p-2 hover:bg-slate-100 rounded-full text-slate-400"
-                        >
-                          <MoreHorizontal className="h-6 w-6" />
-                        </button>
-                        {showMenu && (
-                          <div className="absolute right-0 mt-2 w-60 bg-white border border-slate-200 rounded-xl shadow-lg z-50">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
                             <button
-                              onClick={() => { setShowMenu(false); setShowDeleteConfirm(true); }}
-                              className="w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-slate-50 text-red-600 font-bold rounded-t-xl"
+                              className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-all flex items-center justify-center active:scale-95"
                             >
-                              <Trash2 className="h-5 w-5 mr-2" />
+                              <MoreHorizontal className="h-6 w-6" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-60">
+                            <DropdownMenuItem 
+                              onClick={handleDeleteConversation}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4 mr-3" strokeWidth={3} />
                               Hapus Semua Pesan
-                            </button>
-                            
-                            <button
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                               onClick={() => {
-                                setShowMenu(false);
-                                setToast({ show: true, message: 'Berhasil ditambahkan ke Favorit!', type: 'success' });
+                                handleToggleFavorite(selectedConversation.participant.id);
                               }}
-                              className="w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-slate-50 text-emerald-600 font-bold rounded-b-xl"
+                              className={favoriteInstructorIds.includes(selectedConversation.participant.id) 
+                                ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50" 
+                                : "text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                              }
                             >
-                              <Heart className="h-5 w-5 mr-2" fill="currentColor" />
-                              Tambahkan ke Favorit
-                            </button>
-                          </div>
-                        )}
+                              <Heart 
+                                className="h-4 w-4 mr-3" 
+                                fill={favoriteInstructorIds.includes(selectedConversation.participant.id) ? "currentColor" : "none"} 
+                                strokeWidth={favoriteInstructorIds.includes(selectedConversation.participant.id) ? 0 : 3}
+                              />
+                              {favoriteInstructorIds.includes(selectedConversation.participant.id) 
+                                ? "- Hapus dari Favorit" 
+                                : "+ Instruktur Favorit"
+                              }
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </div>
@@ -925,7 +991,7 @@ const ChatPage = () => {
                                             <img src={message.attachmentUrl} alt="attachment" className="max-h-60 w-full object-cover" />
                                           ) : (
                                             <a href={message.attachmentUrl} target="_blank" className="flex items-center gap-2 p-3">
-                                              <File className="h-5 w-5" />
+                                              <FileIcon className="h-5 w-5" />
                                               <span className="font-bold underline text-xs">Download File</span>
                                             </a>
                                           )}
@@ -981,7 +1047,22 @@ const ChatPage = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center relative">
+                  {/* Fullscreen Toggle for Empty State */}
+                  <div className="absolute top-4 right-4 hidden lg:block">
+                    <button
+                      onClick={() => setIsDesktopChatFullscreen((v) => !v)}
+                      className="p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-all shadow-sm bg-white border-2 border-slate-100"
+                      title={isDesktopChatFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
+                    >
+                      {isDesktopChatFullscreen ? (
+                        <Minimize2 className="h-6 w-6" strokeWidth={2.5} />
+                      ) : (
+                        <Maximize2 className="h-6 w-6" strokeWidth={2.5} />
+                      )}
+                    </button>
+                  </div>
+
                   <div className="w-28 h-28 bg-emerald-50 rounded-full flex items-center justify-center mb-6 border-4 border-emerald-100 animate-pulse">
                     <MessageCircle className="h-14 w-14 text-emerald-400" />
                   </div>
@@ -1019,7 +1100,7 @@ const ChatPage = () => {
                 <img src={filePreviewUrl} alt="Preview" className="max-w-full h-auto rounded-xl border-2 border-slate-200 shadow-md" />
               ) : (
                 <div className="text-center p-8 bg-white rounded-2xl border-2 border-slate-200">
-                  <File className="h-16 w-16 text-emerald-500 mx-auto mb-2" />
+                  <FileIcon className="h-16 w-16 text-emerald-500 mx-auto mb-2" />
                   <p className="font-bold text-slate-700">{selectedFile.name}</p>
                   <p className="text-xs text-slate-400">{formatFileSize(selectedFile.size)}</p>
                 </div>
@@ -1043,48 +1124,92 @@ const ChatPage = () => {
         </div>
       )}
 
-      {/* New Chat Modal */}
+      {/* New Chat Modal (Enhanced & Pro) */}
       {showNewChatModal && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md max-h-[80dvh] flex flex-col overflow-hidden border-4 border-white shadow-2xl">
-            <div className="p-4 border-b-2 border-slate-100 bg-emerald-50 flex justify-between items-center shrink-0">
-              <h3 className="text-lg font-black text-slate-800">Pilih Instruktur</h3>
-              <button onClick={() => setShowNewChatModal(false)} className="p-2 hover:bg-white rounded-xl"><X className="h-5 w-5 text-slate-500" /></button>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-md max-h-[85dvh] flex flex-col overflow-hidden border-4 border-emerald-500 shadow-[10px_10px_0_0_#065f46] animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-6 border-b-4 border-slate-100 bg-emerald-50 flex justify-between items-center shrink-0">
+              <div>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight">Mulai Chat</h3>
+                <p className="text-xs font-bold text-emerald-600 mt-0.5">Pilih instruktur favoritmu</p>
+              </div>
+              <button 
+                onClick={() => { setShowNewChatModal(false); setModalSearchTerm(""); }} 
+                className="p-2.5 hover:bg-white rounded-2xl border-2 border-transparent hover:border-slate-200 transition-all active:scale-95 shadow-sm hover:shadow-orange-100"
+              >
+                <X className="h-6 w-6 text-slate-500" strokeWidth={3} />
+              </button>
             </div>
-            <div className="overflow-y-auto p-2">
-              {instructors.length === 0 ? (
-                <p className="text-center py-10 text-slate-400 font-medium">Tidak ada instruktur tersedia.</p>
+
+            {/* Search Bar within Modal */}
+            <div className="px-6 py-4 bg-white border-b-2 border-slate-50 shrink-0">
+              <div className="relative group">
+                <Input
+                  value={modalSearchTerm}
+                  onChange={(e) => setModalSearchTerm(e.target.value)}
+                  placeholder="Cari nama instruktur..."
+                  className="pl-24 lg:pl-28 py-4 rounded-3xl border-[3px] border-slate-200 focus:border-emerald-400 focus:ring-0 transition-all font-bold placeholder:text-slate-300 shadow-[0_8px_0_0_#34d399] h-14"
+                />
+                <Search className="absolute left-9 lg:left-11 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-300 group-focus-within:text-emerald-500 transition-colors pointer-events-none" strokeWidth={3} />
+              </div>
+            </div>
+
+            {/* Instructor List Area */}
+            <div className="overflow-y-auto p-3 flex-1 custom-scrollbar bg-slate-50/30">
+              {instructors.filter(inst => inst.name.toLowerCase().includes(modalSearchTerm.toLowerCase())).length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 border-2 border-slate-200">
+                    <Search className="h-10 w-10 text-slate-300" strokeWidth={2} />
+                  </div>
+                  <p className="text-slate-500 font-black text-lg">Tidak ditemukan</p>
+                  <p className="text-sm text-slate-400 font-bold mt-1">Coba cari dengan nama atau kata kunci lain</p>
+                </div>
               ) : (
-                instructors.map(inst => (
-                  <button key={inst.id} onClick={() => startConversation(inst.id)} className="w-full flex items-center gap-3 p-3 mb-1 hover:bg-slate-50 rounded-2xl border-2 border-transparent hover:border-slate-100 transition-all text-left">
-                    <Avatar className="h-12 w-12 border-2 border-slate-100">
-                      <AvatarImage src={inst.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${inst.name}`} />
-                      <AvatarFallback>{inst.name.slice(0,2)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-bold text-slate-800">{inst.name}</p>
-                      <p className="text-xs text-slate-500 font-medium">{inst.bidangKeahlian || 'Instruktur'}</p>
-                    </div>
-                  </button>
-                ))
+                <div className="grid grid-cols-1 gap-2">
+                  {instructors
+                    .filter(inst => inst.name.toLowerCase().includes(modalSearchTerm.toLowerCase()))
+                    .map(inst => (
+                      <button 
+                        key={inst.id} 
+                        onClick={() => startConversation(inst.id)} 
+                        className="group w-full flex items-center gap-4 p-4 rounded-3xl bg-white border-[3px] border-slate-100 hover:border-emerald-200 shadow-[0_8px_0_0_#34d399] hover:shadow-[0_8px_0_0_#10b981] hover:-translate-y-1.5 active:translate-y-0 active:shadow-none transition-all text-left animate-in slide-in-from-bottom-2 duration-200"
+                      >
+                        <div className="relative shrink-0">
+                          <Avatar className="h-16 w-16 border-[3px] border-white shadow-sm group-hover:border-emerald-100 transition-colors">
+                            <AvatarImage src={inst.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${inst.name}`} />
+                            <AvatarFallback className="bg-teal-500 text-white font-black text-lg">{inst.name.charAt(0).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                          <div className={`absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm`}>
+                            <div className={`w-3.5 h-3.5 rounded-full ${onlineUsers.has(inst.id) ? 'bg-emerald-400 animate-pulse' : 'bg-slate-300'}`} />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-slate-800 text-lg lg:text-xl truncate group-hover:text-emerald-600 transition-colors tracking-tight">{inst.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border-2 ${onlineUsers.has(inst.id) ? 'text-emerald-500 bg-emerald-50 border-emerald-100' : 'text-slate-400 bg-slate-50 border-slate-100'}`}>
+                              {onlineUsers.has(inst.id) ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 bg-emerald-50 p-3 rounded-2xl border-2 border-emerald-100 text-emerald-500">
+                          <MessageSquarePlus className="h-6 w-6" strokeWidth={3} />
+                        </div>
+                      </button>
+                    ))
+                  }
+                </div>
               )}
+            </div>
+            
+            <div className="p-4 bg-slate-50 border-t-2 border-slate-100 flex justify-center shrink-0">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tetap ingat batasan dalam konsultasi!</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- CARTOON CONFIRM DIALOG --- */}
-      {/* Menggantikan modal delete manual sebelumnya */}
-      <CartoonConfirmDialog
-        isOpen={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirm(false)}
-        onConfirm={handleDeleteConversation}
-        title="Hapus Chat?"
-        message="Apakah kamu yakin ingin menghapus semua pesan dalam percakapan ini? Tindakan ini tidak dapat dibatalkan."
-        type="warning"
-        confirmText="Ya, Hapus"
-        cancelText="Batal"
-      />
+      {/* Toast notification */}
 
       {/* Toast notification */}
       {toast && (

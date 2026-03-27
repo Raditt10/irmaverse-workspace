@@ -19,6 +19,10 @@ import {
   Trophy,
   CheckCheck,
   Users,
+  Handshake,
+  ShieldAlert,
+  ChevronUp,
+  Search,
 } from "lucide-react";
 import Toast from "@/components/ui/Toast";
 import {
@@ -41,6 +45,9 @@ export default function DashboardHeader() {
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [decliningId, setDecliningId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+
   const [toast, setToast] = useState<{
     show: boolean;
     message: string;
@@ -129,6 +136,28 @@ export default function DashboardHeader() {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY === null) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchEndY - touchStartY;
+    
+    // Threshold for swipe detection (e.g., 30px)
+    if (Math.abs(deltaY) > 30) {
+      if (deltaY > 0 && !isSearchOpen) {
+        // Swipe down -> Open
+        setIsSearchOpen(true);
+      } else if (deltaY < 0 && isSearchOpen) {
+        // Swipe up -> Close
+        setIsSearchOpen(false);
+      }
+    }
+    setTouchStartY(null);
+  };
+
   const getNotificationIcon = (notif: NotificationData) => {
     if (notif.type === "invitation")
       return <BookOpen className="h-5 w-5 text-emerald-600" />;
@@ -136,9 +165,9 @@ export default function DashboardHeader() {
       case "trophy":
         return <Trophy className="h-5 w-5 text-amber-500" />;
       case "calendar":
-        return <Calendar className="h-5 w-5 text-blue-500" />;
+        return <Calendar className="h-5 w-5 text-teal-500" />;
       case "megaphone":
-        return <Megaphone className="h-5 w-5 text-purple-500" />;
+        return <Megaphone className="h-5 w-5 text-emerald-500" />;
       default:
         return <Info className="h-5 w-5 text-slate-500" />;
     }
@@ -170,7 +199,10 @@ export default function DashboardHeader() {
   return (
     <div className="w-full">
       {/* Spacer to maintain layout flow since header is fixed */}
-      <div className="h-34 md:h-20 shrink-0" aria-hidden="true" />
+      <div 
+        className={`shrink-0 transition-all duration-500 ${isSearchOpen ? "h-52 md:h-20" : "h-20"}`} 
+        aria-hidden="true" 
+      />
       
       <div
         className="border-b-2 border-slate-200 bg-white/90 backdrop-blur-md fixed top-0 left-0 right-0 z-40 font-sans"
@@ -194,25 +226,25 @@ export default function DashboardHeader() {
               className="h-8 w-8 sm:h-10 sm:w-10 object-contain shrink-0"
             />
 
-            <div className="min-w-0">
-              <h2 className="text-xs sm:text-lg font-black text-emerald-600 leading-tight tracking-tight truncate">
+            <div className="min-w-0 max-w-[120px] sm:max-w-none flex flex-col items-start text-left">
+              <h2 className="text-sm sm:text-lg font-black text-emerald-600 leading-tight tracking-tight truncate w-full">
                 IRMA VERSE
               </h2>
-              <p className="text-[8px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest leading-none mt-0.5 truncate">
+              <p className="text-[8px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider sm:tracking-widest leading-none mt-0.5 truncate w-full">
                 Platform resmi Irma13
               </p>
             </div>
           </div>
 
-          {/* --- CENTER: SEARCH BAR --- */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-4">
+          {/* --- CENTER: SEARCH BAR (Desktop) --- */}
+          <div className="hidden md:flex flex-1 max-w-md mx-4">
             <div className="w-full">
-              <SearchBar />
+              <SearchBar placeholder="Cari apa saja di IRMA VERSE..." />
             </div>
           </div>
 
           {/* --- RIGHT: ACTIONS --- */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Notification Bell */}
             <div className="relative">
               <button
@@ -548,21 +580,34 @@ export default function DashboardHeader() {
                     <span>Profile Saya</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => router.push("/level")}
-                    className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
-                  >
-                    <TrendingUp className="h-4 w-4 mr-2" strokeWidth={2.5} />
-                    <span>Level & Poin</span>
-                  </DropdownMenuItem>
+                  {/* Only show for regular users */}
+                  {(session?.user as any)?.role === "user" && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/level")}
+                        className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
+                      >
+                        <TrendingUp className="h-4 w-4 mr-2" strokeWidth={2.5} />
+                        <span>Level & Poin</span>
+                      </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => router.push("/friends")}
-                    className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
-                  >
-                    <Users className="h-4 w-4 mr-2" strokeWidth={2.5} />
-                    <span>Temanku</span>
-                  </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => router.push("/friends")}
+                        className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
+                      >
+                        <Handshake className="h-4 w-4 mr-2" strokeWidth={2.5} />
+                        <span>Temanku</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={() => router.push("/feedback")}
+                        className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
+                      >
+                        <ShieldAlert className="h-4 w-4 mr-2" strokeWidth={2.5} />
+                        <span>Lapor Bug / Request</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
 
                   <DropdownMenuItem 
                     onClick={() => router.push("/settings")}
@@ -586,12 +631,38 @@ export default function DashboardHeader() {
           </div>
         </div>
 
-        {/* Mobile Search Bar - More compact */}
-        <div className="md:hidden px-4 pb-3 pt-0 border-t border-slate-100 bg-white/50 backdrop-blur-sm">
-          <div className="mt-3 scale-[0.98] origin-top">
-            <SearchBar />
+        {/* Slide-Down Search Bar (Mobile Only) */}
+        <div 
+          className={`md:hidden transition-all duration-500 ease-in-out border-b-2 border-slate-200 ${isSearchOpen ? "max-h-150 opacity-100 overflow-visible" : "max-h-0 opacity-0 border-b-0 overflow-hidden"}`}
+        >
+          <div className="px-4 py-4 flex justify-center bg-white/50 backdrop-blur-sm">
+            <div className="w-full">
+              <SearchBar 
+                placeholder="Cari apa saja di IRMA VERSE..." 
+                isCollapsible={false}
+                isExpanded={true}
+              />
+            </div>
           </div>
         </div>
+
+        {/* Slide Handle Toggle (Mobile Only) */}
+        <button
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="md:hidden absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[calc(100%-2px)] h-8 w-14 bg-white border-2 border-t-0 border-slate-200 rounded-b-2xl shadow-[0_8px_15px_-5px_rgba(0,0,0,0.1)] hover:bg-slate-50 transition-all flex flex-col items-center justify-center group z-50 pointer-events-auto touch-none"
+          aria-label={isSearchOpen ? "Tutup pencarian" : "Buka pencarian"}
+        >
+          {/* Subtle handle line */}
+          <div className="w-6 h-1 bg-slate-100 rounded-full mb-1 sm:mb-1.5 group-hover:bg-emerald-100 transition-colors" />
+          
+          {isSearchOpen ? (
+            <ChevronUp className="h-4 w-4 md:h-5 md:w-5 text-emerald-500 animate-bounce" strokeWidth={3} />
+          ) : (
+            <Search className="h-3.5 w-3.5 md:h-4.5 md:w-4.5 text-slate-400 group-hover:text-emerald-500 transition-colors" strokeWidth={3} />
+          )}
+        </button>
       </div>
     </div>
   );

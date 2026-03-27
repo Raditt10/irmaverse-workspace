@@ -8,58 +8,8 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-model User {
-  id                                                String               @id @default(cuid())
-  email                                             String               @unique
-  name                                              String?
-  password                                          String?
-  createdAt                                         DateTime             @default(now())
-  updatedAt                                         DateTime             @updatedAt
-  address                                           String?
-  bio                                               String?
-  notelp                                            String?
-  role                                              Role                 @default(user)
-  bidangKeahlian                                    String?
-  pengalaman                                        String?
-  avatar                                            String?
-  lastSeen                                          DateTime             @default(now())
-  averageScore                                      Int                  @default(0)
-  badges                                            Int                  @default(0)
-  level                                             Int                  @default(1)
-  points                                            Int                  @default(0)
-  quizzes                                           Int                  @default(0)
-  streak                                            Int                  @default(0)
-  accounts                                          Account[]
-  instructorConversations                           ChatConversation[]   @relation("instructorConversations")
-  userConversations                                 ChatConversation[]   @relation("userConversations")
-  sentMessages                                      ChatMessage[]        @relation("sentMessages")
-  forumMessages                                     ForumMessage[]       @relation("forumMessages")
-  competitions                                      Competition[]        @relation("competitionInstructor")
-  courseenrollment                                  courseenrollment[]
-  favoritedByUsers                                  FavoriteInstructor[] @relation("InstructorFavorites")
-  favoritedInstructors                              FavoriteInstructor[] @relation("UserFavorites")
-  material                                          material[]
-  materialinvite_materialinvite_instructorIdTousers materialinvite[]     @relation("materialinvite_instructorIdTousers")
-  materialinvite_materialinvite_userIdTousers       materialinvite[]     @relation("materialinvite_userIdTousers")
-  newsArticles                                      News[]               @relation("authorNews")
-  sentNotifications                                 Notification[]       @relation("senderNotifications")
-  notifications                                     Notification[]       @relation("userNotifications")
-  programs                                          program[]            @relation("programInstructor")
-  programEnrollments                                program_enrollment[]
-  quizAttempts                                      quiz_attempt[]
-  createdQuizzes                                    material_quiz[]      @relation("createdQuizzes")
-  schedules                                         Schedule[]           @relation("instructorSchedules")
-  followers                                          Friendship[]         @relation("followers")
-  following                                          Friendship[]         @relation("following")
-  activities                                         ActivityLog[]
-  earnedBadges                                       UserBadge[]
-  savedNews                                          SavedNews[]
-
-  @@map("users")
-}
-
-model Account {
-  id                String  @id @default(cuid())
+model accounts {
+  id                String  @id
   userId            String
   type              String
   provider          String
@@ -71,286 +21,35 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  users             users   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
-  @@map("accounts")
 }
 
-model ActivityLog {
-  id          String       @id @default(cuid())
+model activity_logs {
+  id          String             @id
   userId      String
-  type        ActivityType
+  type        activity_logs_type
   title       String
-  description String?      @db.Text
-  xpEarned    Int          @default(0)
+  description String?            @db.Text
+  xpEarned    Int                @default(0)
   metadata    Json?
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime           @default(now())
+  users       users              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([userId, createdAt])
   @@index([type])
-  @@map("activity_logs")
-}
-
-model Badge {
-  id          String      @id @default(cuid())
-  code        String      @unique
-  name        String
-  description String      @db.Text
-  icon        String
-  category    BadgeCategory
-  requirement String      @db.Text
-  xpReward    Int         @default(0)
-  createdAt   DateTime    @default(now())
-
-  earnedBy UserBadge[]
-
-  @@map("badges")
-}
-
-model UserBadge {
-  id        String   @id @default(cuid())
-  userId    String
-  badgeId   String
-  earnedAt  DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, badgeId])
-  @@index([userId])
-  @@index([badgeId])
-  @@map("user_badges")
-}
-
-model Friendship {
-  id          String           @id @default(cuid())
-  followerId  String
-  followingId String
-  status      FriendshipStatus @default(pending)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  follower  User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
-  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@unique([followerId, followingId])
-  @@index([followerId])
-  @@index([followingId])
-  @@index([status])
-  @@map("friendships")
-}
-
-model FavoriteInstructor {
-  id           String   @id @default(cuid())
-  userId       String
-  instructorId String
-  createdAt    DateTime @default(now())
-  instructor   User     @relation("InstructorFavorites", fields: [instructorId], references: [id], onDelete: Cascade)
-  user         User     @relation("UserFavorites", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, instructorId])
-  @@index([userId])
-  @@index([instructorId])
-  @@map("favorite_instructors")
-}
-
-model News {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  category  String
-  deskripsi String   @db.Text
-  content   String   @db.LongText
-  image     String?
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User        @relation("authorNews", fields: [authorId], references: [id], onDelete: Cascade)
-  savedByUsers SavedNews[]
-
-  @@index([slug])
-  @@index([authorId])
-  @@map("news")
-}
-
-model ForumMessage {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  senderId  String
-  createdAt DateTime @default(now())
-  sender    User     @relation("forumMessages", fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([senderId])
-  @@index([createdAt])
-  @@map("forum_messages")
-}
-
-model ChatConversation {
-  id           String        @id @default(cuid())
-  userId       String
-  instructorId String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  instructor   User          @relation("instructorConversations", fields: [instructorId], references: [id], onDelete: Cascade)
-  user         User          @relation("userConversations", fields: [userId], references: [id], onDelete: Cascade)
-  messages     ChatMessage[]
-
-  @@unique([userId, instructorId])
-  @@index([userId])
-  @@index([instructorId])
-  @@map("chat_conversations")
-}
-
-model ChatMessage {
-  id             String           @id @default(cuid())
-  conversationId String
-  senderId       String
-  content        String           @db.Text
-  isRead         Boolean          @default(false)
-  readAt         DateTime?
-  attachmentUrl  String?
-  attachmentType String?
-  isEdited       Boolean          @default(false)
-  editedAt       DateTime?
-  isDeleted      Boolean          @default(false)
-  deletedAt      DateTime?
-  createdAt      DateTime         @default(now())
-  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User             @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId])
-  @@index([senderId])
-  @@map("chat_messages")
-}
-
-model Schedule {
-  id              String         @id @default(cuid())
-  title           String
-  description     String         @db.Text
-  fullDescription String?        @db.LongText
-  date            DateTime
-  time            String
-  location        String
-  pemateri        String
-  thumbnailUrl    String?
-  status          ScheduleStatus @default(segera_hadir)
-  instructorId    String
-  contactNumber   String?
-  contactEmail    String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  instructor      User           @relation("instructorSchedules", fields: [instructorId], references: [id], onDelete: Cascade)
-
-  @@index([instructorId])
-  @@index([date])
-  @@index([status])
-  @@map("schedules")
-}
-
-model Competition {
-  id              String              @id @default(cuid())
-  title           String
-  description     String?             @db.Text
-  date            DateTime
-  prize           String
-  category        CompetitionCategory
-  thumbnailUrl    String?
-  instructorId    String
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  contactEmail    String?
-  contactNumber   String?
-  contactPerson   String?
-  judgingCriteria Json?
-  location        String?
-  maxParticipants Int?
-  prizes          Json?
-  requirements    Json?
-  schedules       Json?
-  instructor      User                @relation("competitionInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
-
-  @@index([instructorId])
-  @@index([date])
-  @@map("competitions")
-}
-
-model Notification {
-  id           String             @id @default(cuid())
-  userId       String
-  type         NotificationType   @default(basic)
-  status       NotificationStatus @default(unread)
-  title        String
-  message      String             @db.Text
-  icon         String?
-  resourceType String?
-  resourceId   String?
-  actionUrl    String?
-  inviteToken  String?            @unique
-  senderId     String?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  sender       User?              @relation("senderNotifications", fields: [senderId], references: [id])
-  user         User               @relation("userNotifications", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, status])
   @@index([userId, createdAt])
-  @@index([inviteToken])
-  @@index([senderId], map: "notifications_senderId_fkey")
-  @@map("notifications")
-}
-
-model program {
-  id           String               @id @default(cuid())
-  title        String
-  description  String?              @db.Text
-  grade        material_grade
-  category     material_category
-  thumbnailUrl String?
-  instructorId String
-  duration     String?
-  syllabus     Json?
-  requirements Json?
-  benefits     Json?
-  totalKajian  Int                  @default(0)
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-
-  instructor   User                 @relation("programInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
-  materials    material[]           @relation("programMaterials")
-  enrollments  program_enrollment[]
-
-  @@index([instructorId])
-  @@map("programs")
-}
-
-model program_enrollment {
-  id         String   @id @default(cuid())
-  programId  String
-  userId     String
-  enrolledAt DateTime @default(now())
-
-  program program @relation(fields: [programId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([programId, userId])
-  @@index([programId])
   @@index([userId])
-  @@map("program_enrollments")
 }
 
 model attendance {
-  id                String   @id @default(cuid())
+  id                String   @id
   userId            String
   materialId        String
   status            String   @default("hadir")
   createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  updatedAt         DateTime
   clarity           String?
   date              String?
   endTime           String?
@@ -370,21 +69,172 @@ model attendance {
   @@index([userId], map: "Attendance_userId_idx")
 }
 
+model badges {
+  id          String          @id
+  code        String          @unique
+  name        String
+  description String          @db.Text
+  icon        String
+  category    badges_category
+  requirement String          @db.Text
+  xpReward    Int             @default(0)
+  createdAt   DateTime        @default(now())
+  user_badges user_badges[]
+}
+
+model chat_conversations {
+  id                                           String          @id
+  userId                                       String
+  instructorId                                 String
+  createdAt                                    DateTime        @default(now())
+  updatedAt                                    DateTime
+  users_chat_conversations_instructorIdTousers users           @relation("chat_conversations_instructorIdTousers", fields: [instructorId], references: [id], onDelete: Cascade)
+  users_chat_conversations_userIdTousers       users           @relation("chat_conversations_userIdTousers", fields: [userId], references: [id], onDelete: Cascade)
+  chat_messages                                chat_messages[]
+
+  @@unique([userId, instructorId])
+  @@index([instructorId])
+  @@index([userId])
+}
+
+model chat_messages {
+  id                 String             @id
+  conversationId     String
+  senderId           String
+  content            String             @db.Text
+  isRead             Boolean            @default(false)
+  readAt             DateTime?
+  attachmentUrl      String?
+  attachmentType     String?
+  isEdited           Boolean            @default(false)
+  editedAt           DateTime?
+  isDeleted          Boolean            @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime           @default(now())
+  chat_conversations chat_conversations @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  users              users              @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model user_chat_conversations {
+  id              String                @id
+  user1Id         String
+  user2Id         String
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime
+  users_user1     users                 @relation("user_chat_conversations_user1", fields: [user1Id], references: [id], onDelete: Cascade)
+  users_user2     users                 @relation("user_chat_conversations_user2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages        user_chat_messages[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model user_chat_messages {
+  id              String                    @id
+  conversationId  String
+  senderId        String
+  content         String                    @db.Text
+  isRead          Boolean                   @default(false)
+  readAt          DateTime?
+  attachmentUrl   String?
+  attachmentType  String?
+  isEdited        Boolean                   @default(false)
+  editedAt        DateTime?
+  isDeleted       Boolean                   @default(false)
+  deletedAt       DateTime?
+  createdAt       DateTime                  @default(now())
+  conversation    user_chat_conversations   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender          users                     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model competitions {
+  id              String                @id
+  title           String
+  description     String?               @db.Text
+  date            DateTime
+  prize           String
+  category        competitions_category
+  thumbnailUrl    String?
+  instructorId    String
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime
+  contactEmail    String?
+  contactNumber   String?
+  contactPerson   String?
+  judgingCriteria Json?
+  location        String?
+  maxParticipants Int?
+  prizes          Json?
+  requirements    Json?
+  schedules       Json?
+  users           users                 @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+
+  @@index([date])
+  @@index([instructorId])
+}
+
 model courseenrollment {
-  id         String                @id @default(cuid())
+  id         String                @id
   materialId String
   userId     String
   role       courseenrollment_role
   enrolledAt DateTime              @default(now())
   material   material              @relation(fields: [materialId], references: [id], onDelete: Cascade, map: "CourseEnrollment_materialId_fkey")
-  users      User                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "CourseEnrollment_userId_fkey")
+  users      users                 @relation(fields: [userId], references: [id], onDelete: Cascade, map: "CourseEnrollment_userId_fkey")
 
   @@unique([materialId, userId], map: "CourseEnrollment_materialId_userId_key")
   @@index([userId], map: "CourseEnrollment_userId_idx")
 }
 
+model favorite_instructors {
+  id                                             String   @id
+  userId                                         String
+  instructorId                                   String
+  createdAt                                      DateTime @default(now())
+  users_favorite_instructors_instructorIdTousers users    @relation("favorite_instructors_instructorIdTousers", fields: [instructorId], references: [id], onDelete: Cascade)
+  users_favorite_instructors_userIdTousers       users    @relation("favorite_instructors_userIdTousers", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, instructorId])
+  @@index([instructorId])
+  @@index([userId])
+}
+
+model forum_messages {
+  id        String   @id
+  content   String   @db.Text
+  senderId  String
+  createdAt DateTime @default(now())
+  users     users    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([senderId])
+}
+
+model friendships {
+  id                                   String             @id
+  followerId                           String
+  followingId                          String
+  status                               friendships_status @default(pending)
+  createdAt                            DateTime           @default(now())
+  updatedAt                            DateTime
+  users_friendships_followerIdTousers  users              @relation("friendships_followerIdTousers", fields: [followerId], references: [id], onDelete: Cascade)
+  users_friendships_followingIdTousers users              @relation("friendships_followingIdTousers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@index([status])
+}
+
 model material {
-  id                                             String             @id @default(cuid())
+  id                                             String             @id
   title                                          String
   description                                    String?
   grade                                          material_grade
@@ -392,7 +242,7 @@ model material {
   instructorId                                   String
   nextCourseId                                   String?
   createdAt                                      DateTime           @default(now())
-  updatedAt                                      DateTime           @updatedAt
+  updatedAt                                      DateTime
   date                                           DateTime           @default(now())
   category                                       material_category
   participants                                   String?
@@ -404,17 +254,17 @@ model material {
   parentId                                       String?
   programId                                      String?
   kajianOrder                                    Int?
+  isAttendanceOpen                               Boolean            @default(true)
   courseenrollment                               courseenrollment[]
-  users                                          User               @relation(fields: [instructorId], references: [id], map: "Material_instructorId_fkey")
+  users                                          users              @relation(fields: [instructorId], references: [id], onDelete: Cascade, map: "Material_instructorId_fkey")
   material_material_nextCourseIdTomaterial       material?          @relation("material_nextCourseIdTomaterial", fields: [nextCourseId], references: [id], map: "Material_nextCourseId_fkey")
   other_material_material_nextCourseIdTomaterial material[]         @relation("material_nextCourseIdTomaterial")
   material_material_parentIdTomaterial           material?          @relation("material_parentIdTomaterial", fields: [parentId], references: [id], map: "Material_parentId_fkey")
   other_material_material_parentIdTomaterial     material[]         @relation("material_parentIdTomaterial")
-  program                                        program?           @relation("programMaterials", fields: [programId], references: [id], onDelete: SetNull, map: "Material_programId_fkey")
+  programs                                       programs?          @relation(fields: [programId], references: [id], map: "Material_programId_fkey")
+  material_quizzes                               material_quizzes[]
   materialinvite                                 materialinvite[]
   rekapan                                        rekapan?
-  quizzes                                        material_quiz[]
-  isAttendanceOpen                               Boolean            @default(true)
 
   @@index([instructorId], map: "Material_instructorId_fkey")
   @@index([nextCourseId], map: "Material_nextCourseId_fkey")
@@ -422,133 +272,313 @@ model material {
   @@index([programId], map: "Material_programId_fkey")
 }
 
+model material_quizzes {
+  id             String           @id
+  materialId     String?
+  creatorId      String?
+  title          String
+  description    String?          @db.Text
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  users          users?           @relation(fields: [creatorId], references: [id])
+  material       material?        @relation(fields: [materialId], references: [id])
+  quiz_attempts  quiz_attempts[]
+  quiz_questions quiz_questions[]
+
+  @@index([creatorId])
+  @@index([materialId])
+}
+
 model materialinvite {
-  id                                       String                @id @default(cuid())
+  id                                       String                @id
   materialId                               String
   instructorId                             String
   token                                    String                @unique(map: "MaterialInvite_token_key")
   status                                   materialinvite_status @default(pending)
   reason                                   String?               @db.Text
   createdAt                                DateTime              @default(now())
-  updatedAt                                DateTime              @updatedAt
+  updatedAt                                DateTime
   userId                                   String
-  users_materialinvite_instructorIdTousers User                  @relation("materialinvite_instructorIdTousers", fields: [instructorId], references: [id], map: "MaterialInvite_instructorId_fkey")
+  users_materialinvite_instructorIdTousers users                 @relation("materialinvite_instructorIdTousers", fields: [instructorId], references: [id], onDelete: Cascade, map: "MaterialInvite_instructorId_fkey")
   material                                 material              @relation(fields: [materialId], references: [id], onDelete: Cascade, map: "MaterialInvite_materialId_fkey")
-  users_materialinvite_userIdTousers       User                  @relation("materialinvite_userIdTousers", fields: [userId], references: [id], onDelete: Cascade, map: "MaterialInvite_userId_fkey")
+  users_materialinvite_userIdTousers       users                 @relation("materialinvite_userIdTousers", fields: [userId], references: [id], onDelete: Cascade, map: "MaterialInvite_userId_fkey")
 
   @@index([instructorId], map: "MaterialInvite_instructorId_fkey")
   @@index([materialId], map: "MaterialInvite_materialId_idx")
   @@index([userId], map: "MaterialInvite_userId_idx")
 }
 
-// ─── Rekapan (Ringkasan Materi) ───────────────────────────────────
+model news {
+  id         String       @id
+  title      String
+  slug       String       @unique
+  category   String
+  deskripsi  String       @db.Text
+  content    String       @db.LongText
+  image      String?
+  authorId   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  users      users        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  saved_news saved_news[]
 
-model rekapan {
-  id         String   @id @default(cuid())
-  materialId String   @unique
-  content    String   @db.LongText
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  material material @relation(fields: [materialId], references: [id], onDelete: Cascade)
-
-  @@index([materialId])
-  @@map("rekapan")
+  @@index([authorId])
+  @@index([slug])
 }
 
-// ─── Material Quiz System ─────────────────────────────────────────
+model notifications {
+  id                                  String               @id
+  userId                              String
+  type                                notifications_type   @default(basic)
+  status                              notifications_status @default(unread)
+  title                               String
+  message                             String               @db.Text
+  icon                                String?
+  resourceType                        String?
+  resourceId                          String?
+  actionUrl                           String?
+  inviteToken                         String?              @unique
+  senderId                            String?
+  createdAt                           DateTime             @default(now())
+  updatedAt                           DateTime
+  users_notifications_senderIdTousers users?               @relation("notifications_senderIdTousers", fields: [senderId], references: [id])
+  users_notifications_userIdTousers   users                @relation("notifications_userIdTousers", fields: [userId], references: [id], onDelete: Cascade)
 
-model material_quiz {
-  id          String   @id @default(cuid())
-  materialId  String?
-  creatorId   String?
-  title       String
-  description String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  material  material?       @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  creator   User?           @relation("createdQuizzes", fields: [creatorId], references: [id], onDelete: SetNull)
-  questions quiz_question[]
-  attempts  quiz_attempt[]
-
-  @@index([materialId])
-  @@index([creatorId])
-  @@map("material_quizzes")
+  @@index([inviteToken])
+  @@index([senderId], map: "notifications_senderId_fkey")
+  @@index([userId, createdAt])
+  @@index([userId, status])
 }
 
-model quiz_question {
-  id       String @id @default(cuid())
-  quizId   String
-  question String @db.Text
-  order    Int    @default(0)
+model program_enrollments {
+  id         String   @id
+  programId  String
+  userId     String
+  enrolledAt DateTime @default(now())
+  programs   programs @relation(fields: [programId], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  quiz    material_quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  options quiz_option[]
-
-  @@index([quizId])
-  @@map("quiz_questions")
+  @@unique([programId, userId])
+  @@index([programId])
+  @@index([userId])
 }
 
-model quiz_option {
-  id         String  @id @default(cuid())
-  questionId String
-  text       String  @db.Text
-  isCorrect  Boolean @default(false)
+model programs {
+  id                  String                @id
+  title               String
+  description         String?               @db.Text
+  grade               programs_grade
+  category            programs_category
+  thumbnailUrl        String?
+  instructorId        String
+  duration            String?
+  syllabus            Json?
+  requirements        Json?
+  benefits            Json?
+  totalKajian         Int                   @default(0)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime
+  material            material[]
+  program_enrollments program_enrollments[]
+  users               users                 @relation(fields: [instructorId], references: [id], onDelete: Cascade)
 
-  question quiz_question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@index([questionId])
-  @@map("quiz_options")
+  @@index([instructorId])
 }
 
-model quiz_attempt {
-  id          String   @id @default(cuid())
-  quizId      String
-  userId      String
-  score       Int
-  totalScore  Int
-  answers     Json
-  completedAt DateTime @default(now())
-
-  quiz material_quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+model quiz_attempts {
+  id               String           @id
+  quizId           String
+  userId           String
+  score            Int
+  totalScore       Int
+  answers          Json
+  completedAt      DateTime         @default(now())
+  material_quizzes material_quizzes @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  users            users            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([quizId])
   @@index([userId])
-  @@map("quiz_attempts")
 }
 
-enum Role {
-  user
-  admin
-  instruktur
+model quiz_options {
+  id             String         @id
+  questionId     String
+  text           String         @db.Text
+  isCorrect      Boolean        @default(false)
+  quiz_questions quiz_questions @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
 }
 
-enum ScheduleStatus {
-  segera_hadir
-  ongoing
-  completed
+model quiz_questions {
+  id               String           @id
+  quizId           String
+  question         String           @db.Text
+  order            Int              @default(0)
+  quiz_options     quiz_options[]
+  material_quizzes material_quizzes @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
 }
 
-enum CompetitionCategory {
-  Tahfidz
-  Seni
-  Bahasa
-  Lainnya
+model rekapan {
+  id         String    @id
+  materialId String?   @unique
+  content    String?   @db.LongText
+  link       String?   @db.Text
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime
+  material   material? @relation(fields: [materialId], references: [id])
+
+  @@index([materialId])
 }
 
-enum NotificationType {
+model saved_news {
+  id        String   @id
+  userId    String
+  newsId    String
+  createdAt DateTime @default(now())
+  news      news     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  users     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsId])
+  @@index([newsId])
+  @@index([userId])
+}
+
+model schedules {
+  id              String           @id
+  title           String
+  description     String           @db.Text
+  fullDescription String?          @db.LongText
+  date            DateTime
+  time            String
+  location        String
+  pemateri        String
+  thumbnailUrl    String?
+  status          schedules_status @default(segera_hadir)
+  instructorId    String
+  contactNumber   String?
+  contactEmail    String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime
+  users           users            @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+
+  @@index([date])
+  @@index([instructorId])
+  @@index([status])
+}
+
+model user_badges {
+  id       String   @id
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+  badges   badges   @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  users    users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([badgeId])
+  @@index([userId])
+}
+
+model users {
+  id                                                            String                 @id
+  email                                                         String                 @unique
+  name                                                          String?
+  password                                                      String?
+  createdAt                                                     DateTime               @default(now())
+  updatedAt                                                     DateTime
+  address                                                       String?
+  bio                                                           String?
+  jabatan                                                       String?
+  notelp                                                        String?
+  role                                                          users_role             @default(user)
+  bidangKeahlian                                                String?
+  pengalaman                                                    String?
+  avatar                                                        String?
+  lastSeen                                                      DateTime               @default(now())
+  averageScore                                                  Int                    @default(0)
+  badges                                                        Int                    @default(0)
+  level                                                         Int                    @default(1)
+  points                                                        Int                    @default(0)
+  quizzes                                                       Int                    @default(0)
+  streak                                                        Int                    @default(0)
+  accounts                                                      accounts[]
+  activity_logs                                                 activity_logs[]
+  chat_conversations_chat_conversations_instructorIdTousers     chat_conversations[]   @relation("chat_conversations_instructorIdTousers")
+  chat_conversations_chat_conversations_userIdTousers           chat_conversations[]   @relation("chat_conversations_userIdTousers")
+  chat_messages                                                 chat_messages[]
+  competitions                                                  competitions[]
+  courseenrollment                                              courseenrollment[]
+  favorite_instructors_favorite_instructors_instructorIdTousers favorite_instructors[] @relation("favorite_instructors_instructorIdTousers")
+  favorite_instructors_favorite_instructors_userIdTousers       favorite_instructors[] @relation("favorite_instructors_userIdTousers")
+  forum_messages                                                forum_messages[]
+  friendships_friendships_followerIdTousers                     friendships[]          @relation("friendships_followerIdTousers")
+  friendships_friendships_followingIdTousers                    friendships[]          @relation("friendships_followingIdTousers")
+  material                                                      material[]
+  material_quizzes                                              material_quizzes[]
+  materialinvite_materialinvite_instructorIdTousers             materialinvite[]       @relation("materialinvite_instructorIdTousers")
+  materialinvite_materialinvite_userIdTousers                   materialinvite[]       @relation("materialinvite_userIdTousers")
+  news                                                          news[]
+  notifications_notifications_senderIdTousers                   notifications[]        @relation("notifications_senderIdTousers")
+  notifications_notifications_userIdTousers                     notifications[]        @relation("notifications_userIdTousers")
+  program_enrollments                                           program_enrollments[]
+  programs                                                      programs[]
+  quiz_attempts                                                 quiz_attempts[]
+  saved_news                                                    saved_news[]
+  schedules                                                     schedules[]
+  user_feedback_reports                                         user_feedback_reports[]
+  user_badges                                                   user_badges[]
+  user_chat_conversations_user1                                 user_chat_conversations[] @relation("user_chat_conversations_user1")
+  user_chat_conversations_user2                                 user_chat_conversations[] @relation("user_chat_conversations_user2")
+  user_chat_messages                                            user_chat_messages[]
+}
+
+model user_feedback_reports {
+  id          String                       @id
+  userId      String
+  type        user_feedback_reports_type
+  title       String
+  description String                       @db.Text
+  screenshotUrl String?
+  status      user_feedback_reports_status @default(open)
+  adminNote   String?                      @db.Text
+  createdAt   DateTime                     @default(now())
+  updatedAt   DateTime
+  users       users                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([type])
+  @@index([userId])
+}
+
+enum activity_logs_type {
+  quiz_completed
+  material_read
+  course_enrolled
+  program_enrolled
+  attendance_marked
+  badge_earned
+  level_up
+  friend_added
+  forum_post
+  streak_maintained
+  profile_completed
+  admin_user_managed
+  admin_program_managed
+  admin_material_managed
+  admin_news_managed
+  admin_schedule_managed
+  admin_competition_managed
+  admin_admin_managed
+}
+
+enum notifications_type {
   basic
   invitation
-}
-
-enum NotificationStatus {
-  unread
-  read
-  accepted
-  rejected
-  expired
 }
 
 enum courseenrollment_role {
@@ -557,7 +587,26 @@ enum courseenrollment_role {
   assistant
 }
 
+enum friendships_status {
+  pending
+  accepted
+}
+
 enum material_grade {
+  X
+  XI
+  XII
+}
+
+enum notifications_status {
+  unread
+  read
+  accepted
+  rejected
+  expired
+}
+
+enum programs_grade {
   X
   XI
   XII
@@ -570,33 +619,14 @@ enum materialinvite_status {
   expired
 }
 
-enum material_category {
+enum programs_category {
   Wajib
   Extra
   NextLevel
   Susulan
 }
 
-enum FriendshipStatus {
-  pending
-  accepted
-}
-
-enum ActivityType {
-  quiz_completed
-  material_read
-  course_enrolled
-  program_enrolled
-  attendance_marked
-  badge_earned
-  level_up
-  friend_added
-  forum_post
-  streak_maintained
-  profile_completed
-}
-
-enum BadgeCategory {
+enum badges_category {
   learning
   social
   achievement
@@ -604,17 +634,41 @@ enum BadgeCategory {
   special
 }
 
-model SavedNews {
-  id        String   @id @default(cuid())
-  userId    String
-  newsId    String
-  createdAt DateTime @default(now())
+enum competitions_category {
+  Tahfidz
+  Seni
+  Bahasa
+  Lainnya
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
+enum schedules_status {
+  segera_hadir
+  ongoing
+  completed
+}
 
-  @@unique([userId, newsId])
-  @@index([userId])
-  @@index([newsId])
-  @@map("saved_news")
+enum material_category {
+  Wajib
+  Extra
+  NextLevel
+  Susulan
+}
+
+enum users_role {
+  user
+  admin
+  super_admin
+  instruktur
+}
+
+enum user_feedback_reports_type {
+  bug
+  feature
+}
+
+enum user_feedback_reports_status {
+  open
+  in_review
+  done
+  rejected
 }

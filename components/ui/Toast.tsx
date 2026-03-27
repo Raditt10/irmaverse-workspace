@@ -29,11 +29,15 @@ const Toast: React.FC<ToastProps> = ({ show, message, type, onClose, duration = 
         }, duration);
         return () => clearTimeout(timer);
       }
-    } else {
-      setIsVisible(false);
-      setIsExiting(false);
+    } else if (isVisible) {
+      setIsExiting(true);
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        setIsExiting(false);
+      }, 350);
+      return () => clearTimeout(timer);
     }
-  }, [show, onClose, duration]);
+  }, [show, onClose, duration, isVisible]);
 
   if (!show && !isVisible) return null;
 
@@ -86,7 +90,7 @@ const Toast: React.FC<ToastProps> = ({ show, message, type, onClose, duration = 
   const animationClass = isExiting ? "toast-exit" : "toast-enter";
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-6 pointer-events-none">
+    <div className="fixed top-0 left-0 right-0 z-[110] flex justify-center pt-6 pointer-events-none">
       <div
         className={`pointer-events-auto rounded-xl px-5 py-3 flex items-center gap-3 min-w-65 max-w-[90vw] text-white bg-linear-to-r ${getGradient()} ${animationClass}`}
         style={{ boxShadow: getBoxShadow() }}
@@ -120,11 +124,7 @@ const Toast: React.FC<ToastProps> = ({ show, message, type, onClose, duration = 
         @keyframes toastSlideIn {
           0% {
             opacity: 0;
-            transform: translateY(-24px) scale(0.95);
-          }
-          60% {
-            opacity: 1;
-            transform: translateY(4px) scale(1.01);
+            transform: translateY(-40px) scale(0.9);
           }
           100% {
             opacity: 1;
@@ -139,27 +139,27 @@ const Toast: React.FC<ToastProps> = ({ show, message, type, onClose, duration = 
           }
           100% {
             opacity: 0;
-            transform: translateY(-18px) scale(0.96);
+            transform: translateY(-20px) scale(0.95);
           }
         }
 
         @keyframes warningPulse {
           0%, 100% {
-            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
             transform: scale(1);
           }
           50% {
-            box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
-            transform: scale(1.08);
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+            transform: scale(1.1);
           }
         }
 
         .toast-enter {
-          animation: toastSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: toastSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
 
         .toast-exit {
-          animation: toastSlideOut 0.35s cubic-bezier(0.4, 0, 1, 1) forwards;
+          animation: toastSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         .toast-warning-icon {

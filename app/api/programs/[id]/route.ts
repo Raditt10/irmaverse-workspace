@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET(
   req: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email as string },
     });
 
@@ -22,13 +23,13 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const program = await prisma.program.findUnique({
+    const program = await prisma.programs.findUnique({
       where: { id },
       include: {
-        instructor: {
+        users: {
           select: { id: true, name: true, avatar: true, email: true },
         },
-        materials: {
+        material: {
           include: {
             users: {
               select: { name: true },
@@ -39,7 +40,7 @@ export async function GET(
           },
           orderBy: { date: "asc" },
         },
-        enrollments: {
+        program_enrollments: {
           select: { id: true, userId: true, enrolledAt: true },
         },
       },
@@ -52,7 +53,7 @@ export async function GET(
       );
     }
 
-    const instructorMaterials = program.materials.filter(m => 
+    const instructorMaterials = program.material.filter(m => 
       user.role === "instruktur" ? m.instructorId === user.id : true
     );
     const materialIds = instructorMaterials.map((m) => m.id);
@@ -62,7 +63,7 @@ export async function GET(
       total: program.totalKajian > 0 ? program.totalKajian : materialIds.length,
       percentage: 0,
     };
-    const isEnrolled = program.enrollments.some((e) => e.userId === user.id);
+    const isEnrolled = program.program_enrollments.some((e) => e.userId === user.id);
 
     if (materialIds.length > 0) {
       const attendanceCount = await prisma.attendance.count({
@@ -91,7 +92,7 @@ export async function GET(
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     };
 
@@ -120,13 +121,22 @@ export async function GET(
       userInvites.map((inv: any) => [inv.materialId, inv.status]),
     );
 
-    const formattedMaterials = instructorMaterials.map((m, idx) => ({
+    const isPrivileged = user.role === "instruktur" || user.role === "admin" || user.role === "super_admin";
+
+    const visibleMaterials = instructorMaterials.filter(m => {
+      if (isPrivileged) return true;
+      const isEnrolledInCourse = m.courseenrollment?.some((e: any) => e.userId === user.id);
+      const isInvited = inviteMap.has(m.id);
+      return isEnrolledInCourse || isInvited;
+    });
+
+    const formattedMaterials = visibleMaterials.map((m, idx) => ({
       id: m.id,
       title: m.title,
       description: m.description,
       date: m.date,
       startedAt: m.startedAt,
-      instructor: m.users?.name || program.instructor?.name || "TBA",
+      instructor: m.users?.name || program.users?.name || "TBA",
       thumbnailUrl: m.thumbnailUrl,
       order: m.kajianOrder || idx + 1,
       isCompleted: attendanceMap.get(m.id) === "hadir",
@@ -144,16 +154,16 @@ export async function GET(
       category: CATEGORY_LABEL[program.category] || program.category,
       image: program.thumbnailUrl,
       instructor: {
-        id: program.instructor?.id,
-        name: program.instructor?.name || "Instruktur IRMA",
-        avatar: program.instructor?.avatar,
-        email: program.instructor?.email,
+        id: program.users?.id,
+        name: program.users?.name || "Instruktur IRMA",
+        avatar: program.users?.avatar,
+        email: program.users?.email,
       },
       syllabus: (program.syllabus as string[]) || [],
       requirements: (program.requirements as string[]) || [],
       benefits: (program.benefits as string[]) || [],
       materials: formattedMaterials,
-      enrollmentCount: program.enrollments.length,
+      enrollmentCount: program.program_enrollments.length,
       totalKajian: program.totalKajian,
       isEnrolled,
       progress: userProgress,
@@ -188,14 +198,14 @@ export async function PUT(
       );
     }
 
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin") {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa mengubah program" },
         { status: 403 },
       );
     }
 
-    const existing = await prisma.program.findUnique({ where: { id } });
+    const existing = await prisma.programs.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json(
         { error: "Program tidak ditemukan" },
@@ -229,8 +239,9 @@ export async function PUT(
       Wajib: "Wajib",
       "Program Ekstra": "Extra",
       Extra: "Extra",
-      "Program Next Level": "NextLevel",
-      NextLevel: "NextLevel",
+      "Program Next Level": "Susulan",
+      "Program Susulan": "Susulan",
+      NextLevel: "Susulan",
       Susulan: "Susulan",
     };
     const GRADE_MAP: Record<string, string> = {
@@ -243,7 +254,7 @@ export async function PUT(
       XII: "XII",
     };
 
-    const updated = await prisma.program.update({
+    const updated = await prisma.programs.update({
       where: { id },
       data: {
         title: title.trim(),
@@ -258,6 +269,18 @@ export async function PUT(
         totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
       },
     });
+
+    // Log Activity for Admin/Superadmin
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_program_managed" as any,
+        title: "Memperbarui Program Kurikulum",
+        description: `Admin memperbarui program: ${updated.title}`,
+        metadata: { programId: updated.id }
+      });
+    }
 
     return NextResponse.json(updated);
   } catch (error) {
@@ -281,7 +304,7 @@ export async function DELETE(
         { status: 401 },
       );
     }
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (session.user.role !== "instruktur" && session.user.role !== "admin" && session.user.role !== "super_admin") {
       return NextResponse.json(
         { error: "Tidak memiliki akses" },
         { status: 403 },
@@ -289,7 +312,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const program = await prisma.program.findUnique({ where: { id } });
+    const program = await prisma.programs.findUnique({ where: { id } });
     if (!program) {
       return NextResponse.json(
         { error: "Program tidak ditemukan" },
@@ -302,7 +325,19 @@ export async function DELETE(
       where: { programId: id },
       data: { programId: null },
     });
-    await prisma.program.delete({ where: { id } });
+    await prisma.programs.delete({ where: { id } });
+
+    // Log Activity for Admin/Superadmin
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_program_managed" as any,
+        title: "Menghapus Program Kurikulum",
+        description: `Admin menghapus program: ${program.title}`,
+        metadata: { programId: id }
+      });
+    }
 
     return NextResponse.json(
       { message: "Program berhasil dihapus" },

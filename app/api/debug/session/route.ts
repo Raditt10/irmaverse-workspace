@@ -19,7 +19,7 @@ export async function GET() {
     }
 
     // Find user by email
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 

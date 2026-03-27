@@ -48,17 +48,44 @@ const TYPE_CONFIG: Record<string, { label: string; icon: React.ElementType; colo
   instructor:  { label: "Instruktur",       icon: GraduationCap, color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", hoverBg: "hover:bg-emerald-50/60", hoverBorder: "hover:border-emerald-400", badgeBg: "bg-emerald-100", badgeText: "text-emerald-700" },
   program:     { label: "Program",          icon: Layers,       color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", hoverBg: "hover:bg-emerald-50/60", hoverBorder: "hover:border-emerald-400", badgeBg: "bg-emerald-100", badgeText: "text-emerald-700" },
   competition: { label: "Kompetisi",        icon: Trophy,       color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", hoverBg: "hover:bg-emerald-50/60", hoverBorder: "hover:border-emerald-400", badgeBg: "bg-emerald-100", badgeText: "text-emerald-700" },
-  schedule:    { label: "Jadwal",           icon: CalendarDays, color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", hoverBg: "hover:bg-emerald-50/60", hoverBorder: "hover:border-emerald-400", badgeBg: "bg-emerald-100", badgeText: "text-emerald-700" },
+  schedule:    { label: "Kegiatan IRMA",    icon: CalendarDays, color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", hoverBg: "hover:bg-emerald-50/60", hoverBorder: "hover:border-emerald-400", badgeBg: "bg-emerald-100", badgeText: "text-emerald-700" },
   quiz:        { label: "Kuis",             icon: HelpCircle,   color: "text-emerald-600", bgColor: "bg-emerald-50", borderColor: "border-emerald-200", hoverBg: "hover:bg-emerald-50/60", hoverBorder: "hover:border-emerald-400", badgeBg: "bg-emerald-100", badgeText: "text-emerald-700" },
 };
 
-export default function SearchBar() {
+interface SearchBarProps {
+  limitTypes?: SearchResult["type"][];
+  placeholder?: string;
+  isCollapsible?: boolean;
+  isExpanded?: boolean;
+  onToggle?: (expanded: boolean) => void;
+  className?: string;
+}
+
+export default function SearchBar({ 
+  limitTypes, 
+  placeholder, 
+  isCollapsible = false,
+  isExpanded: controlledIsExpanded,
+  onToggle,
+  className = ""
+}: SearchBarProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const isExpanded = controlledIsExpanded ?? internalIsExpanded;
+
+  const toggleExpand = (val: boolean) => {
+    if (onToggle) {
+      onToggle(val);
+    } else {
+      setInternalIsExpanded(val);
+    }
+  };
 
   const performSearch = useCallback(
     debounce(async (searchQuery: string) => {
@@ -69,7 +96,13 @@ export default function SearchBar() {
 
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+        const url = new URL("/api/search", window.location.origin);
+        url.searchParams.set("q", searchQuery);
+        if (limitTypes && limitTypes.length > 0) {
+          url.searchParams.set("types", limitTypes.join(","));
+        }
+
+        const response = await fetch(url.toString());
         const data = await response.json();
         setResults(data.results || []);
         setIsOpen(true);
@@ -98,6 +131,9 @@ export default function SearchBar() {
     setQuery("");
     setResults([]);
     setIsOpen(false);
+    if (isCollapsible && query === "") {
+      toggleExpand(false);
+    }
   };
 
   const handleResultClick = (result: SearchResult) => {
@@ -142,8 +178,12 @@ export default function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Group results by type, maintaining order
-  const typeOrder: SearchResult["type"][] = ["material", "news", "instructor", "program", "competition", "schedule", "quiz"];
+    // Group results by type, maintaining order
+  const baseOrder: SearchResult["type"][] = ["material", "news", "schedule", "instructor", "program", "competition", "quiz"];
+  const typeOrder = limitTypes && limitTypes.length > 0 
+    ? baseOrder.filter(t => limitTypes.includes(t))
+    : baseOrder;
+
   const groupedResults = typeOrder
     .map((type) => ({
       type,
@@ -175,35 +215,58 @@ export default function SearchBar() {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full">
-      <div className="relative group">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:border-emerald-600 transition-all duration-300">
-          <Search 
-            className="h-4 w-4 text-emerald-500 group-focus-within:text-white transition-colors duration-300" 
-            strokeWidth={2.5} 
+    <div ref={searchRef} className={`relative ${className}`}>
+      {!isExpanded && isCollapsible ? (
+        <button
+          onClick={() => toggleExpand(true)}
+          className="h-11 w-11 rounded-xl bg-white border-2 border-slate-200 shadow-[3px_3px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[3px_3px_0_0_#34d399] active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center group outline-none"
+          aria-label="Buka pencarian"
+        >
+          <Search className="h-5 w-5 text-slate-500 group-hover:text-emerald-600 transition-colors" strokeWidth={2.5} />
+        </button>
+      ) : (
+        <div className={`relative group animate-in fade-in slide-in-from-right-4 duration-300 w-full`}>
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center group-focus-within:bg-emerald-500 group-focus-within:border-emerald-600 transition-all duration-300">
+            <Search 
+              className="h-4 w-4 text-emerald-500 group-focus-within:text-white transition-colors duration-300" 
+              strokeWidth={2.5} 
+            />
+          </div>
+          
+          <input
+            type="text"
+            value={query}
+            autoFocus={isCollapsible}
+            onChange={handleInputChange}
+            placeholder={placeholder || (limitTypes?.includes("news") ? "Cari berita & kegiatan..." : "Cari di IRMA Verse...")}
+            className="w-full pl-15 pr-12 py-3.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:bg-white focus:shadow-[0_4px_12px_rgba(52,211,153,0.15)] transition-all font-bold text-sm"
           />
+          
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {query && (
+              <button
+                onClick={handleClear}
+                className="h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all"
+                aria-label="Hapus pencarian"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={3} />
+              </button>
+            )}
+            {isCollapsible && (
+              <button
+                onClick={() => toggleExpand(false)}
+                className="h-7 w-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-all"
+                aria-label="Tutup pencarian"
+              >
+                <X className="h-3.5 w-3.5" strokeWidth={3} />
+              </button>
+            )}
+          </div>
         </div>
-        
-        <input
-          type="text"
-          value={query}
-          onChange={handleInputChange}
-          placeholder="Cari kajian, berita, instruktur, program..."
-          className="w-full pl-15 pr-12 py-3.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:bg-white focus:shadow-[0_4px_12px_rgba(52,211,153,0.15)] transition-all font-bold text-sm"
-        />
-        
-        {query && (
-          <button
-            onClick={handleClear}
-            className="absolute right-4 top-1/2 -translate-y-1/2 h-7 w-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all"
-          >
-            <X className="h-3.5 w-3.5" strokeWidth={3} />
-          </button>
-        )}
-      </div>
+      )}
 
       {isOpen && query.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-3xl border-2 border-slate-200 shadow-[0_8px_0_0_#e2e8f0] z-50 max-h-[500px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-3xl border-2 border-slate-200 shadow-[0_8px_0_0_#e2e8f0] z-50 max-h-125 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           
           {isLoading ? (
             <div className="p-10 text-center">
@@ -222,10 +285,10 @@ export default function SearchBar() {
                 <SearchX className="h-10 w-10 text-slate-300" strokeWidth={2} />
               </div>
               <p className="text-slate-700 font-black text-lg">Ups, tidak ditemukan!</p>
-              <p className="text-slate-400 text-xs mt-1 font-medium max-w-[200px]">Coba kata kunci lain atau periksa ejaan ya</p>
+              <p className="text-slate-400 text-xs mt-1 font-medium max-w-50">Coba kata kunci lain atau periksa ejaan ya</p>
             </div>
           ) : (
-            <div className="overflow-y-auto max-h-[480px] scrollbar-thin scrollbar-thumb-slate-200">
+            <div className="overflow-y-auto max-h-120 scrollbar-thin scrollbar-thumb-slate-200">
               {/* Results Header */}
               <div className="sticky top-0 z-10 px-5 py-3 bg-white/95 backdrop-blur-sm border-b-2 border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">

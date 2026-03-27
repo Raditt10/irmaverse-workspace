@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { recordActivity } from "@/lib/activity";
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email as string },
     });
 
@@ -18,17 +19,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const isPrivileged = user.role === "instruktur" || user.role === "admin";
+    const isPrivileged =
+      user.role === "instruktur" ||
+      user.role === "admin" ||
+      user.role === "super_admin";
 
-    const programs = await prisma.program.findMany({
+    const programs = await prisma.programs.findMany({
       include: {
-        instructor: {
+        users: {
           select: { id: true, name: true, avatar: true },
         },
-        materials: {
-          select: { id: true, kajianOrder: true, instructorId: true },
+        material: {
+          select: { 
+            id: true, 
+            title: true, 
+            kajianOrder: true, 
+            instructorId: true
+          },
         },
-        enrollments: {
+        program_enrollments: {
           select: { id: true, userId: true },
         },
       },
@@ -43,6 +52,41 @@ export async function GET(req: NextRequest) {
       userAttendances.map((a) => a.materialId),
     );
 
+    // Fetch all attendances and invites for materials in these programs to get attendeeEmails
+    const allMaterialIds = programs.flatMap(p => p.material?.map((m: any) => m.id) || []);
+    
+    const allAttendances = await prisma.attendance.findMany({
+      where: { materialId: { in: allMaterialIds } },
+      select: { materialId: true, userId: true },
+    });
+
+    const allInvites = await prisma.materialinvite.findMany({
+      where: { materialId: { in: allMaterialIds } },
+      select: { materialId: true, userId: true },
+    });
+
+    const allParticipantRecords = [...allAttendances, ...allInvites];
+
+    // Fetch user emails for those attendees
+    const attendeeUserIds = Array.from(new Set(allParticipantRecords.map(a => a.userId)));
+    const attendeeUsers = await prisma.users.findMany({
+      where: { id: { in: attendeeUserIds } },
+      select: { id: true, email: true },
+    });
+    const userEmailMap = new Map(attendeeUsers.map(u => [u.id, u.email]));
+
+    // Map materialId to an array of emails
+    const materialAttendeesMap: Record<string, string[]> = {};
+    for (const a of allParticipantRecords) {
+      if (!materialAttendeesMap[a.materialId]) {
+        materialAttendeesMap[a.materialId] = [];
+      }
+      const email = userEmailMap.get(a.userId);
+      if (email && !materialAttendeesMap[a.materialId].includes(email)) {
+        materialAttendeesMap[a.materialId].push(email);
+      }
+    }
+
     const GRADE_LABEL: Record<string, string> = {
       X: "Kelas 10",
       XI: "Kelas 11",
@@ -52,31 +96,49 @@ export async function GET(req: NextRequest) {
     const CATEGORY_LABEL: Record<string, string> = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     };
 
     // Semua user bisa melihat semua program kurikulum
-    const result = programs.map((p) => {
-      const isEnrolled = p.enrollments.some((e) => e.userId === user.id);
+    const result = programs.map((p: any) => {
+      const isEnrolled = p.program_enrollments?.some(
+        (e: any) => e.userId === user.id,
+      );
 
-      const filteredMaterials = p.materials.filter((m) =>
+      const filteredMaterials = (p.material || []).filter((m: any) =>
         user.role === "instruktur" ? m.instructorId === user.id : true,
       );
 
       let isCompleted = false;
+      let attendanceCount = 0;
+      if (filteredMaterials.length > 0) {
+        attendanceCount = filteredMaterials.filter((m: any) => attendedMaterialIds.has(m.id)).length;
+      }
+      
+      const totalKajianTarget = p.totalKajian > 0 ? p.totalKajian : filteredMaterials.length;
+      let progressPercentage = 0;
+
+      if (totalKajianTarget > 0) {
+        progressPercentage = Math.round((attendanceCount / totalKajianTarget) * 100);
+        progressPercentage = Math.min(progressPercentage, 100);
+      }
+
       if (p.totalKajian > 0) {
         // Complete jika sudah ada semua materi sebanyak totalKajian DAN user menghadiri semuanya
         const hasAllMaterials = filteredMaterials.length >= p.totalKajian;
-        const attendedAll =
-          filteredMaterials.length > 0 &&
-          filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
-        isCompleted = hasAllMaterials && attendedAll;
+        isCompleted = hasAllMaterials && (attendanceCount >= p.totalKajian);
       } else {
         isCompleted =
           filteredMaterials.length > 0 &&
-          filteredMaterials.every((m) => attendedMaterialIds.has(m.id));
+          (attendanceCount >= filteredMaterials.length);
       }
+
+      const progress = {
+        completed: attendanceCount,
+        total: totalKajianTarget,
+        percentage: progressPercentage,
+      };
 
       return {
         id: p.id,
@@ -86,16 +148,25 @@ export async function GET(req: NextRequest) {
         level: GRADE_LABEL[p.grade] || p.grade,
         category: CATEGORY_LABEL[p.category] || p.category,
         thumbnail: p.thumbnailUrl,
-        instructor: p.instructor?.name || "Instruktur IRMA",
-        instructorAvatar: p.instructor?.avatar,
+        instructor: p.users?.name || "Instruktur IRMA",
+        instructorAvatar: p.users?.avatar,
         materialCount: filteredMaterials.length,
         totalKajian: p.totalKajian,
         usedKajianOrders: filteredMaterials
           .map((m: any) => m.kajianOrder)
           .filter((order: any) => order !== null && order !== undefined),
-        enrollmentCount: p.enrollments.length,
+        usedKajianDetails: filteredMaterials
+          .filter((m: any) => m.kajianOrder !== null && m.kajianOrder !== undefined)
+          .map((m: any) => ({
+            order: m.kajianOrder,
+            title: m.title,
+            materialId: m.id,
+            attendeeEmails: materialAttendeesMap[m.id] || [],
+          })),
+        enrollmentCount: p.program_enrollments?.length || 0,
         isEnrolled,
         isCompleted,
+        progress,
         createdAt: p.createdAt,
       };
     });
@@ -121,7 +192,11 @@ export async function POST(req: Request) {
       );
     }
 
-    if (session.user.role !== "instruktur" && session.user.role !== "admin") {
+    if (
+      session.user.role !== "instruktur" &&
+      session.user.role !== "admin" &&
+      session.user.role !== "super_admin"
+    ) {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa membuat program" },
         { status: 403 },
@@ -154,8 +229,9 @@ export async function POST(req: Request) {
       Wajib: "Wajib",
       "Program Ekstra": "Extra",
       Extra: "Extra",
-      "Program Next Level": "NextLevel",
-      NextLevel: "NextLevel",
+      "Program Next Level": "Susulan",
+      "Program Susulan": "Susulan",
+      NextLevel: "Susulan",
       Susulan: "Susulan",
     };
 
@@ -172,7 +248,7 @@ export async function POST(req: Request) {
     const mappedCategory = CATEGORY_MAP[category] || "Wajib";
     const mappedGrade = GRADE_MAP[grade] || "X";
 
-    const program = await prisma.program.create({
+    const program = await prisma.programs.create({
       data: {
         title: title.trim(),
         description: description || null,
@@ -185,8 +261,22 @@ export async function POST(req: Request) {
         requirements: Array.isArray(requirements) ? requirements : [],
         benefits: Array.isArray(benefits) ? benefits : [],
         totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
+        updatedAt: new Date(),
+        id: crypto.randomUUID(),
       },
     });
+
+    // Log Activity for Admin/Superadmin
+    const userRole = session.user.role?.toLowerCase();
+    if (userRole === "admin" || userRole === "super_admin") {
+      await recordActivity({
+        userId: session.user.id,
+        type: "admin_program_managed" as any,
+        title: "Membuat Program Kurikulum",
+        description: `Admin membuat program baru: ${program.title}`,
+        metadata: { programId: program.id },
+      });
+    }
 
     return NextResponse.json(
       { id: program.id, message: "Program berhasil dibuat" },

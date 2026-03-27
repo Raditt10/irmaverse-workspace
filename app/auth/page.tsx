@@ -13,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
+import BackButton from "@/components/ui/BackButton";
 
 // --- SUB-COMPONENT: Password Input ---
 const PasswordInput = ({
@@ -59,6 +60,16 @@ const Auth = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState("signin");
+
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    if (mode === "signup") {
+      setActiveTab("signup");
+    } else {
+      setActiveTab("signin");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (searchParams.get("registered") === "true") {
@@ -144,8 +155,11 @@ const Auth = () => {
         const userData = await response.json();
 
         let redirectUrl = "/overview";
-        if (userData.role === "ADMIN") redirectUrl = "/admin";
-        else if (userData.role === "INSTRUCTOR") redirectUrl = "/instructor";
+        if (userData.role === "ADMIN" || userData.role === "SUPER_ADMIN") {
+          redirectUrl = "/admin";
+        } else if (userData.role === "INSTRUCTOR") {
+          redirectUrl = "/instructor";
+        }
 
         setTimeout(() => {
           window.location.href = redirectUrl;
@@ -164,7 +178,7 @@ const Auth = () => {
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-full h-full opacity-[0.03] bg-[radial-gradient(#10b981_1.5px,transparent_1.5px)] bg-size-[24px_24px]"></div>
         <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-teal-200/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-emerald-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-125 h-125 bg-emerald-200/30 rounded-full blur-3xl"></div>
       </div>
 
       <div className="flex flex-1 items-center justify-center px-4 py-8 relative z-10 w-full">
@@ -173,6 +187,14 @@ const Auth = () => {
           <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
             {/* Main Card */}
             <div className="bg-white rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] p-6 sm:p-8 md:p-10 relative overflow-hidden">
+              {/* Back Button */}
+              <div className="absolute top-6 left-6 z-20">
+                <BackButton 
+                  onClick={() => router.push("/")} 
+                  className="px-3! py-1.5! rounded-xl! text-xs!"
+                />
+              </div>
+
               {/* Header */}
               <div className="flex flex-col items-center gap-3 mb-8">
                 <div className="w-16 h-16 flex items-center justify-center rounded-2xl">
@@ -192,7 +214,11 @@ const Auth = () => {
                 </div>
               </div>
 
-              <Tabs defaultValue="signin" className="w-full">
+              <Tabs 
+                value={activeTab} 
+                onValueChange={setActiveTab} 
+                className="w-full"
+              >
                 <AuthTabsList />
 
                 {/* === FORM SIGN IN === */}
@@ -305,7 +331,7 @@ const Auth = () => {
                           strokeWidth={3}
                         />
                       ) : (
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 shrink-0 shadow-sm" viewBox="0 0 24 24">
                           <path
                             fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -457,7 +483,7 @@ const Auth = () => {
                           strokeWidth={3}
                         />
                       ) : (
-                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 shrink-0 shadow-sm" viewBox="0 0 24 24">
                           <path
                             fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -556,7 +582,7 @@ const Auth = () => {
               </div>
 
               <div className="text-center relative z-10">
-                <span className="inline-block px-3 py-1 bg-amber-100 text-amber-700 text-xs font-black uppercase tracking-wider rounded-lg mb-3">
+                <span className="inline-block px-3 py-1 bg-teal-50 text-teal-700 text-xs font-black uppercase tracking-wider rounded-lg mb-3">
                   Komunitas Islami SMKN 13 Bandung
                 </span>
                 <h3 className="text-3xl font-black text-slate-800 mb-3 leading-tight">

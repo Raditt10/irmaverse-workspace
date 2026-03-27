@@ -35,6 +35,7 @@ interface ManagedQuiz {
   attemptCount: number;
   createdAt: string;
   isStandalone: boolean;
+  isActive: boolean;
 }
 
 type FilterType = "all" | "standalone" | "material";
@@ -62,7 +63,7 @@ export default function QuizManagePage() {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
-    role === "instruktur" || role === "admin" || role === "instructor";
+    role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });
@@ -168,7 +169,7 @@ export default function QuizManagePage() {
     },
     {
       key: "material",
-      label: "Materi",
+      label: "Kajian",
       count: quizzes.filter((q) => !q.isStandalone).length,
     },
   ];
@@ -318,9 +319,18 @@ export default function QuizManagePage() {
                           </h3>
                           <span
                             className={`shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full border ${
-                              quiz.isStandalone
+                              quiz.isActive
                                 ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-                                : "bg-emerald-50 text-emerald-600 border-emerald-200"
+                                : "bg-slate-50 text-slate-400 border-slate-200"
+                            }`}
+                          >
+                            {quiz.isActive ? "Aktif" : "Nonaktif"}
+                          </span>
+                          <span
+                            className={`shrink-0 text-[10px] font-black px-2 py-0.5 rounded-full border ${
+                              quiz.isStandalone
+                                ? "bg-blue-50 text-blue-600 border-blue-200"
+                                : "bg-purple-50 text-purple-600 border-purple-200"
                             }`}
                           >
                             {quiz.isStandalone ? "Mandiri" : "Materi"}
@@ -370,15 +380,9 @@ export default function QuizManagePage() {
                           <Trash2 className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() =>
-                            quiz.isStandalone
-                              ? router.push(`/quiz/standalone/${quiz.id}`)
-                              : router.push(
-                                  `/quiz/${quiz.materialId}/${quiz.id}`,
-                                )
-                          }
+                          onClick={() => router.push(`/quiz/manage/${quiz.id}/stats`)}
                           className="p-2.5 rounded-xl border-2 border-slate-200 text-slate-500 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
-                          title="Lihat / Preview quiz"
+                          title="Lihat Statistik & Detail"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </button>

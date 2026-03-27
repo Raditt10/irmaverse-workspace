@@ -90,7 +90,7 @@ export default function FollowButton({
             ? "border-red-300 bg-red-50 text-red-600 hover:bg-red-100"
             : isMutual
               ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-              : "border-blue-300 bg-blue-50 text-blue-700"
+              : "border-emerald-300 bg-emerald-50 text-emerald-700"
         } ${sizeClasses[size]} ${className}`}
       >
         {hovered ? (

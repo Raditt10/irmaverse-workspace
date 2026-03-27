@@ -21,6 +21,7 @@ import {
   Plus
 } from "lucide-react";
 import AddButton from "@/components/ui/AddButton";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Schedule {
   id: string;
@@ -159,42 +160,49 @@ const Schedule = () => {
   });
 
 
+  const role = session?.user?.role?.toLowerCase();
+  const isPrivileged = role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
+
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 px-6 lg:px-8 py-12 lg:ml-0">
+        <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  Kegiatan IRMA
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  Daftar kegiatan IRMA yang akan datang dan sedang berlangsung
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {session?.user?.role === "instruktur" && (
-                  <AddButton
-                    label="Buat Kegiatan"
+            <PageBanner
+              title="Kegiatan IRMA"
+              description="Daftar kegiatan IRMA yang akan datang dan sedang berlangsung"
+              icon={Calendar}
+              tag="Jadwal"
+              tagIcon={Calendar}
+              action={
+                isPrivileged && (
+                  <button
                     onClick={() => router.push("/schedule/create")}
-                    icon={<Plus className="h-5 w-5" />}
-                    color="emerald"
-                    hideIcon={false}
-                  />
-                )}
-              </div>
-            </div>
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-emerald-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                  >
+                    <Plus className="h-5 w-5" strokeWidth={3} /> Buat Kegiatan Baru
+                  </button>
+                )
+              }
+            />
 
             {/* Filter & Search Bar */}
             {!loading && schedules.length > 0 && (
-              <div className="grid gap-6 mb-8 lg:grid-cols-[1fr_auto]">
-                <div className="space-y-4 min-w-0 pr-1">
-                  {/* Status Filter Buttons */}
+              <div className="flex flex-col gap-8 mb-10">
+                {/* Search Bar - More Prominent Top Placement */}
+                <div className="relative w-full max-w-2xl mx-auto lg:mx-0">
+                  <SearchInput
+                    placeholder="Cari Kegiatan seru atau topik..."
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                  />
+                </div>
+
+                {/* Status Filter Buttons - Below Search */}
+                <div className="min-w-0">
                   <CategoryFilter
                     categories={statusOptions}
                     subCategories={[]}
@@ -202,14 +210,6 @@ const Schedule = () => {
                     selectedSubCategory=""
                     onCategoryChange={setSelectedStatus}
                     onSubCategoryChange={() => {}}
-                  />
-                </div>
-
-                <div className="relative w-full lg:w-80 self-start">
-                  <SearchInput
-                    placeholder="Cari Kegiatan seru atau topik..."
-                    value={searchQuery}
-                    onChange={setSearchQuery}
                   />
                 </div>
               </div>

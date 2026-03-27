@@ -26,11 +26,11 @@ export async function GET(req: NextRequest) {
       where.status = statusFilter;
     }
 
-    const [notifications, unreadCount] = await Promise.all([
-      prisma.notification.findMany({
+    const [rawNotifications, unreadCount] = await Promise.all([
+      prisma.notifications.findMany({
         where,
         include: {
-          sender: {
+          users_notifications_senderIdTousers: {
             select: {
               id: true,
               name: true,
@@ -42,13 +42,20 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         take: limit,
       }),
-      prisma.notification.count({
+      prisma.notifications.count({
         where: {
           userId: session.user.id,
           status: "unread",
         },
       }),
     ]);
+
+    // Map Prisma relation name to frontend-friendly 'sender'
+    const notifications = rawNotifications.map((n: any) => ({
+      ...n,
+      sender: n.users_notifications_senderIdTousers || null,
+      users_notifications_senderIdTousers: undefined,
+    }));
 
     return NextResponse.json({
       success: true,
@@ -101,7 +108,7 @@ export async function PATCH(req: NextRequest) {
 
     // Mark all unread as read (bulk)
     if (ids && Array.isArray(ids)) {
-      await prisma.notification.updateMany({
+      await prisma.notifications.updateMany({
         where: {
           id: { in: ids },
           userId: session.user.id,
@@ -121,7 +128,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Verify ownership
-    const notification = await prisma.notification.findFirst({
+    const notification = await prisma.notifications.findFirst({
       where: { id, userId: session.user.id },
     });
 
@@ -136,48 +143,57 @@ export async function PATCH(req: NextRequest) {
     if (notification.type === "invitation") {
       const inviteToken = notification.inviteToken;
       const materialId = notification.resourceId;
-      
+
       console.log("[PATCH /api/notifications] Handling invitation response:", {
         inviteToken,
         materialId,
         status,
-        notificationId: id
+        notificationId: id,
       });
-      
+
       if (status === "accepted" || status === "rejected") {
         // Update the materialinvite
         // Strategy: Try by token first, if fails, try by materialId + userId (fallback)
-        let invite = null;
+        let invite: any = null;
         if (inviteToken) {
           invite = await prisma.materialinvite.findUnique({
             where: { token: inviteToken },
           });
         }
-        
+
         if (!invite && materialId) {
-          console.log("[PATCH /api/notifications] token failed, trying fallback by materialId:", materialId);
+          console.log(
+            "[PATCH /api/notifications] token failed, trying fallback by materialId:",
+            materialId,
+          );
           invite = await prisma.materialinvite.findFirst({
-            where: { 
+            where: {
               materialId: materialId,
-              userId: session.user.id
+              userId: session.user.id,
             },
           });
         }
 
         if (invite) {
-          console.log("[PATCH /api/notifications] Found invite, updating status to:", status);
+          console.log(
+            "[PATCH /api/notifications] Found invite, updating status to:",
+            status,
+          );
           await prisma.materialinvite.update({
             where: { id: invite.id },
-            data: { 
-              status, 
+            data: {
+              status,
               reason: status === "rejected" ? reason : null,
-              updatedAt: new Date() 
+              updatedAt: new Date(),
             } as any,
           });
 
           // If accepted, create course enrollment
           if (status === "accepted") {
-            console.log("[PATCH /api/notifications] Accepted! Creating enrollment for user:", session.user.id);
+            console.log(
+              "[PATCH /api/notifications] Accepted! Creating enrollment for user:",
+              session.user.id,
+            );
             await prisma.courseenrollment.upsert({
               where: {
                 materialId_userId: {
@@ -185,9 +201,9 @@ export async function PATCH(req: NextRequest) {
                   userId: session.user.id,
                 },
               },
-              update: { 
+              update: {
                 role: "user",
-                enrolledAt: new Date()
+                enrolledAt: new Date(),
               },
               create: {
                 id: `enr-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -199,16 +215,19 @@ export async function PATCH(req: NextRequest) {
             });
           }
         } else {
-          console.log("[PATCH /api/notifications] WARNING: No invite record found even with fallback for token:", inviteToken);
+          console.log(
+            "[PATCH /api/notifications] WARNING: No invite record found even with fallback for token:",
+            inviteToken,
+          );
         }
       }
     }
 
-    const updated = await prisma.notification.update({
+    const rawUpdated = await prisma.notifications.update({
       where: { id },
       data: { status },
       include: {
-        sender: {
+        users_notifications_senderIdTousers: {
           select: {
             id: true,
             name: true,
@@ -218,6 +237,13 @@ export async function PATCH(req: NextRequest) {
         },
       },
     });
+
+    // Map Prisma relation name to frontend-friendly 'sender'
+    const updated = {
+      ...rawUpdated,
+      sender: (rawUpdated as any).users_notifications_senderIdTousers || null,
+      users_notifications_senderIdTousers: undefined,
+    };
 
     return NextResponse.json({ success: true, notification: updated });
   } catch (error) {
@@ -241,7 +267,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await prisma.notification.updateMany({
+    const result = await prisma.notifications.updateMany({
       where: {
         userId: session.user.id,
         status: "unread",

@@ -71,7 +71,7 @@ const CompetitionDetail = () => {
   const competitionId = params.id as string;
 
   // Assume user with role admin or instruktur is privileged.
-  const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instruktur";
+  const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instruktur" || session?.user?.role === "super_admin";
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ show: true, message, type });

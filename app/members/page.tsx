@@ -16,8 +16,12 @@ import {
   UserPlus, 
   Sparkles, 
   Search, 
-  Trophy
+  Zap,
+  Lock,
+  UserCheck,
+  Users
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface Member {
   id: string;
@@ -26,6 +30,8 @@ interface Member {
   class: string;
   avatar: string;
   points: number;
+  isMutual: boolean;
+  jabatan: string | null;
   status: "Aktif" | "Tidak Aktif";
 }
 
@@ -70,6 +76,8 @@ const Members = () => {
         class: u.class || "-",
         avatar: u.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + (u.name || "user"),
         points: u.points || 0,
+        isMutual: u.isMutual || false,
+        jabatan: u.jabatan || null,
         status: u.status || "Aktif",
       }));
       
@@ -108,16 +116,13 @@ const Members = () => {
           <div className="max-w-7xl mx-auto">
             
             {/* Header Section */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-black text-slate-800 tracking-tight mb-2">
-                  Daftar Anggota IRMA
-                </h1>
-                <p className="text-slate-500 font-medium text-sm lg:text-lg">
-                  Temukan teman dan lihat siapa saja anggota aktif IRMA.
-                </p>
-              </div>
-            </div>
+            <PageBanner
+              title="Daftar Anggota IRMA"
+              description="Temukan teman dan lihat siapa saja anggota aktif IRMA Verse"
+              icon={Users}
+              tag="Keanggotaan"
+              tagIcon={Users}
+            />
 
             {/* Search & Suggestions */}
             <div className="space-y-6 mb-8 lg:mb-10">
@@ -170,47 +175,69 @@ const Members = () => {
                                 <h3 className="text-sm md:text-lg lg:text-xl font-black text-slate-800 truncate px-1 md:px-2">
                                     {member.name}
                                 </h3>
-                                <p className="text-[8px] md:text-[10px] font-bold text-teal-600 bg-teal-50 px-2 md:px-3 py-0.5 rounded-full inline-block border border-teal-100 mt-1">
-                                    {member.role}
-                                </p>
-                                <p className="text-[8px] md:text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">
-                                    {member.class}
+                                <p className={`text-[8px] md:text-[10px] font-bold px-2 md:px-3 py-0.5 rounded-full inline-block mt-1 ${
+                                    member.jabatan 
+                                      ? "text-emerald-700 bg-emerald-50 border border-emerald-200" 
+                                      : "text-teal-600 bg-teal-50 border border-teal-100"
+                                }`}>
+                                    {member.jabatan || "Anggota"}
                                 </p>
                             </div>
                         </div>
 
                         {/* Points Section */}
                         <div className="mt-3 md:mt-4 px-3 md:px-6">
-                            <div className="bg-emerald-50 rounded-xl md:rounded-2xl p-2 md:p-3 border-2 border-emerald-100 flex items-center justify-between">
-                                <div className="flex items-center gap-1 md:gap-2">
-                                    <div className="p-1 md:p-1.5 bg-emerald-100 rounded-[0.4rem] md:rounded-lg text-emerald-600">
-                                        <Trophy className="h-3 w-3 md:h-4 md:w-4" />
+                            {(() => {
+                                const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instruktur" || session?.user?.role === "super_admin";
+                                const isMe = member.id === session?.user?.id;
+                                const isVisibleXp = isPrivileged || isMe || member.isMutual;
+
+                                return (
+                                    <div className={`rounded-xl md:rounded-2xl p-2 md:p-3 border-2 flex items-center justify-between transition-colors duration-300 ${
+                                        isVisibleXp ? "bg-emerald-50 border-emerald-100" : "bg-slate-50 border-slate-100 grayscale-[0.5]"
+                                    }`}>
+                                        <div className="flex items-center gap-1 md:gap-2">
+                                            <div className={`p-1 md:p-1.5 rounded-[0.4rem] md:rounded-lg ${
+                                                isVisibleXp ? "bg-emerald-100 text-emerald-600" : "bg-slate-200 text-slate-400"
+                                            }`}>
+                                                {isVisibleXp ? (
+                                                    <Zap className="h-3 w-3 md:h-4 md:w-4 fill-emerald-600" />
+                                                ) : (
+                                                    <Lock className="h-3 w-3 md:h-4 md:w-4" />
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className={`text-[10px] md:text-xs font-bold ${
+                                                    isVisibleXp ? "text-emerald-800" : "text-slate-400"
+                                                }`}>Total XP</span>
+                                                {member.isMutual && !isMe && !isPrivileged && (
+                                                    <span className="text-[7px] font-black text-teal-600 uppercase tracking-tighter flex items-center gap-0.5">
+                                                        <UserCheck className="h-2 w-2" /> Mutual
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <span className={`text-sm md:text-lg font-black ${
+                                            isVisibleXp ? "text-emerald-600" : "text-slate-300 select-none"
+                                        }`}>
+                                            {isVisibleXp ? member.points.toLocaleString() : "—"}
+                                        </span>
                                     </div>
-                                    <span className="text-[10px] md:text-xs font-bold text-emerald-800">Poin Keaktifan</span>
-                                </div>
-                                <span className="text-sm md:text-lg font-black text-emerald-600">{member.points}</span>
-                            </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Spacer */}
                         <div className="flex-1 min-h-4"></div>
 
                         {/* Action Buttons */}
-                        <div className="p-3 md:p-4 bg-slate-50 border-t-2 border-slate-100 grid grid-cols-2 gap-2 md:gap-3">
+                        <div className="p-3 md:p-4 bg-slate-50 border-t-2 border-slate-100 flex flex-col gap-2 md:gap-3">
                             <button
                                 onClick={() => router.push(`/members/${member.id}`)}
-                                className="flex items-center justify-center gap-1 md:gap-2 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white border-2 border-slate-200 text-slate-600 font-bold text-[10px] md:text-sm shadow-[0_2px_0_0_#cbd5e1] hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#34d399] active:border-b-2 active:translate-y-0.5 transition-all"
+                                className="w-full flex items-center justify-center gap-1 md:gap-2 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-white border-2 border-slate-200 text-slate-600 font-bold text-[10px] md:text-sm shadow-[0_2px_0_0_#cbd5e1] hover:border-teal-400 hover:text-teal-600 hover:shadow-[0_4px_0_0_#34d399] active:border-b-2 active:translate-y-0.5 transition-all"
                             >
                                 <UserCircle2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
                                 Profile
-                            </button>
-
-                            <button
-                                onClick={() => handleAddFriend(member.name)}
-                                className="flex items-center justify-center gap-1 md:gap-2 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-teal-400 border-2 border-teal-600 text-white font-bold text-[10px] md:text-sm shadow-[0_2px_0_0_#0f766e] hover:bg-teal-500 active:border-b-2 active:translate-y-0.5 transition-all"
-                            >
-                                <UserPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                                Add
                             </button>
                         </div>
                       </div>

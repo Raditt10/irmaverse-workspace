@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Update messages to read
-    await prisma.chatMessage.updateMany({
+    await prisma.chat_messages.updateMany({
       where: {
         id: { in: messageIds },
         senderId: { not: session.user.id }, // Don't mark own messages as read

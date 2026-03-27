@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { NextResponse, NextRequest } from "next/server";
+import { createBulkNotifications } from "@/lib/notifications";
+import { emitNotificationsToUsers } from "@/lib/socket-emit";
 
 export async function GET(
   req: NextRequest,
@@ -16,7 +18,7 @@ export async function GET(
     }
 
     // Check if user exists
-    const User = await prisma.user.findUnique({
+    const User = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
 
@@ -52,7 +54,7 @@ export async function GET(
             title: true,
           },
         },
-        program: {
+        programs: {
           select: {
             id: true,
             title: true,
@@ -69,6 +71,11 @@ export async function GET(
             },
           },
         },
+        rekapan: {
+          select: {
+            content: true,
+          },
+        },
       },
     });
 
@@ -79,26 +86,15 @@ export async function GET(
       );
     }
 
-    const isPrivileged = User.role === "instruktur" || User.role === "admin";
+    // Non-privileged users can view all materials, but isJoined controls
+    // whether the attendance section is shown in the UI.
+    const isPrivileged = User.role === "instruktur" || User.role === "admin" || User.role === "super_admin";
 
-    // Access control: non-privileged users must be enrolled (courseenrollment)
-    // OR have an accepted invitation to view this material.
-    // Admins can see all.
-    if (User.role !== "admin") {
-      const isCreator = material.instructorId === User.id;
-      const hasEnrollment = (material as any).courseenrollment?.length > 0;
-      const hasAcceptedInvite = ((material as any).materialinvite || []).some(
-        (inv: any) => inv.status === "accepted",
-      );
-      if (!isCreator && !hasEnrollment && !hasAcceptedInvite) {
-        return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
-      }
-    }
 
     const CATEGORY_LABEL = {
       Wajib: "Program Wajib",
       Extra: "Program Ekstra",
-      NextLevel: "Program Next Level",
+      NextLevel: "Program Susulan",
       Susulan: "Program Susulan",
     } as const;
 
@@ -110,6 +106,12 @@ export async function GET(
       xi: "Kelas 11",
       xii: "Kelas 12",
     };
+
+    const isEnrolledInProgram = material.programId 
+      ? await (prisma as any).program_enrollments.findFirst({
+          where: { userId: User.id, programId: material.programId }
+        })
+      : null;
 
     const m = material as any; // Cast to any to bypass stale linting issues
     const result = {
@@ -127,23 +129,26 @@ export async function GET(
       startedAt: m.startedAt,
       thumbnailUrl: m.thumbnailUrl,
       location: m.location,
-      content: m.content,
+      content: m.content || (m.rekapan && m.rekapan.length > 0 ? m.rekapan[0].content : null),
       link: m.link,
       materialType: m.materialType,
+      kajianOrder: m.kajianOrder,
       isAttendanceOpen: m.isAttendanceOpen,
+      hasRekapan: !!(m.content || m.link || (m.rekapan && m.rekapan.length > 0)),
       isJoined:
         m.courseenrollment?.length > 0 ||
         (m.materialinvite || []).some((inv: any) => inv.status === "accepted"),
+      isEnrolledInProgram: !!isEnrolledInProgram,
       parent: m.material_material_parentIdTomaterial
         ? {
             id: m.material_material_parentIdTomaterial.id,
             title: m.material_material_parentIdTomaterial.title,
           }
         : null,
-      program: m.program
+      program: m.programs
         ? {
-            id: m.program.id,
-            title: m.program.title,
+            id: m.programs.id,
+            title: m.programs.title,
           }
         : null,
       // For editing: flat email list of all invited users
@@ -207,16 +212,28 @@ export async function DELETE(
     }
 
     // Authorization removal as per previous request
-    if (session.user.role !== "admin" && material.instructorId !== session.user.id) {
+    if (session.user.role !== "admin" && session.user.role !== "super_admin" && material.instructorId !== session.user.id) {
       return NextResponse.json(
         { error: "Hanya pembuat materi atau admin yang bisa menghapus kajian" },
         { status: 403 },
       );
     }
 
-    await (prisma as any).material.delete({
-      where: { id },
-    });
+    // Proactively unset relations using Prisma Client (now updated on Windows)
+    // We use a transaction to ensure either everything works or nothing happens
+    await prisma.$transaction([
+      (prisma as any).material_quizzes.updateMany({
+        where: { materialId: id },
+        data: { materialId: null },
+      }),
+      (prisma as any).rekapan.updateMany({
+        where: { materialId: id },
+        data: { materialId: null },
+      }),
+      (prisma as any).material.delete({
+        where: { id },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "Kajian berhasil dihapus" },
@@ -280,7 +297,7 @@ export async function PUT(
     }
 
     // Authorization removal
-    if (session.user.role !== "admin" && material.instructorId !== session.user.id) {
+    if (session.user.role !== "admin" && session.user.role !== "super_admin" && material.instructorId !== session.user.id) {
       return NextResponse.json(
         { error: "Hanya pembuat materi atau admin yang bisa mengedit kajian" },
         { status: 403 },
@@ -290,7 +307,7 @@ export async function PUT(
     const CATEGORY_MAP: Record<string, string> = {
       "Program Wajib": "Wajib",
       "Program Ekstra": "Extra",
-      "Program Next Level": "NextLevel",
+      "Program Next Level": "Susulan",
       "Program Susulan": "Susulan",
     };
 
@@ -327,6 +344,74 @@ export async function PUT(
         },
       },
     });
+
+    // --- Process New Invites ---
+    if (invites && Array.isArray(invites) && invites.length > 0) {
+      // 1. Find users by emails
+      const usersToInvite = await prisma.users.findMany({
+        where: { email: { in: invites } },
+        select: { id: true, email: true },
+      });
+
+      if (usersToInvite.length > 0) {
+        const userIds = usersToInvite.map(u => u.id);
+
+        // 2. Check which users already have invitations
+        const existingInvites = await (prisma as any).materialinvite.findMany({
+          where: {
+            materialId: id,
+            userId: { in: userIds },
+          },
+          select: { userId: true },
+        });
+
+        const alreadyInvitedIds = existingInvites.map((inv: any) => inv.userId);
+        const newUserIds = userIds.filter(uid => !alreadyInvitedIds.includes(uid));
+
+        if (newUserIds.length > 0) {
+          const generateToken = () =>
+            Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15);
+
+          const inviteData = newUserIds.map((userId: string) => ({
+            id: `inv-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+            materialId: id,
+            instructorId: session.user.id,
+            userId,
+            token: generateToken(),
+            status: "pending" as const,
+            updatedAt: new Date(),
+          }));
+
+          await (prisma as any).materialinvite.createMany({
+            data: inviteData,
+          });
+
+          // 3. Trigger Notifications
+          const notifications = await createBulkNotifications(
+            inviteData.map((inv: any) => ({
+              userId: inv.userId,
+              type: "invitation" as const,
+              title: title || "Undangan Kajian",
+              message: `${session.user.name || "Instruktur"} mengundang Anda untuk bergabung ke kajian "${title}"`,
+              icon: "book",
+              resourceType: "material",
+              resourceId: id,
+              actionUrl: `/materials/${id}`,
+              inviteToken: inv.token,
+              senderId: session.user.id,
+            })),
+          );
+
+          await emitNotificationsToUsers(
+            notifications.map((n) => ({
+              userId: n.userId,
+              notification: n,
+            })),
+          );
+        }
+      }
+    }
 
     return NextResponse.json(updatedMaterial, { status: 200 });
   } catch (error) {

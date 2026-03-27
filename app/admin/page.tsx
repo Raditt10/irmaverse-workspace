@@ -19,7 +19,16 @@ import {
   UserCheck,
   LayoutGrid,
   BookMarked,
+  Zap,
+  Book,
+  Award,
+  TrendingUp,
   HelpCircle,
+  Contact,
+  Newspaper,
+  History,
+  FileText,
+  MessageSquare,
 } from "lucide-react";
 import Sidebar from "@/components/ui/Sidebar";
 import DashboardHeader from "@/components/ui/Header";
@@ -31,6 +40,12 @@ export default function AdminDashboard() {
     totalUsers: 0,
     totalInstructors: 0,
     totalActiveMaterials: 0,
+    totalCompletedMaterials: 0,
+    recentMaterials: [] as any[],
+    recentNews: [] as any[],
+    recentUsers: [] as any[],
+    instructorActivities: [] as any[],
+    userActivities: [] as any[],
   });
   const [loading, setLoading] = useState(true);
 
@@ -52,64 +67,8 @@ export default function AdminDashboard() {
     }
   };
 
-  const recentUsers = [
-    {
-      id: 1,
-      name: "Ahmad Zaki",
-      email: "ahmad@irma.com",
-      role: "INSTRUCTOR",
-      joinedAt: "2 jam lalu",
-    },
-    {
-      id: 2,
-      name: "Fatimah Zahra",
-      email: "fatimah@irma.com",
-      role: "USER",
-      joinedAt: "5 jam lalu",
-    },
-    {
-      id: 3,
-      name: "Muhammad Rayan",
-      email: "rayan@irma.com",
-      role: "USER",
-      joinedAt: "1 hari lalu",
-    },
-  ];
 
-  const systemAlerts = [
-    {
-      id: 1,
-      type: "warning",
-      message: "Storage mencapai 85% kapasitas",
-      time: "2 jam lalu",
-    },
-    {
-      id: 2,
-      type: "info",
-      message: "Backup sistem berhasil dilakukan",
-      time: "6 jam lalu",
-    },
-    {
-      id: 3,
-      type: "success",
-      message: "Semua sistem berjalan normal",
-      time: "1 hari lalu",
-    },
-  ];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#FDFBF7]">
-        <DashboardHeader />
-        <div className="flex">
-          <Sidebar />
-          <div className="flex-1 flex items-center justify-center h-[calc(100vh-80px)]">
-            <Loading text="Memuat dashboard administrator..." size="lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <Loading fullScreen text="Membuat dashboard..." />;
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">
@@ -151,11 +110,13 @@ export default function AdminDashboard() {
                 <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
                   <Users className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">User</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Anggota</span>
               </div>
               <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats.totalUsers.toLocaleString("id-ID")}</div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Total Pengguna</div>
+                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
+                  {(stats.totalUsers ?? 0).toLocaleString("id-ID")}
+                </div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Total Anggota IRMA</div>
               </div>
             </div>
 
@@ -163,41 +124,63 @@ export default function AdminDashboard() {
             <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
               <div className="flex justify-between items-start mb-2 md:mb-5">
                 <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <UserCheck className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
+                  <Contact className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
                 <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Instruktur</span>
               </div>
               <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats.totalInstructors}</div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Total Instruktur</div>
+                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
+                  {(stats.totalInstructors ?? 0).toLocaleString("id-ID")}
+                </div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Total Instruktur</div>
               </div>
             </div>
 
-            {/* Stat 3 - Active Materials */}
-            <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
+            {/* Stat 3 - Active Materials (Amber if > 0, Emerald if 0) */}
+            <div className={`bg-white p-5 md:p-6 rounded-[2.5rem] border-2 ${
+              (stats.totalActiveMaterials ?? 0) > 0 
+                ? 'border-amber-100 shadow-[0_8px_0_0_#fef3c7] hover:shadow-[0_4px_0_0_#fef3c7] hover:border-amber-200' 
+                : 'border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:border-emerald-200'
+            } hover:translate-y-1 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40`}>
               <div className="flex justify-between items-start mb-2 md:mb-5">
-                <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
+                <div className={`p-2.5 md:p-3 border-2 rounded-2xl group-hover:scale-110 transition-transform ${
+                  (stats.totalActiveMaterials ?? 0) > 0 
+                    ? 'bg-amber-50 border-amber-100' 
+                    : 'bg-emerald-50 border-emerald-100'
+                }`}>
+                  <BookOpen className={`w-6 h-6 md:w-8 md:h-8 ${
+                    (stats.totalActiveMaterials ?? 0) > 0 ? 'text-amber-500' : 'text-emerald-500'
+                  }`} strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Aktif</span>
+                <span className={`text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 rounded-full border-2 ${
+                  (stats.totalActiveMaterials ?? 0) > 0 
+                    ? 'bg-amber-100 text-amber-600 border-amber-200' 
+                    : 'bg-emerald-100 text-emerald-600 border-emerald-200'
+                }`}>
+                  Ongoing
+                </span>
               </div>
               <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">{stats.totalActiveMaterials}</div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Kajian Ongoing</div>
+                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
+                  {(stats.totalActiveMaterials ?? 0).toLocaleString("id-ID")}
+                </div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Kajian Ongoing</div>
               </div>
             </div>
 
-            {/* Stat 4 - System Status */}
+            {/* Stat 4 - Completed Materials */}
             <div className="bg-white p-5 md:p-6 rounded-[2.5rem] border-2 border-emerald-100 shadow-[0_8px_0_0_#d1fae5] hover:shadow-[0_4px_0_0_#d1fae5] hover:translate-y-1 hover:border-emerald-200 transition-all duration-300 group flex flex-col justify-between aspect-square md:aspect-auto md:min-h-40">
               <div className="flex justify-between items-start mb-2 md:mb-5">
                 <div className="p-2.5 md:p-3 bg-emerald-50 border-2 border-emerald-100 rounded-2xl group-hover:scale-110 transition-transform">
-                  <Activity className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
+                  <CheckCircle2 className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Bagus</span>
+                <span className="text-[10px] md:text-xs font-black px-2.5 py-1 md:px-3 bg-emerald-100 text-emerald-600 rounded-full border-2 border-emerald-200">Tuntas</span>
               </div>
               <div className="flex flex-col gap-1">
-                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">Healthy</div>
-                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide uppercase">Status Sistem</div>
+                <div className="text-3xl md:text-4xl font-black text-slate-800 leading-none">
+                  {(stats.totalCompletedMaterials ?? 0).toLocaleString("id-ID")}
+                </div>
+                <div className="text-[10px] md:text-sm text-slate-400 font-black tracking-wide">Total Kajian Tuntas</div>
               </div>
             </div>
           </div>
@@ -207,77 +190,205 @@ export default function AdminDashboard() {
             
             {/* LEFT COLUMN: CONTROL CENTER */}
             <div className="xl:col-span-8 space-y-10">
+
+              {/* Material Overview Section */}
               <section>
                 <div className="flex items-center justify-between mb-6 px-2">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
-                      <Sparkles className="w-5 h-5 text-slate-800" />
+                      <BookOpen className="w-5 h-5 text-slate-800" />
                     </div>
-                    <h2 className="text-xl font-black text-slate-800">Pusat Kendali Admin</h2>
+                    <h2 className="text-xl font-black text-slate-800">Overview Kajian</h2>
                   </div>
+                  <Link href="/materials" className="text-sm font-black text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+                    Lihat Semua <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                
+                  {stats.recentMaterials && stats.recentMaterials.length > 0 ? (
+                    <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 space-y-4 shadow-sm">
+                      {stats.recentMaterials.map((material) => (
+                        <div key={material.id} className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 hover:bg-white transition-all group">
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform shadow-sm shrink-0">
+                                    {material.thumbnailUrl ? (
+                                      <img
+                                        src={material.thumbnailUrl}
+                                        alt={material.title}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-black text-xl">
+                                        {material.title.charAt(0)}
+                                      </div>
+                                    )}
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="font-black text-slate-700 group-hover:text-emerald-600 transition-colors truncate uppercase tracking-tight">{material.title}</h3>
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest truncate">Oleh: {material.instructor}</p>
+                                </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase border ${
+                                  material.isCompleted 
+                                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                                  : 'bg-amber-50 text-amber-600 border-amber-100'
+                                }`}>
+                                    {material.isCompleted ? 'Tuntas' : 'Belum Tuntas'}
+                                </span>
+                                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                                  {new Date(material.createdAt).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'short'
+                                  })}
+                                </p>
+                            </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <BookOpen className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada kajian terbaru</p>
+                      <p className="text-xs text-slate-400 mt-1">Tambahkan sesi kajian baru untuk anggota</p>
+                    </div>
+                  )}
+              </section>
+
+              {/* News Section */}
+              <section>
+                <div className="flex items-center gap-3 mb-6 px-2">
+                  <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
+                    <Newspaper className="w-5 h-5 text-slate-800" />
+                  </div>
+                  <h2 className="text-xl font-black text-slate-800">
+                    Kabar IRMA Terkini
+                  </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { icon: Users, label: "Mengelola User", desc: "Manajemen akun anggota", color: "emerald", path: "/admin/users" },
-                    { icon: UserPlus, label: "Mengelola Instruktur", desc: "Kelola akun instruktur", color: "emerald", path: "/admin/instructors" },
-                    { icon: BookMarked, label: "Rekapan Kajian", desc: "Arsip & ringkasan materi", color: "emerald", path: "/materials/rekapan" },
-                    { icon: HelpCircle, label: "Kuis Akademia", desc: "Kelola bank soal & nilai", color: "emerald", path: "/quiz" },
-                    { icon: Bell, label: "Broadcast Pesan", desc: "Kirim pengumuman massal", color: "emerald", path: "/admin/broadcast" },
-                    { icon: Settings, label: "Konfigurasi IRMA", desc: "Pengaturan inti platform", color: "emerald", path: "/admin/settings" },
-                  ].map((item, idx) => (
-                    <Link
-                      key={idx}
-                      href={item.path}
-                      className={`bg-white p-6 rounded-4xl border-2 border-slate-100 hover:border-${item.color}-400 hover:shadow-[0_8px_0_0_#cbd5e1] hover:-translate-y-1 transition-all group flex items-center gap-5`}
-                    >
-                      <div className={`p-4 bg-${item.color}-50 border-2 border-${item.color}-100 rounded-2xl group-hover:scale-110 transition-transform`}>
-                        <item.icon className={`h-7 w-7 text-${item.color}-500`} strokeWidth={2.5} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+                  {!stats.recentNews || stats.recentNews.length === 0 ? (
+                    <div className="col-span-1 md:col-span-2 flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <Newspaper className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
                       </div>
-                      <div>
-                        <h3 className="font-black text-slate-800 text-lg group-hover:text-slate-900 transition-colors uppercase tracking-tight">{item.label}</h3>
-                        <p className="text-slate-400 font-bold text-sm">{item.desc}</p>
-                      </div>
-                    </Link>
-                  ))}
+                      <p className="text-sm text-slate-500 font-bold">Belum ada kabar terbaru</p>
+                      <p className="text-xs text-slate-400 mt-1">Buat berita untuk menyampaikan informasi ke anggota</p>
+                    </div>
+                  ) : (
+                    stats.recentNews.map((news) => (
+                      <Link
+                        href={`/news/${news.slug}`}
+                        key={news.id}
+                        className="flex gap-4 p-4 bg-white rounded-4xl border-2 border-slate-100 hover:border-emerald-400 hover:shadow-[0_6px_0_0_#10b981] hover:-translate-y-1 transition-all cursor-pointer group"
+                      >
+                        <div className="w-24 h-24 rounded-2xl bg-slate-200 overflow-hidden shrink-0 border-2 border-slate-100 group-hover:border-emerald-200">
+                          <img
+                            src={
+                              news.image ||
+                              `https://images.unsplash.com/photo-1633613286991-611bcfb63dba?auto=format&fit=crop&w=800&q=80`
+                            }
+                            alt={news.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                        <div className="flex flex-col justify-center min-w-0">
+                          <span className="inline-block w-fit px-2 py-0.5 rounded-md bg-emerald-500 text-white text-[10px] font-black border border-emerald-600 shadow-sm mb-2 uppercase tracking-wide">
+                            {news.category}
+                          </span>
+                          <h3 className="font-bold text-slate-800 leading-snug mb-2 text-base group-hover:text-emerald-600 transition-colors line-clamp-2 uppercase">
+                            {news.title}
+                          </h3>
+                          <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5 uppercase">
+                            <Calendar className="w-3.5 h-3.5" />{" "}
+                            {new Date(news.createdAt).toLocaleDateString(
+                              "id-ID",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              },
+                            )}
+                          </span>
+                        </div>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </section>
 
               {/* Recent Users Section */}
               <section>
-                <div className="flex items-center justify-between mb-6 px-2">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
-                      <UserPlus className="w-5 h-5 text-slate-800" />
-                    </div>
-                    <h2 className="text-xl font-black text-slate-800">Pendaftaran Terbaru</h2>
+                <div className="flex items-center gap-3 mb-6 px-2">
+                  <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
+                    <UserPlus className="w-5 h-5 text-slate-800" />
                   </div>
-                  <Link href="/admin/users" className="text-sm font-black text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
-                    Lihat List <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <h2 className="text-xl font-black text-slate-800">
+                    Pendaftaran Anggota Terbaru
+                  </h2>
                 </div>
-                
-                <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 space-y-4 shadow-sm">
-                  {recentUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white transition-all group">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 font-black text-xl">
-                                {user.name.charAt(0)}
-                            </div>
-                            <div>
-                                <h3 className="font-black text-slate-700 group-hover:text-emerald-600 transition-colors">{user.name}</h3>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase border border-emerald-100">
-                                {user.role}
-                            </span>
-                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{user.joinedAt}</p>
-                        </div>
+
+                {!stats.recentUsers || stats.recentUsers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] mb-10 text-center h-full min-h-40">
+                    <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                      <Users className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
                     </div>
-                  ))}
-                </div>
+                    <p className="text-sm text-slate-500 font-bold">Belum ada anggota baru</p>
+                    <p className="text-xs text-slate-400 mt-1">Anggota yang baru mendaftar akan tampil di sini</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 p-6 space-y-4 shadow-sm mb-10 transition-all hover:shadow-md">
+                      {stats.recentUsers.map((user: any) => (
+                        <div
+                          key={user.id}
+                          className="flex items-center justify-between p-4 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 hover:bg-white hover:border-emerald-200 transition-all group"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="relative">
+                              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform shadow-sm">
+                                {user.avatar ? (
+                                  <img
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <Users className="w-6 h-6 text-emerald-500" />
+                                )}
+                              </div>
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full shadow-[0_0_0_2px_#ecfdf5]" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-black text-slate-800 group-hover:text-emerald-600 transition-colors uppercase tracking-tight truncate">
+                                {user.name}
+                              </h3>
+                              <p className="text-xs text-slate-400 font-bold lowercase tracking-wide truncate">
+                                {user.email}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 shadow-sm group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:border-emerald-100 transition-colors">
+                              Joined
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-black uppercase">
+                              {new Date(user.createdAt).toLocaleDateString(
+                                "id-ID",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </section>
             </div>
 
@@ -294,7 +405,7 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <span className="font-black text-2xl block drop-shadow-md">Administrator</span>
-                    <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest bg-emerald-600/30 px-2 py-0.5 rounded-md">IRMA Central Control</span>
+                    <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest bg-emerald-600/30 px-2 py-0.5 rounded-md">IRMA Administrator</span>
                   </div>
                 </div>
 
@@ -305,51 +416,105 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* System Alerts */}
+              {/* Instructor Activity Section */}
               <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-100 shadow-sm transition-all hover:shadow-md">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
-                            <Bell className="w-5 h-5 text-slate-800" />
+                            <History className="w-5 h-5 text-slate-800" />
                         </div>
-                        <h4 className="font-black text-slate-800 text-lg tracking-tight">System Log</h4>
+                        <h4 className="font-black text-slate-800 text-lg tracking-tight">Log Aktivitas Instruktur</h4>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                  {systemAlerts.map((alert) => (
-                    <div key={alert.id} className="flex gap-4 p-4 rounded-3xl bg-slate-50 border-2 border-slate-100 hover:bg-white hover:border-emerald-100 transition-all group">
-                        <div className={`mt-1 p-2 rounded-xl h-fit border-2 ${
-                          alert.type === 'warning' ? 'bg-emerald-50 border-emerald-100 text-emerald-500' : 
-                          alert.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-500' : 'bg-emerald-50 border-emerald-100 text-emerald-500'
-                        }`}>
-                          {alert.type === 'warning' ? <AlertCircle className="h-5 w-5" /> : 
-                           alert.type === 'success' ? <CheckCircle2 className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-black text-slate-700 leading-tight mb-1 text-sm group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{alert.message}</p>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{alert.time}</p>
-                        </div>
+                  {!stats.instructorActivities || stats.instructorActivities.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <History className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada aktivitas</p>
+                      <p className="text-xs text-slate-400 mt-1">Aktivitas instruktur terbaru akan tercatat di sini</p>
                     </div>
-                  ))}
+                  ) : (
+                    stats.instructorActivities.slice(0, 4).map((act: any) => (
+                      <div key={act.id} className="flex items-center gap-4 p-4 rounded-4xl bg-emerald-50/50 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 bg-white border-emerald-100 text-emerald-500 shadow-sm group-hover:scale-110 transition-transform`}>
+                            {act.type === 'material' && <BookOpen className="h-5 w-5" />}
+                            {act.type === 'schedule' && <Calendar className="h-5 w-5" />}
+                            {act.type === 'competition' && <Award className="h-5 w-5" />}
+                            {act.type === 'news' && <Newspaper className="h-5 w-5" />}
+                            {(!['material', 'schedule', 'competition', 'news'].includes(act.type)) && <History className="h-5 w-5" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-emerald-700 leading-tight mb-1 text-[13.5px] group-hover:text-emerald-600 transition-colors line-clamp-2">
+                              {act.title}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100/50 px-2 py-0.5 rounded-md">{act.user}</span>
+                              <span className="w-1 h-1 bg-emerald-200 rounded-full" />
+                              <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-slate-300" />
+                                {new Date(act.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-                
-                <button className="w-full mt-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 font-black text-xs uppercase tracking-widest rounded-2xl border-2 border-dashed border-slate-200 transition-all">
-                    Lihat Semua Log
-                </button>
               </div>
 
-              {/* Quick Actions */}
-              <div className="bg-[#FAF9F6] p-6 rounded-[2.5rem] border-4 border-slate-200 border-dashed text-center">
-                  <h4 className="font-black text-slate-400 text-xs uppercase tracking-[0.2em] mb-4">Quick Actions</h4>
-                  <div className="space-y-3">
-                      <button className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-700 hover:border-teal-400 hover:text-teal-600 transition-all shadow-sm">
-                          Backup Database
-                      </button>
-                      <button className="w-full py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-700 hover:border-emerald-400 hover:text-emerald-600 transition-all shadow-sm">
-                          System Update
-                      </button>
-                  </div>
+              {/* User Activity Section */}
+              <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-100 shadow-sm transition-all hover:shadow-md">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
+                            <History className="w-5 h-5 text-slate-800" />
+                        </div>
+                        <h4 className="font-black text-slate-800 text-lg tracking-tight">Log Aktivitas Anggota</h4>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                  {!stats.userActivities || stats.userActivities.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl text-center h-full min-h-40">
+                      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 mb-3 block">
+                        <Activity className="w-8 h-8 text-slate-300 mx-auto" strokeWidth={1.5} />
+                      </div>
+                      <p className="text-sm text-slate-500 font-bold">Belum ada aktivitas</p>
+                      <p className="text-xs text-slate-400 mt-1">Aktivitas anggota terbaru akan tercatat di sini</p>
+                    </div>
+                  ) : (
+                    stats.userActivities.slice(0, 4).map((act: any) => (
+                      <div key={act.id} className="flex items-center gap-4 p-4 rounded-4xl bg-emerald-50/50 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 bg-white border-emerald-100 text-emerald-500 shadow-sm group-hover:scale-110 transition-transform`}>
+                            {act.type === 'quiz_completed' && <Zap className="h-5 w-5" />}
+                            {act.type === 'material_read' && <Book className="h-5 w-5" />}
+                            {act.type === 'badge_earned' && <Award className="h-5 w-5" />}
+                            {act.type === 'forum_post' && <MessageSquare className="h-5 w-5" />}
+                            {act.type === 'level_up' && <TrendingUp className="h-5 w-5" />}
+                            {act.type === 'friend_added' && <UserPlus className="h-5 w-5" />}
+                            {act.type === 'attendance_marked' && <CheckCircle2 className="h-5 w-5" />}
+                            {(!['quiz_completed', 'material_read', 'badge_earned', 'forum_post', 'level_up', 'friend_added', 'attendance_marked'].includes(act.type)) && <History className="h-5 w-5" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-emerald-700 leading-tight mb-1 text-[13.5px] group-hover:text-emerald-600 transition-colors line-clamp-2">
+                              {act.title}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100/50 px-2 py-0.5 rounded-md">{act.user}</span>
+                              <span className="w-1 h-1 bg-emerald-200 rounded-full" />
+                              <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-slate-300" />
+                                {new Date(act.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -68,7 +68,7 @@ export default function CreateQuizPage() {
 
   const role = session?.user?.role?.toLowerCase();
   const isPrivileged =
-    role === "instruktur" || role === "admin" || role === "instructor";
+    role === "instruktur" || role === "admin" || role === "instructor" || role === "super_admin";
 
   // --- Question management ---
   const addQuestion = () => {
@@ -277,7 +277,6 @@ export default function CreateQuizPage() {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="Contoh: Quiz Bab 1 - Thaharah"
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -330,7 +329,6 @@ export default function CreateQuizPage() {
                         onChange={(e) => updateQuestion(qIdx, e.target.value)}
                         placeholder="Tulis pertanyaan di sini..."
                         rows={2}
-                        required
                       />
                     </div>
 

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: session.user.email },
     });
 
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Attempt to find the invitation
-    let invite = null;
+    let invite: any = null;
     if (token) {
       invite = await prisma.materialinvite.findUnique({
         where: { token },
@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
 
     // Sync with notifications
     try {
-      await prisma.notification.updateMany({
+      await prisma.notifications.updateMany({
         where: {
           OR: [
             { inviteToken: invite.token },
@@ -187,7 +187,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (materialWithProgram?.programId) {
-        await prisma.program_enrollment.upsert({
+        await prisma.program_enrollments.upsert({
           where: {
             programId_userId: {
               programId: materialWithProgram.programId,
@@ -196,6 +196,7 @@ export async function POST(req: NextRequest) {
           },
           update: {},
           create: {
+            id: crypto.randomUUID(),
             programId: materialWithProgram.programId,
             userId: user.id,
           },

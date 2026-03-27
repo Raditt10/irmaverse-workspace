@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const instructors = await prisma.user.findMany({
+    const instructors = await prisma.users.findMany({
       where: { role: "instruktur" },
       select: {
         id: true,

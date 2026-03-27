@@ -2,6 +2,7 @@
 import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { X, Upload, ZoomIn } from "lucide-react";
+import { useConfirm } from "@/lib/confirm-provider";
 
 interface ImageCropDialogProps {
   imageSrc: string;
@@ -74,6 +75,7 @@ export default function ImageCropDialog({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { alert: customAlert } = useConfirm();
 
   const onCropChange = (crop: { x: number; y: number }) => {
     setCrop(crop);
@@ -97,7 +99,11 @@ export default function ImageCropDialog({
       onCropComplete(croppedImageBlob);
     } catch (error) {
       console.error("Error cropping image:", error);
-      alert("Gagal memproses gambar");
+      customAlert({
+        title: "Gagal Proses",
+        message: "Terjadi kesalahan saat memproses gambar.",
+        confirmText: "Oke"
+      });
     } finally {
       setIsProcessing(false);
     }

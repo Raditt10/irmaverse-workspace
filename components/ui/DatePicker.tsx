@@ -49,13 +49,13 @@ export default function DatePicker({
 
   const handlePrevMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
     );
   };
 
   const handleNextMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
     );
   };
 
@@ -63,7 +63,7 @@ export default function DatePicker({
     const selectedDate = new Date(
       currentMonth.getFullYear(),
       currentMonth.getMonth(),
-      day
+      day,
     );
     const dateString = selectedDate.toISOString().split("T")[0];
     onChange?.(dateString);
@@ -72,11 +72,11 @@ export default function DatePicker({
 
   const formatDisplayDate = (dateString: string) => {
     if (!dateString) return placeholder;
-    
+
     // Validasi apakah string sudah memiliki format waktu (ISO)
     const hasTime = dateString.includes("T");
     const date = new Date(hasTime ? dateString : dateString + "T00:00:00");
-    
+
     if (isNaN(date.getTime())) return placeholder;
 
     const day = String(date.getDate()).padStart(2, "0");
@@ -87,7 +87,7 @@ export default function DatePicker({
 
   const daysInMonth = getDaysInMonth(currentMonth);
   const firstDay = getFirstDayOfMonth(currentMonth);
-  const days = [];
+  const days: Array<number | null> = [];
 
   for (let i = 0; i < firstDay; i++) {
     days.push(null);
@@ -156,7 +156,8 @@ export default function DatePicker({
 
             <div className="text-center">
               <div className="font-black text-lg text-slate-800">
-                {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                {monthNames[currentMonth.getMonth()]}{" "}
+                {currentMonth.getFullYear()}
               </div>
             </div>
 
@@ -193,10 +194,10 @@ export default function DatePicker({
                   !day
                     ? "text-slate-200 cursor-default"
                     : isToday(day)
-                    ? "bg-cyan-400 text-white border-2 border-cyan-600 shadow-[0_2px_0_0_#06b6d4] font-black"
-                    : isSelected(day)
-                    ? "bg-teal-400 text-white border-2 border-teal-600 shadow-[0_2px_0_0_#0f766e] font-black"
-                    : "text-slate-700 hover:bg-slate-100 border-2 border-transparent hover:border-slate-300"
+                      ? "bg-cyan-400 text-white border-2 border-cyan-600 shadow-[0_2px_0_0_#06b6d4] font-black"
+                      : isSelected(day)
+                        ? "bg-teal-400 text-white border-2 border-teal-600 shadow-[0_2px_0_0_#0f766e] font-black"
+                        : "text-slate-700 hover:bg-slate-100 border-2 border-transparent hover:border-slate-300"
                 }`}
               >
                 {day}

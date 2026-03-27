@@ -10,22 +10,38 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const isPrivileged = user.role === "instruktur" || user.role === "admin";
+    const isPrivileged =
+      user.role === "instruktur" ||
+      user.role === "admin" ||
+      user.role === "super_admin";
 
-    // 1. Standalone quizzes (materialId is null) — visible to everyone
-    const standaloneQuizzes = await prisma.material_quiz.findMany({
+    // Build a set of INACTIVE quiz IDs to exclude (non-privileged users only)
+    let inactiveQuizIdSet: Set<string> = new Set();
+    if (!isPrivileged) {
+      try {
+        const inactiveRows: any[] =
+          await prisma.$queryRaw`SELECT id FROM material_quizzes WHERE isActive = 0`;
+        inactiveQuizIdSet = new Set(inactiveRows.map((q) => String(q.id)));
+      } catch (e) {
+        // If column doesn't exist yet, show all quizzes (safe fallback)
+        console.warn("isActive column query failed, showing all quizzes:", e);
+      }
+    }
+
+    // 1. Standalone quizzes (materialId is null) — fetch all, filter later
+    const allStandaloneQuizzes = await prisma.material_quizzes.findMany({
       where: { materialId: null },
       include: {
-        creator: { select: { id: true, name: true, avatar: true } },
-        questions: { select: { id: true } },
-        attempts: {
+        users: { select: { id: true, name: true, avatar: true } },
+        quiz_questions: { select: { id: true } },
+        quiz_attempts: {
           where: { userId: session.user.id },
           orderBy: { completedAt: "desc" },
           take: 1,
@@ -35,17 +51,22 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    // 2. Material-bound quizzes — only from materials user has access to
+    // Filter inactive quizzes for regular users
+    const standaloneQuizzes = isPrivileged
+      ? allStandaloneQuizzes
+      : allStandaloneQuizzes.filter((q) => !inactiveQuizIdSet.has(q.id));
+
+    // 2. Material-bound quizzes
     let materialQuizzes: any[] = [];
 
     if (isPrivileged) {
-      // Instructors/admins can see all material quizzes
-      materialQuizzes = await prisma.material_quiz.findMany({
+      // Instructors/admins see all
+      materialQuizzes = await prisma.material_quizzes.findMany({
         where: { materialId: { not: null } },
         include: {
-          material: { select: { id: true, title: true } },
-          questions: { select: { id: true } },
-          attempts: {
+          material: { select: { id: true, title: true, thumbnailUrl: true } },
+          quiz_questions: { select: { id: true } },
+          quiz_attempts: {
             where: { userId: session.user.id },
             orderBy: { completedAt: "desc" },
             take: 1,
@@ -55,7 +76,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
       });
     } else {
-      // Regular users: only quizzes from materials they have accepted invites for
+      // Regular users: only active quizzes from accepted materials
       const acceptedInvites = await prisma.materialinvite.findMany({
         where: { userId: session.user.id, status: "accepted" },
         select: { materialId: true },
@@ -63,12 +84,12 @@ export async function GET(req: NextRequest) {
       const materialIds = acceptedInvites.map((i) => i.materialId);
 
       if (materialIds.length > 0) {
-        materialQuizzes = await prisma.material_quiz.findMany({
+        const allMaterialQuizzes = await prisma.material_quizzes.findMany({
           where: { materialId: { in: materialIds } },
           include: {
-            material: { select: { id: true, title: true } },
-            questions: { select: { id: true } },
-            attempts: {
+            material: { select: { id: true, title: true, thumbnailUrl: true } },
+            quiz_questions: { select: { id: true } },
+            quiz_attempts: {
               where: { userId: session.user.id },
               orderBy: { completedAt: "desc" },
               take: 1,
@@ -77,40 +98,72 @@ export async function GET(req: NextRequest) {
           },
           orderBy: { createdAt: "desc" },
         });
+        // Filter inactive quizzes
+        materialQuizzes = allMaterialQuizzes.filter(
+          (q) => !inactiveQuizIdSet.has(q.id),
+        );
       }
     }
 
+    const visibleQuizIds = new Set<string>([
+      ...standaloneQuizzes.map((q) => q.id),
+      ...materialQuizzes.map((q: any) => q.id),
+    ]);
+
+    // 3. Total XP earned from quizzes shown on this page only
+    const quizLogs = await prisma.activity_logs.findMany({
+      where: {
+        userId: session.user.id,
+        type: "quiz_completed",
+      },
+      select: {
+        xpEarned: true,
+        metadata: true,
+      },
+    });
+
+    const totalQuizXp = quizLogs.reduce((sum, log: any) => {
+      const quizId = log?.metadata?.quizId as string | undefined;
+      if (!quizId) return sum;
+      if (!visibleQuizIds.has(quizId)) return sum;
+      return sum + (log.xpEarned || 0);
+    }, 0);
+
     // Format results
-    const result = [
+    const quizzes = [
       ...standaloneQuizzes.map((q) => ({
         id: q.id,
         materialId: null,
         materialTitle: null,
         title: q.title,
         description: q.description,
-        questionCount: q.questions.length,
-        creatorName: q.creator?.name || "Unknown",
-        creatorAvatar: q.creator?.avatar || null,
+        questionCount: q.quiz_questions.length,
+        creatorName: q.users?.name || "Unknown",
+        creatorAvatar: q.users?.avatar || null,
         isStandalone: true,
         createdAt: q.createdAt,
-        lastAttempt: q.attempts[0] || null,
+        lastAttempt: q.quiz_attempts[0] || null,
       })),
       ...materialQuizzes.map((q: any) => ({
         id: q.id,
         materialId: q.materialId,
         materialTitle: q.material?.title || "Materi",
+        materialThumbnail: q.material?.thumbnailUrl || null,
         title: q.title,
         description: q.description,
-        questionCount: q.questions.length,
+        questionCount: q.quiz_questions?.length || 0,
         creatorName: null,
         creatorAvatar: null,
         isStandalone: false,
         createdAt: q.createdAt,
-        lastAttempt: q.attempts[0] || null,
+        lastAttempt: q.quiz_attempts?.[0] || null,
       })),
     ];
 
-    return NextResponse.json(result);
+    return NextResponse.json({
+      quizzes,
+      totalQuizXp,
+    });
   } catch (error) {
     console.error("Get all quizzes error:", error);
     return NextResponse.json(
@@ -128,10 +181,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: session.user.id },
     });
-    if (!user || (user.role !== "instruktur" && user.role !== "admin")) {
+    if (
+      !user ||
+      (user.role !== "instruktur" &&
+        user.role !== "admin" &&
+        user.role !== "super_admin")
+    ) {
       return NextResponse.json(
         { error: "Hanya instruktur atau admin yang bisa membuat quiz" },
         { status: 403 },
@@ -178,18 +236,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const quiz = await prisma.material_quiz.create({
+    const quiz = await prisma.material_quizzes.create({
       data: {
+        id: crypto.randomUUID(),
         materialId: null,
         creatorId: session.user.id,
         title: title.trim(),
         description: description?.trim() || null,
-        questions: {
+        updatedAt: new Date(),
+        quiz_questions: {
           create: questions.map((q: any, idx: number) => ({
+            id: crypto.randomUUID(),
             question: q.question.trim(),
             order: idx,
-            options: {
+            quiz_options: {
               create: q.options.map((o: any) => ({
+                id: crypto.randomUUID(),
                 text: o.text.trim(),
                 isCorrect: o.isCorrect === true,
               })),
@@ -198,8 +260,8 @@ export async function POST(req: NextRequest) {
         },
       },
       include: {
-        questions: {
-          include: { options: true },
+        quiz_questions: {
+          include: { quiz_options: true },
           orderBy: { order: "asc" },
         },
       },

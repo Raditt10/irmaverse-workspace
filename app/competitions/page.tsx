@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import DetailButton from "@/components/ui/DetailButton";
 import Toast from "@/components/ui/Toast";
 import AddButton from "@/components/ui/AddButton";
+import PageBanner from "@/components/ui/PageBanner";
 
 interface CompetitionItem {
   id: string;
@@ -49,7 +50,7 @@ const Competitions = () => {
 
   const router = useRouter();
   const { data: session } = useSession();
-  const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instructor";
+  const isPrivileged = session?.user?.role === "admin" || session?.user?.role === "instructor" || session?.user?.role === "super_admin";
 
   // Helper Toast
   const showToast = (message: string, type: "success" | "error") => {
@@ -113,32 +114,27 @@ const Competitions = () => {
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 px-6 lg:px-8 py-12 lg:ml-0">
+        <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             
             {/* Header */}
-            <div className="mb-8 lg:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex-1">
-                <h1 className="text-2xl lg:text-4xl font-black text-slate-800 tracking-tight mb-1.5 leading-tight">
-                  Info Perlombaan
-                </h1>
-                <p className="text-slate-500 font-medium text-xs lg:text-lg">
-                  Tunjukkan bakatmu di ajang bergengsi ini!
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {session?.user?.role === "instruktur" && (
-                  <AddButton
-                    label="Tambah Lomba"
+            <PageBanner
+              title="Info Perlombaan"
+              description="Tunjukkan bakatmu di ajang bergengsi ini!"
+              icon={Trophy}
+              tag="Perlombaan"
+              tagIcon={Trophy}
+              action={
+                (session?.user?.role === "instruktur" || isPrivileged) && (
+                  <button
                     onClick={() => router.push("/competitions/create")}
-                    icon={<Plus className="h-5 w-5" />}
-                    color="emerald"
-                    hideIcon={false}
-                  />
-                )}
-              </div>
-            </div>
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-emerald-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                  >
+                    <Plus className="h-5 w-5" strokeWidth={3} /> Tambah Lomba Baru
+                  </button>
+                )
+              }
+            />
 
             {/* Search Bar */}
             <div className="mb-8">
