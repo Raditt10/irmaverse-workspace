@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import DatePicker from "@/components/ui/DatePicker";
 import TimePicker from "@/components/ui/TimePicker";
@@ -447,7 +446,7 @@ const CreateSchedule = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       <Toast
         show={toast.show}

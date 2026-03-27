@@ -32,7 +32,6 @@ import {
 } from "lucide-react";
 import Sidebar from "@/components/ui/Sidebar";
 import DashboardHeader from "@/components/ui/Header";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 
 export default function AdminDashboard() {
@@ -521,7 +520,7 @@ export default function AdminDashboard() {
         </main>
       </div>
 
-      <ChatbotButton />
+      
     </div>
   );
 }

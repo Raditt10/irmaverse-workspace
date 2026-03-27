@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import Sidebar from "@/components/ui/Sidebar";
 import DashboardHeader from "@/components/ui/Header";
-import ChatbotButton from "@/components/ui/Chatbot";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/ui/Loading";
@@ -1117,7 +1116,7 @@ const Dashboard = () => {
           </div>
         </main>
       </div>
-      <ChatbotButton />
+      
     </div>
   );
 };

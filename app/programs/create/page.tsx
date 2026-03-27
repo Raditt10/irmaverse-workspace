@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import { Input } from "@/components/ui/InputText";
 import { Textarea } from "@/components/ui/textarea";
 import Toast from "@/components/ui/Toast";
@@ -533,7 +532,7 @@ const CreateProgram = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
       <Toast
         show={toast.show}
         message={toast.message}

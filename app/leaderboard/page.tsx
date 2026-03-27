@@ -3,7 +3,6 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/ui/Sidebar";
 import DashboardHeader from "@/components/ui/Header";
-import ChatbotButton from "@/components/ui/Chatbot";
 import LeaderboardClient from "@/components/ui/LeaderboardClient";
 import type { LeaderboardUser } from "@/components/ui/LeaderboardClient";
 import PageBanner from "@/components/ui/PageBanner";
@@ -98,7 +97,7 @@ const LeaderboardPage = async () => {
           />
         </main>
       </div>
-      <ChatbotButton />
+      
     </div>
   );
 };

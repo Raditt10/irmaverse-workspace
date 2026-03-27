@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import SearchInput from "@/components/ui/SearchInput";
@@ -253,7 +252,7 @@ const Competitions = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       {/* Toast Notification */}
       <Toast

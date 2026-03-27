@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import SearchInput from "@/components/ui/SearchInput";
 import EmptyState from "@/components/ui/EmptyState";
@@ -854,7 +853,7 @@ export default function KajianManagement() {
         </main>
       </div>
 
-      <ChatbotButton />
+      
     </div>
   );
 }

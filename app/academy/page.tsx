@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import Sidebar from "@/components/ui/Sidebar";
 import DashboardHeader from "@/components/ui/Header";
-import ChatbotButton from "@/components/ui/Chatbot";
 import AcademyLoading from "@/components/ui/Loading";
 
 export default function InstructorAcademy() {
@@ -522,7 +521,7 @@ export default function InstructorAcademy() {
         </main>
       </div>
 
-      <ChatbotButton />
+      
     </div>
   );
 }

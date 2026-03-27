@@ -25,6 +25,7 @@ import {
   Shield,
   Settings,
   ClipboardList,
+  Sparkles,
 } from "lucide-react";
 
 // Custom scrollbar styles - Cartoon Style
@@ -261,6 +262,11 @@ const Sidebar = () => {
       icon: Medal,
       label: "Info Perlombaan",
       path: "/competitions",
+    },
+    {
+      icon: Sparkles,
+      label: "Ci Irma",
+      path: "/ai-assistant",
     },
     // --- UPDATED SECTION: INSTRUKTUR & DAFTAR ANGGOTA ---
     ...(isInstruktur

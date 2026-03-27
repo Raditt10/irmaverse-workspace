@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import SearchInput from "@/components/ui/SearchInput";
 import Toast from "@/components/ui/Toast";
@@ -296,7 +295,7 @@ export default function AdminUsersPage() {
         </main>
       </div>
 
-      <ChatbotButton />
+      
 
       {/* Modal Add/Edit */}
       {showModal && (

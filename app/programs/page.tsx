@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import SuccessDataFound from "@/components/ui/SuccessDataFound";
 import SearchInput from "@/components/ui/SearchInput";
@@ -374,7 +373,7 @@ const OurPrograms = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       <CartoonConfirmDialog
         type="warning"

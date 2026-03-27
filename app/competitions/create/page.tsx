@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import CustomDropdown from "@/components/ui/CustomDropdown";
 import DashedAddButton from "@/components/ui/DashedAddButton";
 import { Input } from "@/components/ui/InputText";
@@ -744,7 +743,7 @@ const CreateCompetition = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       {/* Toast Notification */}
       <Toast

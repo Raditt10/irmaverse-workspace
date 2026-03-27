@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import SearchInput from "@/components/ui/SearchInput";
 import CategoryFilter from "@/components/ui/CategoryFilter";
 import {
@@ -537,7 +536,7 @@ const News = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

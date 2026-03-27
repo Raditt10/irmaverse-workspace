@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import Loading from "@/components/ui/Loading";
 import SearchInput from "@/components/ui/SearchInput";
 import CartoonNotification from "@/components/ui/Notification";
@@ -258,7 +257,7 @@ const Members = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       {/* --- TOAST --- */}
       {toast && (

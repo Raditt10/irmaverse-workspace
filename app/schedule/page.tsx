@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
 import SearchInput from "@/components/ui/SearchInput";
 import EmptyState from "@/components/ui/EmptyState";
 import Loading from "@/components/ui/Loading";
@@ -340,7 +339,7 @@ const Schedule = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+      
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
