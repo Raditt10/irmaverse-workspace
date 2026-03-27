@@ -114,7 +114,7 @@ const Competitions = () => {
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 px-6 lg:px-8 py-12 lg:ml-0">
+        <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-7xl mx-auto">
             
             {/* Header */}
@@ -125,15 +125,14 @@ const Competitions = () => {
               tag="Perlombaan"
               tagIcon={Trophy}
               action={
-                (session?.user?.role === "instruktur" || isPrivileged) ? (
-                  <AddButton
-                    label="Tambah Lomba"
+                (session?.user?.role === "instruktur" || isPrivileged) && (
+                  <button
                     onClick={() => router.push("/competitions/create")}
-                    icon={<Plus className="h-5 w-5" />}
-                    color="emerald"
-                    hideIcon={false}
-                  />
-                ) : undefined
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-emerald-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                  >
+                    <Plus className="h-5 w-5" strokeWidth={3} /> Tambah Lomba Baru
+                  </button>
+                )
               }
             />
 

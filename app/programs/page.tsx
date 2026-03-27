@@ -169,23 +169,20 @@ const OurPrograms = () => {
               tag="Program"
               tagIcon={GraduationCap}
               action={
-                isPrivileged ? (
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-wrap gap-3 text-xs font-bold">
-                      <div className="flex items-center gap-2 px-3 py-2 bg-white/20 text-white rounded-lg border border-white/30 shadow-sm backdrop-blur-sm">
-                        <GraduationCap className="h-3.5 w-3.5 text-white" />
-                        <span>{programs.length} Program</span>
-                      </div>
+                isPrivileged && (
+                  <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+                    <div className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-white/20 text-white font-black text-sm border-2 border-white/30 backdrop-blur-sm w-full max-w-[180px] md:w-auto justify-center mx-auto md:mx-0">
+                      <GraduationCap className="h-5 w-5" />
+                      <span>{programs.length} Program</span>
                     </div>
-                    <AddButton
-                      label="Buat Program"
+                    <button
                       onClick={() => router.push("/programs/create")}
-                      icon={<Plus className="h-5 w-5" />}
-                      color="emerald"
-                      hideIcon={false}
-                    />
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-teal-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                    >
+                      <Plus className="h-5 w-5" strokeWidth={3} /> Buat Program Baru
+                    </button>
                   </div>
-                ) : undefined
+                )
               }
             />
 

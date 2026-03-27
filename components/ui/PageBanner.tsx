@@ -44,7 +44,7 @@ export default function PageBanner({
         </div>
 
         {action && (
-          <div className="flex flex-col items-center md:items-end gap-2 shrink-0 z-10 w-full md:w-auto">
+          <div className="flex flex-col items-center md:items-end gap-3 shrink-0 z-10 w-full md:w-auto">
             {action}
           </div>
         )}

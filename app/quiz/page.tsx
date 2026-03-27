@@ -186,11 +186,9 @@ const QuizHome = () => {
       <DashboardHeader />
 
       <div className="flex flex-1">
-        <div className="hidden lg:block h-[calc(100vh-64px)] sticky top-16">
-          <Sidebar />
-        </div>
+        <Sidebar />
 
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+        <main className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
           {/* --- HERO BANNER --- */}
           <div className="bg-linear-to-r from-teal-500 to-emerald-400 rounded-4xl lg:rounded-[3rem] p-6 lg:p-10 border-4 border-teal-700 shadow-[0_8px_0_0_#0f766e] text-white relative overflow-hidden mb-10 group">
             <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700" />
@@ -214,18 +212,18 @@ const QuizHome = () => {
               </div>
 
               {isInstructor && isPrivileged && (
-                  <div className="flex flex-col gap-2 shrink-0 z-10">
+                  <div className="flex flex-col gap-3 shrink-0 z-10 w-full md:w-auto">
                     <button
                       onClick={() => router.push("/quiz/create")}
-                      className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-white text-teal-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all"
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-teal-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
                     >
-                      <Plus className="h-4 w-4" strokeWidth={3} /> Buat Quiz Baru
+                      <Plus className="h-5 w-5" strokeWidth={3} /> Buat Quiz Baru
                     </button>
                     <button
                       onClick={() => router.push("/quiz/manage")}
-                      className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-white/20 text-white font-black text-sm border-2 border-white/30 hover:bg-white/30 transition-all backdrop-blur-sm"
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white/20 text-white font-black text-sm border-2 border-white/30 hover:bg-white/30 transition-all backdrop-blur-sm w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
                     >
-                      <Settings className="h-4 w-4" strokeWidth={2.5} /> Kelola Quiz
+                      <Settings className="h-5 w-5" strokeWidth={2.5} /> Kelola Quiz
                     </button>
                   </div>
               )}

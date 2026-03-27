@@ -114,6 +114,11 @@ const Sidebar = () => {
     }
   }, [isExpanded, mounted]);
 
+  // Close mobile sidebar on route change to prevent stale scroll-lock
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
   useEffect(() => {
     const openHandler = () => setIsMobileOpen(true);
     const closeHandler = () => setIsMobileOpen(false);

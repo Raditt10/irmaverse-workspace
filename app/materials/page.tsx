@@ -238,6 +238,24 @@ const Materials = () => {
               icon={BookOpen}
               tag="Kajian"
               tagIcon={BookOpen}
+              action={
+                isPrivileged && (
+                  <>
+                    <button
+                      onClick={() => router.push("/materials/create")}
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-teal-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                    >
+                      <Plus className="h-5 w-5" strokeWidth={3} /> Buat Kajian Baru
+                    </button>
+                    <button
+                      onClick={() => router.push("/materials/rekapan")}
+                      className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white/20 text-white font-black text-sm border-2 border-white/30 hover:bg-white/30 transition-all backdrop-blur-sm w-full max-w-[180px] md:w-auto mx-auto md:mx-0"
+                    >
+                      <ClipboardList className="h-5 w-5" strokeWidth={2.5} /> Rekapan Kajian
+                    </button>
+                  </>
+                )
+              }
             />
 
             {/* --- LATEST MATERIAL CARD --- */}
@@ -360,19 +378,6 @@ const Materials = () => {
                     />
                   </div>
                 </div>
-
-                {/* Right Side: Desktop Add Button */}
-                {isPrivileged && (
-                  <div className="hidden md:block shrink-0">
-                    <AddButton
-                      label="Buat Kajian"
-                      onClick={() => router.push("/materials/create")}
-                      icon={<Plus className="h-5 w-5" />}
-                      color="emerald"
-                      hideIcon={false}
-                    />
-                  </div>
-                )}
               </div>
 
               <div className="space-y-4">

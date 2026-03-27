@@ -18,6 +18,7 @@ import {
   Activity,
   Users,
   MessageCircle,
+  BookMarked,
   GraduationCap,
   Shield,
   Clock
@@ -247,11 +248,11 @@ const InstructorDetail = () => {
                   <div className="mt-8">
                      <button 
                         onClick={() => router.push(`/instructors/chat?instructorId=${instructor.id}`)}
-                        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 border-b-4 border-emerald-700 hover:border-b-2 active:border-b-0 transition-all shadow-lg text-sm uppercase tracking-wide"
+                        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-teal-50 text-teal-600 font-black rounded-2xl border-2 border-teal-100 hover:bg-teal-100 hover:border-teal-200 active:scale-95 transition-all text-sm uppercase tracking-wide"
                      >
                         <MessageCircle className="h-5 w-5" />
-                        HUBUNGI INSTRUKTUR
-                     </button>
+                        Kirim Pesan
+                      </button>
                   </div>
                 </div>
               </div>
@@ -301,7 +302,7 @@ const InstructorDetail = () => {
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center border-2 border-emerald-100">
-                      <GraduationCap className="h-8 w-8 text-emerald-600" />
+                      <BookOpen className="h-8 w-8 text-emerald-600" />
                     </div>
                     <div>
                       <h2 className="text-2xl font-black text-slate-800 leading-none mb-1">
@@ -315,12 +316,15 @@ const InstructorDetail = () => {
                 </div>
 
                 {materials.length === 0 ? (
-                  <div className="text-center py-20 bg-slate-50 rounded-4xl border-2 border-dashed border-slate-200">
-                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                      <BookOpen className="h-10 w-10 text-slate-300" />
+                  <div className="text-center py-20 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100 flex flex-col items-center justify-center">
+                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-slate-50">
+                      <BookOpen className="h-8 w-8 text-slate-300" />
                     </div>
-                    <p className="text-slate-400 font-black text-sm uppercase tracking-wide">
-                      Belum ada kajian yang dibuat
+                    <p className="text-slate-500 font-bold text-sm mb-1">
+                      Belum ada kajian yang diselesaikan
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">
+                       Ikuti kajian dan selesaikan untuk melihat rekapan di sini
                     </p>
                   </div>
                 ) : (() => {
@@ -330,8 +334,16 @@ const InstructorDetail = () => {
                   const shown = tuntasMaterials.slice(0, 3);
 
                   if (tuntasMaterials.length === 0) return (
-                    <div className="text-center py-12 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                      <p className="text-slate-400 font-bold text-sm">Belum ada kajian yang tuntas</p>
+                    <div className="text-center py-16 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100 flex flex-col items-center justify-center">
+                      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-slate-50">
+                        <BookOpen className="h-8 w-8 text-slate-300" />
+                      </div>
+                      <p className="text-slate-500 font-bold text-sm mb-1">
+                        Belum ada kajian yang diselesaikan
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest text-center px-4">
+                        Ikuti kajian dan selesaikan untuk melihat rekapan di sini
+                      </p>
                     </div>
                   );
 

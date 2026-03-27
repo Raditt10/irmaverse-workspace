@@ -315,15 +315,14 @@ const News = () => {
               tag="Berita"
               tagIcon={Newspaper}
               action={
-                isPrivileged ? (
-                  <AddButton
-                    label="Buat Berita"
+                isPrivileged && (
+                  <button
                     onClick={() => router.push("/news/create")}
-                    icon={<Plus className="h-5 w-5" />}
-                    color="emerald"
-                    hideIcon={false}
-                  />
-                ) : undefined
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-emerald-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-[240px] md:w-auto mx-auto md:mx-0"
+                  >
+                    <Plus className="h-5 w-5" strokeWidth={3} /> Buat Berita Baru
+                  </button>
+                )
               }
             />
 

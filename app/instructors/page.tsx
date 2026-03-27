@@ -15,7 +15,6 @@ import {
   RefreshCcw, 
   Heart,
   Contact,
-  GraduationCap,
   Users
 } from "lucide-react";
 import Link from "next/link";
@@ -345,7 +344,7 @@ const Instructors = () => {
                                     <p className="font-black text-slate-700 text-sm leading-none">{instructor.kajianCount || 0}</p>
                                   </div>
                                   <div className="w-8 h-8 rounded-lg bg-white border-2 border-slate-100 flex items-center justify-center text-teal-500 shadow-sm group-hover:border-emerald-200 transition-all">
-                                    <GraduationCap className="w-4 h-4" />
+                                    <BookOpen className="w-4 h-4" />
                                   </div>
                                 </div>
                               </div>
@@ -361,7 +360,7 @@ const Instructors = () => {
                             {/* Footer Action - Member Style Profile Button */}
                             <div className="w-full mt-auto pt-4 border-t border-slate-50 group-hover:border-emerald-50 transition-colors space-y-3">
                               <Link
-                                href={`/u/${instructor.id}`}
+                                href={`/instructors/${instructor.id}`}
                                 className="w-full py-3 rounded-xl bg-white text-slate-600 font-black border-2 border-slate-100 shadow-[0_4px_0_0_#f1f5f9] hover:bg-slate-50 hover:border-slate-300 hover:shadow-none hover:translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-2.5 text-xs group/profile"
                               >
                                 <Contact className="w-4 h-4 text-slate-400 group-hover/profile:text-emerald-500 transition-colors" />
