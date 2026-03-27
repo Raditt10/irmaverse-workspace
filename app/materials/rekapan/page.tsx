@@ -465,13 +465,13 @@ const RekapanListPage = () => {
                     </div>
                   ) : (
                     filteredRekapan.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() =>
-                          router.push(`/materials/${item.materialId}/rekapan`)
-                        }
-                        className="bg-white rounded-[2.5rem] border-2 border-slate-200 p-6 hover:border-teal-400 hover:shadow-[0_12px_0_0_#34d399] transition-all duration-300 cursor-pointer group flex flex-col h-full relative overflow-hidden"
-                      >
+                        <div
+                          key={item.id}
+                          onClick={() =>
+                            router.push(`/materials/${item.materialId}/rekapan`)
+                          }
+                          className="bg-white rounded-[2.5rem] border-2 border-slate-200 p-8 hover:border-teal-400 hover:shadow-[0_12px_0_0_#34d399] transition-all duration-300 cursor-pointer group flex flex-col h-full relative overflow-hidden"
+                        >
                         {/* Background Decoration */}
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-teal-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl z-0"></div>
 
@@ -492,11 +492,11 @@ const RekapanListPage = () => {
                             )}
                           </div>
 
-                          <h3 className="text-xl font-black text-slate-800 leading-tight mb-3 group-hover:text-teal-600 transition-colors line-clamp-2">
+                          <h3 className="text-2xl font-black text-slate-800 leading-tight mb-4 group-hover:text-teal-600 transition-colors line-clamp-2">
                             {item.materialTitle}
                           </h3>
 
-                          <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6 line-clamp-3">
+                          <p className="text-base text-slate-500 font-medium leading-relaxed mb-6 line-clamp-3">
                             {item.contentPreview}
                           </p>
 

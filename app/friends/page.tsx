@@ -178,7 +178,7 @@ export default function FriendsPage() {
             title="Teman Belajar"
             description="Temukan dan berinteraksi dengan teman sesama pejuang ilmu."
             icon={Handshake}
-            tag="Koneksi"
+            tag="Bestie"
             tagIcon={Handshake}
             className="mb-8"
           />
@@ -267,11 +267,11 @@ export default function FriendsPage() {
                 )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
               {users.map((user) => (
                 <div
                   key={user.id}
-                  className="bg-white border-2 border-slate-200 rounded-4xl p-6 shadow-[0_6px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_6px_0_0_#34d399] transition-all duration-300 group relative overflow-hidden"
+                  className="bg-white border-2 border-slate-200 rounded-[2.5rem] p-8 shadow-[0_8px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_8px_0_0_#34d399] hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col"
                 >
                   {/* Status Indicator */}
                   <div className="absolute top-6 right-6 flex items-center gap-1.5">
@@ -288,8 +288,8 @@ export default function FriendsPage() {
                   </div>
 
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="relative">
-                      <Avatar className="h-16 w-16 border-4 border-slate-50 shadow-sm">
+                    <div className="relative group-hover:scale-105 transition-transform duration-500">
+                      <Avatar className="h-20 w-20 md:h-24 md:w-24 border-4 border-slate-50 shadow-md">
                         <AvatarImage
                           src={
                             user.avatar ||
@@ -297,25 +297,25 @@ export default function FriendsPage() {
                           }
                           alt={user.name || "User"}
                         />
-                        <AvatarFallback className="bg-emerald-500 text-white font-black text-xl">
+                        <AvatarFallback className="bg-emerald-500 text-white font-black text-2xl">
                           {(user.name || "U").substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-black text-slate-800 truncate group-hover:text-emerald-600 transition-colors">
+                      <h3 className="text-xl md:text-2xl font-black text-slate-800 truncate group-hover:text-emerald-600 transition-colors leading-tight">
                         {user.name || "Pengguna"}
                       </h3>
-                      <p className="text-xs font-bold text-slate-400 truncate mb-2">
+                      <p className="text-sm font-bold text-slate-400 truncate mb-3">
                         {user.email}
                       </p>
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded-lg border border-amber-100 text-[10px] font-black uppercase">
-                          <Zap className="h-3 w-3" fill="currentColor" />
+                        <div className="flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-xl border-2 border-amber-100 text-xs font-black uppercase">
+                          <Zap className="h-3.5 w-3.5" fill="currentColor" />
                           Lvl {user.level}
                         </div>
-                        <span className="text-[10px] font-black text-slate-300 uppercase">
+                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">
                           {user.points.toLocaleString()} XP
                         </span>
                       </div>
@@ -324,18 +324,18 @@ export default function FriendsPage() {
 
                   {/* Bio preview */}
                   {user.bio && (
-                    <p className="text-xs text-slate-500 font-medium mb-4 line-clamp-2 leading-relaxed">
-                      {user.bio}
+                    <p className="text-sm text-slate-500 font-bold mb-6 line-clamp-3 leading-relaxed italic border-l-4 border-emerald-100 pl-4 py-1">
+                      "{user.bio}"
                     </p>
                   )}
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 mt-auto">
                     <button
                       onClick={() => router.push(`/u/${user.id}`)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 text-slate-600 font-bold rounded-xl border-2 border-slate-100 hover:bg-slate-200 transition-colors text-xs"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-white text-slate-600 font-black rounded-2xl border-2 border-slate-200 border-b-4 hover:bg-slate-50 hover:border-slate-300 active:border-b-2 active:translate-y-0.5 transition-all text-sm"
                     >
-                      <UserIcon className="h-4 w-4" /> Profil
+                      <UserIcon className="h-5 w-5" /> Profil
                     </button>
                     {activeTab === "friends" &&
                       session?.user?.id !== user.id && (
@@ -343,11 +343,14 @@ export default function FriendsPage() {
                           onClick={() =>
                             router.push(`/friends/chat?userId=${user.id}`)
                           }
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-xl border-2 border-emerald-200 hover:bg-emerald-100 transition-colors text-xs"
+                          className="w-full flex items-center justify-center gap-2 py-3.5 bg-teal-400 text-white font-black rounded-2xl border-2 border-teal-600 border-b-4 hover:bg-teal-500 hover:shadow-lg active:border-b-2 active:translate-y-0.5 transition-all text-sm shadow-sm"
                         >
-                          <MessageCircle className="h-4 w-4" /> Chat
+                          <MessageCircle className="h-5 w-5" /> Chat
                         </button>
                       )}
+                  </div>
+                  
+                  <div className="mt-4">
                     {session?.user?.id !== user.id && ( // Hide if it's ourself (rare but good check)
                       <FollowButton
                         targetUserId={user.id}
@@ -360,8 +363,8 @@ export default function FriendsPage() {
                           activeTab === "friends" ||
                           (activeTab === "followers" && !!user.iFollowBack)
                         }
-                        size="sm"
-                        className="flex-1 py-1.5"
+                        size="lg"
+                        className="w-full"
                         onStatusChange={() => {
                           fetchCounts();
                         }}

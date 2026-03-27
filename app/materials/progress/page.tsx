@@ -524,11 +524,11 @@ export default function KajianManagement() {
                                     isExpanded ? null : user.id
                                   )
                                 }
-                                className="flex items-center gap-2.5 md:gap-4 px-4 md:px-6 py-3 md:py-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                className="flex items-center gap-3 md:gap-6 px-4 md:px-8 py-5 md:py-7 cursor-pointer hover:bg-slate-50 transition-all duration-300"
                               >
                                 {/* Avatar */}
                                 <div className="relative shrink-0">
-                                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden">
+                                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden shadow-sm grow-0 shrink-0">
                                     {user.avatar ? (
                                       <img
                                         src={user.avatar}
@@ -536,7 +536,7 @@ export default function KajianManagement() {
                                         className="w-full h-full object-cover"
                                       />
                                     ) : (
-                                      <span className="text-emerald-600 font-black text-lg">
+                                      <span className="text-emerald-600 font-black text-2xl">
                                         {(user.name || "?")
                                           .charAt(0)
                                           .toUpperCase()}
@@ -556,10 +556,10 @@ export default function KajianManagement() {
 
                                 {/* User Info */}
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-black text-slate-800 truncate text-sm">
+                                  <h4 className="font-black text-slate-800 truncate text-lg md:text-xl tracking-tight">
                                     {user.name || "Tanpa Nama"}
                                   </h4>
-                                  <p className="text-xs text-slate-400 font-bold truncate">
+                                  <p className="text-sm text-slate-400 font-bold truncate mt-0.5">
                                     {user.email}
                                   </p>
                                 </div>
@@ -613,7 +613,7 @@ export default function KajianManagement() {
                                   {/* User Profile Header */}
                                   <div className="px-4 md:px-6 pt-4 md:pt-6 pb-4">
                                       <div className="bg-white rounded-2xl md:rounded-3xl border-2 border-slate-100 shadow-[0_4px_0_0_#e2e8f0] p-4 md:p-6">
-                                      <div className="flex flex-col md:flex-row md:items-center gap-5">
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
                                         {/* Big Avatar */}
                                         <div className="flex items-center gap-4 flex-1 min-w-0">
                                           <div className="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
