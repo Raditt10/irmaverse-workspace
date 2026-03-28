@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import Toast from "@/components/ui/Toast";
 import Loading from "@/components/ui/Loading";
 import {
@@ -325,7 +325,7 @@ const AttendanceList = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
 
       <Toast
         show={toast.show}

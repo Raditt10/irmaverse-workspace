@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import DatePicker from "@/components/ui/DatePicker";
 import TimePicker from "@/components/ui/TimePicker";
 import CategoryFilter from "@/components/ui/CategoryFilter";
@@ -869,7 +869,7 @@ const EditMaterial = () => {
                 {/* Upload Thumbnail */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Thumbnail Kajian
+                    Thumbnail Kajian <span className="text-red-500 ml-1 font-bold">*</span>
                   </label>
                   <div className="relative group cursor-pointer">
                     <input
@@ -1136,7 +1136,7 @@ const EditMaterial = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
       <Toast
         show={toast.show}
         message={toast.message}

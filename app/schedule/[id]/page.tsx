@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import ButtonEdit from "@/components/ui/ButtonEdit";
 import DeleteButton from "@/components/ui/DeleteButton";
 import Loading from "@/components/ui/Loading";
@@ -185,7 +185,7 @@ const ScheduleDetail = () => {
       <DashboardHeader />
       <div className="flex">
         <Sidebar />
-        <ChatbotButton />
+
         
         <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
           <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
@@ -386,7 +386,7 @@ const ScheduleDetail = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
 
       {/* Confirm Delete Dialog */}
       <CartoonConfirmDialog

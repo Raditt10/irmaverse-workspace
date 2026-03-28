@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import BackButton from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/InputText";
 import { useSession } from "next-auth/react";
@@ -541,7 +541,7 @@ const Absensi = () => {
                     </div>
                 </div>
             </div>
-            <ChatbotButton />
+
             <Toast
                 show={toast.show}
                 message={toast.message}

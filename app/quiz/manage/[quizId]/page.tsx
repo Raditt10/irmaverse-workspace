@@ -379,7 +379,7 @@ export default function EditQuizPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="block text-xs font-bold text-slate-600 ml-1">
-                      Judul Quiz <span className="text-red-400">*</span>
+                      Judul Quiz <span className="text-red-500 ml-1 font-bold">*</span>
                     </label>
                     <Input
                       type="text"
@@ -419,7 +419,7 @@ export default function EditQuizPage() {
                           </span>
                         </div>
                         <span className="text-sm font-black text-slate-600 uppercase tracking-wide">
-                          Soal {qIdx + 1}
+                          Soal {qIdx + 1} <span className="text-red-500 ml-1 font-bold">*</span>
                         </span>
                       </div>
                       <button

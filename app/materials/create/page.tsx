@@ -1007,7 +1007,7 @@ const CreateMaterial = () => {
                 {/* Upload Thumbnail */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    Thumbnail Kajian
+                    Thumbnail Kajian <span className="text-red-500 ml-1 font-bold">*</span>
                   </label>
                   <div className="relative group cursor-pointer">
                     <input
@@ -1062,8 +1062,7 @@ const CreateMaterial = () => {
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1]">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-black text-slate-700 flex items-center gap-2">
-                      <Users className="h-5 w-5 text-amber-500" /> Undang Peserta{" "}
-                      <span className="text-red-400 text-sm hidden sm:inline">(wajib min. 1)</span>
+                      <Users className="h-5 w-5 text-amber-500" /> Undang Peserta <span className="text-red-500 ml-1 font-bold">*</span>
                     </h2>
                     <button 
                       type="button" 

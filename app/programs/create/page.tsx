@@ -216,7 +216,7 @@ const CreateProgram = () => {
                             name="duration"
                             value={formData.duration}
                             onChange={handleInputChange}
-                            placeholder="e.g. 12 Sesi / 3 Bulan"
+                            placeholder="Contoh: 3 Bulan"
                             className="pl-12 lg:pl-14"
                           />
                         </div>
@@ -399,7 +399,7 @@ const CreateProgram = () => {
                 {/* Thumbnail Card */}
                 <div className="bg-white p-5 lg:p-6 rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] lg:shadow-[0_8px_0_0_#cbd5e1] text-center">
                   <label className="block text-xs lg:text-sm font-bold text-slate-600 mb-3 lg:mb-4">
-                    TUmbnail Program
+                    Thumbnail Program <span className="text-red-500 ml-1 font-bold">*</span>
                   </label>
                   <div className="relative group cursor-pointer">
                     <input
@@ -489,8 +489,8 @@ const CreateProgram = () => {
                 </div>
 
                 {/* Info Card */}
-                <div className="bg-blue-50 p-5 rounded-[2rem] border-2 border-blue-200 border-dashed">
-                  <p className="text-xs text-blue-700 font-bold leading-relaxed text-center">
+                <div className="bg-yellow-50 p-5 rounded-[2rem] border-2 border-yellow-200 border-dashed">
+                  <p className="text-xs text-yellow-700 font-bold leading-relaxed text-center">
                     💡 Setelah Program dibuat, Anda dapat menambahkan materi ke
                     dalam Program melalui halaman <strong>Buat Kajian</strong>.
                   </p>

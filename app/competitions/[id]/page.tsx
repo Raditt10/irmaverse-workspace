@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import { useSession } from "next-auth/react";
 import CartoonConfirmDialog from "@/components/ui/ConfirmDialog";
 import Toast from "@/components/ui/Toast";
@@ -503,7 +503,7 @@ const CompetitionDetail = () => {
             </div>
           </div>
         </div>
-        <ChatbotButton />
+
       </div>
 
       <CartoonConfirmDialog

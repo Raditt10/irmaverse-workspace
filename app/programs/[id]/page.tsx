@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import Toast from "@/components/ui/Toast";
 import CartoonConfirmDialog from "@/components/ui/ConfirmDialog"; // Import Confirm Dialog
 import Loading from "@/components/ui/Loading";
@@ -789,7 +789,7 @@ const ProgramDetail = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
       <Toast
         show={toast.show}
         message={toast.message}

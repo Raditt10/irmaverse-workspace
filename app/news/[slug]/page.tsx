@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import BackButton from "@/components/ui/BackButton";
 import { Calendar, Eye, Share2, Bookmark } from "lucide-react";
 import Link from "next/link";
@@ -317,7 +317,7 @@ export default function NewsDetailPage() {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
       <Toast
         show={toast.show}
         message={toast.message}

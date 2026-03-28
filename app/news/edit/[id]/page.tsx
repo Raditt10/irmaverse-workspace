@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import { ArrowLeft, Eye, Edit3, Image as ImageIcon, Sparkles, Save } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -412,7 +412,7 @@ export default function EditNewsPage() {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
       <Toast 
         show={toastData.show} 
         message={toastData.message} 

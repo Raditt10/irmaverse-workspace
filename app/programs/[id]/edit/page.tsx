@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import Toast from "@/components/ui/Toast";
 import Loading from "@/components/ui/Loading";
 import {
@@ -271,7 +271,7 @@ const EditProgram = () => {
                             name="duration"
                             value={formData.duration}
                             onChange={handleInputChange}
-                            placeholder="e.g. 12 Sesi / 3 Bulan"
+                            placeholder="Contoh: 3 Bulan"
                             className="pl-12 lg:pl-14"
                           />
                         </div>
@@ -463,7 +463,7 @@ const EditProgram = () => {
                   {/* Thumbnail */}
                   <div className="bg-white p-6 rounded-[2.5rem] border-2 border-slate-200 shadow-[0_8px_0_0_#cbd5e1] text-center">
                     <label className="block text-sm font-bold text-slate-600 mb-4">
-                      Banner Program
+                      Banner Program <span className="text-red-500 ml-1 font-bold">*</span>
                     </label>
                     <div className="relative group overflow-hidden rounded-3xl border-2 border-dashed border-slate-300 aspect-video flex flex-col items-center justify-center bg-slate-50 hover:bg-emerald-50 hover:border-emerald-400 transition-all cursor-pointer">
                       <input
@@ -532,7 +532,7 @@ const EditProgram = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
       <Toast
         show={toast.show}
         message={toast.message}

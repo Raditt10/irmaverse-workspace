@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import Loading from "@/components/ui/Loading";
 import BackButton from "@/components/ui/BackButton";
 import FollowButton from "@/components/ui/FollowButton";
@@ -732,7 +732,7 @@ export default function UserPublicProfile() {
           </div>
         </main>
       </div>
-      <ChatbotButton />
+
     </div>
   );
 }

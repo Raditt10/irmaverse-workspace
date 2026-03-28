@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import DashboardHeader from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
-import ChatbotButton from "@/components/ui/Chatbot";
+
 import Loading from "@/components/ui/Loading";
 import Toast from "@/components/ui/Toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -321,7 +321,7 @@ const RekapanEditPage = () => {
           </div>
         </div>
       </div>
-      <ChatbotButton />
+
 
       <Toast
         show={toast.show}
