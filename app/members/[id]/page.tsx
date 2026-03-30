@@ -280,7 +280,7 @@ const MemberDetail = () => {
                     </Avatar>
                   </div>
                   <div className="text-center mb-4">
-                    <h1 className="text-2xl font-black text-slate-800 mb-1">
+                    <h1 className="text-2xl font-black text-slate-800 mb-1 wrap-break-word">
                       {profile.name || "Pengguna"}
                     </h1>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-black text-emerald-700 uppercase tracking-wider">
@@ -307,7 +307,7 @@ const MemberDetail = () => {
                     )}
                   </div>
                   {profile.bio && (
-                    <p className="text-sm text-slate-600 text-center leading-relaxed mb-6 px-2">
+                    <p className="text-sm text-slate-600 text-center leading-relaxed mb-6 px-2 wrap-break-word">
                       {profile.bio}
                     </p>
                   )}
