@@ -34,11 +34,11 @@ export default function PageBanner({
             </div>
           )}
           
-          <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-2 flex items-center gap-3 justify-center md:justify-start w-full">
+          <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-2 flex items-center gap-3 justify-center md:justify-start w-full wrap-break-word">
             {title}
           </h1>
           
-          <p className="text-teal-50 font-medium text-sm lg:text-base max-w-xl mx-auto md:mx-0">
+          <p className="text-teal-50 font-medium text-sm lg:text-base max-w-xl mx-auto md:mx-0 wrap-break-word">
             {description}
           </p>
         </div>

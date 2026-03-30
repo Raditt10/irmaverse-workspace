@@ -255,10 +255,10 @@ const CompetitionDetail = () => {
                        Kategori: {competition.category}
                      </span>
                   </div>
-                  <h1 className="text-3xl md:text-5xl font-black text-white mb-3 drop-shadow-md leading-tight">
+                  <h1 className="text-3xl md:text-5xl font-black text-white mb-3 drop-shadow-md leading-tight wrap-break-word">
                     {competition.title}
                   </h1>
-                  <p className="text-slate-100 text-sm md:text-lg font-medium max-w-2xl line-clamp-2">
+                  <p className="text-slate-100 text-sm md:text-lg font-medium max-w-2xl line-clamp-2 wrap-break-word">
                     {competition.description}
                   </p>
                 </div>

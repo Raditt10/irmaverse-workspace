@@ -126,7 +126,7 @@ export default function NewsDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <Loading text="Memuat berita..." size="lg" />
       </div>
     );
@@ -134,7 +134,7 @@ export default function NewsDetailPage() {
 
   if (!news) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-500 mb-4">Berita tidak ditemukan</p>
           <BackButton onClick={() => window.history.back()} />
@@ -151,7 +151,7 @@ export default function NewsDetailPage() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100"
+      className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100"
       style={{
 
       }}
@@ -194,7 +194,7 @@ export default function NewsDetailPage() {
                 </div>
 
                 {/* Title */}
-                <h1 className="text-4xl lg:text-5xl font-black text-slate-800 mb-4">
+                <h1 className="text-4xl lg:text-5xl font-black text-slate-800 mb-4 wrap-break-word">
                   {news.title}
                 </h1>
 
@@ -220,16 +220,16 @@ export default function NewsDetailPage() {
                   <ReactMarkdown
                     components={{
                       h1: ({ node, ...props }) => (
-                        <h1 className="text-3xl font-bold text-slate-800 mt-6 mb-4" {...props} />
+                        <h1 className="text-3xl font-bold text-slate-800 mt-6 mb-4 wrap-break-word" {...props} />
                       ),
                       h2: ({ node, ...props }) => (
-                        <h2 className="text-2xl font-bold text-slate-800 mt-6 mb-4" {...props} />
+                        <h2 className="text-2xl font-bold text-slate-800 mt-6 mb-4 wrap-break-word" {...props} />
                       ),
                       h3: ({ node, ...props }) => (
-                        <h3 className="text-xl font-bold text-slate-800 mt-4 mb-3" {...props} />
+                        <h3 className="text-xl font-bold text-slate-800 mt-4 mb-3 wrap-break-word" {...props} />
                       ),
                       p: ({ node, ...props }) => (
-                        <p className="text-slate-700 leading-7 mb-4" {...props} />
+                        <p className="text-slate-700 leading-7 mb-4 wrap-break-word" {...props} />
                       ),
                       strong: ({ node, ...props }) => (
                         <strong className="font-bold text-slate-900" {...props} />

@@ -291,10 +291,10 @@ const ProgramDetail = () => {
                       {program.duration}
                     </span>
                   </div>
-                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-3 drop-shadow-md leading-tight">
+                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-3 drop-shadow-md leading-tight wrap-break-word">
                     {program.title}
                   </h1>
-                  <p className="text-slate-200 text-sm md:text-lg font-medium max-w-3xl line-clamp-2 leading-relaxed">
+                  <p className="text-slate-200 text-sm md:text-lg font-medium max-w-3xl line-clamp-2 leading-relaxed wrap-break-word">
                     {program.description}
                   </p>
                 </div>

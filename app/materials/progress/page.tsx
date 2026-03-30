@@ -324,11 +324,11 @@ export default function KajianManagement() {
                               {selectedProgram.grade}
                             </span>
                           </div>
-                          <h3 className="text-2xl md:text-3xl font-black drop-shadow-md">
+                           <h3 className="text-2xl md:text-3xl font-black drop-shadow-md wrap-break-word">
                             {selectedProgram.title}
                           </h3>
                           {selectedProgram.description && (
-                            <p className="text-emerald-50 text-sm mt-2 max-w-xl leading-relaxed font-medium">
+                            <p className="text-emerald-50 text-sm mt-2 max-w-xl leading-relaxed font-medium wrap-break-word">
                               {selectedProgram.description}
                             </p>
                           )}

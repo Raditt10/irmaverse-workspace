@@ -237,10 +237,10 @@ const ScheduleDetail = () => {
                   <div className="mb-3 md:mb-4">
                     {getStatusBadge(schedule.status || "")}
                   </div>
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-2 md:mb-3 leading-tight drop-shadow-md text-balance">
+                   <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-2 md:mb-3 leading-tight drop-shadow-md text-balance wrap-break-word">
                     {schedule.title}
                   </h1>
-                  <p className="text-slate-200 text-sm md:text-lg font-medium max-w-3xl line-clamp-2 leading-relaxed">
+                  <p className="text-slate-200 text-sm md:text-lg font-medium max-w-3xl line-clamp-2 leading-relaxed wrap-break-word">
                     {schedule.description}
                   </p>
                 </div>
@@ -302,7 +302,7 @@ const ScheduleDetail = () => {
                         <h3 className="text-lg md:text-2xl font-black text-slate-800">Deskripsi Kegiatan</h3>
                     </div>
                     <div className="prose prose-slate max-w-none">
-                        <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-lg whitespace-pre-line text-justify md:text-left">
+                        <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-lg whitespace-pre-line text-justify md:text-left wrap-break-word">
                             {schedule.fullDescription}
                         </p>
                     </div>

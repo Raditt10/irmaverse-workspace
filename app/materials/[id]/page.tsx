@@ -334,11 +334,11 @@ const MaterialDetail = () => {
                   </span>
                 </div>
 
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 drop-shadow-xl leading-tight tracking-tight">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-4 drop-shadow-xl leading-tight tracking-tight wrap-break-word">
                   {material.title}
                 </h1>
 
-                <p className="text-slate-300 font-bold text-lg md:text-xl max-w-2xl leading-relaxed drop-shadow-md">
+                <p className="text-slate-300 font-bold text-lg md:text-xl max-w-2xl leading-relaxed drop-shadow-md wrap-break-word">
                   {material.description
                     ? material.description.split("\n")[0]
                     : "Deskripsi materi tidak tersedia..."}
@@ -425,7 +425,7 @@ const MaterialDetail = () => {
                     </h2>
                   </div>
 
-                  <p className="text-slate-600 font-bold leading-relaxed mb-8 whitespace-pre-line text-lg">
+                  <p className="text-slate-600 font-bold leading-relaxed mb-8 whitespace-pre-line text-lg wrap-break-word">
                     {material.description}
                   </p>
 
