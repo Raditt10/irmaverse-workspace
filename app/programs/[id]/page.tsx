@@ -28,6 +28,7 @@ import {
   Edit,
   Trash2,
   Share2,
+  Lock,
 } from "lucide-react";
 
 interface MaterialItem {
@@ -71,6 +72,10 @@ interface Program {
     total: number;
     percentage: number;
   };
+  stageOrder: number | null;
+  totalStages: number;
+  isLocked: boolean;
+  prerequisiteProgram: { id: string; title: string } | null;
 }
 
 const ProgramDetail = () => {
@@ -274,22 +279,50 @@ const ProgramDetail = () => {
                     "https://picsum.photos/seed/program/1200/600"
                   }
                   alt={program.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${
+                    program.isLocked ? "blur-sm opacity-80" : ""
+                  }`}
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
 
+                {program.isLocked && (
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-[85%] lg:-translate-y-[65%] flex flex-col items-center justify-center z-10 pointer-events-none px-4">
+                    <div className="flex flex-col items-center gap-2 lg:gap-3">
+                      <div className="p-3.5 lg:p-6 bg-white/95 rounded-3xl lg:rounded-4xl border-2 border-white shadow-2xl backdrop-blur-md">
+                        <Lock className="h-5 w-5 lg:h-10 lg:w-10 text-slate-600" strokeWidth={2.5} />
+                      </div>
+                      <span className="text-[10px] sm:text-sm lg:text-base font-black text-white bg-slate-900/60 px-4 sm:px-6 py-2 sm:py-2.5 rounded-2xl border border-white/20 backdrop-blur-md shadow-lg uppercase tracking-wider text-center max-w-full sm:max-w-md lg:max-w-[80%] wrap-break-word font-sans">
+                        {program.prerequisiteProgram 
+                          ? `Program ini tidak dapat kamu akses, selesaikan program "${program.prerequisiteProgram.title}" sebelumnya.`
+                          : "Program Terkunci"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-10">
                   <div className="flex flex-wrap items-center gap-3 mb-3 lg:mb-4">
-                    <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-white/90 text-slate-800 border-2 border-white uppercase tracking-wide backdrop-blur-sm">
+                    <span className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black bg-white/90 text-slate-800 border-2 border-white uppercase tracking-wide backdrop-blur-sm">
                       {program.category}
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-white/90 text-slate-800 border-2 border-white uppercase tracking-wide backdrop-blur-sm">
-                      Level: {program.level}
+                    <span className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black bg-white/90 text-slate-800 border-2 border-white uppercase tracking-wide backdrop-blur-sm">
+                      {program.level}
                     </span>
-                    <span className="px-3 py-1.5 rounded-xl text-xs font-black bg-teal-500/90 text-white border-2 border-teal-400 uppercase tracking-wide backdrop-blur-sm flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" strokeWidth={3} />
+                    {program.stageOrder && (
+                      <span className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black bg-emerald-500 text-white border-2 border-emerald-400 uppercase tracking-wide backdrop-blur-sm flex items-center gap-1 sm:gap-1.5">
+                        Tahap {program.stageOrder}{program.totalStages > 0 ? ` / ${program.totalStages}` : ""}
+                      </span>
+                    )}
+                    <span className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black bg-teal-500/90 text-white border-2 border-teal-400 uppercase tracking-wide backdrop-blur-sm flex items-center gap-1 sm:gap-1.5">
+                      <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={3} />
                       {program.duration}
                     </span>
+                    {program.isLocked && (
+                      <span className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[9px] sm:text-xs font-black bg-amber-500 text-white border-2 border-amber-400 uppercase tracking-wide backdrop-blur-sm flex items-center gap-1 sm:gap-1.5">
+                        <Lock className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={3} />
+                        Terkunci
+                      </span>
+                    )}
                   </div>
                   <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-3 drop-shadow-md leading-tight wrap-break-word">
                     {program.title}
@@ -381,7 +414,7 @@ const ProgramDetail = () => {
                   </div>
 
                   {program.materials.length === 0 ? (
-                    <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-[2rem] bg-slate-50/30">
+                    <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-4xl bg-slate-50/30">
                       <div className="w-16 h-16 bg-white rounded-3xl border-2 border-slate-100 flex items-center justify-center mx-auto mb-4 shadow-sm">
                         <BookOpen className="w-8 h-8 text-slate-300" />
                       </div>
@@ -414,7 +447,7 @@ const ProgramDetail = () => {
                                       router.push(`/materials/${materialForThisSlot.id}`);
                                     }
                                   }}
-                                  className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 transition-all group cursor-pointer ${
+                                  className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-4xl border-2 transition-all group cursor-pointer ${
                                     materialForThisSlot.isCompleted
                                       ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-300"
                                       : "bg-slate-50 border-slate-100 hover:border-teal-200 hover:bg-teal-50/30"
@@ -502,7 +535,7 @@ const ProgramDetail = () => {
                             return (
                               <div
                                 key={`empty-${num}`}
-                                className="flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 border-dashed border-slate-200 bg-white/50 opacity-70 transition-all"
+                                className="flex gap-4 md:gap-6 p-5 md:p-6 rounded-4xl border-2 border-dashed border-slate-200 bg-white/50 opacity-70 transition-all"
                               >
                                 {/* Step number */}
                                 <div className="flex flex-col items-center gap-2">
@@ -552,7 +585,7 @@ const ProgramDetail = () => {
                                 router.push(`/materials/${material.id}`);
                               }
                             }}
-                            className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-[2rem] border-2 transition-all group cursor-pointer ${
+                            className={`flex gap-4 md:gap-6 p-5 md:p-6 rounded-4xl border-2 transition-all group cursor-pointer ${
                               material.isCompleted
                                 ? "bg-emerald-50/50 border-emerald-200 hover:border-emerald-300"
                                 : "bg-slate-50 border-slate-100 hover:border-teal-200 hover:bg-teal-50/30"
@@ -753,26 +786,44 @@ const ProgramDetail = () => {
 
                 {/* CTA Enroll */}
                 {!program.isEnrolled && !isPrivileged && (
-                  <div className="bg-linear-to-br from-teal-400 to-cyan-400 rounded-[2.5rem] p-6 lg:p-8 text-white border-2 border-teal-600 shadow-[0_6px_0_0_#0f766e] text-center relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
-                    <GraduationCap className="h-10 w-10 mx-auto mb-3 text-white/80" />
-                    <h3 className="text-2xl font-black mb-2 relative z-10">
-                      Tertarik Bergabung?
+                  <div className={`rounded-[2.5rem] p-6 lg:p-8 text-white border-2 shadow-[0_6px_0_0] text-center relative overflow-hidden ${
+                    program.isLocked 
+                      ? "bg-slate-100 border-slate-300 shadow-slate-200 text-slate-400" 
+                      : "bg-linear-to-br from-teal-400 to-cyan-400 border-teal-600 shadow-[#0f766e]"
+                  }`}>
+                    {!program.isLocked && <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />}
+                    <div className={`h-10 w-10 mx-auto mb-3 ${program.isLocked ? "text-slate-300" : "text-white/80"}`}>
+                      {program.isLocked ? <Lock className="w-full h-full" /> : <GraduationCap className="w-full h-full" />}
+                    </div>
+                    <h3 className={`text-2xl font-black mb-2 relative z-10 ${program.isLocked ? "text-slate-600" : "text-white"}`}>
+                      {program.isLocked ? "Program Terkunci" : "Tertarik Bergabung?"}
                     </h3>
-                    <p className="text-teal-50 text-sm font-bold mb-6 leading-relaxed relative z-10">
-                      Daftar untuk mengikuti Program kami dan mulai belajar.
+                    <p className={`text-sm font-bold mb-6 leading-relaxed relative z-10 ${program.isLocked ? "text-slate-400" : "text-teal-50"}`}>
+                      {program.isLocked 
+                        ? `Selesaikan program "${program.prerequisiteProgram?.title}" terlebih dahulu untuk membuka akses program ini.`
+                        : "Daftar untuk mengikuti Program kami dan mulai belajar."
+                      }
                     </p>
-                    <button
-                      onClick={handleEnroll}
-                      disabled={enrolling}
-                      className="w-full py-4 rounded-2xl bg-white text-teal-600 font-black border-2 border-teal-100 shadow-lg hover:bg-teal-50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10 disabled:opacity-50"
-                    >
-                      {enrolling ? (
-                        <Sparkles className="h-5 w-5 animate-spin" />
-                      ) : (
-                        "Daftar Sekarang"
-                      )}
-                    </button>
+                    {program.isLocked ? (
+                      <button
+                        onClick={() => router.push(`/programs/${program.prerequisiteProgram?.id}`)}
+                        className="w-full py-4 rounded-2xl bg-white text-slate-500 font-black border-2 border-slate-200 shadow-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2 relative z-10"
+                      >
+                        Lihat Program Prasyarat
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleEnroll}
+                        disabled={enrolling}
+                        className="w-full py-4 rounded-2xl bg-white text-teal-600 font-black border-2 border-teal-100 shadow-lg hover:bg-teal-50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10 disabled:opacity-50"
+                      >
+                        {enrolling ? (
+                          <Sparkles className="h-5 w-5 animate-spin" />
+                        ) : (
+                          "Daftar Sekarang"
+                        )}
+                      </button>
+                    )}
                   </div>
                 )}
 

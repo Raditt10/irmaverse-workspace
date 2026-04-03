@@ -40,6 +40,7 @@ const CreateProgram = () => {
     thumbnailUrl: "",
     duration: "",
     totalKajian: "",
+    stageOrder: "",
     syllabus: [] as string[],
     requirements: [] as string[],
     benefits: [] as string[],
@@ -115,6 +116,11 @@ const CreateProgram = () => {
     }
     if (!formData.thumbnailUrl) {
       showToast("Tumbnail Program wajib diunggah", "error");
+      return;
+    }
+
+    if (!formData.stageOrder) {
+      showToast("Urutan Program Ke- wajib diisi", "error");
       return;
     }
 
@@ -237,6 +243,26 @@ const CreateProgram = () => {
                             className="pl-12 lg:pl-14"
                           />
                         </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-600 ml-1">
+                          Urutan Program Ke- <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative flex items-center group">
+                          <Rocket className="absolute left-4 lg:left-5 h-5 w-5 text-emerald-500 group-hover:text-emerald-600 transition-colors pointer-events-none" />
+                          <Input
+                            type="number"
+                            name="stageOrder"
+                            min="1"
+                            value={formData.stageOrder}
+                            onChange={handleInputChange}
+                            placeholder="Contoh: 1"
+                            className="pl-12 lg:pl-14"
+                          />
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-medium ml-1">
+                          Tentukan urutan program ini (1, 2, 3...). User harus menyelesaikan program sebelumnya untuk membuka program ini.
+                        </p>
                       </div>
                     </div>
                   </div>

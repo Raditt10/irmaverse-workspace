@@ -435,7 +435,8 @@ const Materials = () => {
                   {filteredMaterials.map((material) => (
                     <div
                       key={material.id}
-                      className="bg-white rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] sm:shadow-[0_8px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_8px_0_0_#34d399] transition-all duration-300 overflow-hidden group hover:-translate-y-2 flex flex-col h-full"
+                      onClick={() => router.push(`/materials/${material.id}`)}
+                      className="bg-white rounded-3xl lg:rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] sm:shadow-[0_8px_0_0_#cbd5e1] hover:border-emerald-400 hover:shadow-[0_8px_0_0_#34d399] transition-all duration-300 overflow-hidden group hover:-translate-y-2 flex flex-col h-full cursor-pointer"
                     >
                       {/* Thumbnail */}
                       <div className="relative h-40 md:h-52 overflow-hidden border-b-2 border-slate-100">
@@ -522,7 +523,7 @@ const Materials = () => {
                         </div>
 
                         {/* --- BUTTON ACTION DINAMIS (LAYOUT BARU) --- */}
-                        <div className="mt-auto flex w-full">
+                        <div className="mt-auto flex w-full" onClick={(e) => e.stopPropagation()}>
                             {isPrivileged ? (
                               <MaterialInstructorActions
                                 materialId={material.id}

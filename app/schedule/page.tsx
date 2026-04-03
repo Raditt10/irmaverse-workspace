@@ -249,7 +249,8 @@ const Schedule = () => {
                 {filteredSchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_6px_0_0_#34d399] transition-all duration-300 overflow-hidden group hover:-translate-y-2"
+                    onClick={() => router.push(`/schedule/${schedule.id}`)}
+                    className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_6px_0_0_#34d399] transition-all duration-300 overflow-hidden group hover:-translate-y-2 cursor-pointer"
                   >
                     <div className="p-6">
                       <div className="flex items-start gap-5 mb-5">
@@ -319,7 +320,7 @@ const Schedule = () => {
                           </div>
                         )}
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                           <DetailButton
                             role={session?.user?.role as any}
                             onClick={() => router.push(`/schedule/${schedule.id}`)}

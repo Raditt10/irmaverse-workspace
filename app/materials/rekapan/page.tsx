@@ -280,7 +280,8 @@ const RekapanListPage = () => {
                     filteredInstructorMaterials.map((material) => (
                       <div
                         key={material.id}
-                        className="bg-white rounded-[2.5rem] border-2 border-slate-200 p-6 hover:border-emerald-400 hover:shadow-[0_12px_0_0_#34d399] transition-all duration-300 flex flex-col h-full group relative overflow-hidden"
+                        onClick={() => router.push(`/materials/${material.id}/rekapan`)}
+                        className="bg-white rounded-4xl border-2 border-slate-200 p-6 hover:border-emerald-400 hover:shadow-[0_12px_0_0_#34d399] transition-all duration-300 flex flex-col h-full group relative overflow-hidden cursor-pointer"
                       >
                         {/* Background Decoration */}
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl z-0"></div>
@@ -340,7 +341,7 @@ const RekapanListPage = () => {
                           </div>
 
                           {/* Action Buttons Container */}
-                          <div className="mt-auto space-y-3 pt-5 border-t-4 border-dotted border-slate-100">
+                          <div className="mt-auto space-y-3 pt-5 border-t-4 border-dotted border-slate-100" onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center gap-2">
                               <div className="flex-1">
                                 <DetailButton
@@ -382,41 +383,41 @@ const RekapanListPage = () => {
               /* --- USER VIEW (LAMA) --- */
               <>
                 {/* --- STATISTIK CARDS --- */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                    <div className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
-                      <div className="p-4 bg-emerald-100 rounded-2xl border border-emerald-200">
-                        <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+                  <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-10">
+                    <div className="bg-white rounded-3xl sm:rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-4 sm:p-6 flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-5">
+                      <div className="p-3 sm:p-4 bg-emerald-100 rounded-xl sm:rounded-2xl border border-emerald-200 shrink-0">
+                        <CheckCircle2 className="h-6 w-6 sm:h-8 sm:w-8 text-emerald-600" />
                       </div>
-                      <div>
-                        <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">
+                      <div className="min-w-0">
+                        <p className="text-slate-500 font-bold text-[10px] sm:text-sm uppercase tracking-wider mb-0.5 sm:mb-0">
                           Total Hadir
                         </p>
-                        <p className="text-3xl font-black text-slate-800">
+                        <p className="text-xl sm:text-3xl font-black text-slate-800 leading-tight">
                           {totalHadir}{" "}
-                          <span className="text-base text-slate-500 font-semibold">
+                          <span className="text-[10px] sm:text-base text-slate-500 font-semibold">
                             Kajian
                           </span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-6 flex items-center gap-5">
-                      <div className="p-4 bg-red-100 rounded-2xl border border-red-200">
-                        <XCircle className="h-8 w-8 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">
-                        Tidak Hadir
-                      </p>
-                      <p className="text-3xl font-black text-slate-800">
-                        {totalKajian - totalHadir}{" "}
-                        <span className="text-base text-slate-500 font-semibold">
-                          Kajian
-                        </span>
-                      </p>
+                    <div className="bg-white rounded-3xl sm:rounded-4xl border-2 border-slate-200 shadow-[0_4px_0_0_#cbd5e1] p-4 sm:p-6 flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-5">
+                      <div className="p-3 sm:p-4 bg-red-100 rounded-xl sm:rounded-2xl border border-red-200 shrink-0">
+                        <XCircle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-slate-500 font-bold text-[10px] sm:text-sm uppercase tracking-wider mb-0.5 sm:mb-0">
+                          Tidak Hadir
+                        </p>
+                        <p className="text-xl sm:text-3xl font-black text-slate-800 leading-tight">
+                          {totalKajian - totalHadir}{" "}
+                          <span className="text-[10px] sm:text-base text-slate-500 font-semibold">
+                            Kajian
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
                 {/* Search */}
                 <div className="bg-white rounded-3xl border-2 border-slate-200 shadow-sm p-4 mb-6">

@@ -396,7 +396,8 @@ const News = () => {
                 {filteredNews.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white rounded-3xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_6px_0_0_#34d399] transition-all duration-300 overflow-hidden group"
+                    onClick={() => router.push(`/news/${item.slug}`)}
+                    className="bg-white rounded-3xl border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_6px_0_0_#34d399] transition-all duration-300 overflow-hidden group cursor-pointer"
                   >
                     <div className="flex flex-col sm:flex-row relative sm:h-48 h-full">
                       {/* Image Area */}
@@ -470,7 +471,7 @@ const News = () => {
                             </span>
                           </div>
 
-                          <div className="flex shrink-0 gap-2 items-center">
+                          <div className="flex shrink-0 gap-2 items-center" onClick={(e) => e.stopPropagation()}>
                             {isPrivileged && (
                               <>
                                 <Link

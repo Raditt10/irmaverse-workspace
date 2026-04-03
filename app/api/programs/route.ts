@@ -315,7 +315,7 @@ export async function POST(req: Request) {
         requirements: Array.isArray(requirements) ? requirements : [],
         benefits: Array.isArray(benefits) ? benefits : [],
         totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
-        stageOrder: stageOrder ? parseInt(stageOrder, 10) : null,
+        stageOrder: stageOrder && !isNaN(Number(stageOrder)) && Number(stageOrder) > 0 ? Number(stageOrder) : null,
         updatedAt: new Date(),
         id: crypto.randomUUID(),
       },
