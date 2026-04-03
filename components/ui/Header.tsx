@@ -222,16 +222,16 @@ export default function DashboardHeader() {
 
             <img
               src="/logo.webp"
-              alt="IRMA Verse"
+              alt="IrmaVerse"
               className="h-8 w-8 sm:h-10 sm:w-10 object-contain shrink-0"
             />
 
             <div className="min-w-0 max-w-[120px] sm:max-w-none flex flex-col items-start text-left">
               <h2 className="text-sm sm:text-lg font-black text-emerald-600 leading-tight tracking-tight truncate w-full">
-                IRMA VERSE
+                IrmaVerse
               </h2>
               <p className="text-[8px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider sm:tracking-widest leading-none mt-0.5 truncate w-full">
-                Platform resmi Irma13
+                Platform Rohis Digital
               </p>
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function DashboardHeader() {
           {/* --- CENTER: SEARCH BAR (Desktop) --- */}
           <div className="hidden md:flex flex-1 max-w-md mx-4">
             <div className="w-full">
-              <SearchBar placeholder="Cari apa saja di IRMA VERSE..." />
+              <SearchBar placeholder="Cari apa saja di IrmaVerse..." />
             </div>
           </div>
 
@@ -648,7 +648,7 @@ export default function DashboardHeader() {
           <div className="px-4 py-4 flex justify-center bg-white/50 backdrop-blur-sm">
             <div className="w-full">
               <SearchBar 
-                placeholder="Cari apa saja di IRMA VERSE..." 
+                placeholder="Cari apa saja di IrmaVerse..." 
                 isCollapsible={false}
                 isExpanded={true}
               />

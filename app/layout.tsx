@@ -26,7 +26,7 @@ const comicNeue = Comic_Neue({
 });
 
 export const metadata: Metadata = {
-  title: "IrmaVerse - SMKN 13 Bandung",
+  title: "IrmaVerse",
   description: "Platform pembelajaran Islam interaktif untuk generasi muda",
 };
 

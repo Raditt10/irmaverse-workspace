@@ -428,15 +428,11 @@ const ProgramDetail = () => {
                   ) : (
                     <div className="max-h-[500px] md:max-h-[650px] overflow-y-auto overscroll-contain pr-3 space-y-5 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent hover:scrollbar-thumb-teal-200 transition-all duration-300">
                       {(() => {
-                        // Jika totalKajian ditentukan (> 0), buat slot sebanyak totalKajian.
-                        // Jika tidak, cukup render materi yang ada seperti biasa.
                         if (program.totalKajian > 0) {
                           return Array.from({ length: program.totalKajian }, (_, i) => i + 1).map((num) => {
-                            // Cari apakah ada materi untuk nomor kajian ini
                             const materialForThisSlot = program.materials.find(m => m.order === num);
 
                             if (materialForThisSlot) {
-                              // Render Kajian Terisi
                               return (
                                 <div
                                   key={materialForThisSlot.id}

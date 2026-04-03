@@ -206,7 +206,7 @@ const Auth = () => {
                 </div>
                 <div className="text-center">
                   <h1 className="font-black text-2xl text-slate-800 tracking-tight">
-                    IRMA Verse
+                    IrmaVerse
                   </h1>
                   <p className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                     Platform Rohis Digital
@@ -583,7 +583,7 @@ const Auth = () => {
 
               <div className="text-center relative z-10">
                 <span className="inline-block px-3 py-1 bg-teal-50 text-teal-700 text-xs font-black uppercase tracking-wider rounded-lg mb-3">
-                  Komunitas Islami SMKN 13 Bandung
+                  Komunitas Islami IrmaVerse
                 </span>
                 <h3 className="text-3xl font-black text-slate-800 mb-3 leading-tight">
                   Belajar Agama Jadi <br />

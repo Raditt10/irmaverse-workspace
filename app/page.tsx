@@ -317,7 +317,7 @@ export default function Home() {
               />
               <div>
                 <p className="text-[9px] sm:text-xs uppercase tracking-[0.15em] text-white/70 font-bold">Platform Rohis</p>
-                <h1 className="text-base sm:text-2xl font-extrabold leading-tight" style={{ textShadow: "2px 2px 0px rgba(0,0,0,0.1)" }}>IRMA Verse</h1>
+                <h1 className="text-base sm:text-2xl font-extrabold leading-tight" style={{ textShadow: "2px 2px 0px rgba(0,0,0,0.1)" }}>IrmaVerse</h1>
               </div>
             </div>
 
@@ -366,7 +366,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center pt-4 sm:pt-8 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8">
             <div className="space-y-4 sm:space-y-6 z-10">
               <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white/20 border-2 border-white/30 text-white text-[10px] sm:text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] transform -rotate-1 hover:rotate-0 transition-all">
-                Official Website <span className="text-emerald-100 bg-emerald-600 px-1 rounded text-[10px] sm:text-sm">IRMA13</span>
+                Official Website <span className="text-emerald-100 bg-emerald-600 px-1 rounded text-[10px] sm:text-sm">IrmaVerse</span>
               </div>
 
               <div className="space-y-1 sm:space-y-2">
@@ -387,11 +387,11 @@ export default function Home() {
               <div className="bg-white border-[3px] border-emerald-200 rounded-2xl sm:rounded-3xl shadow-[5px_5px_0px_0px_rgba(0,0,0,0.12)] sm:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.15)] p-3 sm:p-4 max-w-60 sm:max-w-xs transform hover:scale-105 hover:-rotate-1 transition-all duration-300 cursor-pointer">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="p-1.5 sm:p-2 bg-slate-50 rounded-xl sm:rounded-2xl border-2 border-slate-100">
-                    <img src="/logo13.webp" alt="SMKN 13" className="h-8 sm:h-10 w-auto object-contain" />
+                    <img src="/logo.webp" alt="Logo" className="h-8 sm:h-10 w-auto object-contain" />
                   </div>
                   <div>
-                    <p className="text-[9px] sm:text-[10px] font-extrabold text-emerald-600 uppercase tracking-tight">Platform Ekskul</p>
-                    <p className="text-xs sm:text-sm font-bold text-slate-800">SMKN 13 Bandung</p>
+                    <p className="text-[9px] sm:text-[10px] font-extrabold text-emerald-600 uppercase tracking-tight">Platform Rohis</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-800">IrmaVerse</p>
                   </div>
                 </div>
               </div>
@@ -568,8 +568,8 @@ export default function Home() {
           <div className="space-y-3 sm:space-y-4">
             {[
               {
-                q: "Apa itu IRMAVerse?",
-                a: "IRMAVerse adalah platform digital khusus untuk mendukung seluruh kegiatan, informasi, dan komunikasi anggota IRMA SMKN 13 Bandung agar lebih terorganisir dan modern."
+                q: "Apa itu IrmaVerse?",
+                a: "IrmaVerse adalah platform digital khusus untuk mendukung seluruh kegiatan, informasi, dan komunikasi anggota IRMA secara terorganisir dan modern."
               },
               {
                 q: "Bagaimana cara mengakses fitur di IRMAVerse?",

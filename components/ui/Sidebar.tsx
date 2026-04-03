@@ -333,7 +333,7 @@ const Sidebar = () => {
           ]),
     {
       icon: Newspaper,
-      label: isInstruktur || isAdmin ? "Kelola Berita" : "Berita IRMA",
+      label: isInstruktur || isAdmin ? "Kelola Berita" : "Berita",
       path: "/news",
     },
     ...(isAdmin
@@ -516,16 +516,16 @@ const Sidebar = () => {
                     <div className="w-9 h-9 flex items-center justify-center">
                       <img
                         src="/logo.webp"
-                        alt="IRMA Logo"
+                        alt="IrmaVerse"
                         className="h-9 w-9 object-contain"
                       />
                     </div>
                     <div>
                       <h2 className="text-base font-black text-slate-800 leading-none">
-                        IRMA VERSE
+                        IrmaVerse
                       </h2>
                       <p className="text-[9px] font-extrabold text-teal-600 uppercase tracking-widest mt-1">
-                        Platform resmi IRMA13
+                        Platform Rohis Digital
                       </p>
                     </div>
                   </div>

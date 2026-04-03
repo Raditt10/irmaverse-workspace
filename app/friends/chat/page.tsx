@@ -213,6 +213,8 @@ const ChatPage = () => {
         await fetchConversations();
         setSelectedConversationId(data.id);
         setShowNewChatModal(false);
+        // Clear query params
+        router.replace("/friends/chat", { scroll: false });
         if (window.innerWidth < 1024) {
           setIsMobileViewingChat(true);
         }
@@ -763,6 +765,15 @@ const ChatPage = () => {
 
         <main className={`w-full flex-1 flex flex-col transition-all duration-300 ${isDesktopChatFullscreen ? 'p-0' : (isMobileViewingChat ? 'p-0' : 'p-4 lg:p-6')} overflow-hidden relative`}>
           
+          {/* Back Button for Desktop (Back to Friends) */}
+          <div className={`${isDesktopChatFullscreen || isMobileViewingChat ? 'hidden' : 'hidden lg:block mb-4'}`}>
+            <BackButton 
+              label="Kembali" 
+              onClick={() => router.push("/friends")}
+              className="bg-white hover:bg-slate-50 border-2 border-slate-200"
+            />
+          </div>
+
           {/* Page Title */}
           <PageBanner
             title="Chat Temanku"
@@ -818,6 +829,8 @@ const ChatPage = () => {
                       key={conv.id}
                       onClick={() => {
                         setSelectedConversationId(conv.id);
+                        // Clear query params to avoid re-triggering the auto-select effect
+                        router.replace("/friends/chat", { scroll: false });
                         if (window.innerWidth < 1024) { // hanya mobile/tablet
                           setIsMobileViewingChat(true);
                         }
