@@ -27,9 +27,15 @@ export async function GET(req: NextRequest) {
     const status = req.nextUrl.searchParams.get("status");
     const type = req.nextUrl.searchParams.get("type");
     const q = req.nextUrl.searchParams.get("q");
+    const userId = req.nextUrl.searchParams.get("userId");
 
     let whereSql = "WHERE 1=1";
     const params: any[] = [];
+
+    if (userId) {
+      whereSql += " AND fr.userId = ?";
+      params.push(userId);
+    }
 
     if (status && FEEDBACK_STATUSES.includes(status as any)) {
       whereSql += " AND fr.status = ?";
@@ -63,7 +69,8 @@ export async function GET(req: NextRequest) {
         fr.updatedAt,
         u.name as userName,
         u.email as userEmail,
-        u.role as userRole
+        u.role as userRole,
+        u.avatar as userAvatar
       FROM user_feedback_reports fr
       JOIN users u ON u.id = fr.userId
       ${whereSql}

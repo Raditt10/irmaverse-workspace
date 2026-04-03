@@ -22,6 +22,7 @@ import {
   Users,
   BarChart3,
   GraduationCap,
+  Lock,
 } from "lucide-react";
 import PageBanner from "@/components/ui/PageBanner";
 
@@ -43,6 +44,10 @@ interface Program {
     total: number;
     percentage: number;
   };
+  stageOrder: number | null;
+  totalStages: number;
+  isLocked: boolean;
+  prerequisiteProgram: string | null;
 }
 
 const OurPrograms = () => {
@@ -246,7 +251,11 @@ const OurPrograms = () => {
                     <div
                       key={program.id}
                       onClick={() => router.push(`/programs/${program.id}`)}
-                      className="bg-white rounded-3xl lg:rounded-[2.5rem] border-2 border-slate-200 shadow-[0_6px_0_0_#cbd5e1] sm:shadow-[0_8px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_8px_0_0_#34d399] transition-all duration-300 overflow-hidden group hover:-translate-y-2 flex flex-col h-full cursor-pointer"
+                      className={`bg-white rounded-3xl lg:rounded-[2.5rem] border-2 shadow-[0_6px_0_0_#cbd5e1] sm:shadow-[0_8px_0_0_#cbd5e1] transition-all duration-300 overflow-hidden group flex flex-col h-full cursor-pointer relative ${
+                        program.isLocked
+                          ? "border-slate-300 opacity-75 hover:opacity-90"
+                          : "border-slate-200 hover:border-teal-400 hover:shadow-[0_8px_0_0_#34d399] hover:-translate-y-2"
+                      }`}
                     >
                       {/* Image */}
                       <div className="relative h-40 md:h-52 overflow-hidden border-b-2 border-slate-100">
@@ -278,6 +287,29 @@ const OurPrograms = () => {
                             {program.materialCount} Kajian
                           </span>
                         </div>
+
+                        {/* Stage Badge */}
+                        {program.stageOrder && (
+                          <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl flex items-center gap-1.5 bg-indigo-500/90 backdrop-blur-sm border border-indigo-400">
+                            <span className="text-[10px] font-black uppercase tracking-wide text-white">
+                              Tahap {program.stageOrder}{program.totalStages > 0 ? ` / ${program.totalStages}` : ""}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Lock Overlay */}
+                        {program.isLocked && (
+                          <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] flex items-center justify-center z-10">
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="p-3 bg-white/90 rounded-2xl border-2 border-slate-200 shadow-lg">
+                                <Lock className="h-6 w-6 text-slate-500" strokeWidth={2.5} />
+                              </div>
+                              <span className="text-xs font-black text-white bg-black/50 px-3 py-1 rounded-lg backdrop-blur-sm">
+                                Terkunci
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -331,6 +363,16 @@ const OurPrograms = () => {
                                   }}
                                 />
                               </div>
+                            </div>
+                          )}
+
+                          {/* Lock info for locked programs */}
+                          {program.isLocked && program.prerequisiteProgram && (
+                            <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200">
+                              <Lock className="h-3.5 w-3.5 text-amber-600 shrink-0" strokeWidth={2.5} />
+                              <span className="text-[10px] font-bold text-amber-700 leading-tight">
+                                Selesaikan "{program.prerequisiteProgram}" terlebih dahulu
+                              </span>
                             </div>
                           )}
                         </div>

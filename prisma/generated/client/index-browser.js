@@ -379,6 +379,7 @@ exports.Prisma.ProgramsScalarFieldEnum = {
   requirements: 'requirements',
   benefits: 'benefits',
   totalKajian: 'totalKajian',
+  stageOrder: 'stageOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

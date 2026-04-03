@@ -23334,10 +23334,12 @@ export namespace Prisma {
 
   export type ProgramsAvgAggregateOutputType = {
     totalKajian: number | null
+    stageOrder: number | null
   }
 
   export type ProgramsSumAggregateOutputType = {
     totalKajian: number | null
+    stageOrder: number | null
   }
 
   export type ProgramsMinAggregateOutputType = {
@@ -23350,6 +23352,7 @@ export namespace Prisma {
     instructorId: string | null
     duration: string | null
     totalKajian: number | null
+    stageOrder: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -23364,6 +23367,7 @@ export namespace Prisma {
     instructorId: string | null
     duration: string | null
     totalKajian: number | null
+    stageOrder: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -23381,6 +23385,7 @@ export namespace Prisma {
     requirements: number
     benefits: number
     totalKajian: number
+    stageOrder: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -23389,10 +23394,12 @@ export namespace Prisma {
 
   export type ProgramsAvgAggregateInputType = {
     totalKajian?: true
+    stageOrder?: true
   }
 
   export type ProgramsSumAggregateInputType = {
     totalKajian?: true
+    stageOrder?: true
   }
 
   export type ProgramsMinAggregateInputType = {
@@ -23405,6 +23412,7 @@ export namespace Prisma {
     instructorId?: true
     duration?: true
     totalKajian?: true
+    stageOrder?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -23419,6 +23427,7 @@ export namespace Prisma {
     instructorId?: true
     duration?: true
     totalKajian?: true
+    stageOrder?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -23436,6 +23445,7 @@ export namespace Prisma {
     requirements?: true
     benefits?: true
     totalKajian?: true
+    stageOrder?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -23540,6 +23550,7 @@ export namespace Prisma {
     requirements: JsonValue | null
     benefits: JsonValue | null
     totalKajian: number
+    stageOrder: number | null
     createdAt: Date
     updatedAt: Date
     _count: ProgramsCountAggregateOutputType | null
@@ -23576,6 +23587,7 @@ export namespace Prisma {
     requirements?: boolean
     benefits?: boolean
     totalKajian?: boolean
+    stageOrder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     material?: boolean | programs$materialArgs<ExtArgs>
@@ -23599,11 +23611,12 @@ export namespace Prisma {
     requirements?: boolean
     benefits?: boolean
     totalKajian?: boolean
+    stageOrder?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type programsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "grade" | "category" | "thumbnailUrl" | "instructorId" | "duration" | "syllabus" | "requirements" | "benefits" | "totalKajian" | "createdAt" | "updatedAt", ExtArgs["result"]["programs"]>
+  export type programsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "grade" | "category" | "thumbnailUrl" | "instructorId" | "duration" | "syllabus" | "requirements" | "benefits" | "totalKajian" | "stageOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["programs"]>
   export type programsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     material?: boolean | programs$materialArgs<ExtArgs>
     program_enrollments?: boolean | programs$program_enrollmentsArgs<ExtArgs>
@@ -23631,6 +23644,7 @@ export namespace Prisma {
       requirements: Prisma.JsonValue | null
       benefits: Prisma.JsonValue | null
       totalKajian: number
+      stageOrder: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["programs"]>
@@ -24017,6 +24031,7 @@ export namespace Prisma {
     readonly requirements: FieldRef<"programs", 'Json'>
     readonly benefits: FieldRef<"programs", 'Json'>
     readonly totalKajian: FieldRef<"programs", 'Int'>
+    readonly stageOrder: FieldRef<"programs", 'Int'>
     readonly createdAt: FieldRef<"programs", 'DateTime'>
     readonly updatedAt: FieldRef<"programs", 'DateTime'>
   }
@@ -34441,6 +34456,7 @@ export namespace Prisma {
     requirements: 'requirements',
     benefits: 'benefits',
     totalKajian: 'totalKajian',
+    stageOrder: 'stageOrder',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -36784,6 +36800,7 @@ export namespace Prisma {
     requirements?: JsonNullableFilter<"programs">
     benefits?: JsonNullableFilter<"programs">
     totalKajian?: IntFilter<"programs"> | number
+    stageOrder?: IntNullableFilter<"programs"> | number | null
     createdAt?: DateTimeFilter<"programs"> | Date | string
     updatedAt?: DateTimeFilter<"programs"> | Date | string
     material?: MaterialListRelationFilter
@@ -36804,6 +36821,7 @@ export namespace Prisma {
     requirements?: SortOrderInput | SortOrder
     benefits?: SortOrderInput | SortOrder
     totalKajian?: SortOrder
+    stageOrder?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     material?: materialOrderByRelationAggregateInput
@@ -36828,6 +36846,7 @@ export namespace Prisma {
     requirements?: JsonNullableFilter<"programs">
     benefits?: JsonNullableFilter<"programs">
     totalKajian?: IntFilter<"programs"> | number
+    stageOrder?: IntNullableFilter<"programs"> | number | null
     createdAt?: DateTimeFilter<"programs"> | Date | string
     updatedAt?: DateTimeFilter<"programs"> | Date | string
     material?: MaterialListRelationFilter
@@ -36848,6 +36867,7 @@ export namespace Prisma {
     requirements?: SortOrderInput | SortOrder
     benefits?: SortOrderInput | SortOrder
     totalKajian?: SortOrder
+    stageOrder?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: programsCountOrderByAggregateInput
@@ -36873,6 +36893,7 @@ export namespace Prisma {
     requirements?: JsonNullableWithAggregatesFilter<"programs">
     benefits?: JsonNullableWithAggregatesFilter<"programs">
     totalKajian?: IntWithAggregatesFilter<"programs"> | number
+    stageOrder?: IntNullableWithAggregatesFilter<"programs"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"programs"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"programs"> | Date | string
   }
@@ -39378,6 +39399,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     material?: materialCreateNestedManyWithoutProgramsInput
@@ -39398,6 +39420,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     material?: materialUncheckedCreateNestedManyWithoutProgramsInput
@@ -39416,6 +39439,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: materialUpdateManyWithoutProgramsNestedInput
@@ -39436,6 +39460,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: materialUncheckedUpdateManyWithoutProgramsNestedInput
@@ -39455,6 +39480,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
   }
@@ -39471,6 +39497,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -39488,6 +39515,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41837,12 +41865,14 @@ export namespace Prisma {
     requirements?: SortOrder
     benefits?: SortOrder
     totalKajian?: SortOrder
+    stageOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type programsAvgOrderByAggregateInput = {
     totalKajian?: SortOrder
+    stageOrder?: SortOrder
   }
 
   export type programsMaxOrderByAggregateInput = {
@@ -41855,6 +41885,7 @@ export namespace Prisma {
     instructorId?: SortOrder
     duration?: SortOrder
     totalKajian?: SortOrder
+    stageOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41869,12 +41900,14 @@ export namespace Prisma {
     instructorId?: SortOrder
     duration?: SortOrder
     totalKajian?: SortOrder
+    stageOrder?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type programsSumOrderByAggregateInput = {
     totalKajian?: SortOrder
+    stageOrder?: SortOrder
   }
 
   export type Enumprograms_gradeWithAggregatesFilter<$PrismaModel = never> = {
@@ -49862,6 +49895,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     program_enrollments?: program_enrollmentsCreateNestedManyWithoutProgramsInput
@@ -49881,6 +49915,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     program_enrollments?: program_enrollmentsUncheckedCreateNestedManyWithoutProgramsInput
@@ -50340,6 +50375,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program_enrollments?: program_enrollmentsUpdateManyWithoutProgramsNestedInput
@@ -50359,6 +50395,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program_enrollments?: program_enrollmentsUncheckedUpdateManyWithoutProgramsNestedInput
@@ -52227,6 +52264,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     material?: materialCreateNestedManyWithoutProgramsInput
@@ -52246,6 +52284,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     material?: materialUncheckedCreateNestedManyWithoutProgramsInput
@@ -52388,6 +52427,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: materialUpdateManyWithoutProgramsNestedInput
@@ -52407,6 +52447,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: materialUncheckedUpdateManyWithoutProgramsNestedInput
@@ -54937,6 +54978,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     material?: materialCreateNestedManyWithoutProgramsInput
@@ -54955,6 +54997,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
     material?: materialUncheckedCreateNestedManyWithoutProgramsInput
@@ -55701,6 +55744,7 @@ export namespace Prisma {
     requirements?: JsonNullableFilter<"programs">
     benefits?: JsonNullableFilter<"programs">
     totalKajian?: IntFilter<"programs"> | number
+    stageOrder?: IntNullableFilter<"programs"> | number | null
     createdAt?: DateTimeFilter<"programs"> | Date | string
     updatedAt?: DateTimeFilter<"programs"> | Date | string
   }
@@ -57043,6 +57087,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: number
+    stageOrder?: number | null
     createdAt?: Date | string
     updatedAt: Date | string
   }
@@ -57820,6 +57865,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: materialUpdateManyWithoutProgramsNestedInput
@@ -57838,6 +57884,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     material?: materialUncheckedUpdateManyWithoutProgramsNestedInput
@@ -57856,6 +57903,7 @@ export namespace Prisma {
     requirements?: NullableJsonNullValueInput | InputJsonValue
     benefits?: NullableJsonNullValueInput | InputJsonValue
     totalKajian?: IntFieldUpdateOperationsInput | number
+    stageOrder?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

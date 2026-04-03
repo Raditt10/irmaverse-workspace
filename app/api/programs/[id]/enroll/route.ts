@@ -27,6 +27,43 @@ export async function POST(
       );
     }
 
+    // Sequential enrollment validation
+    const user = await prisma.users.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    const isPrivileged = user?.role === "instruktur" || user?.role === "admin" || user?.role === "super_admin";
+
+    if (program.stageOrder && program.stageOrder > 1 && !isPrivileged) {
+      // Find prerequisite program (same grade + category, previous stageOrder)
+      const prereq = await prisma.programs.findFirst({
+        where: {
+          grade: program.grade,
+          category: program.category,
+          stageOrder: program.stageOrder - 1,
+        },
+        select: { id: true, title: true, totalKajian: true, material: { select: { id: true } } },
+      });
+
+      if (prereq) {
+        const prereqMaterialIds = prereq.material.map((m) => m.id);
+        const prereqAttendanceCount = prereqMaterialIds.length > 0
+          ? await prisma.attendance.count({
+              where: { userId: session.user.id, materialId: { in: prereqMaterialIds }, status: "hadir" },
+            })
+          : 0;
+        const prereqTotal = prereq.totalKajian > 0 ? prereq.totalKajian : prereqMaterialIds.length;
+        const prereqCompleted = prereqTotal > 0 && prereqAttendanceCount >= prereqTotal;
+
+        if (!prereqCompleted) {
+          return NextResponse.json(
+            { error: `Kamu harus menyelesaikan "${prereq.title}" terlebih dahulu sebelum mendaftar program ini.` },
+            { status: 403 },
+          );
+        }
+      }
+    }
+
     // Check if already enrolled
     const existing = await prisma.program_enrollments.findUnique({
       where: { programId_userId: { programId: id, userId: session.user.id } },

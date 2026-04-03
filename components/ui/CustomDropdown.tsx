@@ -1,10 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, User } from "lucide-react";
 
 interface Option {
   value: string;
   label: string;
+  image?: string;
 }
 
 interface CustomDropdownProps {
@@ -39,6 +40,7 @@ const CustomDropdown = ({
   }, []);
 
   const selectedOption = options.find((opt) => opt.value === value);
+  const hasImages = options.some((opt) => opt.image);
 
   return (
     <div className={`space-y-2 ${className}`} ref={dropdownRef}>
@@ -66,7 +68,14 @@ const CustomDropdown = ({
             ${isOpen ? "translate-y-0.5 shadow-none border-teal-500" : ""}
           `}
         >
-          <span className={selectedOption ? "text-slate-700" : "text-slate-400"}>
+          <span className={`flex items-center gap-2 ${selectedOption ? "text-slate-700" : "text-slate-400"}`}>
+            {hasImages && selectedOption?.image && (
+              <img
+                src={selectedOption.image}
+                alt={selectedOption.label}
+                className="w-6 h-6 rounded-full object-cover border border-slate-200"
+              />
+            )}
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <ChevronDown
@@ -98,7 +107,22 @@ const CustomDropdown = ({
                     }
                   `}
                 >
-                  {option.label}
+                  <span className="flex items-center gap-2">
+                    {hasImages && (
+                      option.image ? (
+                        <img
+                          src={option.image}
+                          alt={option.label}
+                          className="w-6 h-6 rounded-full object-cover border border-slate-200"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                          <User className="w-3.5 h-3.5 text-slate-400" />
+                        </div>
+                      )
+                    )}
+                    {option.label}
+                  </span>
                   {value === option.value && <Check className="w-4 h-4" />}
                 </button>
               ))}

@@ -15,7 +15,7 @@ import {
   ArrowLeft, Upload, X, Plus, Trophy, Sparkles, Save, 
   Calendar, CalendarClock, MapPin, Tag, Users, ShieldCheck, ListChecks, Headset, Phone, Mail
 } from "lucide-react";
-import Toast from "@/components/ui/Toast"; // Import Toast
+import Toast from "@/components/ui/Toast";
 import Loading from "@/components/ui/Loading";
 
 const EditCompetition = () => {

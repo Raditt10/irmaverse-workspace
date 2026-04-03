@@ -100,6 +100,35 @@ export async function GET(req: NextRequest) {
       Susulan: "Program Susulan",
     };
 
+    // Pre-compute completion status for all programs (needed for lock logic)
+    const programCompletionMap = new Map<string, boolean>();
+    const programResults: any[] = [];
+
+    for (const p of programs) {
+      const filteredMaterials = (p.material || []).filter((m: any) =>
+        user.role === "instruktur" ? m.instructorId === user.id : true,
+      );
+
+      let isCompleted = false;
+      let attendanceCount = 0;
+      if (filteredMaterials.length > 0) {
+        attendanceCount = filteredMaterials.filter((m: any) => attendedMaterialIds.has(m.id)).length;
+      }
+
+      const totalKajianTarget = p.totalKajian > 0 ? p.totalKajian : filteredMaterials.length;
+
+      if (p.totalKajian > 0) {
+        const hasAllMaterials = filteredMaterials.length >= p.totalKajian;
+        isCompleted = hasAllMaterials && (attendanceCount >= p.totalKajian);
+      } else {
+        isCompleted =
+          filteredMaterials.length > 0 &&
+          (attendanceCount >= filteredMaterials.length);
+      }
+
+      programCompletionMap.set(p.id, isCompleted);
+    }
+
     // Semua user bisa melihat semua program kurikulum
     const result = programs.map((p: any) => {
       const isEnrolled = p.program_enrollments?.some(
@@ -110,7 +139,7 @@ export async function GET(req: NextRequest) {
         user.role === "instruktur" ? m.instructorId === user.id : true,
       );
 
-      let isCompleted = false;
+      const isCompleted = programCompletionMap.get(p.id) || false;
       let attendanceCount = 0;
       if (filteredMaterials.length > 0) {
         attendanceCount = filteredMaterials.filter((m: any) => attendedMaterialIds.has(m.id)).length;
@@ -124,21 +153,41 @@ export async function GET(req: NextRequest) {
         progressPercentage = Math.min(progressPercentage, 100);
       }
 
-      if (p.totalKajian > 0) {
-        // Complete jika sudah ada semua materi sebanyak totalKajian DAN user menghadiri semuanya
-        const hasAllMaterials = filteredMaterials.length >= p.totalKajian;
-        isCompleted = hasAllMaterials && (attendanceCount >= p.totalKajian);
-      } else {
-        isCompleted =
-          filteredMaterials.length > 0 &&
-          (attendanceCount >= filteredMaterials.length);
-      }
-
       const progress = {
         completed: attendanceCount,
         total: totalKajianTarget,
         percentage: progressPercentage,
       };
+
+      // Sequential lock logic: check if prerequisite stage is completed
+      let isLocked = false;
+      let prerequisiteProgram: string | null = null;
+      if (p.stageOrder && p.stageOrder > 1 && !isPrivileged) {
+        // Find the prerequisite program (same grade + category, stageOrder = current - 1)
+        const prereq = programs.find(
+          (other: any) =>
+            other.grade === p.grade &&
+            other.category === p.category &&
+            other.stageOrder === p.stageOrder - 1,
+        );
+        if (prereq) {
+          const prereqCompleted = programCompletionMap.get(prereq.id) || false;
+          if (!prereqCompleted) {
+            isLocked = true;
+            prerequisiteProgram = prereq.title;
+          }
+        }
+      }
+
+      // Count how many staged programs exist in same grade+category
+      const totalStages = p.stageOrder
+        ? programs.filter(
+            (other: any) =>
+              other.grade === p.grade &&
+              other.category === p.category &&
+              other.stageOrder != null,
+          ).length
+        : 0;
 
       return {
         id: p.id,
@@ -152,6 +201,10 @@ export async function GET(req: NextRequest) {
         instructorAvatar: p.users?.avatar,
         materialCount: filteredMaterials.length,
         totalKajian: p.totalKajian,
+        stageOrder: p.stageOrder || null,
+        totalStages,
+        isLocked,
+        prerequisiteProgram,
         usedKajianOrders: filteredMaterials
           .map((m: any) => m.kajianOrder)
           .filter((order: any) => order !== null && order !== undefined),
@@ -215,6 +268,7 @@ export async function POST(req: Request) {
       requirements,
       benefits,
       totalKajian,
+      stageOrder,
     } = body;
 
     if (!title || !title.trim()) {
@@ -261,6 +315,7 @@ export async function POST(req: Request) {
         requirements: Array.isArray(requirements) ? requirements : [],
         benefits: Array.isArray(benefits) ? benefits : [],
         totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
+        stageOrder: stageOrder ? parseInt(stageOrder, 10) : null,
         updatedAt: new Date(),
         id: crypto.randomUUID(),
       },

@@ -378,6 +378,7 @@ model programs {
   requirements        Json?
   benefits            Json?
   totalKajian         Int                   @default(0)
+  stageOrder          Int?
   createdAt           DateTime              @default(now())
   updatedAt           DateTime
   material            material[]

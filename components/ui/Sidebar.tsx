@@ -362,11 +362,6 @@ const Sidebar = () => {
                     },
                   ]
                 : []),
-              {
-                icon: ClipboardList,
-                label: "Laporan User",
-                path: "/admin/feedback",
-              },
             ],
           },
         ]

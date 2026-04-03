@@ -145,6 +145,46 @@ export async function GET(
       enrollmentCount: m.courseenrollment?.length || 0,
     }));
 
+    // Sequential lock logic
+    let isLocked = false;
+    let prerequisiteProgram: { id: string; title: string } | null = null;
+    const isPrivilegedUser = user.role === "instruktur" || user.role === "admin" || user.role === "super_admin";
+    if (program.stageOrder && program.stageOrder > 1 && !isPrivilegedUser) {
+      const prereq = await prisma.programs.findFirst({
+        where: {
+          grade: program.grade,
+          category: program.category,
+          stageOrder: program.stageOrder - 1,
+        },
+        select: { id: true, title: true, totalKajian: true, material: { select: { id: true } } },
+      });
+      if (prereq) {
+        const prereqMaterialIds = prereq.material.map((m) => m.id);
+        const prereqAttendanceCount = prereqMaterialIds.length > 0
+          ? await prisma.attendance.count({
+              where: { userId: user.id, materialId: { in: prereqMaterialIds }, status: "hadir" },
+            })
+          : 0;
+        const prereqTotal = prereq.totalKajian > 0 ? prereq.totalKajian : prereqMaterialIds.length;
+        const prereqCompleted = prereqTotal > 0 && prereqAttendanceCount >= prereqTotal;
+        if (!prereqCompleted) {
+          isLocked = true;
+          prerequisiteProgram = { id: prereq.id, title: prereq.title };
+        }
+      }
+    }
+
+    // Count total stages in same grade+category group
+    const totalStages = program.stageOrder
+      ? await prisma.programs.count({
+          where: {
+            grade: program.grade,
+            category: program.category,
+            stageOrder: { not: null },
+          },
+        })
+      : 0;
+
     const result = {
       id: program.id,
       title: program.title,
@@ -165,6 +205,10 @@ export async function GET(
       materials: formattedMaterials,
       enrollmentCount: program.program_enrollments.length,
       totalKajian: program.totalKajian,
+      stageOrder: program.stageOrder || null,
+      totalStages,
+      isLocked,
+      prerequisiteProgram,
       isEnrolled,
       progress: userProgress,
       createdAt: program.createdAt,
@@ -225,6 +269,7 @@ export async function PUT(
       requirements,
       benefits,
       totalKajian,
+      stageOrder,
     } = body;
 
     if (!title || !title.trim()) {
@@ -267,6 +312,7 @@ export async function PUT(
         requirements: Array.isArray(requirements) ? requirements : [],
         benefits: Array.isArray(benefits) ? benefits : [],
         totalKajian: totalKajian ? parseInt(totalKajian, 10) : 0,
+        stageOrder: stageOrder ? parseInt(stageOrder, 10) : null,
       },
     });
 

@@ -609,6 +609,16 @@ export default function DashboardHeader() {
                     </>
                   )}
 
+                  {(session?.user as any)?.role === "super_admin" && (
+                    <DropdownMenuItem
+                      onClick={() => router.push("/admin/feedback")}
+                      className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors"
+                    >
+                      <ShieldAlert className="h-4 w-4 mr-2" strokeWidth={2.5} />
+                      <span>Lapor Bug / Request</span>
+                    </DropdownMenuItem>
+                  )}
+
                   <DropdownMenuItem 
                     onClick={() => router.push("/settings")}
                     className="cursor-pointer font-bold text-slate-600 focus:text-emerald-700 focus:bg-emerald-50 rounded-lg px-3 py-2.5 transition-colors">

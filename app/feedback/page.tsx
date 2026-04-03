@@ -17,7 +17,9 @@ import {
   Eye,
   XCircle,
   ImagePlus,
+  MessageSquare,
 } from "lucide-react";
+import PageBanner from "@/components/ui/PageBanner";
 
 type FeedbackType = "bug" | "feature";
 type FeedbackStatus = "open" | "in_review" | "done" | "rejected";
@@ -201,26 +203,23 @@ export default function FeedbackPage() {
         <Sidebar />
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-          <section className="bg-linear-to-r from-teal-500 to-emerald-500 rounded-[2.5rem] border-2 border-teal-700 shadow-[0_8px_0_0_#0f766e] p-6 md:p-8 text-white">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-black tracking-tight">
-                  Lapor Bug & Request Fitur
-                </h1>
-                <p className="text-teal-50 font-bold mt-1">
-                  Bantu kami meningkatkan IRMA Verse dengan masukan kamu.
-                </p>
-              </div>
-              {isAdmin && (
-                <button
-                  onClick={() => router.push("/admin/feedback")}
-                  className="px-4 py-2 rounded-xl bg-white text-teal-600 font-black border-2 border-white shadow-[0_4px_0_0_#0f766e] hover:translate-y-0.5 transition-all"
-                >
-                  Lihat Semua Laporan
-                </button>
-              )}
-            </div>
-          </section>
+            <PageBanner
+              title="Lapor Bug & Request Fitur"
+              description="Bantu kami meningkatkan IRMA Verse dengan masukan kamu."
+              icon={ClipboardList}
+              tag="Laporan"
+              tagIcon={ClipboardList}
+              action={
+                isAdmin && (
+                  <button
+                    onClick={() => router.push("/admin/feedback")}
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-white text-emerald-600 font-black text-sm border-2 border-white/80 shadow-[0_4px_0_0_#0f766e] hover:shadow-[0_2px_0_0_#0f766e] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all w-full max-w-60 md:w-auto mx-auto md:mx-0"
+                  >
+                    Lihat Semua Laporan
+                  </button>
+                )
+              }
+            />
 
           {role !== "user" && (
             <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-amber-800 font-bold">
@@ -230,7 +229,7 @@ export default function FeedbackPage() {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_6px_0_0_#e2e8f0] p-5 md:p-6">
+            <div className="lg:col-span-2 bg-white rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#e2e8f0] p-5 md:p-6">
               <h2 className="text-xl font-black text-slate-800 mb-4 flex items-center gap-2">
                 <ClipboardList className="h-5 w-5 text-teal-500" />
                 Form Laporan
@@ -364,7 +363,7 @@ export default function FeedbackPage() {
               </form>
             </div>
 
-            <div className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_6px_0_0_#e2e8f0] p-5 md:p-6 space-y-3 h-fit">
+            <div className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#e2e8f0] p-5 md:p-6 space-y-3 h-fit">
               <h3 className="font-black text-slate-800">Ringkasan Laporanmu</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border-2 border-slate-100 bg-slate-50 p-3">
@@ -403,17 +402,23 @@ export default function FeedbackPage() {
             </div>
           </div>
 
-          <section className="bg-white rounded-[2rem] border-2 border-slate-200 shadow-[0_6px_0_0_#e2e8f0] p-5 md:p-6">
+          <section className="bg-white rounded-4xl border-2 border-slate-200 shadow-[0_6px_0_0_#e2e8f0] p-5 md:p-6">
             <h2 className="text-xl font-black text-slate-800 mb-4">
               Riwayat Laporan
             </h2>
 
             {items.length === 0 ? (
-              <p className="text-slate-500 font-bold">
-                Belum ada laporan yang kamu kirim.
-              </p>
+              <div className="flex flex-col items-center justify-center py-16 px-4">
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 border-2 border-slate-200 shadow-[0_6px_0_0_#f1f5f9] flex items-center justify-center mb-5">
+                  <ClipboardList className="h-8 w-8 text-slate-300" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-black text-slate-800">Belum Ada Laporan</h3>
+                <p className="text-slate-500 font-bold max-w-xs mt-1 text-center text-sm">
+                  Kamu belum pernah mengirim laporan. Riwayat laporanmu akan muncul di sini.
+                </p>
+              </div>
             ) : (
-              <div className="space-y-4 max-h-[500px] md:max-h-[600px] overflow-y-auto pr-2 feedback-scrollbar">
+              <div className="space-y-4 max-h-125 md:max-h-150 overflow-y-auto pr-2 feedback-scrollbar">
                 {items.map((item) => {
                   const statusMeta = STATUS_META[item.status];
                   const StatusIcon = statusMeta.icon;
