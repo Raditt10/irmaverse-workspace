@@ -408,7 +408,7 @@ const ProgramDetail = () => {
                         className="flex items-center gap-2 px-4 py-2.5 bg-teal-500 text-white font-black text-sm rounded-2xl border-2 border-teal-600 shadow-[0_3px_0_0_#0f766e] hover:bg-teal-600 active:translate-y-0.5 active:shadow-none transition-all"
                       >
                         <ListChecks className="h-4 w-4" />
-                        Tambah Kajian
+                        Buat Kajian Baru
                       </button>
                     )}
                   </div>

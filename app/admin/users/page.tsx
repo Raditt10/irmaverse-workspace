@@ -236,7 +236,7 @@ export default function AdminUsersPage() {
           </div>
 
           {/* User List */}
-          <div className="bg-white rounded-[2.5rem] border-2 border-slate-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
             <div className="divide-y divide-slate-100">
               {filtered.length === 0 ? (
                 <div className="p-8">
@@ -247,48 +247,64 @@ export default function AdminUsersPage() {
                   />
                 </div>
               ) : (
-                filtered.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 md:p-5 hover:bg-slate-50/50 transition-colors group">
-                    <div className="flex items-center gap-4 min-w-0">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center overflow-hidden shrink-0">
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={user.name || ""} className="w-full h-full object-cover" />
-                        ) : (
-                          <UserCircle2 className="w-6 h-6 text-emerald-400" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="font-black text-slate-800 truncate text-sm md:text-base">{user.name || "—"}</h3>
-                        <p className="text-xs text-slate-400 font-bold truncate">{user.email}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          {getRoleBadge(user.jabatan)}
-                          <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                            <Zap className="h-3 w-3 text-emerald-400" />{user.points} XP
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                            <Star className="h-3 w-3 text-amber-400" />Lv.{user.level}
-                          </span>
+                filtered.map((user) => {
+                  const isNew = (new Date().getTime() - new Date(user.createdAt).getTime()) / (1000 * 60) <= 20;
+
+                  return (
+                    <div 
+                      key={user.id} 
+                      className={`flex items-center justify-between p-4 md:p-5 transition-colors group ${
+                        isNew ? 'bg-emerald-50/50 hover:bg-emerald-50/80 border-l-4 border-l-emerald-500' : 'hover:bg-slate-50 border-l-4 border-l-transparent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm relative">
+                          {user.avatar ? (
+                            <img src={user.avatar} alt={user.name || ""} className="w-full h-full object-cover" />
+                          ) : (
+                            <UserCircle2 className="w-6 h-6 text-emerald-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h3 className="font-bold text-slate-800 truncate text-sm md:text-base group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{user.name || "—"}</h3>
+                            {isNew && (
+                              <span className="px-2 py-0.5 bg-emerald-500 text-white rounded text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                <Zap className="w-2.5 h-2.5 fill-white" /> Baru Daftar
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-400 font-medium truncate mb-1.5 lowercase tracking-wide">{user.email}</p>
+                          <div className="flex items-center gap-2">
+                            {getRoleBadge(user.jabatan)}
+                            <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 uppercase">
+                              <Zap className="h-3 w-3 text-emerald-400" />{user.points} XP
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 uppercase">
+                              <Star className="h-3 w-3 text-amber-400" />Lv.{user.level}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => openEditModal(user)}
+                          className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 shadow-sm hover:shadow-[0_2px_0_0_#a7f3d0] active:shadow-none active:translate-y-0.5 transition-all"
+                          title="Edit"
+                        >
+                          <Edit3 className="h-4 w-4" strokeWidth={2.5} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(user)}
+                          className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-400 hover:border-red-300 hover:text-red-500 hover:bg-red-50 shadow-sm hover:shadow-[0_2px_0_0_#fecaca] active:shadow-none active:translate-y-0.5 transition-all"
+                          title="Hapus"
+                        >
+                          <Trash2 className="h-4 w-4" strokeWidth={2.5} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => openEditModal(user)}
-                        className="p-2.5 rounded-xl bg-white border-2 border-slate-200 text-slate-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 shadow-[0_2px_0_0_#e2e8f0] hover:shadow-[0_2px_0_0_#a7f3d0] active:shadow-none active:translate-y-0.5 transition-all"
-                        title="Edit"
-                      >
-                        <Edit3 className="h-4 w-4" strokeWidth={2.5} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(user)}
-                        className="p-2.5 rounded-xl bg-white border-2 border-slate-200 text-slate-400 hover:border-red-300 hover:text-red-500 hover:bg-red-50 shadow-[0_2px_0_0_#e2e8f0] hover:shadow-[0_2px_0_0_#fecaca] active:shadow-none active:translate-y-0.5 transition-all"
-                        title="Hapus"
-                      >
-                        <Trash2 className="h-4 w-4" strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

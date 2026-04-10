@@ -316,8 +316,8 @@ export default function Home() {
                 className="h-9 w-9 sm:h-12 sm:w-12 object-contain drop-shadow-md" 
               />
               <div>
-                <p className="text-[9px] sm:text-xs uppercase tracking-[0.15em] text-white/70 font-bold">Platform Rohis</p>
-                <h1 className="text-base sm:text-2xl font-extrabold leading-tight" style={{ textShadow: "2px 2px 0px rgba(0,0,0,0.1)" }}>IrmaVerse</h1>
+                <p className="text-[9px] sm:text-xs uppercase tracking-[0.15em] text-white/70 font-bold">Platform Rohis SMKN 13 Bandung</p>
+                <h1 className="text-base sm:text-2xl font-extrabold leading-tight" style={{ textShadow: "2px 2px 0px rgba(0,0,0,0.1)" }}>IRMAVerse</h1>
               </div>
             </div>
 
@@ -387,11 +387,11 @@ export default function Home() {
               <div className="bg-white border-[3px] border-emerald-200 rounded-2xl sm:rounded-3xl shadow-[5px_5px_0px_0px_rgba(0,0,0,0.12)] sm:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.15)] p-3 sm:p-4 max-w-60 sm:max-w-xs transform hover:scale-105 hover:-rotate-1 transition-all duration-300 cursor-pointer">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="p-1.5 sm:p-2 bg-slate-50 rounded-xl sm:rounded-2xl border-2 border-slate-100">
-                    <img src="/logo.webp" alt="Logo" className="h-8 sm:h-10 w-auto object-contain" />
+                    <img src="/logo13.webp" alt="Logo" className="h-8 sm:h-10 w-auto object-contain" />
                   </div>
                   <div>
-                    <p className="text-[9px] sm:text-[10px] font-extrabold text-emerald-600 uppercase tracking-tight">Platform Rohis</p>
-                    <p className="text-xs sm:text-sm font-bold text-slate-800">IrmaVerse</p>
+                    <p className="text-[9px] sm:text-[10px] font-extrabold text-emerald-600 uppercase tracking-tight">Aplikasi Dipelihara di</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-800">SMKN 13 Bandung</p>
                   </div>
                 </div>
               </div>

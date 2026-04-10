@@ -320,13 +320,18 @@ export default function AdminDashboard() {
 
               {/* Recent Users Section */}
               <section>
-                <div className="flex items-center gap-3 mb-6 px-2">
-                  <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
-                    <UserPlus className="w-5 h-5 text-slate-800" />
+                <div className="flex items-center justify-between mb-6 px-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white border-2 border-slate-200 rounded-xl shadow-[0_3px_0_0_#e2e8f0]">
+                      <UserPlus className="w-5 h-5 text-slate-800" />
+                    </div>
+                    <h2 className="text-xl font-black text-slate-800">
+                      Pendaftaran Anggota Terbaru
+                    </h2>
                   </div>
-                  <h2 className="text-xl font-black text-slate-800">
-                    Pendaftaran Anggota Terbaru
-                  </h2>
+                  <Link href="/admin/users" className="text-sm font-black text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+                    Lihat Semua <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
 
                 {!stats.recentUsers || stats.recentUsers.length === 0 ? (
