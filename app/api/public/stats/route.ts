@@ -19,6 +19,10 @@ export async function GET() {
     return NextResponse.json({
       totalMembers,
       totalInstructors
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
     });
   } catch (error) {
     console.error("Public Stats API Error:", error);

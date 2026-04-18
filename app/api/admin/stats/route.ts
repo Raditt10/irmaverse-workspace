@@ -11,6 +11,9 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
     const [
       totalUsers, 
       totalInstructors, 
@@ -77,6 +80,11 @@ export async function GET() {
         }
       }),
       prisma.news.findMany({
+        where: {
+          createdAt: {
+            gte: threeDaysAgo
+          }
+        },
         take: 2,
         orderBy: {
           createdAt: 'desc'

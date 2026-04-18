@@ -207,15 +207,17 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     }
   }, [socket, session?.user]);
 
-  // Update last seen every minute
+  // Update last seen every 5 minutes (only when tab is visible)
   useEffect(() => {
     if (!session?.user?.id) return;
     
     const interval = setInterval(() => {
-      updateLastSeen();
-      // Also update in database
-      fetch('/api/users/last-seen', { method: 'POST' }).catch(console.error);
-    }, 60000); // Every minute
+      // Only send if tab is active to avoid wasting requests on background tabs
+      if (document.visibilityState === 'visible') {
+        updateLastSeen();
+        fetch('/api/users/last-seen', { method: 'POST' }).catch(console.error);
+      }
+    }, 300000); // Every 5 minutes (was 60s)
 
     return () => clearInterval(interval);
   }, [session?.user?.id, updateLastSeen]);

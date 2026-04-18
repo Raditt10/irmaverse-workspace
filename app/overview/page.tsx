@@ -152,187 +152,22 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Load instructors, favorites, materials, and attendance
-        const [
-          instructorsRes,
-          favoritesRes,
-          materialsRes,
-          attendanceRes,
-          newsRes,
-          quizRes,
-          gamRes,
-        ] = await Promise.all([
-          fetch("/api/instructors"),
-          fetch("/api/instructors/favorites"),
-          fetch("/api/materials"),
-          fetch("/api/materials/attendance"),
-          fetch("/api/news"),
-          fetch("/api/quiz"),
-          fetch("/api/users/gamification"),
-        ]);
-
-        // Gamification data for level card
-        if (gamRes.ok) {
-          const gamData = await gamRes.json();
-          setLevelData({
-            level: gamData.stats?.level || 1,
-            levelTitle: gamData.xpProgress?.levelTitle || "Pemula",
-            points: gamData.stats?.points || 0,
-            currentLevelXp: gamData.xpProgress?.currentLevelXp || 0,
-            nextLevelXp: gamData.xpProgress?.nextLevelXp || 100,
-            progressPercent: gamData.xpProgress?.progressPercent || 0,
+        const res = await fetch("/api/dashboard");
+        if (res.ok) {
+          const data = await res.json();
+          setLevelData(data.levelData);
+          setFavoriteInstructors(data.favoriteInstructors || []);
+          setMaterials(data.materials || []);
+          setTodayMaterials(data.todayMaterials || []);
+          setFinishedMaterials(data.finishedMaterials || []);
+          setDynamicStats(data.dynamicStats || {
+            totalAttended: 0,
+            quizCompleted: 0,
+            quizPending: 0,
+            avgScore: 0,
           });
-        }
-
-        if (instructorsRes.ok) {
-          const data = await instructorsRes.json();
-          let favoriteIds: string[] = [];
-          if (favoritesRes.ok) {
-            const favData = await favoritesRes.json();
-            favoriteIds = Array.isArray(favData.favoriteIds)
-              ? favData.favoriteIds.map((id: any) => String(id))
-              : [];
-          }
-          const favorites = data.filter((instructor: any) =>
-            favoriteIds.includes(String(instructor.id)),
-          );
-          setFavoriteInstructors(favorites);
-        }
-
-        let allMaterialsData: any[] = [];
-        if (materialsRes.ok) {
-          allMaterialsData = await materialsRes.json();
-          setMaterials(allMaterialsData.slice(0, 5));
-
-          // Find today's kajian (materials scheduled for today that user has joined)
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const todayEnd = new Date(today);
-          todayEnd.setHours(23, 59, 59, 999);
-          const todayKajian = allMaterialsData.filter((m: any) => {
-            const mDate = new Date(m.date);
-            return mDate >= today && mDate <= todayEnd && m.isJoined;
-          });
-          setTodayMaterials(todayKajian);
-          setLoadingToday(false);
-        } else {
-          setLoadingToday(false);
-        }
-
-        if (attendanceRes.ok) {
-          const aData = await attendanceRes.json();
-          // Filter: only materials that have passed their date (status complete)
-          // and have an attendance record (can see recap)
-          const finished = Array.isArray(aData)
-            ? aData.sort(
-                (a: any, b: any) =>
-                  new Date(b.attendedAt).getTime() -
-                  new Date(a.attendedAt).getTime(),
-              )
-            : [];
-
-          // Get rekapan for the attended materials. We only need max 2 real rekapans.
-          const enrichedFinished: any[] = [];
-          for (const att of finished) {
-            if (enrichedFinished.length >= 2) break;
-            try {
-              const recRes = await fetch(
-                `/api/materials/${att.materialId}/rekapan`,
-              );
-              if (recRes.ok) {
-                const recData = await recRes.json();
-                const mDataRef = materialsRes.ok
-                  ? allMaterialsData.find((m: any) => m.id === att.materialId)
-                  : null;
-
-                let plainText = "";
-                if (recData.content) {
-                  plainText = recData.content
-                    .replace(/<[^>]*>?/gm, "")
-                    .substring(0, 120);
-                  if (recData.content.length > 120) plainText += "...";
-                }
-
-                enrichedFinished.push({
-                  ...att,
-                  grade: mDataRef?.grade || "KELAS 10",
-                  category: mDataRef?.category || "PROGRAM WAJIB",
-                  materialTitle:
-                    mDataRef?.title || att.materialTitle || "Kajian",
-                  instructorName:
-                    mDataRef?.instructor || att.instructorName || "TBA",
-                  contentPreview: plainText,
-                  link: recData.attachmentUrl || "",
-                });
-              }
-            } catch (e) {
-              console.error(
-                "Error fetching rekapan for material",
-                att.materialId,
-                e,
-              );
-            }
-          }
-
-          setFinishedMaterials(enrichedFinished);
-
-          if (quizRes.ok) {
-            const quizData = await quizRes.json();
-            const attendedMaterialIds = finished.map(
-              (att: any) => att.materialId,
-            );
-
-            const allQuizzes = Array.isArray(quizData) ? quizData : [];
-            const completedQuizzes = allQuizzes.filter(
-              (q: any) => q.lastAttempt,
-            );
-            const pendingQuizzes = allQuizzes.filter(
-              (q: any) =>
-                !q.lastAttempt &&
-                !q.isStandalone &&
-                attendedMaterialIds.includes(q.materialId),
-            );
-
-            // Compute average score from completed quizzes
-            let avgScore = 0;
-            if (completedQuizzes.length > 0) {
-              const totalPct = completedQuizzes.reduce(
-                (sum: number, q: any) => {
-                  const pct =
-                    q.lastAttempt.totalScore > 0
-                      ? Math.round(
-                          (q.lastAttempt.score / q.lastAttempt.totalScore) *
-                            100,
-                        )
-                      : 0;
-                  return sum + pct;
-                },
-                0,
-              );
-              avgScore = Math.round(totalPct / completedQuizzes.length);
-            }
-
-            setDynamicStats({
-              totalAttended: finished.length,
-              quizCompleted: completedQuizzes.length,
-              quizPending: pendingQuizzes.length,
-              avgScore,
-            });
-
-            setUpcomingQuizzes(pendingQuizzes.slice(0, 3));
-          }
-        }
-
-        if (newsRes.ok) {
-          const nData = await newsRes.json();
-          const sortedNews = Array.isArray(nData)
-            ? nData.sort(
-                (a: any, b: any) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime(),
-              )
-            : [];
-          setLatestNews(sortedNews.slice(0, 2));
+          setUpcomingQuizzes(data.upcomingQuizzes || []);
+          setLatestNews(data.latestNews || []);
         }
       } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -342,6 +177,7 @@ const Dashboard = () => {
         setLoadingFinished(false);
         setLoadingNews(false);
         setLoadingQuizzes(false);
+        setLoadingToday(false);
       }
     };
 
@@ -605,10 +441,10 @@ const Dashboard = () => {
                             <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide border bg-emerald-100 text-emerald-700 border-emerald-300 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               {material.startedAt ||
-                                new Date(material.date).toLocaleTimeString(
+                                (material.date ? new Date(material.date).toLocaleTimeString(
                                   "id-ID",
                                   { hour: "2-digit", minute: "2-digit" },
-                                )}
+                                ) : "TBA")}
                             </span>
                             <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide border bg-emerald-50 text-emerald-600 border-emerald-200">
                               {material.category}
@@ -706,14 +542,14 @@ const Dashboard = () => {
                           </h3>
                           <span className="text-xs text-slate-400 font-bold flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5" />{" "}
-                            {new Date(news.createdAt).toLocaleDateString(
+                            {news.createdAt ? new Date(news.createdAt).toLocaleDateString(
                               "id-ID",
                               {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                               },
-                            )}
+                            ) : "Tanggal tidak tersedia"}
                           </span>
                         </div>
                       </Link>
@@ -793,18 +629,18 @@ const Dashboard = () => {
                           <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-400">
                             <div className="flex items-center gap-1.5">
                               <User className="h-3.5 w-3.5" />
-                              {material.instructorName || "Instruktur"}
+                              {material.instructor || "Instruktur"}
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5" />
-                              {new Date(material.attendedAt).toLocaleDateString(
+                              {material.attendedAt ? new Date(material.attendedAt).toLocaleDateString(
                                 "id-ID",
                                 {
                                   day: "numeric",
                                   month: "long",
                                   year: "numeric",
                                 },
-                              )}
+                              ) : "Tanggal tidak tersedia"}
                             </div>
                           </div>
                         </div>
@@ -1093,17 +929,17 @@ const Dashboard = () => {
 
                           <div className="flex items-center justify-between">
                             <p className="text-[10px] text-slate-400 font-bold tracking-tight">
-                              {item.instructorName ||
+                              {item.instructor ||
                                 item.material?.instructor ||
                                 "Instruktur"}
                             </p>
                             <p className="text-[9px] text-slate-300 font-black uppercase tracking-widest pl-2">
-                              {new Date(
+                              {(item.createdAt || item.attendedAt) ? new Date(
                                 item.createdAt || item.attendedAt,
                               ).toLocaleDateString("id-ID", {
                                 day: "numeric",
                                 month: "short",
-                              })}
+                              }) : "TBA"}
                             </p>
                           </div>
                         </div>

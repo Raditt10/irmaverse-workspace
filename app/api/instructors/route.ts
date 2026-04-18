@@ -54,7 +54,11 @@ export async function GET() {
       })
     );
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch instructors" }, { status: 500 });
   }

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Comic_Neue } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
-import { SocketProvider } from "@/lib/socket";
-import { NotificationProvider } from "@/lib/notification-provider";
 import { ConfirmProvider } from "@/lib/confirm-provider";
+import AuthenticatedProviders from "@/components/ui/AuthenticatedProviders";
 import PageTransitionProvider from "@/components/ui/PageTransitionProvider";
 import { Suspense } from "react";
 
@@ -26,7 +25,7 @@ const comicNeue = Comic_Neue({
 });
 
 export const metadata: Metadata = {
-  title: "IrmaVerse",
+  title: "IRMAVerse",
   description: "Platform pembelajaran Islam interaktif untuk generasi muda",
 };
 
@@ -41,16 +40,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} antialiased`}
       >
         <SessionProvider>
-          <SocketProvider>
+          <AuthenticatedProviders>
             <ConfirmProvider>
-              <NotificationProvider>
-                <Suspense fallback={null}>
-                  <PageTransitionProvider />
-                </Suspense>
-                {children}
-              </NotificationProvider>
+              <Suspense fallback={null}>
+                <PageTransitionProvider />
+              </Suspense>
+              {children}
             </ConfirmProvider>
-          </SocketProvider>
+          </AuthenticatedProviders>
         </SessionProvider>
       </body>
     </html>

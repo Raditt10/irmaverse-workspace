@@ -122,51 +122,22 @@ const Profile = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const [gamRes, actRes, badgeRes, progRes] = await Promise.all([
-        fetch("/api/users/gamification"),
-        fetch("/api/activities?limit=8"),
-        fetch("/api/badges"),
-        fetch("/api/programs/enrolled"),
-      ]);
-
-      if (gamRes.ok) {
-        const data = await gamRes.json();
-        setGamification(data);
-      }
-      if (actRes.ok) {
-        const data = await actRes.json();
+      const res = await fetch("/api/profile/summary");
+      if (res.ok) {
+        const data = await res.json();
+        setGamification(data.gamification || null);
         setActivities(data.activities || []);
-      }
-      if (badgeRes.ok) {
-        const data = await badgeRes.json();
-        setBadges(data.badges || []);
-      }
-      if (progRes.ok) {
-        const data = await progRes.json();
+        setBadges(data.badges?.badges || []);
         setPrograms(data.enrollments || []);
-      }
-
-      // If instructor, fetch academy activities as well
-      if (session?.user?.role === "instruktur") {
-        const acadRes = await fetch("/api/academy/overview");
-        if (acadRes.ok) {
-          const acadData = await acadRes.json();
-          setInstructorStats(acadData.stats);
-          if (acadData.recentActivities) {
-            // Map academy activity to match the display needs
-            const mappedActivities = acadData.recentActivities.map((act: any) => ({
-              id: act.id,
-              type: act.type,
-              title: act.title,
-              time: act.time, // formatted string like "5 menit yang lalu"
-              createdAt: new Date().toISOString() // fallback for formatDate if needed
-            }));
-            setActivities(mappedActivities);
+        
+        // If instructor, also apply academy stats and overwrite recent activities
+        if (session?.user?.role === "instruktur" && data.academyData) {
+          setInstructorStats(data.academyData.stats);
+          if (data.academyData.recentActivities) {
+            setActivities(data.academyData.recentActivities);
           }
         }
       }
-      
-
     } catch (err) {
       console.error("Error loading profile data:", err);
     } finally {

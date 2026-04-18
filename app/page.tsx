@@ -212,29 +212,39 @@ export default function Home() {
   const [userLocation, setUserLocation] = useState<string>("Lokasi tidak diketahui");
   
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const { latitude, longitude } = pos.coords;
-          try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            );
-            const data = await res.json();
-            setUserLocation(
-              data.address.city ||
-                data.address.town ||
-                data.address.village ||
-                data.address.state ||
-                data.display_name ||
-                "Lokasi ditemukan"
-            );
-          } catch {
-            setUserLocation("Lokasi ditemukan");
-          }
-        },
-        () => setUserLocation("Lokasi tidak diketahui")
-      );
+    // Lazy load geolocation — don't block initial render
+    const loadGeolocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const { latitude, longitude } = pos.coords;
+            try {
+              const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              );
+              const data = await res.json();
+              setUserLocation(
+                data.address.city ||
+                  data.address.town ||
+                  data.address.village ||
+                  data.address.state ||
+                  data.display_name ||
+                  "Lokasi ditemukan"
+              );
+            } catch {
+              setUserLocation("Lokasi ditemukan");
+            }
+          },
+          () => setUserLocation("Lokasi tidak diketahui")
+        );
+      }
+    };
+
+    // Use requestIdleCallback if available, otherwise defer with setTimeout
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(loadGeolocation);
+    } else {
+      setTimeout(loadGeolocation, 2000);
     }
   }, []);
 

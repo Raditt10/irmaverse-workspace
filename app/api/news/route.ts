@@ -160,7 +160,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json(mappedNews);
+    return NextResponse.json(mappedNews, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      },
+    });
   } catch (error: any) {
     console.error("DEBUG: Error fetching news:", error);
     return NextResponse.json(
