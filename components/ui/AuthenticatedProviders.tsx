@@ -13,17 +13,18 @@ import { NotificationProvider } from "@/lib/notification-provider";
 export default function AuthenticatedProviders({ children }: { children: ReactNode }) {
   const { status } = useSession();
 
-  // Only load Socket + Notification providers when user is authenticated
-  if (status === "authenticated") {
-    return (
-      <SocketProvider>
-        <NotificationProvider>
-          {children}
-        </NotificationProvider>
-      </SocketProvider>
-    );
+  // Only skip Socket + Notification providers when user is explicitly unauthenticated
+  if (status === "unauthenticated") {
+    // Guest — render children without socket/notification overhead
+    return <>{children}</>;
   }
 
-  // Guest / loading — render children without socket/notification overhead
-  return <>{children}</>;
+  // Loading or authenticated
+  return (
+    <SocketProvider>
+      <NotificationProvider>
+        {children}
+      </NotificationProvider>
+    </SocketProvider>
+  );
 }
