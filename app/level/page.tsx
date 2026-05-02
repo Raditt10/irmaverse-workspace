@@ -469,7 +469,7 @@ export default async function LevelPage() {
             {/* LEFT col */}
             <div className="lg:col-span-2 space-y-6">
               {/* Activity Log — grouped by day */}
-              <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
+              <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1] flex flex-col">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
                     <Activity className="h-5 w-5 text-emerald-600" />
@@ -484,70 +484,72 @@ export default async function LevelPage() {
                   </div>
                 </div>
 
-                {activities.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-50 border-2 border-slate-100 mb-3 text-slate-300">
-                      <Inbox className="h-8 w-8" />
-                    </div>
-                    <p className="font-bold text-slate-500">
-                      Belum ada aktivitas
-                    </p>
-                    <p className="text-sm text-slate-400 mt-1">
-                      Ikuti quiz atau program untuk mendapat XP!
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {grouped.map((group) => (
-                      <div key={group.label}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="h-px flex-1 bg-slate-100" />
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2">
-                            {group.label}
-                          </span>
-                          <div className="h-px flex-1 bg-slate-100" />
-                        </div>
-                        <div className="space-y-1">
-                          {group.items.map((a) => {
-                            const cfg = getActivityConfig(a.type);
-                            return (
-                              <div
-                                key={a.id}
-                                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
-                              >
-                                <div
-                                  className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}
-                                >
-                                  {cfg.icon}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-bold text-slate-700 text-sm truncate">
-                                    {a.title}
-                                  </p>
-                                  <p className="text-[11px] text-slate-400 font-medium">
-                                    {formatRelativeTime(a.createdAt)}
-                                  </p>
-                                </div>
-                                {a.xpEarned > 0 && (
-                                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0">
-                                    <Zap className="h-3 w-3 text-emerald-500" />
-                                    <span className="text-xs font-black text-emerald-600">
-                                      +{a.xpEarned}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
+                <div className="min-h-0 max-h-[min(420px,55vh)] md:max-h-[min(520px,60vh)] overflow-y-auto overscroll-contain pr-2 -mr-2">
+                  {activities.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-50 border-2 border-slate-100 mb-3 text-slate-300">
+                        <Inbox className="h-8 w-8" />
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <p className="font-bold text-slate-500">
+                        Belum ada aktivitas
+                      </p>
+                      <p className="text-sm text-slate-400 mt-1">
+                        Ikuti quiz atau program untuk mendapat XP!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {grouped.map((group) => (
+                        <div key={group.label}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="h-px flex-1 bg-slate-100" />
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider px-2">
+                              {group.label}
+                            </span>
+                            <div className="h-px flex-1 bg-slate-100" />
+                          </div>
+                          <div className="space-y-1">
+                            {group.items.map((a) => {
+                              const cfg = getActivityConfig(a.type);
+                              return (
+                                <div
+                                  key={a.id}
+                                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                                >
+                                  <div
+                                    className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}
+                                  >
+                                    {cfg.icon}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-bold text-slate-700 text-sm truncate">
+                                      {a.title}
+                                    </p>
+                                    <p className="text-[11px] text-slate-400 font-medium">
+                                      {formatRelativeTime(a.createdAt)}
+                                    </p>
+                                  </div>
+                                  {a.xpEarned > 0 && (
+                                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 flex-shrink-0">
+                                      <Zap className="h-3 w-3 text-emerald-500" />
+                                      <span className="text-xs font-black text-emerald-600">
+                                        +{a.xpEarned}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Level Roadmap */}
-              <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1]">
+              <div className="bg-white border-2 border-slate-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#cbd5e1] flex flex-col">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
                     <Trophy className="h-5 w-5 text-emerald-600" />
@@ -562,7 +564,7 @@ export default async function LevelPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="min-h-0 max-h-[min(420px,55vh)] md:max-h-[min(520px,60vh)] overflow-y-auto overscroll-contain pr-2 -mr-2 space-y-2">
                   {LEVEL_MILESTONES.map((m, i) => {
                     const isReached = user.level >= m.level;
                     const isCurrent = currentMilestone.level === m.level;
