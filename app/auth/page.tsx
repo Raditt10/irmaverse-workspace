@@ -15,6 +15,64 @@ import {
 } from "lucide-react";
 import BackButton from "@/components/ui/BackButton";
 
+// --- SUB-COMPONENT: Autofill Guard Input ---
+const AutofillGuardInput = ({
+  className,
+  onFocus,
+  onPointerDown,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) => {
+  const [locked, setLocked] = useState(true);
+  const inputRef = useState<{ current: HTMLInputElement | null }>({
+    current: null,
+  })[0];
+
+  useEffect(() => {
+    // Wipe injected values that some password managers apply without firing onChange
+    const timeouts: number[] = [];
+    const wipe = () => {
+      const el = inputRef.current;
+      if (!el) return;
+      if (document.activeElement === el) return;
+      if (!locked) return;
+      if (el.value !== "") el.value = "";
+    };
+    wipe();
+    timeouts.push(window.setTimeout(wipe, 50));
+    timeouts.push(window.setTimeout(wipe, 150));
+    timeouts.push(window.setTimeout(wipe, 400));
+    timeouts.push(window.setTimeout(wipe, 800));
+    return () => timeouts.forEach((t) => window.clearTimeout(t));
+  }, [locked, inputRef]);
+
+  return (
+    <input
+      {...props}
+      ref={(el) => {
+        inputRef.current = el;
+      }}
+      readOnly={locked}
+      onFocus={(e) => {
+        setLocked(false);
+        onFocus?.(e);
+      }}
+      onPointerDown={(e) => {
+        setLocked(false);
+        onPointerDown?.(e);
+      }}
+      autoComplete="new-password"
+      data-lpignore="true"
+      data-1p-ignore="true"
+      data-bwignore="true"
+      data-form-type="other"
+      autoCapitalize="none"
+      autoCorrect="off"
+      spellCheck={false}
+      className={className}
+    />
+  );
+};
+
 // --- SUB-COMPONENT: Password Input ---
 const PasswordInput = ({
   id,
@@ -24,6 +82,7 @@ const PasswordInput = ({
   minLength = 0,
 }: any) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [locked, setLocked] = useState(true);
 
   return (
     <div className="relative group">
@@ -34,6 +93,14 @@ const PasswordInput = ({
         placeholder={placeholder}
         required={required}
         minLength={minLength}
+        readOnly={locked}
+        onFocus={() => setLocked(false)}
+        onPointerDown={() => setLocked(false)}
+        autoComplete="new-password"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        data-bwignore="true"
+        data-form-type="other"
         className="w-full py-4 px-5 pr-12 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:outline-none focus:shadow-[0_4px_0_0_#10b981] transition-all font-bold text-slate-700 placeholder:font-medium placeholder:text-slate-400"
       />
       <button
@@ -226,7 +293,16 @@ const Auth = () => {
                   value="signin"
                   className="animate-in fade-in-50 zoom-in-95 duration-300 focus-visible:outline-none"
                 >
-                  <form onSubmit={handleSignIn} className="space-y-5">
+                  <form onSubmit={handleSignIn} className="space-y-5" autoComplete="off">
+                    {/* Decoy fields to absorb aggressive autofill */}
+                    <div className="hidden" aria-hidden="true">
+                      <input type="text" name="username" autoComplete="username" />
+                      <input
+                        type="password"
+                        name="password"
+                        autoComplete="current-password"
+                      />
+                    </div>
                     {error && (
                       <div className="rounded-2xl bg-red-50 p-4 border-2 border-red-100 flex items-start gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 shrink-0" />
@@ -251,7 +327,7 @@ const Auth = () => {
                       >
                         Email
                       </label>
-                      <input
+                      <AutofillGuardInput
                         id="signin-email"
                         name="signin-email"
                         type="email"
@@ -308,11 +384,11 @@ const Auth = () => {
 
                     {/* Divider */}
                     <div className="flex items-center gap-3 mt-1">
-                      <div className="flex-1 h-[2px] bg-slate-200 rounded-full"></div>
+                      <div className="flex-1 h-0.5 bg-slate-200 rounded-full"></div>
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                         atau
                       </span>
-                      <div className="flex-1 h-[2px] bg-slate-200 rounded-full"></div>
+                      <div className="flex-1 h-0.5 bg-slate-200 rounded-full"></div>
                     </div>
 
                     {/* Google Button */}
@@ -360,7 +436,16 @@ const Auth = () => {
                   value="signup"
                   className="animate-in fade-in-50 zoom-in-95 duration-300 focus-visible:outline-none"
                 >
-                  <form onSubmit={handleSignUp} className="space-y-5">
+                  <form onSubmit={handleSignUp} className="space-y-5" autoComplete="off">
+                    {/* Decoy fields to absorb aggressive autofill */}
+                    <div className="hidden" aria-hidden="true">
+                      <input type="text" name="username" autoComplete="username" />
+                      <input
+                        type="password"
+                        name="password"
+                        autoComplete="new-password"
+                      />
+                    </div>
                     {error && (
                       <div className="rounded-2xl bg-red-50 p-4 border-2 border-red-100 flex items-start gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 shrink-0" />
@@ -377,7 +462,7 @@ const Auth = () => {
                       >
                         Nama Lengkap
                       </label>
-                      <input
+                      <AutofillGuardInput
                         id="full-name"
                         name="full-name"
                         type="text"
@@ -394,7 +479,7 @@ const Auth = () => {
                       >
                         Email
                       </label>
-                      <input
+                      <AutofillGuardInput
                         id="signup-email"
                         name="signup-email"
                         type="email"
@@ -460,11 +545,11 @@ const Auth = () => {
 
                     {/* Divider */}
                     <div className="flex items-center gap-3 mt-1">
-                      <div className="flex-1 h-[2px] bg-slate-200 rounded-full"></div>
+                      <div className="flex-1 h-0.5 bg-slate-200 rounded-full"></div>
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                         atau
                       </span>
-                      <div className="flex-1 h-[2px] bg-slate-200 rounded-full"></div>
+                      <div className="flex-1 h-0.5 bg-slate-200 rounded-full"></div>
                     </div>
 
                     {/* Google Button */}

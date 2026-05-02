@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   Search, 
   X, 
@@ -70,12 +70,15 @@ export default function SearchBar({
   className = ""
 }: SearchBarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputLocked, setInputLocked] = useState(true);
 
   const isExpanded = controlledIsExpanded ?? internalIsExpanded;
 
@@ -116,7 +119,60 @@ export default function SearchBar({
     []
   );
 
+  useEffect(() => {
+    // Clear search state on navigation so header search doesn't persist/open on new pages
+    setQuery("");
+    setResults([]);
+    setIsOpen(false);
+    setIsLoading(false);
+
+    // Lock input to avoid browser/password manager autofill on sensitive pages (e.g. Settings)
+    setInputLocked(true);
+
+    if (isCollapsible) {
+      toggleExpand(false);
+    }
+
+    // Cancel any in-flight debounced search that might open results after navigation
+    (performSearch as any).cancel?.();
+
+    // Some browsers can inject value into input without firing onChange.
+    // Re-assert the controlled empty value a few times after navigation.
+    const timeouts: number[] = [];
+    const wipe = () => {
+      const el = inputRef.current;
+      if (!el) return;
+      if (document.activeElement === el) return;
+      if (el.value !== "") {
+        el.value = "";
+      }
+    };
+
+    // Immediate + a few delayed wipes to catch late autofill
+    wipe();
+    timeouts.push(window.setTimeout(wipe, 50));
+    timeouts.push(window.setTimeout(wipe, 150));
+    timeouts.push(window.setTimeout(wipe, 400));
+    timeouts.push(window.setTimeout(wipe, 800));
+
+    return () => {
+      timeouts.forEach((t) => window.clearTimeout(t));
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    return () => {
+      (performSearch as any).cancel?.();
+    };
+  }, [performSearch]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Prevent unexpected autofill (often triggered on pages with password fields, e.g. Settings)
+    // If the input isn't focused, ignore and let controlled value clear any injected text.
+    if (inputRef.current && document.activeElement !== inputRef.current) {
+      return;
+    }
+
     const value = e.target.value;
     setQuery(value);
     if (value.length >= 2) {
@@ -234,9 +290,23 @@ export default function SearchBar({
           </div>
           
           <input
+            ref={inputRef}
             type="text"
             value={query}
             autoFocus={isCollapsible}
+            name="irmaverse_search"
+            autoComplete="new-password"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-bwignore="true"
+            data-form-type="other"
+            inputMode="search"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            readOnly={inputLocked}
+            onFocus={() => setInputLocked(false)}
+            onPointerDown={() => setInputLocked(false)}
             onChange={handleInputChange}
             placeholder={placeholder || (limitTypes?.includes("news") ? "Cari berita & kegiatan..." : "Cari di IRMA Verse...")}
             className="w-full pl-15 pr-12 py-3.5 rounded-2xl border-2 border-slate-200 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:bg-white focus:shadow-[0_4px_12px_rgba(52,211,153,0.15)] transition-all font-bold text-sm"

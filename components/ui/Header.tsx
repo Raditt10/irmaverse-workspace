@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Bell,
@@ -41,12 +41,18 @@ import {
 
 export default function DashboardHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
   const [respondingId, setRespondingId] = useState<string | null>(null);
   const [decliningId, setDecliningId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const lastNavAtRef = useRef<number>(Date.now());
+  const togglePointerRef = useRef<{
+    x: number;
+    y: number;
+    t: number;
+  } | null>(null);
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -136,27 +142,11 @@ export default function DashboardHeader() {
     }
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartY(e.touches[0].clientY);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY === null) return;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchEndY - touchStartY;
-    
-    // Threshold for swipe detection (e.g., 30px)
-    if (Math.abs(deltaY) > 30) {
-      if (deltaY > 0 && !isSearchOpen) {
-        // Swipe down -> Open
-        setIsSearchOpen(true);
-      } else if (deltaY < 0 && isSearchOpen) {
-        // Swipe up -> Close
-        setIsSearchOpen(false);
-      }
-    }
-    setTouchStartY(null);
-  };
+  useEffect(() => {
+    // Always close mobile search on route change
+    setIsSearchOpen(false);
+    lastNavAtRef.current = Date.now();
+  }, [pathname]);
 
   const getNotificationIcon = (notif: NotificationData) => {
     if (notif.type === "invitation")
@@ -226,7 +216,7 @@ export default function DashboardHeader() {
               className="h-8 w-8 sm:h-10 sm:w-10 object-contain shrink-0"
             />
 
-            <div className="min-w-0 max-w-[120px] sm:max-w-none flex flex-col items-start text-left">
+            <div className="min-w-0 max-w-30 sm:max-w-none flex flex-col items-start text-left">
               <h2 className="text-sm sm:text-lg font-black text-emerald-600 leading-tight tracking-tight truncate w-full">
                 IRMA VERSE
               </h2>
@@ -658,10 +648,31 @@ export default function DashboardHeader() {
 
         {/* Slide Handle Toggle (Mobile Only) */}
         <button
-          onClick={() => setIsSearchOpen(!isSearchOpen)}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          className="md:hidden absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[calc(100%-2px)] h-8 w-14 bg-white border-2 border-t-0 border-slate-200 rounded-b-2xl shadow-[0_8px_15px_-5px_rgba(0,0,0,0.1)] hover:bg-slate-50 transition-all flex flex-col items-center justify-center group z-50 pointer-events-auto touch-none"
+          onPointerDown={(e) => {
+            togglePointerRef.current = {
+              x: e.clientX,
+              y: e.clientY,
+              t: Date.now(),
+            };
+          }}
+          onPointerUp={(e) => {
+            const start = togglePointerRef.current;
+            togglePointerRef.current = null;
+            if (!start) return;
+
+            // Guard: ignore accidental tap immediately after navigation
+            if (Date.now() - lastNavAtRef.current < 250) return;
+
+            const dx = Math.abs(e.clientX - start.x);
+            const dy = Math.abs(e.clientY - start.y);
+            const dt = Date.now() - start.t;
+
+            // Only toggle on deliberate tap (not scroll)
+            if (dx <= 8 && dy <= 8 && dt <= 350) {
+              setIsSearchOpen((prev) => !prev);
+            }
+          }}
+          className="md:hidden absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[calc(100%-2px)] h-8 w-14 bg-white border-2 border-t-0 border-slate-200 rounded-b-2xl shadow-[0_8px_15px_-5px_rgba(0,0,0,0.1)] hover:bg-slate-50 transition-all flex flex-col items-center justify-center group z-50 pointer-events-auto touch-pan-y"
           aria-label={isSearchOpen ? "Tutup pencarian" : "Buka pencarian"}
         >
           {/* Subtle handle line */}
