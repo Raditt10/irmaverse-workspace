@@ -16,10 +16,39 @@ export default function DatePicker({
   label = "Tanggal",
   placeholder = "Pilih tanggal",
 }: DatePickerProps) {
+  const pad2 = (n: number) => String(n).padStart(2, "0");
+
+  const formatDateOnlyLocal = (date: Date) => {
+    // Format as YYYY-MM-DD in local time (avoid UTC shifting from toISOString)
+    const y = date.getFullYear();
+    const m = pad2(date.getMonth() + 1);
+    const d = pad2(date.getDate());
+    return `${y}-${m}-${d}`;
+  };
+
+  const parseValueToDate = (dateString: string): Date | null => {
+    if (!dateString) return null;
+
+    // If has time component, rely on native Date parsing
+    if (dateString.includes("T")) {
+      const dt = new Date(dateString);
+      return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    // Date-only string like YYYY-MM-DD should be treated as local date
+    const m = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return null;
+    const y = Number(m[1]);
+    const mo = Number(m[2]);
+    const d = Number(m[3]);
+    const dt = new Date(y, mo - 1, d);
+    return isNaN(dt.getTime()) ? null : dt;
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(() => {
-    const d = value ? new Date(value) : new Date();
-    return isNaN(d.getTime()) ? new Date() : d;
+    const parsed = value ? parseValueToDate(value) : null;
+    return parsed ?? new Date();
   });
 
   const monthNames = [
@@ -65,7 +94,7 @@ export default function DatePicker({
       currentMonth.getMonth(),
       day,
     );
-    const dateString = selectedDate.toISOString().split("T")[0];
+    const dateString = formatDateOnlyLocal(selectedDate);
     onChange?.(dateString);
     setIsOpen(false);
   };
@@ -73,16 +102,10 @@ export default function DatePicker({
   const formatDisplayDate = (dateString: string) => {
     if (!dateString) return placeholder;
 
-    // Validasi apakah string sudah memiliki format waktu (ISO)
-    const hasTime = dateString.includes("T");
-    const date = new Date(hasTime ? dateString : dateString + "T00:00:00");
+    const date = parseValueToDate(dateString);
+    if (!date) return placeholder;
 
-    if (isNaN(date.getTime())) return placeholder;
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()}`;
   };
 
   const daysInMonth = getDaysInMonth(currentMonth);
@@ -108,9 +131,8 @@ export default function DatePicker({
 
   const isSelected = (day: number) => {
     if (!value || !day) return false;
-    const hasTime = value.includes("T");
-    const date = new Date(hasTime ? value : value + "T00:00:00");
-    if (isNaN(date.getTime())) return false;
+    const date = parseValueToDate(value);
+    if (!date) return false;
     return (
       day === date.getDate() &&
       currentMonth.getMonth() === date.getMonth() &&
@@ -129,7 +151,7 @@ export default function DatePicker({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 rounded-2xl border-2 border-slate-300 bg-white text-slate-700 font-bold flex items-center justify-between gap-2 shadow-[0_4px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_4px_0_0_#14b8a6] transition-all active:translate-y-[2px] active:shadow-none"
+        className="w-full px-4 py-3 rounded-2xl border-2 border-slate-300 bg-white text-slate-700 font-bold flex items-center justify-between gap-2 shadow-[0_4px_0_0_#cbd5e1] hover:border-teal-400 hover:shadow-[0_4px_0_0_#14b8a6] transition-all active:translate-y-0.5 active:shadow-none"
       >
         <span className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-teal-500" />
@@ -207,7 +229,7 @@ export default function DatePicker({
 
           {/* Selected date display */}
           {value && (
-            <div className="text-center p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border-2 border-teal-200 mb-4">
+            <div className="text-center p-3 bg-linear-to-r from-teal-50 to-cyan-50 rounded-2xl border-2 border-teal-200 mb-4">
               <div className="text-xs text-slate-500 font-bold mb-1">
                 Tanggal Dipilih
               </div>
